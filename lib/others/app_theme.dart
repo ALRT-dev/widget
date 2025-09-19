@@ -1,0 +1,249 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/others/app_colors.dart';
+
+class AppTheme {
+  static String? get defaultFontFamily => 'Poppins';
+
+  /// The default theme settings of the app.
+  static ThemeData get _defaultTheme {
+    return ThemeData(
+      scaffoldBackgroundColor: AppColors.white,
+      fontFamily: defaultFontFamily,
+      splashColor: AppColors.primary.withValues(alpha: 0.1),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          padding: EdgeInsets.all(15.spMin),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100.spMin),
+          ),
+          elevation: 0.0,
+          disabledBackgroundColor: AppColors.lightGrey,
+          disabledForegroundColor: AppColors.grey,
+          foregroundColor: AppColors.white,
+          textStyle: TextStyle(
+            fontSize: 16.spMin,
+            fontWeight: FontWeight.w600,
+            height: 0.0,
+            fontFamily: defaultFontFamily,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.all(15.spMin),
+          side: const BorderSide(
+            width: 1.2,
+            color: AppColors.primary,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100.spMin),
+          ),
+          foregroundColor: AppColors.black,
+          textStyle: TextStyle(
+            fontSize: 16.spMin,
+            fontWeight: FontWeight.w600,
+            height: 0.0,
+            fontFamily: defaultFontFamily,
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.symmetric(
+            vertical: 10.spMin,
+            horizontal: 13.spMin,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.spMin),
+          ),
+          foregroundColor: AppColors.primary,
+          textStyle: TextStyle(
+            fontFamily: defaultFontFamily,
+            fontSize: 16.spMin,
+            fontWeight: FontWeight.w600,
+            height: 0.0,
+          ),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: AppColors.extraLightGrey,
+        disabledColor: AppColors.extraLightGrey,
+        selectedColor: AppColors.primary,
+        labelStyle: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontFamily: defaultFontFamily,
+          overflow: TextOverflow.ellipsis,
+        ),
+        showCheckmark: false,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50.spMin),
+          side: BorderSide(
+            width: 0.0,
+            color: AppColors.transparent,
+          ),
+        ),
+      ),
+      textTheme: TextTheme(
+        displayLarge: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        displayMedium: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        displaySmall: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        headlineLarge: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        headlineMedium: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        headlineSmall: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        titleLarge: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        titleMedium: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        titleSmall: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        bodyLarge: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        bodyMedium: TextStyle(
+          letterSpacing: 0.0,
+        ),
+        bodySmall: TextStyle(
+          letterSpacing: 0.0,
+        ),
+      ).apply(
+        fontFamily: defaultFontFamily,
+      ),
+      appBarTheme: AppBarTheme(
+        backgroundColor: AppColors.white,
+        surfaceTintColor: AppColors.white,
+        titleTextStyle: TextStyle(
+          fontSize: 20.spMin,
+          fontWeight: FontWeight.w600,
+          color: AppColors.black,
+          fontFamily: defaultFontFamily,
+          letterSpacing: 0.0,
+        ),
+        centerTitle: true,
+      ),
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.all(AppColors.primary),
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: AppColors.primary,
+      ),
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: AppColors.extraLightGrey,
+        dayBackgroundColor: WidgetStateColor.resolveWith((state) {
+          if (state.contains(WidgetState.selected)) {
+            return AppColors.primary;
+          }
+          return AppColors.extraLightGrey;
+        }),
+        dayShape: WidgetStateProperty.resolveWith((state) {
+          if (state.contains(WidgetState.selected)) {
+            return RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(5.spMin),
+            );
+          }
+          return RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(5.spMin),
+          );
+        }),
+        yearBackgroundColor: WidgetStateColor.resolveWith((state) {
+          if (state.contains(WidgetState.selected)) {
+            return AppColors.primary;
+          }
+          return AppColors.extraLightGrey;
+        }),
+        yearShape: WidgetStateProperty.resolveWith((state) {
+          if (state.contains(WidgetState.selected)) {
+            return RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(5.spMin),
+            );
+          }
+          return RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(5.spMin),
+          );
+        }),
+        todayBackgroundColor: WidgetStateColor.resolveWith((state) {
+          if (state.contains(WidgetState.selected)) {
+            return AppColors.primary;
+          }
+          return AppColors.extraLightGrey;
+        }),
+        todayForegroundColor: WidgetStateColor.resolveWith((state) {
+          if (state.contains(WidgetState.selected)) {
+            return AppColors.white;
+          }
+          return AppColors.primary;
+        }),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(10.spMin),
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
+        elevation: 0.0,
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: IconButton.styleFrom(
+          foregroundColor: AppColors.primary,
+        ),
+      ),
+      tabBarTheme: TabBarThemeData(
+        splashBorderRadius: BorderRadius.circular(10.spMin),
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: AppColors.primary,
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.white;
+          }
+          return AppColors.transparent;
+        }),
+        checkColor: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.primary;
+          }
+          return AppColors.white;
+        }),
+        side: BorderSide(
+          color: AppColors.white,
+          width: 2.0,
+        ),
+        shape: CircleBorder(),
+      ),
+    );
+  }
+
+  /// The light theme palette of the app when the system is in light mode.
+  static ThemeData get lightPalette {
+    return _defaultTheme;
+  }
+
+  /// The dark theme palette of the app when the system is in dark mode.
+  static ThemeData get darkPalette {
+    return lightPalette;
+  }
+}
+
+final textShadow = Shadow(
+  offset: Offset(0.0, 0.0),
+  blurRadius: 10.0,
+  color: AppColors.black.withValues(alpha: 0.4),
+);
