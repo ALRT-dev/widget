@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -42,6 +43,9 @@ class _MyAppState extends ConsumerState<MyApp> {
           routerDelegate: _router.routerDelegate,
           routeInformationParser: _router.routeInformationParser,
           routeInformationProvider: _router.routeInformationProvider,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
           theme: AppTheme.lightPalette,
           darkTheme: AppTheme.darkPalette,
         );
