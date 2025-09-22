@@ -1,4 +1,4 @@
-package com.gtg.hazard_app
+package com.safetyalrt.alrt
 
 import io.flutter.embedding.android.FlutterActivity
 
