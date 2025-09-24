@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hazard_app/features/auth/enums/auth_method_types.dart';
 import 'package:hazard_app/features/auth/providers/auth_provider.dart';
 import 'package:hazard_app/features/auth/providers/states/auth_provider_state.dart';
+import 'package:hazard_app/features/auth/views/widgets/google_signin_button.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
-import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
-import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
-import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
-import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_wrapper.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
@@ -42,34 +36,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     state.signInWithGoogleState is SignInWithGoogleStateLoading,
               ),
             );
-            return _buttonBuilder(
-              method: AuthMethod.google,
+            return GoogleSignInButton(
               isLoading: isLoading,
               onPressed: isLoading ? null : _signInWithGoogle,
             );
           },
         ),
       ),
-    );
-  }
-
-  Widget _buttonBuilder({
-    required final AuthMethod method,
-    final bool isLoading = false,
-    final Function()? onPressed,
-  }) {
-    return RoundButton(
-      size: 50.0,
-      icon: isLoading
-          ? Spinner(
-              size: 20.0,
-              color: AppColors.white,
-            )
-          : SvgPicture.asset(
-              method.logoPath,
-              width: 30.spMin,
-            ).pB(method == AuthMethod.apple ? 3.0 : 0.0),
-      onPressed: onPressed,
     );
   }
 

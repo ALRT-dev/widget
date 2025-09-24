@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hazard_app/features/auth/enums/auth_method_types.dart';
 import 'package:hazard_app/features/auth/models/auth_success_model.dart';
 import 'package:hazard_app/features/auth/providers/repository_providers.dart';
@@ -19,9 +20,49 @@ class AuthService {
   SharedPreferencesRepository get _sharedPrefRepository =>
       _ref.read(providerOfSharedPreferencesRepository);
 
+  /// Initializes Google Sign-In.
+  Future<Either<void, AppError>> initializeGoogleSignIn() async {
+    return _authRepository.initializeGoogleSignIn();
+  }
+
   /// Signs in the user with Google.
+  ///
+  /// This method is used for non-web platforms where the Google Sign-In
+  /// process is handled within the app. It retrieves the Google account,
+  /// exchanges the authentication token with the backend, and stores the
+  /// access and refresh tokens locally.
   Future<Either<AuthSuccess, AppError>> signInWithGoogle() async {
     final result = await _authRepository.signInWithGoogle();
+
+    await result.whenSuccess((response) {
+      log('Access Token ::  ${response.accessToken}');
+      log('Refresh Token ::  ${response.refreshToken}');
+      return Future.wait([
+        _saveAuthMethod(
+          authMethod: AuthMethod.google,
+        ),
+        _saveAuthTokens(
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        ),
+      ]);
+    });
+
+    return result;
+  }
+
+  /// Signs in the user with an already authenticated Google account (for web).
+  ///
+  /// This method is used for web platforms where the Google Sign-In
+  /// process is handled externally (e.g., via a popup). It takes the
+  /// authenticated Google account, exchanges the authentication token
+  /// with the backend, and stores the access and refresh tokens locally.
+  Future<Either<AuthSuccess, AppError>> signInWithGoogleUser({
+    required GoogleSignInAccount googleUser,
+  }) async {
+    final result = await _authRepository.signInWithGoogleUser(
+      googleUser: googleUser,
+    );
 
     await result.whenSuccess((response) {
       log('Access Token ::  ${response.accessToken}');

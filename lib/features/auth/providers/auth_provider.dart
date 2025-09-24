@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hazard_app/features/auth/providers/service_providers.dart';
 import 'package:hazard_app/features/auth/providers/states/auth_provider_state.dart';
 import 'package:hazard_app/features/auth/services/auth_service.dart';
@@ -23,6 +24,33 @@ class AuthProvider extends Notifier<AuthProviderState> {
     );
 
     final result = await _authService.signInWithGoogle();
+    if (!ref.mounted) return;
+
+    result.when(
+      (data) {
+        state = state.copyWith(
+          signInWithGoogleState: const SignInWithGoogleState.success(),
+        );
+      },
+      (error) {
+        state = state.copyWith(
+          signInWithGoogleState: SignInWithGoogleState.error(error),
+        );
+      },
+    );
+  }
+
+  /// Handles web sign-in after the user has authenticated via renderButton
+  Future<void> handleWebSignIn({
+    required GoogleSignInAccount googleUser,
+  }) async {
+    state = state.copyWith(
+      signInWithGoogleState: const SignInWithGoogleState.loading(),
+    );
+
+    final result = await _authService.signInWithGoogleUser(
+      googleUser: googleUser,
+    );
     if (!ref.mounted) return;
 
     result.when(

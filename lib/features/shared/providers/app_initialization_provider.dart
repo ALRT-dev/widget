@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hazard_app/features/auth/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/providers/instance_providers.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
@@ -25,6 +26,7 @@ class AppInitializationProvider extends Notifier<bool> {
     // initialize these things after shared preference is initialized but before logged in user is initialized
     await Future.wait([
       _initializeLoggedInUser(),
+      _initializeGoogleSignIn(),
     ]);
     if (!ref.mounted) return;
 
@@ -43,6 +45,17 @@ class AppInitializationProvider extends Notifier<bool> {
         final sharedPrefs = await SharedPreferences.getInstance();
         ref.read(providerOfSharedPreferencesInstance.notifier).state =
             sharedPrefs;
+      },
+      onError: (_) {},
+    );
+  }
+
+  /// Initialize google sign-in.
+  Future<void> _initializeGoogleSignIn() {
+    return runAsyncCall(
+      name: 'initializeGoogleSignIn',
+      future: () {
+        return ref.read(providerOfAuthService).initializeGoogleSignIn();
       },
       onError: (_) {},
     );

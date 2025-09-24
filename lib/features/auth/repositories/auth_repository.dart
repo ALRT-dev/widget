@@ -6,7 +6,11 @@ import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 
 abstract class AuthRepository {
+  Future<Either<void, AppError>> initializeGoogleSignIn();
   Future<Either<AuthSuccess, AppError>> signInWithGoogle();
+  Future<Either<AuthSuccess, AppError>> signInWithGoogleUser({
+    required GoogleSignInAccount googleUser,
+  });
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -20,16 +24,48 @@ class AuthRepositoryImpl implements AuthRepository {
   final GoogleSignIn _googleSignIn;
 
   @override
+  Future<Either<void, AppError>> initializeGoogleSignIn() {
+    return runAsyncCall(
+      name: 'initializeGoogleSignIn',
+      future: () async {
+        await _googleSignIn.initialize();
+        return const Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
   Future<Either<AuthSuccess, AppError>> signInWithGoogle() {
     return runAsyncCall(
       name: 'signInWithGoogle',
       future: () async {
-        await _googleSignIn.initialize();
         final account = await _googleSignIn.authenticate();
 
         final googleAuth = account.authentication;
         if (googleAuth.idToken == null) {
-          throw AppError(message: 'No account was selected');
+          throw AppError(message: 'Failed to get authentication token');
+        }
+
+        final result = await _restClient.verifyGoogleOAuth(
+          idToken: googleAuth.idToken!,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<AuthSuccess, AppError>> signInWithGoogleUser({
+    required GoogleSignInAccount googleUser,
+  }) {
+    return runAsyncCall(
+      name: 'signInWithGoogleUser',
+      future: () async {
+        final googleAuth = googleUser.authentication;
+        if (googleAuth.idToken == null) {
+          throw AppError(message: 'Failed to get authentication token');
         }
 
         final result = await _restClient.verifyGoogleOAuth(
