@@ -41,14 +41,16 @@
       "request": "launch",
       "type": "dart",
       "flutterMode": "debug",
-      "program": "lib/main_dev.dart"
+      "program": "lib/main_dev.dart",
+      "args": ["--web-hostname", "localhost", "--web-port", "1122"]
     },
     {
       "name": "[Web] PROD",
       "request": "launch",
       "type": "dart",
       "flutterMode": "debug",
-      "program": "lib/main_prod.dart"
+      "program": "lib/main_prod.dart",
+      "args": ["--web-hostname", "localhost", "--web-port", "1122"]
     }
   ]
 }

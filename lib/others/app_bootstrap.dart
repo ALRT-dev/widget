@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/shared/providers/app_info_provider.dart';
 import 'package:hazard_app/features/shared/providers/base_url_provider.dart';
@@ -16,7 +17,11 @@ class AppBootstrap {
 
   void _onInit() async {
     WidgetsFlutterBinding.ensureInitialized();
-    await EasyLocalization.ensureInitialized();
+
+    await Future.wait([
+      EasyLocalization.ensureInitialized(),
+      dotenv.load(fileName: '.env'),
+    ]);
 
     return runApp(
       EasyLocalization(

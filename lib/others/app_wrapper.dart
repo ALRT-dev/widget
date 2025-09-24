@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/auth/views/screens/auth_screen.dart';
+import 'package:hazard_app/features/home/views/screens/home_screen.dart';
+import 'package:hazard_app/features/shared/providers/app_initialization_provider.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
+import 'package:hazard_app/features/shared/views/screens/splash_screen.dart';
 
 class AppWrapper extends ConsumerStatefulWidget {
   /// A simple wrapper widget for the app's main content.
@@ -16,14 +22,55 @@ class AppWrapper extends ConsumerStatefulWidget {
 
 class _AppWrapperState extends ConsumerState<AppWrapper> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          'Welcome to Hazard App Test',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
+    _listenToTheAppInitializationProvider();
+
+    return SplashScreen();
+  }
+
+  void _onInit() {
+    ref.read(providerOfAppInitialization.notifier).initialize();
+  }
+
+  /// Listens to the app initialization provider and checks the authentication state.
+  void _listenToTheAppInitializationProvider() {
+    ref.listen(
+      providerOfAppInitialization,
+      (prev, next) {
+        if (prev != next) {
+          if (next) _checkAuthState();
+        }
+      },
     );
+  }
+
+  /// Checks which screen to navigate to based on the authentication state.
+  void _checkAuthState() async {
+    // create a fake delay to simulate loading
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+
+    final loggedInUser = ref.read(providerOfLoggedInUser);
+    if (loggedInUser != null) {
+      _gotoHomeScreen();
+    } else {
+      _gotoAuthScreen();
+    }
+  }
+
+  /// Navigates to the auth screen.
+  void _gotoAuthScreen() {
+    context.go(AuthScreen.route);
+  }
+
+  /// Navigates to the home screen.
+  void _gotoHomeScreen() {
+    context.go(HomeScreen.route);
   }
 }

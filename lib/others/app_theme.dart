@@ -126,12 +126,12 @@ class AppTheme {
         fontFamily: defaultFontFamily,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.white,
-        surfaceTintColor: AppColors.white,
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
         titleTextStyle: TextStyle(
           fontSize: 20.spMin,
           fontWeight: FontWeight.w600,
-          color: AppColors.black,
+          color: AppColors.white,
           fontFamily: defaultFontFamily,
           letterSpacing: 0.0,
         ),
