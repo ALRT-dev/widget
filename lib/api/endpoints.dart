@@ -1,4 +1,4 @@
-const kUrlBase = 'http://192.168.1.252:3000/api';
+const kUrlBase = 'http://3.26.195.127:80/api';
 const kUrlBaseDev = 'http://192.168.1.252:3000/api';
 
 // ---------------------------- AUTH ----------------------------
