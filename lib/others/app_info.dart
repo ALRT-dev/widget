@@ -2,10 +2,10 @@ import 'package:hazard_app/others/app_flavor_types.dart';
 
 class AppInfo {
   /// The name of the app.
-  final appName = 'Hazard';
+  final appName = 'Alrt';
 
   /// The package name of the app.
-  final appId = 'com.gtg.hazard';
+  final appId = 'com.safetyalrt.alrt';
 
   /// The flavor that the app is running on.
   final flavor = AppFlavor.prod;
@@ -13,7 +13,7 @@ class AppInfo {
 
 class DevAppInfo extends AppInfo {
   @override
-  String get appName => '[DEV] Hazard';
+  String get appName => '[DEV] Alrt';
 
   @override
   String get appId => '${super.appId}.dev';

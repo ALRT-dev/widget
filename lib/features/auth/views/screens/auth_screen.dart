@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/providers/auth_provider.dart';
 import 'package:hazard_app/features/auth/providers/states/auth_provider_state.dart';
@@ -28,19 +29,29 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
     return Scaffold(
       body: Center(
-        child: Consumer(
-          builder: (context, ref, child) {
-            final isLoading = ref.watch(
-              providerOfAuth.select(
-                (state) =>
-                    state.signInWithGoogleState is SignInWithGoogleStateLoading,
-              ),
-            );
-            return GoogleSignInButton(
-              isLoading: isLoading,
-              onPressed: isLoading ? null : _signInWithGoogle,
-            );
-          },
+        child: Column(
+          spacing: 20.spMin,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Welcome to Alrt!',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            Consumer(
+              builder: (context, ref, child) {
+                final isLoading = ref.watch(
+                  providerOfAuth.select(
+                    (state) => state.signInWithGoogleState
+                        is SignInWithGoogleStateLoading,
+                  ),
+                );
+                return GoogleSignInButton(
+                  isLoading: isLoading,
+                  onPressed: isLoading ? null : _signInWithGoogle,
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
