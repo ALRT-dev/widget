@@ -4,15 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:google_sign_in_web/google_sign_in_web.dart';
 import 'package:hazard_app/features/auth/enums/auth_method_types.dart';
 import 'package:hazard_app/features/auth/providers/auth_provider.dart';
+import 'package:hazard_app/features/auth/views/widgets/google_sign_in_web/google_sign_in_web_wrapper.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 import 'package:hazard_app/others/app_colors.dart';
-
-// Import web-only widget when on web
-import 'package:google_sign_in_web/web_only.dart' as web;
 
 class GoogleSignInButton extends ConsumerStatefulWidget {
   const GoogleSignInButton({
@@ -55,16 +52,9 @@ class _GoogleSignInButtonState extends ConsumerState<GoogleSignInButton> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_googleSignIn.supportsAuthenticate()) {
+    if (kIsWeb && !_googleSignIn.supportsAuthenticate()) {
       // On web, use renderButton instead of custom UI
-      return web.renderButton(
-        configuration: GSIButtonConfiguration(
-          type: GSIButtonType.icon,
-          theme: GSIButtonTheme.outline,
-          size: GSIButtonSize.large,
-          shape: GSIButtonShape.pill,
-        ),
-      );
+      return renderButton();
     } else {
       // On mobile platforms, use custom button
       return RoundButton(
