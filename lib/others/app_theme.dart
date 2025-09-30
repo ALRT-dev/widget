@@ -16,7 +16,7 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           padding: EdgeInsets.all(15.spMin),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100.spMin),
+            borderRadius: BorderRadius.circular(10.r),
           ),
           elevation: 0.0,
           disabledBackgroundColor: AppColors.lightGrey,

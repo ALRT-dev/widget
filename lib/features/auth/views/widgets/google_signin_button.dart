@@ -4,10 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:hazard_app/features/auth/enums/auth_method_types.dart';
 import 'package:hazard_app/features/auth/providers/auth_provider.dart';
 import 'package:hazard_app/features/auth/views/widgets/google_sign_in_web/google_sign_in_web_wrapper.dart';
-import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
+import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -57,18 +56,23 @@ class _GoogleSignInButtonState extends ConsumerState<GoogleSignInButton> {
       return renderButton();
     } else {
       // On mobile platforms, use custom button
-      return RoundButton(
-        size: 50.0,
-        icon: widget.isLoading
-            ? Spinner(
-                size: 20.0,
-                color: AppColors.white,
-              )
-            : SvgPicture.asset(
-                AuthMethod.google.logoPath,
-                width: 30.spMin,
-              ),
+      return Button.filled(
+        value: 'Continue with Google',
+        valueStyle: TextStyle(
+          color: AppColors.black,
+        ),
+        icon: SvgPicture.asset(
+          'assets/logos/google.svg',
+          width: 20.spMin,
+          height: 20.spMin,
+        ),
+        color: AppColors.extraLightGrey,
+        loader: Spinner(
+          size: 15.spMin,
+          color: AppColors.black,
+        ),
         onPressed: widget.onPressed,
+        isLoading: widget.isLoading,
       );
     }
   }
