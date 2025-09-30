@@ -65,5 +65,11 @@
       <string>com.google.gppconsent</string>
       <string>com.googleusercontent.apps.504114714307-p2d97f549jdgkcdslboe7mhhbkfa4vpo</string>
     </array>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>This app needs access to your location to show nearby alerts and help you navigate to
+      safety.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This app needs access to your location to show nearby alerts and help you navigate to
+      safety.</string>
   </dict>
 </plist>

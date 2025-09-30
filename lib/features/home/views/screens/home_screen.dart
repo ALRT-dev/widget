@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hazard_app/features/auth/providers/service_providers.dart';
-import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
-import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
-import 'package:hazard_app/features/shared/views/widgets/button.dart';
-import 'package:hazard_app/others/app_wrapper.dart';
+import 'package:hazard_app/features/home/enums/home_tab_types.dart';
+import 'package:hazard_app/features/home/widgets/home_tabbar.dart';
+import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/views/screens/map_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   /// Displays the home screen of the app.
@@ -18,33 +15,38 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late final _tabController = TabController(
+    length: HomeTab.values.length,
+    vsync: this,
+  );
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final email = ref.watch(
-      providerOfLoggedInUser.select((value) => value?.email),
-    );
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 20.spMin,
-          children: <Widget>[
-            Text('You are logged in as $email'),
-            Button.filled(
-              value: 'Log out',
-              onPressed: () async {
-                await ref.read(providerOfAuthService).logOut();
-                if (!context.mounted) return;
+    // register this provider to the lifecycle of this screen
+    ref.watch(providerOfMap.select((value) => null));
 
-                context.go(AppWrapper.route);
-              },
-            ),
-          ],
-        ).pX(20.0),
+    return Scaffold(
+      body: TabBarView(
+        controller: _tabController,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          const MapScreen(),
+          const SizedBox(),
+          const SizedBox(),
+          const SizedBox(),
+          const SizedBox(),
+        ],
+      ),
+      bottomNavigationBar: HomeTabbar(
+        tabController: _tabController,
       ),
     );
   }

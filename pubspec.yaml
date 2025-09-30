@@ -29,6 +29,11 @@ dependencies:
   flutter_dotenv: ^6.0.0
   flutter_svg: ^2.2.1
   toastification: ^3.0.3
+  google_maps_flutter: ^2.13.1
+  cached_network_image: ^3.4.1
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
+  app_settings: ^6.1.1
 
 dev_dependencies:
   flutter_test:
@@ -50,6 +55,7 @@ flutter:
     - .env
     - assets/translations/
     - assets/logos/
+    - assets/icons/
 
   fonts:
     - family: Poppins

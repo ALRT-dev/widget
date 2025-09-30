@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/auth/providers/service_providers.dart';
+import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/shared/providers/instance_providers.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
@@ -31,7 +32,9 @@ class AppInitializationProvider extends Notifier<bool> {
     if (!ref.mounted) return;
 
     // initialize these things after logged in user is initialized
-    await Future.wait([]);
+    await Future.wait([
+      _getCurrentUserLocation(),
+    ]);
     if (!ref.mounted) return;
 
     state = true;
@@ -40,7 +43,7 @@ class AppInitializationProvider extends Notifier<bool> {
   /// Initializes the shared preferences instance.
   Future<void> _initializeSharedPreferences() {
     return runAsyncCall(
-      name: 'initializeSharedPreferences',
+      name: '_initializeSharedPreferences',
       future: () async {
         final sharedPrefs = await SharedPreferences.getInstance();
         ref.read(providerOfSharedPreferencesInstance.notifier).state =
@@ -53,7 +56,7 @@ class AppInitializationProvider extends Notifier<bool> {
   /// Initialize google sign-in.
   Future<void> _initializeGoogleSignIn() {
     return runAsyncCall(
-      name: 'initializeGoogleSignIn',
+      name: '_initializeGoogleSignIn',
       future: () {
         return ref.read(providerOfAuthService).initializeGoogleSignIn();
       },
@@ -64,10 +67,19 @@ class AppInitializationProvider extends Notifier<bool> {
   /// Initializes the current logged in user.
   Future<void> _initializeLoggedInUser() {
     return runAsyncCall(
-      name: 'initializeLoggedInUser',
+      name: '_initializeLoggedInUser',
       future: () {
         return ref.refresh(providerOfLoggedInUserFetcher.future);
       },
+      onError: (_) {},
+    );
+  }
+
+  /// Gets the location of the current user.
+  Future<void> _getCurrentUserLocation() {
+    return runAsyncCall(
+      name: '_getCurrentUserLocation',
+      future: () => ref.read(providerOfLocation.notifier).getLocation(),
       onError: (_) {},
     );
   }

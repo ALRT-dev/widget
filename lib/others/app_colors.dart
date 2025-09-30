@@ -16,4 +16,7 @@ class AppColors {
   static const grey = Color(0xff787676);
 
   static const yellow = Color(0xFFFFD663);
+
+  static const shadowColor = Color.fromRGBO(0, 0, 0, 0.05);
+  static const shadowColorDark = Color.fromRGBO(0, 0, 0, 0.2);
 }
