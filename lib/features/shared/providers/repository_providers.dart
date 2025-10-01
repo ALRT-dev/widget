@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/shared/providers/instance_providers.dart';
 import 'package:hazard_app/features/shared/providers/rest_client_provider.dart';
+import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
 import 'package:hazard_app/features/shared/repositories/shared_prefs_repository.dart';
 import 'package:hazard_app/features/shared/repositories/user_repository.dart';
 
@@ -15,6 +16,13 @@ final providerOfSharedPreferencesRepository =
 /// Provides [UserRepository].
 final providerOfUserRepository = Provider<UserRepository>((ref) {
   return UserRepositoryImpl(
+    restClient: ref.watch(providerOfRestClient),
+  );
+});
+
+/// Provides [HazardRepository].
+final providerOfHazardRepository = Provider<HazardRepository>((ref) {
+  return MockHazardRepositoryImpl(
     restClient: ref.watch(providerOfRestClient),
   );
 });

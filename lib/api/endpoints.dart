@@ -9,3 +9,7 @@ const kUrlRefreshToken = '/auth/refresh-token';
 // ---------------------------- USER ----------------------------
 
 const kUrlUser = '/user';
+
+// ---------------------------- HAZARD ----------------------------
+
+const kUrlHazards = '/hazards';

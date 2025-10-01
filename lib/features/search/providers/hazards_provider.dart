@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/utils/dummy_data.dart';
+import 'package:hazard_app/features/shared/providers/service_providers.dart';
+import 'package:hazard_app/features/shared/services/hazard_service.dart';
 
 final providerOfHazards =
     StateNotifierProvider.autoDispose<HazardsProvider, HazardsProviderState>(
@@ -17,19 +18,38 @@ class HazardsProvider extends StateNotifier<HazardsProviderState> {
   HazardsProvider({
     required final Ref ref,
     required final HazardsProviderState state,
-  }) : super(state) {
-    _onInit();
+  })  : _ref = ref,
+        super(state) {
+    getHazards();
   }
 
-  void _onInit() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    // sort by createdAt descending
-    kDummyHazards.sort((a, b) {
-      final aDate = a.createdAt ?? DateTime.now();
-      final bDate = b.createdAt ?? DateTime.now();
-      return bDate.compareTo(aDate);
-    });
-    updateHazards(kDummyHazards);
+  final Ref _ref;
+  HazardService get _hazardService => _ref.read(providerOfHazardService);
+
+  /// Gets the list of hazards based on the current [HazardsProviderState.searchParams].
+  Future<void> getHazards() async {
+    state = state.copyWith(
+      getHazardsState: const GetHazardsState.loading(),
+    );
+
+    final result = await _hazardService.getHazards(
+      searchParams: state.searchParams,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (hazards) {
+        state = state.copyWith(
+          getHazardsState: GetHazardsState.success(hazards),
+        );
+        updateHazards(hazards);
+      },
+      (error) {
+        state = state.copyWith(
+          getHazardsState: GetHazardsState.error(error),
+        );
+      },
+    );
   }
 
   /// Updates [HazardsProviderState.tempSearchParams] with the given [searchParams].

@@ -14,8 +14,17 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$HazardSearchParams {
+  /// The search string to filter hazards by their title or description.
   String? get searchString;
+
+  /// The list of category IDs to filter hazards.
   List<String> get categoryIds;
+
+  /// The page number for pagination.
+  int get page;
+
+  /// The number of items per page for pagination.
+  int get pageSize;
 
   /// Create a copy of HazardSearchParams
   /// with the given fields replaced by the non-null parameter values.
@@ -36,17 +45,20 @@ mixin _$HazardSearchParams {
             (identical(other.searchString, searchString) ||
                 other.searchString == searchString) &&
             const DeepCollectionEquality()
-                .equals(other.categoryIds, categoryIds));
+                .equals(other.categoryIds, categoryIds) &&
+            (identical(other.page, page) || other.page == page) &&
+            (identical(other.pageSize, pageSize) ||
+                other.pageSize == pageSize));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, searchString,
-      const DeepCollectionEquality().hash(categoryIds));
+      const DeepCollectionEquality().hash(categoryIds), page, pageSize);
 
   @override
   String toString() {
-    return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds)';
+    return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, page: $page, pageSize: $pageSize)';
   }
 }
 
@@ -56,7 +68,8 @@ abstract mixin class $HazardSearchParamsCopyWith<$Res> {
           HazardSearchParams value, $Res Function(HazardSearchParams) _then) =
       _$HazardSearchParamsCopyWithImpl;
   @useResult
-  $Res call({String? searchString, List<String> categoryIds});
+  $Res call(
+      {String? searchString, List<String> categoryIds, int page, int pageSize});
 }
 
 /// @nodoc
@@ -74,6 +87,8 @@ class _$HazardSearchParamsCopyWithImpl<$Res>
   $Res call({
     Object? searchString = freezed,
     Object? categoryIds = null,
+    Object? page = null,
+    Object? pageSize = null,
   }) {
     return _then(_self.copyWith(
       searchString: freezed == searchString
@@ -84,6 +99,14 @@ class _$HazardSearchParamsCopyWithImpl<$Res>
           ? _self.categoryIds
           : categoryIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      page: null == page
+          ? _self.page
+          : page // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _self.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -181,14 +204,16 @@ extension HazardSearchParamsPatterns on HazardSearchParams {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String? searchString, List<String> categoryIds)?
+    TResult Function(String? searchString, List<String> categoryIds, int page,
+            int pageSize)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _HazardSearchParams() when $default != null:
-        return $default(_that.searchString, _that.categoryIds);
+        return $default(
+            _that.searchString, _that.categoryIds, _that.page, _that.pageSize);
       case _:
         return orElse();
     }
@@ -209,12 +234,15 @@ extension HazardSearchParamsPatterns on HazardSearchParams {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String? searchString, List<String> categoryIds) $default,
+    TResult Function(String? searchString, List<String> categoryIds, int page,
+            int pageSize)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardSearchParams():
-        return $default(_that.searchString, _that.categoryIds);
+        return $default(
+            _that.searchString, _that.categoryIds, _that.page, _that.pageSize);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -234,12 +262,15 @@ extension HazardSearchParamsPatterns on HazardSearchParams {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String? searchString, List<String> categoryIds)? $default,
+    TResult? Function(String? searchString, List<String> categoryIds, int page,
+            int pageSize)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardSearchParams() when $default != null:
-        return $default(_that.searchString, _that.categoryIds);
+        return $default(
+            _that.searchString, _that.categoryIds, _that.page, _that.pageSize);
       case _:
         return null;
     }
@@ -250,14 +281,22 @@ extension HazardSearchParamsPatterns on HazardSearchParams {
 @JsonSerializable()
 class _HazardSearchParams implements HazardSearchParams {
   const _HazardSearchParams(
-      {this.searchString, final List<String> categoryIds = const <String>[]})
+      {this.searchString,
+      final List<String> categoryIds = const <String>[],
+      this.page = 1,
+      this.pageSize = 20})
       : _categoryIds = categoryIds;
   factory _HazardSearchParams.fromJson(Map<String, dynamic> json) =>
       _$HazardSearchParamsFromJson(json);
 
+  /// The search string to filter hazards by their title or description.
   @override
   final String? searchString;
+
+  /// The list of category IDs to filter hazards.
   final List<String> _categoryIds;
+
+  /// The list of category IDs to filter hazards.
   @override
   @JsonKey()
   List<String> get categoryIds {
@@ -265,6 +304,16 @@ class _HazardSearchParams implements HazardSearchParams {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_categoryIds);
   }
+
+  /// The page number for pagination.
+  @override
+  @JsonKey()
+  final int page;
+
+  /// The number of items per page for pagination.
+  @override
+  @JsonKey()
+  final int pageSize;
 
   /// Create a copy of HazardSearchParams
   /// with the given fields replaced by the non-null parameter values.
@@ -289,17 +338,20 @@ class _HazardSearchParams implements HazardSearchParams {
             (identical(other.searchString, searchString) ||
                 other.searchString == searchString) &&
             const DeepCollectionEquality()
-                .equals(other._categoryIds, _categoryIds));
+                .equals(other._categoryIds, _categoryIds) &&
+            (identical(other.page, page) || other.page == page) &&
+            (identical(other.pageSize, pageSize) ||
+                other.pageSize == pageSize));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, searchString,
-      const DeepCollectionEquality().hash(_categoryIds));
+      const DeepCollectionEquality().hash(_categoryIds), page, pageSize);
 
   @override
   String toString() {
-    return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds)';
+    return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, page: $page, pageSize: $pageSize)';
   }
 }
 
@@ -311,7 +363,8 @@ abstract mixin class _$HazardSearchParamsCopyWith<$Res>
       __$HazardSearchParamsCopyWithImpl;
   @override
   @useResult
-  $Res call({String? searchString, List<String> categoryIds});
+  $Res call(
+      {String? searchString, List<String> categoryIds, int page, int pageSize});
 }
 
 /// @nodoc
@@ -329,6 +382,8 @@ class __$HazardSearchParamsCopyWithImpl<$Res>
   $Res call({
     Object? searchString = freezed,
     Object? categoryIds = null,
+    Object? page = null,
+    Object? pageSize = null,
   }) {
     return _then(_HazardSearchParams(
       searchString: freezed == searchString
@@ -339,6 +394,14 @@ class __$HazardSearchParamsCopyWithImpl<$Res>
           ? _self._categoryIds
           : categoryIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      page: null == page
+          ? _self.page
+          : page // ignore: cast_nullable_to_non_nullable
+              as int,
+      pageSize: null == pageSize
+          ? _self.pageSize
+          : pageSize // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }

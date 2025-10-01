@@ -13,10 +13,14 @@ _HazardSearchParams _$HazardSearchParamsFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const <String>[],
+      page: (json['page'] as num?)?.toInt() ?? 1,
+      pageSize: (json['pageSize'] as num?)?.toInt() ?? 20,
     );
 
 Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
     <String, dynamic>{
       'searchString': instance.searchString,
       'categoryIds': instance.categoryIds,
+      'page': instance.page,
+      'pageSize': instance.pageSize,
     };
