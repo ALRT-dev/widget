@@ -22,6 +22,7 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
           HazardSearchAppBar(),
           20.hSizedBox.sliverBox,
           HazardSearchResultsList(),
+          20.hSizedBox.sliverBox,
         ],
       ),
     ).keyboardDismisser(context);

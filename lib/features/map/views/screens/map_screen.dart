@@ -26,6 +26,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               .read(providerOfMap.notifier)
               .init(googleMapController: controller);
         },
+        markers: ref.watch(
+          providerOfMap.select(
+            (value) => value.markers,
+          ),
+        ),
         onCameraMove: _handleMapMoved,
       ),
     );

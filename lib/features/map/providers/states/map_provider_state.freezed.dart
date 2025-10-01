@@ -17,6 +17,9 @@ mixin _$MapProviderState {
   /// The current camera position of the map.
   CameraPosition get cameraPosition;
 
+  /// The set of markers displayed on the map.
+  Set<Marker> get markers;
+
   /// Create a copy of MapProviderState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -31,15 +34,17 @@ mixin _$MapProviderState {
         (other.runtimeType == runtimeType &&
             other is MapProviderState &&
             (identical(other.cameraPosition, cameraPosition) ||
-                other.cameraPosition == cameraPosition));
+                other.cameraPosition == cameraPosition) &&
+            const DeepCollectionEquality().equals(other.markers, markers));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, cameraPosition);
+  int get hashCode => Object.hash(runtimeType, cameraPosition,
+      const DeepCollectionEquality().hash(markers));
 
   @override
   String toString() {
-    return 'MapProviderState(cameraPosition: $cameraPosition)';
+    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers)';
   }
 }
 
@@ -49,7 +54,7 @@ abstract mixin class $MapProviderStateCopyWith<$Res> {
           MapProviderState value, $Res Function(MapProviderState) _then) =
       _$MapProviderStateCopyWithImpl;
   @useResult
-  $Res call({CameraPosition cameraPosition});
+  $Res call({CameraPosition cameraPosition, Set<Marker> markers});
 }
 
 /// @nodoc
@@ -66,12 +71,17 @@ class _$MapProviderStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? cameraPosition = null,
+    Object? markers = null,
   }) {
     return _then(_self.copyWith(
       cameraPosition: null == cameraPosition
           ? _self.cameraPosition
           : cameraPosition // ignore: cast_nullable_to_non_nullable
               as CameraPosition,
+      markers: null == markers
+          ? _self.markers
+          : markers // ignore: cast_nullable_to_non_nullable
+              as Set<Marker>,
     ));
   }
 }
@@ -169,13 +179,14 @@ extension MapProviderStatePatterns on MapProviderState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(CameraPosition cameraPosition)? $default, {
+    TResult Function(CameraPosition cameraPosition, Set<Marker> markers)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _MapProviderState() when $default != null:
-        return $default(_that.cameraPosition);
+        return $default(_that.cameraPosition, _that.markers);
       case _:
         return orElse();
     }
@@ -196,12 +207,13 @@ extension MapProviderStatePatterns on MapProviderState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(CameraPosition cameraPosition) $default,
+    TResult Function(CameraPosition cameraPosition, Set<Marker> markers)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _MapProviderState():
-        return $default(_that.cameraPosition);
+        return $default(_that.cameraPosition, _that.markers);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -221,12 +233,13 @@ extension MapProviderStatePatterns on MapProviderState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(CameraPosition cameraPosition)? $default,
+    TResult? Function(CameraPosition cameraPosition, Set<Marker> markers)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _MapProviderState() when $default != null:
-        return $default(_that.cameraPosition);
+        return $default(_that.cameraPosition, _that.markers);
       case _:
         return null;
     }
@@ -236,12 +249,27 @@ extension MapProviderStatePatterns on MapProviderState {
 /// @nodoc
 
 class _MapProviderState implements MapProviderState {
-  const _MapProviderState({this.cameraPosition = kDefaultCameraPosition});
+  const _MapProviderState(
+      {this.cameraPosition = kDefaultCameraPosition,
+      final Set<Marker> markers = const <Marker>{}})
+      : _markers = markers;
 
   /// The current camera position of the map.
   @override
   @JsonKey()
   final CameraPosition cameraPosition;
+
+  /// The set of markers displayed on the map.
+  final Set<Marker> _markers;
+
+  /// The set of markers displayed on the map.
+  @override
+  @JsonKey()
+  Set<Marker> get markers {
+    if (_markers is EqualUnmodifiableSetView) return _markers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_markers);
+  }
 
   /// Create a copy of MapProviderState
   /// with the given fields replaced by the non-null parameter values.
@@ -257,15 +285,17 @@ class _MapProviderState implements MapProviderState {
         (other.runtimeType == runtimeType &&
             other is _MapProviderState &&
             (identical(other.cameraPosition, cameraPosition) ||
-                other.cameraPosition == cameraPosition));
+                other.cameraPosition == cameraPosition) &&
+            const DeepCollectionEquality().equals(other._markers, _markers));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, cameraPosition);
+  int get hashCode => Object.hash(runtimeType, cameraPosition,
+      const DeepCollectionEquality().hash(_markers));
 
   @override
   String toString() {
-    return 'MapProviderState(cameraPosition: $cameraPosition)';
+    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers)';
   }
 }
 
@@ -277,7 +307,7 @@ abstract mixin class _$MapProviderStateCopyWith<$Res>
       __$MapProviderStateCopyWithImpl;
   @override
   @useResult
-  $Res call({CameraPosition cameraPosition});
+  $Res call({CameraPosition cameraPosition, Set<Marker> markers});
 }
 
 /// @nodoc
@@ -294,12 +324,17 @@ class __$MapProviderStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? cameraPosition = null,
+    Object? markers = null,
   }) {
     return _then(_MapProviderState(
       cameraPosition: null == cameraPosition
           ? _self.cameraPosition
           : cameraPosition // ignore: cast_nullable_to_non_nullable
               as CameraPosition,
+      markers: null == markers
+          ? _self._markers
+          : markers // ignore: cast_nullable_to_non_nullable
+              as Set<Marker>,
     ));
   }
 }

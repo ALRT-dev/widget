@@ -9,5 +9,8 @@ abstract class MapProviderState with _$MapProviderState {
   const factory MapProviderState({
     /// The current camera position of the map.
     @Default(kDefaultCameraPosition) final CameraPosition cameraPosition,
+
+    /// The set of markers displayed on the map.
+    @Default(<Marker>{}) final Set<Marker> markers,
   }) = _MapProviderState;
 }

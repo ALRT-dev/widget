@@ -20,6 +20,9 @@ mixin _$HazardsProviderState {
   /// The actual search parameters used to fetch hazards.
   HazardSearchParams get searchParams;
 
+  /// The list of hazards fetched based on [searchParams].
+  List<Hazard> get hazards;
+
   /// Create a copy of HazardsProviderState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -36,15 +39,17 @@ mixin _$HazardsProviderState {
             (identical(other.tempSearchParams, tempSearchParams) ||
                 other.tempSearchParams == tempSearchParams) &&
             (identical(other.searchParams, searchParams) ||
-                other.searchParams == searchParams));
+                other.searchParams == searchParams) &&
+            const DeepCollectionEquality().equals(other.hazards, hazards));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, tempSearchParams, searchParams);
+  int get hashCode => Object.hash(runtimeType, tempSearchParams, searchParams,
+      const DeepCollectionEquality().hash(hazards));
 
   @override
   String toString() {
-    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams)';
+    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams, hazards: $hazards)';
   }
 }
 
@@ -55,7 +60,9 @@ abstract mixin class $HazardsProviderStateCopyWith<$Res> {
       _$HazardsProviderStateCopyWithImpl;
   @useResult
   $Res call(
-      {HazardSearchParams tempSearchParams, HazardSearchParams searchParams});
+      {HazardSearchParams tempSearchParams,
+      HazardSearchParams searchParams,
+      List<Hazard> hazards});
 
   $HazardSearchParamsCopyWith<$Res> get tempSearchParams;
   $HazardSearchParamsCopyWith<$Res> get searchParams;
@@ -76,6 +83,7 @@ class _$HazardsProviderStateCopyWithImpl<$Res>
   $Res call({
     Object? tempSearchParams = null,
     Object? searchParams = null,
+    Object? hazards = null,
   }) {
     return _then(_self.copyWith(
       tempSearchParams: null == tempSearchParams
@@ -86,6 +94,10 @@ class _$HazardsProviderStateCopyWithImpl<$Res>
           ? _self.searchParams
           : searchParams // ignore: cast_nullable_to_non_nullable
               as HazardSearchParams,
+      hazards: null == hazards
+          ? _self.hazards
+          : hazards // ignore: cast_nullable_to_non_nullable
+              as List<Hazard>,
     ));
   }
 
@@ -204,14 +216,15 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(HazardSearchParams tempSearchParams,
-            HazardSearchParams searchParams)?
+            HazardSearchParams searchParams, List<Hazard> hazards)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _HazardsProviderState() when $default != null:
-        return $default(_that.tempSearchParams, _that.searchParams);
+        return $default(
+            _that.tempSearchParams, _that.searchParams, _that.hazards);
       case _:
         return orElse();
     }
@@ -233,13 +246,14 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(HazardSearchParams tempSearchParams,
-            HazardSearchParams searchParams)
+            HazardSearchParams searchParams, List<Hazard> hazards)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardsProviderState():
-        return $default(_that.tempSearchParams, _that.searchParams);
+        return $default(
+            _that.tempSearchParams, _that.searchParams, _that.hazards);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -260,13 +274,14 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(HazardSearchParams tempSearchParams,
-            HazardSearchParams searchParams)?
+            HazardSearchParams searchParams, List<Hazard> hazards)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardsProviderState() when $default != null:
-        return $default(_that.tempSearchParams, _that.searchParams);
+        return $default(
+            _that.tempSearchParams, _that.searchParams, _that.hazards);
       case _:
         return null;
     }
@@ -278,7 +293,9 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
 class _HazardsProviderState implements HazardsProviderState {
   const _HazardsProviderState(
       {this.tempSearchParams = const HazardSearchParams(),
-      this.searchParams = const HazardSearchParams()});
+      this.searchParams = const HazardSearchParams(),
+      final List<Hazard> hazards = const <Hazard>[]})
+      : _hazards = hazards;
 
   /// The temporary search parameters that are being modified by the user.
   @override
@@ -289,6 +306,18 @@ class _HazardsProviderState implements HazardsProviderState {
   @override
   @JsonKey()
   final HazardSearchParams searchParams;
+
+  /// The list of hazards fetched based on [searchParams].
+  final List<Hazard> _hazards;
+
+  /// The list of hazards fetched based on [searchParams].
+  @override
+  @JsonKey()
+  List<Hazard> get hazards {
+    if (_hazards is EqualUnmodifiableListView) return _hazards;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_hazards);
+  }
 
   /// Create a copy of HazardsProviderState
   /// with the given fields replaced by the non-null parameter values.
@@ -307,15 +336,17 @@ class _HazardsProviderState implements HazardsProviderState {
             (identical(other.tempSearchParams, tempSearchParams) ||
                 other.tempSearchParams == tempSearchParams) &&
             (identical(other.searchParams, searchParams) ||
-                other.searchParams == searchParams));
+                other.searchParams == searchParams) &&
+            const DeepCollectionEquality().equals(other._hazards, _hazards));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, tempSearchParams, searchParams);
+  int get hashCode => Object.hash(runtimeType, tempSearchParams, searchParams,
+      const DeepCollectionEquality().hash(_hazards));
 
   @override
   String toString() {
-    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams)';
+    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams, hazards: $hazards)';
   }
 }
 
@@ -328,7 +359,9 @@ abstract mixin class _$HazardsProviderStateCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {HazardSearchParams tempSearchParams, HazardSearchParams searchParams});
+      {HazardSearchParams tempSearchParams,
+      HazardSearchParams searchParams,
+      List<Hazard> hazards});
 
   @override
   $HazardSearchParamsCopyWith<$Res> get tempSearchParams;
@@ -351,6 +384,7 @@ class __$HazardsProviderStateCopyWithImpl<$Res>
   $Res call({
     Object? tempSearchParams = null,
     Object? searchParams = null,
+    Object? hazards = null,
   }) {
     return _then(_HazardsProviderState(
       tempSearchParams: null == tempSearchParams
@@ -361,6 +395,10 @@ class __$HazardsProviderStateCopyWithImpl<$Res>
           ? _self.searchParams
           : searchParams // ignore: cast_nullable_to_non_nullable
               as HazardSearchParams,
+      hazards: null == hazards
+          ? _self._hazards
+          : hazards // ignore: cast_nullable_to_non_nullable
+              as List<Hazard>,
     ));
   }
 

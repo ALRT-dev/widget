@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/search/views/widgets/hazard_search_results_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
-import 'package:hazard_app/features/shared/utils/dummy_data.dart';
 
 class HazardSearchResultsList extends ConsumerStatefulWidget {
   const HazardSearchResultsList({super.key});
@@ -16,10 +16,15 @@ class _HazardSearchResultsListState
     extends ConsumerState<HazardSearchResultsList> {
   @override
   Widget build(BuildContext context) {
+    final hazards = ref.watch(
+      providerOfHazards.select(
+        (value) => value.hazards,
+      ),
+    );
     return SliverList.separated(
-      itemCount: kDummyHazards.length,
+      itemCount: hazards.length,
       itemBuilder: (context, index) {
-        final hazard = kDummyHazards[index];
+        final hazard = hazards[index];
         return HazardSearchResultsListItem(
           hazard: hazard,
         );

@@ -36,6 +36,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfMap.select((value) => null));
     ref.watch(providerOfHazards.select((value) => null));
 
+    _listenToHazardsState();
+
     return Scaffold(
       body: TabBarView(
         controller: _tabController,
@@ -51,6 +53,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       bottomNavigationBar: HomeTabbar(
         tabController: _tabController,
       ),
+    );
+  }
+
+  /// Listens to changes in the hazards state and updates the map markers accordingly.
+  void _listenToHazardsState() {
+    ref.listen(
+      providerOfHazards.select(
+        (value) => value.hazards,
+      ),
+      (prev, next) {
+        if (prev != next) {
+          ref.read(providerOfMap.notifier).generateMarkers();
+        }
+      },
     );
   }
 }
