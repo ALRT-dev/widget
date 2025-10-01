@@ -1,7 +1,7 @@
 import 'package:app_settings/app_settings.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hazard_app/features/map/models/location_model.dart';
+import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';

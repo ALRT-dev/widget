@@ -110,7 +110,7 @@ extension WidgetExt on Widget {
         child: this,
       );
 
-  Widget toSliverBox() => SliverToBoxAdapter(
+  Widget get sliverBox => SliverToBoxAdapter(
         key: key,
         child: this,
       );

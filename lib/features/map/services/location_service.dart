@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hazard_app/features/map/models/location_model.dart';
+import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/providers/repository_providers.dart';
 import 'package:hazard_app/features/map/repositories/location_repository.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';

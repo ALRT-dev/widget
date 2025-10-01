@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:hazard_app/features/map/models/location_model.dart';
+import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
 import 'package:hazard_app/features/map/providers/states/location_permission_provider_state.dart';
 import 'package:hazard_app/features/map/services/location_service.dart';

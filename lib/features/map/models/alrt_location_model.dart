@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'location_model.freezed.dart';
-part 'location_model.g.dart';
+part 'alrt_location_model.freezed.dart';
+part 'alrt_location_model.g.dart';
 
 @freezed
 abstract class AlrtLocation with _$AlrtLocation {

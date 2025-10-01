@@ -36,8 +36,7 @@ mixin _$LocationProviderState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is LocationProviderState &&
-            (identical(other.location, location) ||
-                other.location == location) &&
+            const DeepCollectionEquality().equals(other.location, location) &&
             (identical(other.getLocationState, getLocationState) ||
                 other.getLocationState == getLocationState) &&
             (identical(other.getLocationPremissionState,
@@ -48,7 +47,10 @@ mixin _$LocationProviderState {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, location, getLocationState, getLocationPremissionState);
+      runtimeType,
+      const DeepCollectionEquality().hash(location),
+      getLocationState,
+      getLocationPremissionState);
 
   @override
   String toString() {
@@ -67,7 +69,6 @@ abstract mixin class $LocationProviderStateCopyWith<$Res> {
       GetLocationState getLocationState,
       GetLocationPremissionState getLocationPremissionState});
 
-  $AlrtLocationCopyWith<$Res>? get location;
   $GetLocationStateCopyWith<$Res> get getLocationState;
   $GetLocationPremissionStateCopyWith<$Res> get getLocationPremissionState;
 }
@@ -103,20 +104,6 @@ class _$LocationProviderStateCopyWithImpl<$Res>
           : getLocationPremissionState // ignore: cast_nullable_to_non_nullable
               as GetLocationPremissionState,
     ));
-  }
-
-  /// Create a copy of LocationProviderState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $AlrtLocationCopyWith<$Res>? get location {
-    if (_self.location == null) {
-      return null;
-    }
-
-    return $AlrtLocationCopyWith<$Res>(_self.location!, (value) {
-      return _then(_self.copyWith(location: value));
-    });
   }
 
   /// Create a copy of LocationProviderState
@@ -344,8 +331,7 @@ class _LocationProviderState implements LocationProviderState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _LocationProviderState &&
-            (identical(other.location, location) ||
-                other.location == location) &&
+            const DeepCollectionEquality().equals(other.location, location) &&
             (identical(other.getLocationState, getLocationState) ||
                 other.getLocationState == getLocationState) &&
             (identical(other.getLocationPremissionState,
@@ -356,7 +342,10 @@ class _LocationProviderState implements LocationProviderState {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType, location, getLocationState, getLocationPremissionState);
+      runtimeType,
+      const DeepCollectionEquality().hash(location),
+      getLocationState,
+      getLocationPremissionState);
 
   @override
   String toString() {
@@ -377,8 +366,6 @@ abstract mixin class _$LocationProviderStateCopyWith<$Res>
       GetLocationState getLocationState,
       GetLocationPremissionState getLocationPremissionState});
 
-  @override
-  $AlrtLocationCopyWith<$Res>? get location;
   @override
   $GetLocationStateCopyWith<$Res> get getLocationState;
   @override
@@ -416,20 +403,6 @@ class __$LocationProviderStateCopyWithImpl<$Res>
           : getLocationPremissionState // ignore: cast_nullable_to_non_nullable
               as GetLocationPremissionState,
     ));
-  }
-
-  /// Create a copy of LocationProviderState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $AlrtLocationCopyWith<$Res>? get location {
-    if (_self.location == null) {
-      return null;
-    }
-
-    return $AlrtLocationCopyWith<$Res>(_self.location!, (value) {
-      return _then(_self.copyWith(location: value));
-    });
   }
 
   /// Create a copy of LocationProviderState
@@ -748,12 +721,12 @@ class GetLocationStateSuccess implements GetLocationState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is GetLocationStateSuccess &&
-            (identical(other.location, location) ||
-                other.location == location));
+            const DeepCollectionEquality().equals(other.location, location));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, location);
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(location));
 
   @override
   String toString() {
@@ -769,8 +742,6 @@ abstract mixin class $GetLocationStateSuccessCopyWith<$Res>
       _$GetLocationStateSuccessCopyWithImpl;
   @useResult
   $Res call({AlrtLocation location});
-
-  $AlrtLocationCopyWith<$Res> get location;
 }
 
 /// @nodoc
@@ -785,24 +756,14 @@ class _$GetLocationStateSuccessCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? location = null,
+    Object? location = freezed,
   }) {
     return _then(GetLocationStateSuccess(
-      null == location
+      freezed == location
           ? _self.location
           : location // ignore: cast_nullable_to_non_nullable
               as AlrtLocation,
     ));
-  }
-
-  /// Create a copy of GetLocationState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $AlrtLocationCopyWith<$Res> get location {
-    return $AlrtLocationCopyWith<$Res>(_self.location, (value) {
-      return _then(_self.copyWith(location: value));
-    });
   }
 }
 

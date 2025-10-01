@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hazard_app/features/map/models/location_model.dart';
+import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 
 part 'location_permission_provider_state.freezed.dart';

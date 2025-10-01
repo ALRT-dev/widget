@@ -4,6 +4,8 @@ import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/widgets/home_tabbar.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/views/screens/map_screen.dart';
+import 'package:hazard_app/features/search/providers/hazards_provider.dart';
+import 'package:hazard_app/features/search/views/screens/hazard_search_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   /// Displays the home screen of the app.
@@ -32,6 +34,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   Widget build(BuildContext context) {
     // register this provider to the lifecycle of this screen
     ref.watch(providerOfMap.select((value) => null));
+    ref.watch(providerOfHazards.select((value) => null));
 
     return Scaffold(
       body: TabBarView(
@@ -39,7 +42,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         physics: const NeverScrollableScrollPhysics(),
         children: [
           const MapScreen(),
-          const SizedBox(),
+          const HazardSearchScreen(),
           const SizedBox(),
           const SizedBox(),
           const SizedBox(),

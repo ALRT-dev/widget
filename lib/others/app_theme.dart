@@ -7,6 +7,10 @@ class AppTheme {
 
   /// The default theme settings of the app.
   static ThemeData get _defaultTheme {
+    final inputBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(100.0),
+    );
+
     return ThemeData(
       scaffoldBackgroundColor: AppColors.white,
       fontFamily: defaultFontFamily,
@@ -227,6 +231,28 @@ class AppTheme {
           width: 2.0,
         ),
         shape: CircleBorder(),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        border: inputBorder,
+        enabledBorder: inputBorder.copyWith(
+          borderSide: BorderSide(
+            color: AppColors.lightGrey,
+          ),
+        ),
+        focusedBorder: inputBorder.copyWith(
+          borderSide: BorderSide(
+            color: AppColors.black,
+          ),
+        ),
+        focusedErrorBorder: inputBorder.copyWith(
+          borderSide: BorderSide(
+            color: AppColors.black,
+          ),
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 10.spMin,
+          horizontal: 20.spMin,
+        ),
       ),
     );
   }
