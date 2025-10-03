@@ -33,7 +33,7 @@ class _CustomMarkerState extends ConsumerState<CustomMarker> {
             child: Container(
               padding: EdgeInsets.all(3.w),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.black26,
                 shape: BoxShape.circle,
               ),
               child: Text(

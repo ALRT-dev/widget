@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,6 +8,7 @@ import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_marker.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
 
 final providerOfMap =
@@ -69,50 +68,37 @@ class MapProvider extends StateNotifier<MapProviderState> {
   ///
   /// Uses [providerOfHazards] to get the list of hazards and creates a marker for each hazard with a valid location.
   void generateMarkers() async {
-    final pinIcons = await Future.wait([
-      CustomMarker(
-        markerImagePath: 'assets/pins/pin_blue.png',
-        emoji: '🚑',
-      ).toBitmapDescriptor(),
-      CustomMarker(
-        markerImagePath: 'assets/pins/pin_yellow.png',
-        emoji: '🛑',
-      ).toBitmapDescriptor(),
-      CustomMarker(
-        markerImagePath: 'assets/pins/pin_orange.png',
-        emoji: '🤏',
-      ).toBitmapDescriptor(),
-      CustomMarker(
-        markerImagePath: 'assets/pins/pin_red.png',
-        emoji: '🚨',
-      ).toBitmapDescriptor(),
-    ]);
-
     final hazards = _ref.read(providerOfHazards).hazards;
-    final markers = <Marker>{};
-
-    final rand = Random();
+    final markerFutures = <Future<Marker>>[];
 
     for (final hazard in hazards) {
       if (hazard.location?.latitude != null &&
           hazard.location?.longitude != null) {
-        final marker = Marker(
-          markerId: MarkerId(hazard.id),
-          position: LatLng(
-            hazard.location!.latitude,
-            hazard.location!.longitude,
-          ),
-          infoWindow: InfoWindow(
-            title: hazard.title,
-            snippet: hazard.description,
-          ),
-          icon: pinIcons[rand.nextInt(pinIcons.length)],
-        );
-        markers.add(marker);
+        final markerFuture = CustomMarker(
+          markerImagePath:
+              hazard.severity?.markerPath ?? HazardSeverity.info.markerPath,
+          emoji: hazard.category?.emoji ?? '❗',
+        ).toBitmapDescriptor().then((bitmapDescriptor) {
+          return Marker(
+            markerId: MarkerId(hazard.id),
+            position: LatLng(
+              hazard.location!.latitude,
+              hazard.location!.longitude,
+            ),
+            infoWindow: InfoWindow(
+              title: hazard.title,
+              snippet: hazard.shortDescription,
+            ),
+            icon: bitmapDescriptor,
+          );
+        });
+        markerFutures.add(markerFuture);
       }
     }
 
-    updateMarkers(markers);
+    final markers = await Future.wait(markerFutures);
+
+    updateMarkers(markers.toSet());
   }
 
   /// Updates [MapProviderState.cameraPosition] to the given [cameraPosition].

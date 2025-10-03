@@ -16,11 +16,14 @@ T _$identity<T>(T value) => value;
 mixin _$Hazard {
   String get id;
   String? get title;
-  String? get description;
+  String? get shortDescription;
+  HazardSeverity? get severity;
+  String? get source;
   AlrtLocation? get location;
   HazardCategory? get category;
   DateTime? get createdAt;
   DateTime? get updatedAt;
+  DateTime? get expiresAt;
 
   /// Create a copy of Hazard
   /// with the given fields replaced by the non-null parameter values.
@@ -39,8 +42,11 @@ mixin _$Hazard {
             other is Hazard &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
+            (identical(other.shortDescription, shortDescription) ||
+                other.shortDescription == shortDescription) &&
+            (identical(other.severity, severity) ||
+                other.severity == severity) &&
+            (identical(other.source, source) || other.source == source) &&
             (identical(other.location, location) ||
                 other.location == location) &&
             (identical(other.category, category) ||
@@ -48,17 +54,19 @@ mixin _$Hazard {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.expiresAt, expiresAt) ||
+                other.expiresAt == expiresAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, description, location,
-      category, createdAt, updatedAt);
+  int get hashCode => Object.hash(runtimeType, id, title, shortDescription,
+      severity, source, location, category, createdAt, updatedAt, expiresAt);
 
   @override
   String toString() {
-    return 'Hazard(id: $id, title: $title, description: $description, location: $location, category: $category, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Hazard(id: $id, title: $title, shortDescription: $shortDescription, severity: $severity, source: $source, location: $location, category: $category, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
   }
 }
 
@@ -70,11 +78,14 @@ abstract mixin class $HazardCopyWith<$Res> {
   $Res call(
       {String id,
       String? title,
-      String? description,
+      String? shortDescription,
+      HazardSeverity? severity,
+      String? source,
       AlrtLocation? location,
       HazardCategory? category,
       DateTime? createdAt,
-      DateTime? updatedAt});
+      DateTime? updatedAt,
+      DateTime? expiresAt});
 
   $AlrtLocationCopyWith<$Res>? get location;
   $HazardCategoryCopyWith<$Res>? get category;
@@ -94,11 +105,14 @@ class _$HazardCopyWithImpl<$Res> implements $HazardCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? title = freezed,
-    Object? description = freezed,
+    Object? shortDescription = freezed,
+    Object? severity = freezed,
+    Object? source = freezed,
     Object? location = freezed,
     Object? category = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? expiresAt = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -109,9 +123,17 @@ class _$HazardCopyWithImpl<$Res> implements $HazardCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
-      description: freezed == description
-          ? _self.description
-          : description // ignore: cast_nullable_to_non_nullable
+      shortDescription: freezed == shortDescription
+          ? _self.shortDescription
+          : shortDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
+      severity: freezed == severity
+          ? _self.severity
+          : severity // ignore: cast_nullable_to_non_nullable
+              as HazardSeverity?,
+      source: freezed == source
+          ? _self.source
+          : source // ignore: cast_nullable_to_non_nullable
               as String?,
       location: freezed == location
           ? _self.location
@@ -128,6 +150,10 @@ class _$HazardCopyWithImpl<$Res> implements $HazardCopyWith<$Res> {
       updatedAt: freezed == updatedAt
           ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      expiresAt: freezed == expiresAt
+          ? _self.expiresAt
+          : expiresAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
     ));
   }
@@ -257,19 +283,31 @@ extension HazardPatterns on Hazard {
     TResult Function(
             String id,
             String? title,
-            String? description,
+            String? shortDescription,
+            HazardSeverity? severity,
+            String? source,
             AlrtLocation? location,
             HazardCategory? category,
             DateTime? createdAt,
-            DateTime? updatedAt)?
+            DateTime? updatedAt,
+            DateTime? expiresAt)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _Hazard() when $default != null:
-        return $default(_that.id, _that.title, _that.description,
-            _that.location, _that.category, _that.createdAt, _that.updatedAt);
+        return $default(
+            _that.id,
+            _that.title,
+            _that.shortDescription,
+            _that.severity,
+            _that.source,
+            _that.location,
+            _that.category,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.expiresAt);
       case _:
         return orElse();
     }
@@ -293,18 +331,30 @@ extension HazardPatterns on Hazard {
     TResult Function(
             String id,
             String? title,
-            String? description,
+            String? shortDescription,
+            HazardSeverity? severity,
+            String? source,
             AlrtLocation? location,
             HazardCategory? category,
             DateTime? createdAt,
-            DateTime? updatedAt)
+            DateTime? updatedAt,
+            DateTime? expiresAt)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Hazard():
-        return $default(_that.id, _that.title, _that.description,
-            _that.location, _that.category, _that.createdAt, _that.updatedAt);
+        return $default(
+            _that.id,
+            _that.title,
+            _that.shortDescription,
+            _that.severity,
+            _that.source,
+            _that.location,
+            _that.category,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.expiresAt);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -327,18 +377,30 @@ extension HazardPatterns on Hazard {
     TResult? Function(
             String id,
             String? title,
-            String? description,
+            String? shortDescription,
+            HazardSeverity? severity,
+            String? source,
             AlrtLocation? location,
             HazardCategory? category,
             DateTime? createdAt,
-            DateTime? updatedAt)?
+            DateTime? updatedAt,
+            DateTime? expiresAt)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _Hazard() when $default != null:
-        return $default(_that.id, _that.title, _that.description,
-            _that.location, _that.category, _that.createdAt, _that.updatedAt);
+        return $default(
+            _that.id,
+            _that.title,
+            _that.shortDescription,
+            _that.severity,
+            _that.source,
+            _that.location,
+            _that.category,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.expiresAt);
       case _:
         return null;
     }
@@ -351,11 +413,14 @@ class _Hazard implements Hazard {
   const _Hazard(
       {required this.id,
       this.title,
-      this.description,
+      this.shortDescription,
+      this.severity,
+      this.source,
       this.location,
       this.category,
       this.createdAt,
-      this.updatedAt});
+      this.updatedAt,
+      this.expiresAt});
   factory _Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);
 
   @override
@@ -363,7 +428,11 @@ class _Hazard implements Hazard {
   @override
   final String? title;
   @override
-  final String? description;
+  final String? shortDescription;
+  @override
+  final HazardSeverity? severity;
+  @override
+  final String? source;
   @override
   final AlrtLocation? location;
   @override
@@ -372,6 +441,8 @@ class _Hazard implements Hazard {
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
+  @override
+  final DateTime? expiresAt;
 
   /// Create a copy of Hazard
   /// with the given fields replaced by the non-null parameter values.
@@ -395,8 +466,11 @@ class _Hazard implements Hazard {
             other is _Hazard &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
+            (identical(other.shortDescription, shortDescription) ||
+                other.shortDescription == shortDescription) &&
+            (identical(other.severity, severity) ||
+                other.severity == severity) &&
+            (identical(other.source, source) || other.source == source) &&
             (identical(other.location, location) ||
                 other.location == location) &&
             (identical(other.category, category) ||
@@ -404,17 +478,19 @@ class _Hazard implements Hazard {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.expiresAt, expiresAt) ||
+                other.expiresAt == expiresAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, description, location,
-      category, createdAt, updatedAt);
+  int get hashCode => Object.hash(runtimeType, id, title, shortDescription,
+      severity, source, location, category, createdAt, updatedAt, expiresAt);
 
   @override
   String toString() {
-    return 'Hazard(id: $id, title: $title, description: $description, location: $location, category: $category, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Hazard(id: $id, title: $title, shortDescription: $shortDescription, severity: $severity, source: $source, location: $location, category: $category, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
   }
 }
 
@@ -427,11 +503,14 @@ abstract mixin class _$HazardCopyWith<$Res> implements $HazardCopyWith<$Res> {
   $Res call(
       {String id,
       String? title,
-      String? description,
+      String? shortDescription,
+      HazardSeverity? severity,
+      String? source,
       AlrtLocation? location,
       HazardCategory? category,
       DateTime? createdAt,
-      DateTime? updatedAt});
+      DateTime? updatedAt,
+      DateTime? expiresAt});
 
   @override
   $AlrtLocationCopyWith<$Res>? get location;
@@ -453,11 +532,14 @@ class __$HazardCopyWithImpl<$Res> implements _$HazardCopyWith<$Res> {
   $Res call({
     Object? id = null,
     Object? title = freezed,
-    Object? description = freezed,
+    Object? shortDescription = freezed,
+    Object? severity = freezed,
+    Object? source = freezed,
     Object? location = freezed,
     Object? category = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? expiresAt = freezed,
   }) {
     return _then(_Hazard(
       id: null == id
@@ -468,9 +550,17 @@ class __$HazardCopyWithImpl<$Res> implements _$HazardCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String?,
-      description: freezed == description
-          ? _self.description
-          : description // ignore: cast_nullable_to_non_nullable
+      shortDescription: freezed == shortDescription
+          ? _self.shortDescription
+          : shortDescription // ignore: cast_nullable_to_non_nullable
+              as String?,
+      severity: freezed == severity
+          ? _self.severity
+          : severity // ignore: cast_nullable_to_non_nullable
+              as HazardSeverity?,
+      source: freezed == source
+          ? _self.source
+          : source // ignore: cast_nullable_to_non_nullable
               as String?,
       location: freezed == location
           ? _self.location
@@ -487,6 +577,10 @@ class __$HazardCopyWithImpl<$Res> implements _$HazardCopyWith<$Res> {
       updatedAt: freezed == updatedAt
           ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      expiresAt: freezed == expiresAt
+          ? _self.expiresAt
+          : expiresAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
     ));
   }

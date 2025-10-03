@@ -1,4 +1,5 @@
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 
@@ -16,11 +17,9 @@ final kDummyHazards = [
   Hazard(
     id: '1',
     title: 'Landslide in Kathmandu',
-    category: HazardCategory(
-      id: '1',
-      name: 'Wheather & Environment',
-    ),
-    description: 'A massive landslide has occurred in Kathmandu.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.emergency,
+    shortDescription: 'A massive landslide has occurred in Kathmandu.',
     location: AlrtLocation(
       latitude: 27.7172,
       longitude: 85.3240,
@@ -31,11 +30,9 @@ final kDummyHazards = [
   Hazard(
     id: '2',
     title: 'Flood in Chitwan',
-    category: HazardCategory(
-      id: '2',
-      name: 'Flood',
-    ),
-    description: 'Severe flooding reported in Chitwan area.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.watchAndAct,
+    shortDescription: 'Severe flooding reported in Chitwan area.',
     location: AlrtLocation(
       latitude: 27.5291,
       longitude: 84.3542,
@@ -46,11 +43,9 @@ final kDummyHazards = [
   Hazard(
     id: '3',
     title: 'Earthquake near Pokhara',
-    category: HazardCategory(
-      id: '3',
-      name: 'Earthquake',
-    ),
-    description: 'A 5.6 magnitude earthquake struck near Pokhara.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.emergency,
+    shortDescription: 'A 5.6 magnitude earthquake struck near Pokhara.',
     location: AlrtLocation(
       latitude: 28.2096,
       longitude: 83.9856,
@@ -61,11 +56,9 @@ final kDummyHazards = [
   Hazard(
     id: '4',
     title: 'Wildfire in Bardiya',
-    category: HazardCategory(
-      id: '4',
-      name: 'Wildfire',
-    ),
-    description: 'Wildfire spreading rapidly in Bardiya National Park.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.emergency,
+    shortDescription: 'Wildfire spreading rapidly in Bardiya National Park.',
     location: AlrtLocation(
       latitude: 28.3560,
       longitude: 81.4910,
@@ -76,11 +69,9 @@ final kDummyHazards = [
   Hazard(
     id: '5',
     title: 'Tornado in Biratnagar',
-    category: HazardCategory(
-      id: '5',
-      name: 'Tornado',
-    ),
-    description: 'A tornado has caused damage in Biratnagar region.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.emergency,
+    shortDescription: 'A tornado has caused damage in Biratnagar region.',
     location: AlrtLocation(
       latitude: 26.4525,
       longitude: 87.2718,
@@ -91,11 +82,9 @@ final kDummyHazards = [
   Hazard(
     id: '6',
     title: 'Flood near Bagmati River',
-    category: HazardCategory(
-      id: '2',
-      name: 'Flood',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
         'The Bagmati River overflowed due to heavy rainfall, causing localized flooding.',
     location: AlrtLocation(
       latitude: 27.6931,
@@ -107,11 +96,9 @@ final kDummyHazards = [
   Hazard(
     id: '7',
     title: 'Earthquake tremor felt in Thamel',
-    category: HazardCategory(
-      id: '3',
-      name: 'Earthquake',
-    ),
-    description: 'Mild earthquake tremor shook buildings in Thamel area.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription: 'Mild earthquake tremor shook buildings in Thamel area.',
     location: AlrtLocation(
       latitude: 27.7154,
       longitude: 85.3123,
@@ -122,11 +109,9 @@ final kDummyHazards = [
   Hazard(
     id: '8',
     title: 'Wildfire in Shivapuri forest',
-    category: HazardCategory(
-      id: '4',
-      name: 'Wildfire',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.emergency,
+    shortDescription:
         'A wildfire has broken out in the Shivapuri National Park forest area.',
     location: AlrtLocation(
       latitude: 27.8333,
@@ -138,11 +123,9 @@ final kDummyHazards = [
   Hazard(
     id: '9',
     title: 'Building collapse in Baneshwor',
-    category: HazardCategory(
-      id: '5',
-      name: 'Structural Collapse',
-    ),
-    description:
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.emergency,
+    shortDescription:
         'A residential building collapsed due to weak structure and recent tremors.',
     location: AlrtLocation(
       latitude: 27.7033,
@@ -154,11 +137,9 @@ final kDummyHazards = [
   Hazard(
     id: '10',
     title: 'Tornado spotted in Bhaktapur outskirts',
-    category: HazardCategory(
-      id: '6',
-      name: 'Tornado',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
         'A small tornado was spotted on the outskirts near Bhaktapur, affecting nearby houses.',
     location: AlrtLocation(
       latitude: 27.6710,
@@ -170,11 +151,9 @@ final kDummyHazards = [
   Hazard(
     id: '11',
     title: 'Flooded streets in Patan',
-    category: HazardCategory(
-      id: '2',
-      name: 'Flood',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription:
         'Monsoon rains caused waterlogging in Patan Durbar Square area.',
     location: AlrtLocation(
       latitude: 27.6722,
@@ -186,11 +165,10 @@ final kDummyHazards = [
   Hazard(
     id: '12',
     title: 'Gas leak in Baneshwor',
-    category: HazardCategory(
-      id: '11',
-      name: 'Industrial Accident',
-    ),
-    description: 'A gas leak was reported in a small factory near Baneshwor.',
+    category: kDummyHazardCategories[3], // Health & Emergency
+    severity: HazardSeverity.emergency,
+    shortDescription:
+        'A gas leak was reported in a small factory near Baneshwor.',
     location: AlrtLocation(
       latitude: 27.7030,
       longitude: 85.3345,
@@ -201,11 +179,10 @@ final kDummyHazards = [
   Hazard(
     id: '13',
     title: 'Fire outbreak in Kalimati market',
-    category: HazardCategory(
-      id: '10',
-      name: 'Wildfire',
-    ),
-    description: 'A fire broke out in the crowded Kalimati vegetable market.',
+    category: kDummyHazardCategories[3], // Health & Emergency
+    severity: HazardSeverity.emergency,
+    shortDescription:
+        'A fire broke out in the crowded Kalimati vegetable market.',
     location: AlrtLocation(
       latitude: 27.6915,
       longitude: 85.3010,
@@ -216,11 +193,10 @@ final kDummyHazards = [
   Hazard(
     id: '14',
     title: 'Power outage in Bhaktapur',
-    category: HazardCategory(
-      id: '14',
-      name: 'Power Outage',
-    ),
-    description: 'Large parts of Bhaktapur experienced blackout due to storm.',
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.info,
+    shortDescription:
+        'Large parts of Bhaktapur experienced blackout due to storm.',
     location: AlrtLocation(
       latitude: 27.6710,
       longitude: 85.4298,
@@ -231,11 +207,10 @@ final kDummyHazards = [
   Hazard(
     id: '15',
     title: 'Structural damage at Dharahara',
-    category: HazardCategory(
-      id: '12',
-      name: 'Structural Collapse',
-    ),
-    description: 'Cracks appeared in Dharahara tower after recent tremors.',
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
+        'Cracks appeared in Dharahara tower after recent tremors.',
     location: AlrtLocation(
       latitude: 27.7039,
       longitude: 85.3157,
@@ -246,11 +221,9 @@ final kDummyHazards = [
   Hazard(
     id: '16',
     title: 'Earthquake tremors in Lalitpur',
-    category: HazardCategory(
-      id: '3',
-      name: 'Earthquake',
-    ),
-    description: 'People rushed out of their homes after mild tremors.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription: 'People rushed out of their homes after mild tremors.',
     location: AlrtLocation(
       latitude: 27.6588,
       longitude: 85.3247,
@@ -261,11 +234,10 @@ final kDummyHazards = [
   Hazard(
     id: '17',
     title: 'Heavy rainfall in Kirtipur',
-    category: HazardCategory(
-      id: '8',
-      name: 'Heavy Rainfall',
-    ),
-    description: 'Continuous rainfall flooded low-lying roads in Kirtipur.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription:
+        'Continuous rainfall flooded low-lying roads in Kirtipur.',
     location: AlrtLocation(
       latitude: 27.6675,
       longitude: 85.2780,
@@ -276,11 +248,9 @@ final kDummyHazards = [
   Hazard(
     id: '18',
     title: 'Small landslide in Sundarijal',
-    category: HazardCategory(
-      id: '1',
-      name: 'Landslide',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
         'Road blocked due to small landslide near Sundarijal hiking trail.',
     location: AlrtLocation(
       latitude: 27.7892,
@@ -292,11 +262,9 @@ final kDummyHazards = [
   Hazard(
     id: '19',
     title: 'Bridge collapse in Gorkha',
-    category: HazardCategory(
-      id: '12',
-      name: 'Structural Collapse',
-    ),
-    description: 'A suspension bridge collapsed due to rust and overuse.',
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.emergency,
+    shortDescription: 'A suspension bridge collapsed due to rust and overuse.',
     location: AlrtLocation(
       latitude: 28.0135,
       longitude: 84.6339,
@@ -307,11 +275,9 @@ final kDummyHazards = [
   Hazard(
     id: '20',
     title: 'Robbery reported in New Road',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description: 'Two individuals reported being robbed at New Road.',
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.info,
+    shortDescription: 'Two individuals reported being robbed at New Road.',
     location: AlrtLocation(
       latitude: 27.7045,
       longitude: 85.3073,
@@ -322,11 +288,9 @@ final kDummyHazards = [
   Hazard(
     id: '21',
     title: 'Pickpocketing in Ratnapark',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description:
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.info,
+    shortDescription:
         'Several cases of pickpocketing reported in crowded Ratnapark.',
     location: AlrtLocation(
       latitude: 27.7080,
@@ -338,11 +302,10 @@ final kDummyHazards = [
   Hazard(
     id: '22',
     title: 'Explosion in a workshop, Balaju',
-    category: HazardCategory(
-      id: '15',
-      name: 'Explosion',
-    ),
-    description: 'Small explosion injured two people in a Balaju workshop.',
+    category: kDummyHazardCategories[3], // Health & Emergency
+    severity: HazardSeverity.emergency,
+    shortDescription:
+        'Small explosion injured two people in a Balaju workshop.',
     location: AlrtLocation(
       latitude: 27.7400,
       longitude: 85.3080,
@@ -353,11 +316,9 @@ final kDummyHazards = [
   Hazard(
     id: '23',
     title: 'Fire in Thamel hotel',
-    category: HazardCategory(
-      id: '10',
-      name: 'Wildfire',
-    ),
-    description: 'A fire broke out in a hotel kitchen in Thamel.',
+    category: kDummyHazardCategories[3], // Health & Emergency
+    severity: HazardSeverity.emergency,
+    shortDescription: 'A fire broke out in a hotel kitchen in Thamel.',
     location: AlrtLocation(
       latitude: 27.7154,
       longitude: 85.3123,
@@ -368,11 +329,9 @@ final kDummyHazards = [
   Hazard(
     id: '24',
     title: 'Avalanche in Manang',
-    category: HazardCategory(
-      id: '7',
-      name: 'Avalanche',
-    ),
-    description: 'Heavy snow caused avalanche blocking trekking route.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.emergency,
+    shortDescription: 'Heavy snow caused avalanche blocking trekking route.',
     location: AlrtLocation(
       latitude: 28.6686,
       longitude: 84.0190,
@@ -383,11 +342,9 @@ final kDummyHazards = [
   Hazard(
     id: '25',
     title: 'Tsunami warning in coastal region',
-    category: HazardCategory(
-      id: '9',
-      name: 'Tsunami',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.emergency,
+    shortDescription:
         'Authorities issued a tsunami warning after undersea quake (simulation).',
     location: AlrtLocation(
       latitude: 27.0,
@@ -399,11 +356,9 @@ final kDummyHazards = [
   Hazard(
     id: '26',
     title: 'Cyclone effect reaching Eastern Nepal',
-    category: HazardCategory(
-      id: '6',
-      name: 'Cyclone',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
         'Cyclone from Bay of Bengal causing heavy winds in eastern Nepal.',
     location: AlrtLocation(
       latitude: 26.6675,
@@ -415,11 +370,9 @@ final kDummyHazards = [
   Hazard(
     id: '27',
     title: 'Chemical spill in Biratnagar factory',
-    category: HazardCategory(
-      id: '11',
-      name: 'Industrial Accident',
-    ),
-    description: 'Toxic chemical leak in industrial zone caused panic.',
+    category: kDummyHazardCategories[3], // Health & Emergency
+    severity: HazardSeverity.emergency,
+    shortDescription: 'Toxic chemical leak in industrial zone caused panic.',
     location: AlrtLocation(
       latitude: 26.4525,
       longitude: 87.2718,
@@ -430,11 +383,10 @@ final kDummyHazards = [
   Hazard(
     id: '28',
     title: 'Epidemic outbreak in Terai region',
-    category: HazardCategory(
-      id: '16',
-      name: 'Epidemic',
-    ),
-    description: 'Health officials reported spread of waterborne diseases.',
+    category: kDummyHazardCategories[3], // Health & Emergency
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
+        'Health officials reported spread of waterborne diseases.',
     location: AlrtLocation(
       latitude: 27.0,
       longitude: 85.0,
@@ -445,11 +397,9 @@ final kDummyHazards = [
   Hazard(
     id: '29',
     title: 'Pest infestation in Kavre farms',
-    category: HazardCategory(
-      id: '18',
-      name: 'Pest Infestation',
-    ),
-    description: 'Farmers in Kavre reported locust infestation.',
+    category: kDummyHazardCategories[6], // Advisory / Info
+    severity: HazardSeverity.info,
+    shortDescription: 'Farmers in Kavre reported locust infestation.',
     location: AlrtLocation(
       latitude: 27.6270,
       longitude: 85.5486,
@@ -460,11 +410,9 @@ final kDummyHazards = [
   Hazard(
     id: '30',
     title: 'Violence reported in Gongabu bus park',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description: 'Group clash turned violent at Gongabu bus park.',
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.watchAndAct,
+    shortDescription: 'Group clash turned violent at Gongabu bus park.',
     location: AlrtLocation(
       latitude: 27.7392,
       longitude: 85.3150,
@@ -475,11 +423,9 @@ final kDummyHazards = [
   Hazard(
     id: '31',
     title: 'Road accident in Kalanki',
-    category: HazardCategory(
-      id: '13',
-      name: 'Transportation Accident',
-    ),
-    description: 'A bus and truck collision blocked highway at Kalanki.',
+    category: kDummyHazardCategories[1], // Transport & Travel
+    severity: HazardSeverity.watchAndAct,
+    shortDescription: 'A bus and truck collision blocked highway at Kalanki.',
     location: AlrtLocation(
       latitude: 27.6930,
       longitude: 85.2813,
@@ -490,11 +436,9 @@ final kDummyHazards = [
   Hazard(
     id: '32',
     title: 'Bridge cracks in Sankhu',
-    category: HazardCategory(
-      id: '12',
-      name: 'Structural Collapse',
-    ),
-    description: 'Old bridge in Sankhu developed major cracks.',
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.advice,
+    shortDescription: 'Old bridge in Sankhu developed major cracks.',
     location: AlrtLocation(
       latitude: 27.8015,
       longitude: 85.4455,
@@ -505,11 +449,9 @@ final kDummyHazards = [
   Hazard(
     id: '33',
     title: 'Assault case reported in Lazimpat',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description: 'Police reported a late-night assault case in Lazimpat.',
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.info,
+    shortDescription: 'Police reported a late-night assault case in Lazimpat.',
     location: AlrtLocation(
       latitude: 27.7253,
       longitude: 85.3267,
@@ -520,11 +462,9 @@ final kDummyHazards = [
   Hazard(
     id: '34',
     title: 'Flash flood in Dolakha',
-    category: HazardCategory(
-      id: '2',
-      name: 'Flood',
-    ),
-    description: 'Flash floods swept away houses in Dolakha.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.emergency,
+    shortDescription: 'Flash floods swept away houses in Dolakha.',
     location: AlrtLocation(
       latitude: 27.75,
       longitude: 86.0,
@@ -535,11 +475,9 @@ final kDummyHazards = [
   Hazard(
     id: '35',
     title: 'Landslide in Sindhupalchok highway',
-    category: HazardCategory(
-      id: '1',
-      name: 'Landslide',
-    ),
-    description: 'Landslide blocked Araniko Highway in Sindhupalchok.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.watchAndAct,
+    shortDescription: 'Landslide blocked Araniko Highway in Sindhupalchok.',
     location: AlrtLocation(
       latitude: 27.9,
       longitude: 85.8,
@@ -550,11 +488,9 @@ final kDummyHazards = [
   Hazard(
     id: '36',
     title: 'Cyber attack on Kathmandu bank',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description: 'Bank servers went offline due to cyber intrusion.',
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.watchAndAct,
+    shortDescription: 'Bank servers went offline due to cyber intrusion.',
     location: AlrtLocation(
       latitude: 27.7172,
       longitude: 85.3240,
@@ -565,11 +501,9 @@ final kDummyHazards = [
   Hazard(
     id: '37',
     title: 'Storm damages houses in Lalitpur',
-    category: HazardCategory(
-      id: '8',
-      name: 'Heavy Rainfall',
-    ),
-    description: 'Strong storm damaged roofs of several houses.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription: 'Strong storm damaged roofs of several houses.',
     location: AlrtLocation(
       latitude: 27.65,
       longitude: 85.32,
@@ -580,11 +514,9 @@ final kDummyHazards = [
   Hazard(
     id: '38',
     title: 'Power blackout in Pokhara',
-    category: HazardCategory(
-      id: '14',
-      name: 'Power Outage',
-    ),
-    description: 'Entire Pokhara valley faced power blackout for 3 hours.',
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.info,
+    shortDescription: 'Entire Pokhara valley faced power blackout for 3 hours.',
     location: AlrtLocation(
       latitude: 28.2096,
       longitude: 83.9856,
@@ -595,11 +527,9 @@ final kDummyHazards = [
   Hazard(
     id: '39',
     title: 'Building fire in Jawalakhel',
-    category: HazardCategory(
-      id: '10',
-      name: 'Wildfire',
-    ),
-    description: 'A multi-story building caught fire in Jawalakhel.',
+    category: kDummyHazardCategories[3], // Health & Emergency
+    severity: HazardSeverity.emergency,
+    shortDescription: 'A multi-story building caught fire in Jawalakhel.',
     location: AlrtLocation(
       latitude: 27.6735,
       longitude: 85.3148,
@@ -610,11 +540,9 @@ final kDummyHazards = [
   Hazard(
     id: '40',
     title: 'Drought reported in Terai',
-    category: HazardCategory(
-      id: '17',
-      name: 'Drought',
-    ),
-    description: 'Farmers in Terai reported severe drought conditions.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription: 'Farmers in Terai reported severe drought conditions.',
     location: AlrtLocation(
       latitude: 27.1,
       longitude: 84.9,
@@ -625,11 +553,9 @@ final kDummyHazards = [
   Hazard(
     id: '41',
     title: 'Landslide near Budanilkantha temple road',
-    category: HazardCategory(
-      id: '1',
-      name: 'Landslide',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
         'Heavy rain triggered a landslide blocking the road to Budanilkantha temple.',
     location: AlrtLocation(
       latitude: 27.8015,
@@ -641,11 +567,9 @@ final kDummyHazards = [
   Hazard(
     id: '42',
     title: 'Flash flood in Budanilkantha river stream',
-    category: HazardCategory(
-      id: '2',
-      name: 'Flood',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription:
         'A sudden flash flood swept through small river streams near Budanilkantha.',
     location: AlrtLocation(
       latitude: 27.8070,
@@ -657,11 +581,9 @@ final kDummyHazards = [
   Hazard(
     id: '43',
     title: 'Wildfire in Shivapuri forest near Budanilkantha',
-    category: HazardCategory(
-      id: '10',
-      name: 'Wildfire',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.emergency,
+    shortDescription:
         'A wildfire has been reported spreading in Shivapuri forest close to Budanilkantha.',
     location: AlrtLocation(
       latitude: 27.8200,
@@ -673,11 +595,10 @@ final kDummyHazards = [
   Hazard(
     id: '44',
     title: 'Road accident on Budanilkantha highway',
-    category: HazardCategory(
-      id: '13',
-      name: 'Transportation Accident',
-    ),
-    description: 'A truck and motorbike collided on Budanilkantha highway.',
+    category: kDummyHazardCategories[1], // Transport & Travel
+    severity: HazardSeverity.info,
+    shortDescription:
+        'A truck and motorbike collided on Budanilkantha highway.',
     location: AlrtLocation(
       latitude: 27.8055,
       longitude: 85.3520,
@@ -688,11 +609,10 @@ final kDummyHazards = [
   Hazard(
     id: '45',
     title: 'Power outage in Budanilkantha wards',
-    category: HazardCategory(
-      id: '14',
-      name: 'Power Outage',
-    ),
-    description: 'Residents faced complete blackout due to transformer damage.',
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.info,
+    shortDescription:
+        'Residents faced complete blackout due to transformer damage.',
     location: AlrtLocation(
       latitude: 27.8040,
       longitude: 85.3570,
@@ -703,11 +623,9 @@ final kDummyHazards = [
   Hazard(
     id: '46',
     title: 'Pickpocketing case at Budanilkantha bus stop',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description:
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.info,
+    shortDescription:
         'Several passengers reported stolen wallets at a busy bus stop.',
     location: AlrtLocation(
       latitude: 27.8065,
@@ -719,11 +637,9 @@ final kDummyHazards = [
   Hazard(
     id: '47',
     title: 'Small landslide blocking hiking trail',
-    category: HazardCategory(
-      id: '1',
-      name: 'Landslide',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription:
         'Tourists reported a small landslide blocking a hiking trail to Shivapuri.',
     location: AlrtLocation(
       latitude: 27.8150,
@@ -735,11 +651,9 @@ final kDummyHazards = [
   Hazard(
     id: '48',
     title: 'Heavy rainfall causes waterlogging',
-    category: HazardCategory(
-      id: '8',
-      name: 'Heavy Rainfall',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription:
         'Continuous rainfall caused waterlogging in residential areas.',
     location: AlrtLocation(
       latitude: 27.8080,
@@ -751,11 +665,9 @@ final kDummyHazards = [
   Hazard(
     id: '49',
     title: 'Wild monkeys attack locals',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description:
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.info,
+    shortDescription:
         'Aggressive monkeys from Shivapuri entered neighborhoods and injured locals.',
     location: AlrtLocation(
       latitude: 27.8120,
@@ -767,11 +679,9 @@ final kDummyHazards = [
   Hazard(
     id: '50',
     title: 'House fire in Budanilkantha neighborhood',
-    category: HazardCategory(
-      id: '10',
-      name: 'Wildfire',
-    ),
-    description:
+    category: kDummyHazardCategories[3], // Health & Emergency
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
         'A fire broke out in a residential house near Budanilkantha school area.',
     location: AlrtLocation(
       latitude: 27.8030,
@@ -783,11 +693,9 @@ final kDummyHazards = [
   Hazard(
     id: '51',
     title: 'Flooded streets in Golfutar',
-    category: HazardCategory(
-      id: '2',
-      name: 'Flood',
-    ),
-    description: 'Heavy rainfall caused street flooding in Golfutar area.',
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription: 'Heavy rainfall caused street flooding in Golfutar area.',
     location: AlrtLocation(
       latitude: 27.7830,
       longitude: 85.3490,
@@ -798,11 +706,9 @@ final kDummyHazards = [
   Hazard(
     id: '52',
     title: 'Landslide near Golfutar hillside',
-    category: HazardCategory(
-      id: '1',
-      name: 'Landslide',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
         'Minor landslide occurred on a hillside near Golfutar settlement.',
     location: AlrtLocation(
       latitude: 27.7850,
@@ -814,11 +720,10 @@ final kDummyHazards = [
   Hazard(
     id: '53',
     title: 'House fire in Hattigauda neighborhood',
-    category: HazardCategory(
-      id: '10',
-      name: 'Wildfire',
-    ),
-    description: 'Electrical short circuit led to a house fire in Hattigauda.',
+    category: kDummyHazardCategories[3], // Health & Emergency
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
+        'Electrical short circuit led to a house fire in Hattigauda.',
     location: AlrtLocation(
       latitude: 27.7800,
       longitude: 85.3525,
@@ -829,11 +734,10 @@ final kDummyHazards = [
   Hazard(
     id: '54',
     title: 'Traffic accident in Hattigauda road',
-    category: HazardCategory(
-      id: '13',
-      name: 'Transportation Accident',
-    ),
-    description: 'A motorbike collided with a taxi on Hattigauda main road.',
+    category: kDummyHazardCategories[1], // Transport & Travel
+    severity: HazardSeverity.info,
+    shortDescription:
+        'A motorbike collided with a taxi on Hattigauda main road.',
     location: AlrtLocation(
       latitude: 27.7790,
       longitude: 85.3540,
@@ -844,11 +748,9 @@ final kDummyHazards = [
   Hazard(
     id: '55',
     title: 'Power outage in Golfutar area',
-    category: HazardCategory(
-      id: '14',
-      name: 'Power Outage',
-    ),
-    description:
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.info,
+    shortDescription:
         'Transformer malfunction caused blackout in Golfutar neighborhoods.',
     location: AlrtLocation(
       latitude: 27.7825,
@@ -860,11 +762,10 @@ final kDummyHazards = [
   Hazard(
     id: '56',
     title: 'Pickpocketing case in Golfutar bus stop',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description: 'Passengers reported stolen wallets at Golfutar bus stop.',
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.info,
+    shortDescription:
+        'Passengers reported stolen wallets at Golfutar bus stop.',
     location: AlrtLocation(
       latitude: 27.7838,
       longitude: 85.3488,
@@ -875,11 +776,9 @@ final kDummyHazards = [
   Hazard(
     id: '57',
     title: 'Heavy rainfall in Hattigauda',
-    category: HazardCategory(
-      id: '8',
-      name: 'Heavy Rainfall',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription:
         'Downpour caused road blockages and localized flooding in Hattigauda.',
     location: AlrtLocation(
       latitude: 27.7780,
@@ -891,11 +790,9 @@ final kDummyHazards = [
   Hazard(
     id: '58',
     title: 'Structural crack in Golfutar building',
-    category: HazardCategory(
-      id: '12',
-      name: 'Structural Collapse',
-    ),
-    description:
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.advice,
+    shortDescription:
         'An old residential building in Golfutar developed deep cracks.',
     location: AlrtLocation(
       latitude: 27.7845,
@@ -907,11 +804,10 @@ final kDummyHazards = [
   Hazard(
     id: '59',
     title: 'Robbery case reported in Hattigauda shop',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description: 'A small grocery shop in Hattigauda was robbed late at night.',
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.info,
+    shortDescription:
+        'A small grocery shop in Hattigauda was robbed late at night.',
     location: AlrtLocation(
       latitude: 27.7795,
       longitude: 85.3555,
@@ -922,11 +818,9 @@ final kDummyHazards = [
   Hazard(
     id: '60',
     title: 'Monkey attack in Golfutar',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description:
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.info,
+    shortDescription:
         'Locals reported monkeys attacking passersby near Golfutar hillside.',
     location: AlrtLocation(
       latitude: 27.7860,
@@ -938,11 +832,9 @@ final kDummyHazards = [
   Hazard(
     id: '61',
     title: 'Flooding near Baluwatar',
-    category: HazardCategory(
-      id: '2',
-      name: 'Flood',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription:
         'Drainage overflow caused street flooding near Baluwatar residences.',
     location: AlrtLocation(
       latitude: 27.7285,
@@ -954,11 +846,9 @@ final kDummyHazards = [
   Hazard(
     id: '62',
     title: 'Landslide blocking road in Tokha-Chhahare',
-    category: HazardCategory(
-      id: '1',
-      name: 'Landslide',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
         'Rainfall triggered a hillside landslide blocking the Tokha–Chhahare road.',
     location: AlrtLocation(
       latitude: 27.7830,
@@ -970,11 +860,10 @@ final kDummyHazards = [
   Hazard(
     id: '63',
     title: 'Transformer explosion in Gongabu',
-    category: HazardCategory(
-      id: '15',
-      name: 'Explosion',
-    ),
-    description: 'Residents reported a loud blast due to transformer failure.',
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
+        'Residents reported a loud blast due to transformer failure.',
     location: AlrtLocation(
       latitude: 27.7370,
       longitude: 85.3075,
@@ -985,11 +874,9 @@ final kDummyHazards = [
   Hazard(
     id: '64',
     title: 'Bus accident in Samakhusi road',
-    category: HazardCategory(
-      id: '13',
-      name: 'Transportation Accident',
-    ),
-    description:
+    category: kDummyHazardCategories[1], // Transport & Travel
+    severity: HazardSeverity.emergency,
+    shortDescription:
         'A passenger bus lost control and collided with roadside shops.',
     location: AlrtLocation(
       latitude: 27.7405,
@@ -1001,11 +888,10 @@ final kDummyHazards = [
   Hazard(
     id: '65',
     title: 'Fire outbreak in Tokha bazar',
-    category: HazardCategory(
-      id: '10',
-      name: 'Wildfire',
-    ),
-    description: 'A grocery shop caught fire, spreading to adjacent stores.',
+    category: kDummyHazardCategories[3], // Health & Emergency
+    severity: HazardSeverity.emergency,
+    shortDescription:
+        'A grocery shop caught fire, spreading to adjacent stores.',
     location: AlrtLocation(
       latitude: 27.7580,
       longitude: 85.3370,
@@ -1016,11 +902,9 @@ final kDummyHazards = [
   Hazard(
     id: '66',
     title: 'Pickpocketing case in Kalanki bus stop',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description:
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.info,
+    shortDescription:
         'Several travelers reported stolen belongings in crowded bus station.',
     location: AlrtLocation(
       latitude: 27.6900,
@@ -1032,11 +916,9 @@ final kDummyHazards = [
   Hazard(
     id: '67',
     title: 'Heavy rainfall in Budhanilkantha hillside',
-    category: HazardCategory(
-      id: '8',
-      name: 'Heavy Rainfall',
-    ),
-    description:
+    category: kDummyHazardCategories[2], // Weather & Environment
+    severity: HazardSeverity.advice,
+    shortDescription:
         'Continuous downpour caused soil erosion near hillside settlements.',
     location: AlrtLocation(
       latitude: 27.8100,
@@ -1048,11 +930,9 @@ final kDummyHazards = [
   Hazard(
     id: '68',
     title: 'Structural cracks at Tokha hospital building',
-    category: HazardCategory(
-      id: '12',
-      name: 'Structural Collapse',
-    ),
-    description:
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
         'Hospital building walls developed cracks after recent tremors.',
     location: AlrtLocation(
       latitude: 27.7655,
@@ -1064,11 +944,9 @@ final kDummyHazards = [
   Hazard(
     id: '69',
     title: 'Robbery reported in Lazimpat hotel',
-    category: HazardCategory(
-      id: '19',
-      name: 'Crime & Security',
-    ),
-    description:
+    category: kDummyHazardCategories[0], // Safety & Security
+    severity: HazardSeverity.watchAndAct,
+    shortDescription:
         'Armed robbery took place in a small hotel at Lazimpat late at night.',
     location: AlrtLocation(
       latitude: 27.7260,
@@ -1080,11 +958,10 @@ final kDummyHazards = [
   Hazard(
     id: '70',
     title: 'Power outage in Maharajgunj area',
-    category: HazardCategory(
-      id: '14',
-      name: 'Power Outage',
-    ),
-    description: 'Sudden blackout affected residential blocks in Maharajgunj.',
+    category: kDummyHazardCategories[4], // Infrastructure & Services
+    severity: HazardSeverity.info,
+    shortDescription:
+        'Sudden blackout affected residential blocks in Maharajgunj.',
     location: AlrtLocation(
       latitude: 27.7415,
       longitude: 85.3360,
