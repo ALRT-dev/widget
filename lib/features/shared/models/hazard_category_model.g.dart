@@ -10,10 +10,12 @@ _HazardCategory _$HazardCategoryFromJson(Map<String, dynamic> json) =>
     _HazardCategory(
       id: json['id'] as String,
       name: json['name'] as String,
+      emoji: json['emoji'] as String?,
     );
 
 Map<String, dynamic> _$HazardCategoryToJson(_HazardCategory instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'emoji': instance.emoji,
     };

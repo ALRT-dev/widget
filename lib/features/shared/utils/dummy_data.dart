@@ -3,26 +3,13 @@ import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 
 final kDummyHazardCategories = [
-  HazardCategory(id: '1', name: '⛰️ Landslide'),
-  HazardCategory(id: '2', name: '🌊 Flood'),
-  HazardCategory(id: '3', name: '🌍 Earthquake'),
-  HazardCategory(id: '4', name: '🌋 Volcanic Eruption'),
-  HazardCategory(id: '5', name: '🌪️ Tornado'),
-  HazardCategory(id: '6', name: '🌀 Cyclone'),
-  HazardCategory(id: '7', name: '❄️ Avalanche'),
-  HazardCategory(id: '8', name: '🌧️ Storm'),
-  HazardCategory(id: '9', name: '☄️ Tsunami'),
-  HazardCategory(id: '10', name: '🔥 Wildfire'),
-  HazardCategory(id: '11', name: '🏭 Industrial Accident'),
-  HazardCategory(id: '12', name: '🏚️ Structural Collapse'),
-  HazardCategory(id: '13', name: '🚆 Transportation Accident'),
-  HazardCategory(id: '14', name: '⚡ Power Outage'),
-  HazardCategory(id: '15', name: '💥 Explosion'),
-  HazardCategory(id: '16', name: '🦠 Epidemic'),
-  HazardCategory(id: '17', name: '💧 Drought'),
-  HazardCategory(id: '18', name: '🪲 Pest Infestation'),
-  HazardCategory(id: '19', name: '🔒 Crime'),
-  HazardCategory(id: '20', name: '⚠️ Other'),
+  HazardCategory(id: '1', name: 'Safety & Security', emoji: '🔒'),
+  HazardCategory(id: '2', name: 'Transport & Travel', emoji: '🚉'),
+  HazardCategory(id: '3', name: 'Weather & Environment', emoji: '🌦'),
+  HazardCategory(id: '4', name: 'Health & Emergency', emoji: '🚑'),
+  HazardCategory(id: '5', name: 'Infrastructure & Services', emoji: '💡'),
+  HazardCategory(id: '6', name: 'Crowds & Events', emoji: '👥'),
+  HazardCategory(id: '7', name: 'Advisory / Info', emoji: 'ℹ️'),
 ];
 
 final kDummyHazards = [
@@ -31,7 +18,7 @@ final kDummyHazards = [
     title: 'Landslide in Kathmandu',
     category: HazardCategory(
       id: '1',
-      name: 'Landslide',
+      name: 'Wheather & Environment',
     ),
     description: 'A massive landslide has occurred in Kathmandu.',
     location: AlrtLocation(

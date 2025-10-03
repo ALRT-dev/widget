@@ -35,6 +35,7 @@ dependencies:
   geocoding: ^4.0.0
   app_settings: ^6.1.1
   timeago: ^3.7.1
+  widget_to_marker: ^1.0.6
 
 dev_dependencies:
   flutter_test:

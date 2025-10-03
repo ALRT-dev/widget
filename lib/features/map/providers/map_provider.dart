@@ -1,16 +1,16 @@
 import 'dart:math';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
+import 'package:hazard_app/features/map/views/widgets/custom_marker.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
+import 'package:widget_to_marker/widget_to_marker.dart';
 
 final providerOfMap =
     StateNotifierProvider.autoDispose<MapProvider, MapProviderState>(
@@ -69,39 +69,27 @@ class MapProvider extends StateNotifier<MapProviderState> {
   ///
   /// Uses [providerOfHazards] to get the list of hazards and creates a marker for each hazard with a valid location.
   void generateMarkers() async {
-    final hazards = _ref.read(providerOfHazards).hazards;
-    final markers = <Marker>{};
-
-    final pins = await Future.wait([
-      rootBundle.load('assets/pins/pin_warning.png'),
-      rootBundle.load('assets/pins/pin_danger.png'),
-      rootBundle.load('assets/pins/pin_pickpocket.png'),
-      rootBundle.load('assets/pins/pin_thief.png'),
+    final pinIcons = await Future.wait([
+      CustomMarker(
+        markerImagePath: 'assets/pins/pin_blue.png',
+        emoji: '🚑',
+      ).toBitmapDescriptor(),
+      CustomMarker(
+        markerImagePath: 'assets/pins/pin_yellow.png',
+        emoji: '🛑',
+      ).toBitmapDescriptor(),
+      CustomMarker(
+        markerImagePath: 'assets/pins/pin_orange.png',
+        emoji: '🤏',
+      ).toBitmapDescriptor(),
+      CustomMarker(
+        markerImagePath: 'assets/pins/pin_red.png',
+        emoji: '🚨',
+      ).toBitmapDescriptor(),
     ]);
 
-    final warningPin = BitmapDescriptor.bytes(
-      pins[0].buffer.asUint8List(),
-      width: 32.w,
-    );
-    final dangerPin = BitmapDescriptor.bytes(
-      pins[1].buffer.asUint8List(),
-      width: 32.w,
-    );
-    final pickpocketPin = BitmapDescriptor.bytes(
-      pins[2].buffer.asUint8List(),
-      width: 32.w,
-    );
-    final thiefPin = BitmapDescriptor.bytes(
-      pins[3].buffer.asUint8List(),
-      width: 32.w,
-    );
-
-    final pinIcons = [
-      warningPin,
-      dangerPin,
-      pickpocketPin,
-      thiefPin,
-    ];
+    final hazards = _ref.read(providerOfHazards).hazards;
+    final markers = <Marker>{};
 
     final rand = Random();
 

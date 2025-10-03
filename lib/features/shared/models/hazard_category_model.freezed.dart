@@ -16,6 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$HazardCategory {
   String get id;
   String get name;
+  String? get emoji;
 
   /// Create a copy of HazardCategory
   /// with the given fields replaced by the non-null parameter values.
@@ -34,16 +35,17 @@ mixin _$HazardCategory {
         (other.runtimeType == runtimeType &&
             other is HazardCategory &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name));
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.emoji, emoji) || other.emoji == emoji));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name);
+  int get hashCode => Object.hash(runtimeType, id, name, emoji);
 
   @override
   String toString() {
-    return 'HazardCategory(id: $id, name: $name)';
+    return 'HazardCategory(id: $id, name: $name, emoji: $emoji)';
   }
 }
 
@@ -53,7 +55,7 @@ abstract mixin class $HazardCategoryCopyWith<$Res> {
           HazardCategory value, $Res Function(HazardCategory) _then) =
       _$HazardCategoryCopyWithImpl;
   @useResult
-  $Res call({String id, String name});
+  $Res call({String id, String name, String? emoji});
 }
 
 /// @nodoc
@@ -71,6 +73,7 @@ class _$HazardCategoryCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? emoji = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -81,6 +84,10 @@ class _$HazardCategoryCopyWithImpl<$Res>
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      emoji: freezed == emoji
+          ? _self.emoji
+          : emoji // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -178,13 +185,13 @@ extension HazardCategoryPatterns on HazardCategory {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String name)? $default, {
+    TResult Function(String id, String name, String? emoji)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _HazardCategory() when $default != null:
-        return $default(_that.id, _that.name);
+        return $default(_that.id, _that.name, _that.emoji);
       case _:
         return orElse();
     }
@@ -205,12 +212,12 @@ extension HazardCategoryPatterns on HazardCategory {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String name) $default,
+    TResult Function(String id, String name, String? emoji) $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardCategory():
-        return $default(_that.id, _that.name);
+        return $default(_that.id, _that.name, _that.emoji);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -230,12 +237,12 @@ extension HazardCategoryPatterns on HazardCategory {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String name)? $default,
+    TResult? Function(String id, String name, String? emoji)? $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardCategory() when $default != null:
-        return $default(_that.id, _that.name);
+        return $default(_that.id, _that.name, _that.emoji);
       case _:
         return null;
     }
@@ -245,7 +252,7 @@ extension HazardCategoryPatterns on HazardCategory {
 /// @nodoc
 @JsonSerializable()
 class _HazardCategory implements HazardCategory {
-  const _HazardCategory({required this.id, required this.name});
+  const _HazardCategory({required this.id, required this.name, this.emoji});
   factory _HazardCategory.fromJson(Map<String, dynamic> json) =>
       _$HazardCategoryFromJson(json);
 
@@ -253,6 +260,8 @@ class _HazardCategory implements HazardCategory {
   final String id;
   @override
   final String name;
+  @override
+  final String? emoji;
 
   /// Create a copy of HazardCategory
   /// with the given fields replaced by the non-null parameter values.
@@ -275,16 +284,17 @@ class _HazardCategory implements HazardCategory {
         (other.runtimeType == runtimeType &&
             other is _HazardCategory &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.name, name) || other.name == name));
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.emoji, emoji) || other.emoji == emoji));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name);
+  int get hashCode => Object.hash(runtimeType, id, name, emoji);
 
   @override
   String toString() {
-    return 'HazardCategory(id: $id, name: $name)';
+    return 'HazardCategory(id: $id, name: $name, emoji: $emoji)';
   }
 }
 
@@ -296,7 +306,7 @@ abstract mixin class _$HazardCategoryCopyWith<$Res>
       __$HazardCategoryCopyWithImpl;
   @override
   @useResult
-  $Res call({String id, String name});
+  $Res call({String id, String name, String? emoji});
 }
 
 /// @nodoc
@@ -314,6 +324,7 @@ class __$HazardCategoryCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? emoji = freezed,
   }) {
     return _then(_HazardCategory(
       id: null == id
@@ -324,6 +335,10 @@ class __$HazardCategoryCopyWithImpl<$Res>
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      emoji: freezed == emoji
+          ? _self.emoji
+          : emoji // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
