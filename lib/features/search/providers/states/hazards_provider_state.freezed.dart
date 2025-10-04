@@ -23,8 +23,14 @@ mixin _$HazardsProviderState {
   /// The list of hazards fetched based on [searchParams] after [getHazardsState] is successful.
   List<Hazard> get hazards;
 
+  /// The list of hazard categories fetched after [getHazardCategoriesState] is successful.
+  List<HazardCategory> get hazardCategories;
+
   /// The state of the get hazards operation.
   GetHazardsState get getHazardsState;
+
+  /// The state of the get hazard categories operation.
+  GetHazardCategoriesState get getHazardCategoriesState;
 
   /// Create a copy of HazardsProviderState
   /// with the given fields replaced by the non-null parameter values.
@@ -44,17 +50,28 @@ mixin _$HazardsProviderState {
             (identical(other.searchParams, searchParams) ||
                 other.searchParams == searchParams) &&
             const DeepCollectionEquality().equals(other.hazards, hazards) &&
+            const DeepCollectionEquality()
+                .equals(other.hazardCategories, hazardCategories) &&
             (identical(other.getHazardsState, getHazardsState) ||
-                other.getHazardsState == getHazardsState));
+                other.getHazardsState == getHazardsState) &&
+            (identical(
+                    other.getHazardCategoriesState, getHazardCategoriesState) ||
+                other.getHazardCategoriesState == getHazardCategoriesState));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, tempSearchParams, searchParams,
-      const DeepCollectionEquality().hash(hazards), getHazardsState);
+  int get hashCode => Object.hash(
+      runtimeType,
+      tempSearchParams,
+      searchParams,
+      const DeepCollectionEquality().hash(hazards),
+      const DeepCollectionEquality().hash(hazardCategories),
+      getHazardsState,
+      getHazardCategoriesState);
 
   @override
   String toString() {
-    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams, hazards: $hazards, getHazardsState: $getHazardsState)';
+    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams, hazards: $hazards, hazardCategories: $hazardCategories, getHazardsState: $getHazardsState, getHazardCategoriesState: $getHazardCategoriesState)';
   }
 }
 
@@ -68,11 +85,14 @@ abstract mixin class $HazardsProviderStateCopyWith<$Res> {
       {HazardSearchParams tempSearchParams,
       HazardSearchParams searchParams,
       List<Hazard> hazards,
-      GetHazardsState getHazardsState});
+      List<HazardCategory> hazardCategories,
+      GetHazardsState getHazardsState,
+      GetHazardCategoriesState getHazardCategoriesState});
 
   $HazardSearchParamsCopyWith<$Res> get tempSearchParams;
   $HazardSearchParamsCopyWith<$Res> get searchParams;
   $GetHazardsStateCopyWith<$Res> get getHazardsState;
+  $GetHazardCategoriesStateCopyWith<$Res> get getHazardCategoriesState;
 }
 
 /// @nodoc
@@ -91,7 +111,9 @@ class _$HazardsProviderStateCopyWithImpl<$Res>
     Object? tempSearchParams = null,
     Object? searchParams = null,
     Object? hazards = null,
+    Object? hazardCategories = null,
     Object? getHazardsState = null,
+    Object? getHazardCategoriesState = null,
   }) {
     return _then(_self.copyWith(
       tempSearchParams: null == tempSearchParams
@@ -106,10 +128,18 @@ class _$HazardsProviderStateCopyWithImpl<$Res>
           ? _self.hazards
           : hazards // ignore: cast_nullable_to_non_nullable
               as List<Hazard>,
+      hazardCategories: null == hazardCategories
+          ? _self.hazardCategories
+          : hazardCategories // ignore: cast_nullable_to_non_nullable
+              as List<HazardCategory>,
       getHazardsState: null == getHazardsState
           ? _self.getHazardsState
           : getHazardsState // ignore: cast_nullable_to_non_nullable
               as GetHazardsState,
+      getHazardCategoriesState: null == getHazardCategoriesState
+          ? _self.getHazardCategoriesState
+          : getHazardCategoriesState // ignore: cast_nullable_to_non_nullable
+              as GetHazardCategoriesState,
     ));
   }
 
@@ -140,6 +170,17 @@ class _$HazardsProviderStateCopyWithImpl<$Res>
   $GetHazardsStateCopyWith<$Res> get getHazardsState {
     return $GetHazardsStateCopyWith<$Res>(_self.getHazardsState, (value) {
       return _then(_self.copyWith(getHazardsState: value));
+    });
+  }
+
+  /// Create a copy of HazardsProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GetHazardCategoriesStateCopyWith<$Res> get getHazardCategoriesState {
+    return $GetHazardCategoriesStateCopyWith<$Res>(
+        _self.getHazardCategoriesState, (value) {
+      return _then(_self.copyWith(getHazardCategoriesState: value));
     });
   }
 }
@@ -241,15 +282,22 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
             HazardSearchParams tempSearchParams,
             HazardSearchParams searchParams,
             List<Hazard> hazards,
-            GetHazardsState getHazardsState)?
+            List<HazardCategory> hazardCategories,
+            GetHazardsState getHazardsState,
+            GetHazardCategoriesState getHazardCategoriesState)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _HazardsProviderState() when $default != null:
-        return $default(_that.tempSearchParams, _that.searchParams,
-            _that.hazards, _that.getHazardsState);
+        return $default(
+            _that.tempSearchParams,
+            _that.searchParams,
+            _that.hazards,
+            _that.hazardCategories,
+            _that.getHazardsState,
+            _that.getHazardCategoriesState);
       case _:
         return orElse();
     }
@@ -274,14 +322,21 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
             HazardSearchParams tempSearchParams,
             HazardSearchParams searchParams,
             List<Hazard> hazards,
-            GetHazardsState getHazardsState)
+            List<HazardCategory> hazardCategories,
+            GetHazardsState getHazardsState,
+            GetHazardCategoriesState getHazardCategoriesState)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardsProviderState():
-        return $default(_that.tempSearchParams, _that.searchParams,
-            _that.hazards, _that.getHazardsState);
+        return $default(
+            _that.tempSearchParams,
+            _that.searchParams,
+            _that.hazards,
+            _that.hazardCategories,
+            _that.getHazardsState,
+            _that.getHazardCategoriesState);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -305,14 +360,21 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
             HazardSearchParams tempSearchParams,
             HazardSearchParams searchParams,
             List<Hazard> hazards,
-            GetHazardsState getHazardsState)?
+            List<HazardCategory> hazardCategories,
+            GetHazardsState getHazardsState,
+            GetHazardCategoriesState getHazardCategoriesState)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardsProviderState() when $default != null:
-        return $default(_that.tempSearchParams, _that.searchParams,
-            _that.hazards, _that.getHazardsState);
+        return $default(
+            _that.tempSearchParams,
+            _that.searchParams,
+            _that.hazards,
+            _that.hazardCategories,
+            _that.getHazardsState,
+            _that.getHazardCategoriesState);
       case _:
         return null;
     }
@@ -326,8 +388,11 @@ class _HazardsProviderState implements HazardsProviderState {
       {this.tempSearchParams = const HazardSearchParams(),
       this.searchParams = const HazardSearchParams(),
       final List<Hazard> hazards = const <Hazard>[],
-      this.getHazardsState = const GetHazardsState.initial()})
-      : _hazards = hazards;
+      final List<HazardCategory> hazardCategories = const <HazardCategory>[],
+      this.getHazardsState = const GetHazardsState.initial(),
+      this.getHazardCategoriesState = const GetHazardCategoriesState.initial()})
+      : _hazards = hazards,
+        _hazardCategories = hazardCategories;
 
   /// The temporary search parameters that are being modified by the user.
   @override
@@ -351,10 +416,28 @@ class _HazardsProviderState implements HazardsProviderState {
     return EqualUnmodifiableListView(_hazards);
   }
 
+  /// The list of hazard categories fetched after [getHazardCategoriesState] is successful.
+  final List<HazardCategory> _hazardCategories;
+
+  /// The list of hazard categories fetched after [getHazardCategoriesState] is successful.
+  @override
+  @JsonKey()
+  List<HazardCategory> get hazardCategories {
+    if (_hazardCategories is EqualUnmodifiableListView)
+      return _hazardCategories;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_hazardCategories);
+  }
+
   /// The state of the get hazards operation.
   @override
   @JsonKey()
   final GetHazardsState getHazardsState;
+
+  /// The state of the get hazard categories operation.
+  @override
+  @JsonKey()
+  final GetHazardCategoriesState getHazardCategoriesState;
 
   /// Create a copy of HazardsProviderState
   /// with the given fields replaced by the non-null parameter values.
@@ -375,17 +458,28 @@ class _HazardsProviderState implements HazardsProviderState {
             (identical(other.searchParams, searchParams) ||
                 other.searchParams == searchParams) &&
             const DeepCollectionEquality().equals(other._hazards, _hazards) &&
+            const DeepCollectionEquality()
+                .equals(other._hazardCategories, _hazardCategories) &&
             (identical(other.getHazardsState, getHazardsState) ||
-                other.getHazardsState == getHazardsState));
+                other.getHazardsState == getHazardsState) &&
+            (identical(
+                    other.getHazardCategoriesState, getHazardCategoriesState) ||
+                other.getHazardCategoriesState == getHazardCategoriesState));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, tempSearchParams, searchParams,
-      const DeepCollectionEquality().hash(_hazards), getHazardsState);
+  int get hashCode => Object.hash(
+      runtimeType,
+      tempSearchParams,
+      searchParams,
+      const DeepCollectionEquality().hash(_hazards),
+      const DeepCollectionEquality().hash(_hazardCategories),
+      getHazardsState,
+      getHazardCategoriesState);
 
   @override
   String toString() {
-    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams, hazards: $hazards, getHazardsState: $getHazardsState)';
+    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams, hazards: $hazards, hazardCategories: $hazardCategories, getHazardsState: $getHazardsState, getHazardCategoriesState: $getHazardCategoriesState)';
   }
 }
 
@@ -401,7 +495,9 @@ abstract mixin class _$HazardsProviderStateCopyWith<$Res>
       {HazardSearchParams tempSearchParams,
       HazardSearchParams searchParams,
       List<Hazard> hazards,
-      GetHazardsState getHazardsState});
+      List<HazardCategory> hazardCategories,
+      GetHazardsState getHazardsState,
+      GetHazardCategoriesState getHazardCategoriesState});
 
   @override
   $HazardSearchParamsCopyWith<$Res> get tempSearchParams;
@@ -409,6 +505,8 @@ abstract mixin class _$HazardsProviderStateCopyWith<$Res>
   $HazardSearchParamsCopyWith<$Res> get searchParams;
   @override
   $GetHazardsStateCopyWith<$Res> get getHazardsState;
+  @override
+  $GetHazardCategoriesStateCopyWith<$Res> get getHazardCategoriesState;
 }
 
 /// @nodoc
@@ -427,7 +525,9 @@ class __$HazardsProviderStateCopyWithImpl<$Res>
     Object? tempSearchParams = null,
     Object? searchParams = null,
     Object? hazards = null,
+    Object? hazardCategories = null,
     Object? getHazardsState = null,
+    Object? getHazardCategoriesState = null,
   }) {
     return _then(_HazardsProviderState(
       tempSearchParams: null == tempSearchParams
@@ -442,10 +542,18 @@ class __$HazardsProviderStateCopyWithImpl<$Res>
           ? _self._hazards
           : hazards // ignore: cast_nullable_to_non_nullable
               as List<Hazard>,
+      hazardCategories: null == hazardCategories
+          ? _self._hazardCategories
+          : hazardCategories // ignore: cast_nullable_to_non_nullable
+              as List<HazardCategory>,
       getHazardsState: null == getHazardsState
           ? _self.getHazardsState
           : getHazardsState // ignore: cast_nullable_to_non_nullable
               as GetHazardsState,
+      getHazardCategoriesState: null == getHazardCategoriesState
+          ? _self.getHazardCategoriesState
+          : getHazardCategoriesState // ignore: cast_nullable_to_non_nullable
+              as GetHazardCategoriesState,
     ));
   }
 
@@ -476,6 +584,17 @@ class __$HazardsProviderStateCopyWithImpl<$Res>
   $GetHazardsStateCopyWith<$Res> get getHazardsState {
     return $GetHazardsStateCopyWith<$Res>(_self.getHazardsState, (value) {
       return _then(_self.copyWith(getHazardsState: value));
+    });
+  }
+
+  /// Create a copy of HazardsProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GetHazardCategoriesStateCopyWith<$Res> get getHazardCategoriesState {
+    return $GetHazardCategoriesStateCopyWith<$Res>(
+        _self.getHazardCategoriesState, (value) {
+      return _then(_self.copyWith(getHazardCategoriesState: value));
     });
   }
 }
@@ -892,6 +1011,436 @@ class _$GetHazardsStateErrorCopyWithImpl<$Res>
   }
 
   /// Create a copy of GetHazardsState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AppErrorCopyWith<$Res> get error {
+    return $AppErrorCopyWith<$Res>(_self.error, (value) {
+      return _then(_self.copyWith(error: value));
+    });
+  }
+}
+
+/// @nodoc
+mixin _$GetHazardCategoriesState {
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is GetHazardCategoriesState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetHazardCategoriesState()';
+  }
+}
+
+/// @nodoc
+class $GetHazardCategoriesStateCopyWith<$Res> {
+  $GetHazardCategoriesStateCopyWith(
+      GetHazardCategoriesState _, $Res Function(GetHazardCategoriesState) __);
+}
+
+/// Adds pattern-matching-related methods to [GetHazardCategoriesState].
+extension GetHazardCategoriesStatePatterns on GetHazardCategoriesState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(GetHazardCategoriesStateInitial value)? initial,
+    TResult Function(GetHazardCategoriesStateLoading value)? loading,
+    TResult Function(GetHazardCategoriesStateSuccess value)? success,
+    TResult Function(GetHazardCategoriesStateError value)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GetHazardCategoriesStateInitial() when initial != null:
+        return initial(_that);
+      case GetHazardCategoriesStateLoading() when loading != null:
+        return loading(_that);
+      case GetHazardCategoriesStateSuccess() when success != null:
+        return success(_that);
+      case GetHazardCategoriesStateError() when error != null:
+        return error(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(GetHazardCategoriesStateInitial value) initial,
+    required TResult Function(GetHazardCategoriesStateLoading value) loading,
+    required TResult Function(GetHazardCategoriesStateSuccess value) success,
+    required TResult Function(GetHazardCategoriesStateError value) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GetHazardCategoriesStateInitial():
+        return initial(_that);
+      case GetHazardCategoriesStateLoading():
+        return loading(_that);
+      case GetHazardCategoriesStateSuccess():
+        return success(_that);
+      case GetHazardCategoriesStateError():
+        return error(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(GetHazardCategoriesStateInitial value)? initial,
+    TResult? Function(GetHazardCategoriesStateLoading value)? loading,
+    TResult? Function(GetHazardCategoriesStateSuccess value)? success,
+    TResult? Function(GetHazardCategoriesStateError value)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GetHazardCategoriesStateInitial() when initial != null:
+        return initial(_that);
+      case GetHazardCategoriesStateLoading() when loading != null:
+        return loading(_that);
+      case GetHazardCategoriesStateSuccess() when success != null:
+        return success(_that);
+      case GetHazardCategoriesStateError() when error != null:
+        return error(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(List<HazardCategory> hazardCategories)? success,
+    TResult Function(AppError error)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GetHazardCategoriesStateInitial() when initial != null:
+        return initial();
+      case GetHazardCategoriesStateLoading() when loading != null:
+        return loading();
+      case GetHazardCategoriesStateSuccess() when success != null:
+        return success(_that.hazardCategories);
+      case GetHazardCategoriesStateError() when error != null:
+        return error(_that.error);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(List<HazardCategory> hazardCategories) success,
+    required TResult Function(AppError error) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GetHazardCategoriesStateInitial():
+        return initial();
+      case GetHazardCategoriesStateLoading():
+        return loading();
+      case GetHazardCategoriesStateSuccess():
+        return success(_that.hazardCategories);
+      case GetHazardCategoriesStateError():
+        return error(_that.error);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(List<HazardCategory> hazardCategories)? success,
+    TResult? Function(AppError error)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case GetHazardCategoriesStateInitial() when initial != null:
+        return initial();
+      case GetHazardCategoriesStateLoading() when loading != null:
+        return loading();
+      case GetHazardCategoriesStateSuccess() when success != null:
+        return success(_that.hazardCategories);
+      case GetHazardCategoriesStateError() when error != null:
+        return error(_that.error);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class GetHazardCategoriesStateInitial implements GetHazardCategoriesState {
+  const GetHazardCategoriesStateInitial();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is GetHazardCategoriesStateInitial);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetHazardCategoriesState.initial()';
+  }
+}
+
+/// @nodoc
+
+class GetHazardCategoriesStateLoading implements GetHazardCategoriesState {
+  const GetHazardCategoriesStateLoading();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is GetHazardCategoriesStateLoading);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetHazardCategoriesState.loading()';
+  }
+}
+
+/// @nodoc
+
+class GetHazardCategoriesStateSuccess implements GetHazardCategoriesState {
+  const GetHazardCategoriesStateSuccess(
+      final List<HazardCategory> hazardCategories)
+      : _hazardCategories = hazardCategories;
+
+  final List<HazardCategory> _hazardCategories;
+  List<HazardCategory> get hazardCategories {
+    if (_hazardCategories is EqualUnmodifiableListView)
+      return _hazardCategories;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_hazardCategories);
+  }
+
+  /// Create a copy of GetHazardCategoriesState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GetHazardCategoriesStateSuccessCopyWith<GetHazardCategoriesStateSuccess>
+      get copyWith => _$GetHazardCategoriesStateSuccessCopyWithImpl<
+          GetHazardCategoriesStateSuccess>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is GetHazardCategoriesStateSuccess &&
+            const DeepCollectionEquality()
+                .equals(other._hazardCategories, _hazardCategories));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, const DeepCollectionEquality().hash(_hazardCategories));
+
+  @override
+  String toString() {
+    return 'GetHazardCategoriesState.success(hazardCategories: $hazardCategories)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $GetHazardCategoriesStateSuccessCopyWith<$Res>
+    implements $GetHazardCategoriesStateCopyWith<$Res> {
+  factory $GetHazardCategoriesStateSuccessCopyWith(
+          GetHazardCategoriesStateSuccess value,
+          $Res Function(GetHazardCategoriesStateSuccess) _then) =
+      _$GetHazardCategoriesStateSuccessCopyWithImpl;
+  @useResult
+  $Res call({List<HazardCategory> hazardCategories});
+}
+
+/// @nodoc
+class _$GetHazardCategoriesStateSuccessCopyWithImpl<$Res>
+    implements $GetHazardCategoriesStateSuccessCopyWith<$Res> {
+  _$GetHazardCategoriesStateSuccessCopyWithImpl(this._self, this._then);
+
+  final GetHazardCategoriesStateSuccess _self;
+  final $Res Function(GetHazardCategoriesStateSuccess) _then;
+
+  /// Create a copy of GetHazardCategoriesState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? hazardCategories = null,
+  }) {
+    return _then(GetHazardCategoriesStateSuccess(
+      null == hazardCategories
+          ? _self._hazardCategories
+          : hazardCategories // ignore: cast_nullable_to_non_nullable
+              as List<HazardCategory>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class GetHazardCategoriesStateError implements GetHazardCategoriesState {
+  const GetHazardCategoriesStateError(this.error);
+
+  final AppError error;
+
+  /// Create a copy of GetHazardCategoriesState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $GetHazardCategoriesStateErrorCopyWith<GetHazardCategoriesStateError>
+      get copyWith => _$GetHazardCategoriesStateErrorCopyWithImpl<
+          GetHazardCategoriesStateError>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is GetHazardCategoriesStateError &&
+            (identical(other.error, error) || other.error == error));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, error);
+
+  @override
+  String toString() {
+    return 'GetHazardCategoriesState.error(error: $error)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $GetHazardCategoriesStateErrorCopyWith<$Res>
+    implements $GetHazardCategoriesStateCopyWith<$Res> {
+  factory $GetHazardCategoriesStateErrorCopyWith(
+          GetHazardCategoriesStateError value,
+          $Res Function(GetHazardCategoriesStateError) _then) =
+      _$GetHazardCategoriesStateErrorCopyWithImpl;
+  @useResult
+  $Res call({AppError error});
+
+  $AppErrorCopyWith<$Res> get error;
+}
+
+/// @nodoc
+class _$GetHazardCategoriesStateErrorCopyWithImpl<$Res>
+    implements $GetHazardCategoriesStateErrorCopyWith<$Res> {
+  _$GetHazardCategoriesStateErrorCopyWithImpl(this._self, this._then);
+
+  final GetHazardCategoriesStateError _self;
+  final $Res Function(GetHazardCategoriesStateError) _then;
+
+  /// Create a copy of GetHazardCategoriesState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? error = null,
+  }) {
+    return _then(GetHazardCategoriesStateError(
+      null == error
+          ? _self.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as AppError,
+    ));
+  }
+
+  /// Create a copy of GetHazardCategoriesState
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')

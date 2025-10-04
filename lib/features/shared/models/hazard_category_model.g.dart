@@ -9,7 +9,7 @@ part of 'hazard_category_model.dart';
 _HazardCategory _$HazardCategoryFromJson(Map<String, dynamic> json) =>
     _HazardCategory(
       id: json['id'] as String,
-      name: json['name'] as String,
+      name: json['name'] as String?,
       emoji: json['emoji'] as String?,
     );
 

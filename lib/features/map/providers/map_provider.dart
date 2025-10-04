@@ -72,8 +72,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final markerFutures = <Future<Marker>>[];
 
     for (final hazard in hazards) {
-      if (hazard.location?.latitude != null &&
-          hazard.location?.longitude != null) {
+      if (hazard.latitude != null && hazard.longitude != null) {
         final markerFuture = CustomMarker(
           markerImagePath:
               hazard.severity?.markerPath ?? HazardSeverity.info.markerPath,
@@ -82,8 +81,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
           return Marker(
             markerId: MarkerId(hazard.id),
             position: LatLng(
-              hazard.location!.latitude,
-              hazard.location!.longitude,
+              hazard.latitude!,
+              hazard.longitude!,
             ),
             infoWindow: InfoWindow(
               title: hazard.title,

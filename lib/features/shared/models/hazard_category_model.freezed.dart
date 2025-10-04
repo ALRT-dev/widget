@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HazardCategory {
   String get id;
-  String get name;
+  String? get name;
   String? get emoji;
 
   /// Create a copy of HazardCategory
@@ -55,7 +55,7 @@ abstract mixin class $HazardCategoryCopyWith<$Res> {
           HazardCategory value, $Res Function(HazardCategory) _then) =
       _$HazardCategoryCopyWithImpl;
   @useResult
-  $Res call({String id, String name, String? emoji});
+  $Res call({String id, String? name, String? emoji});
 }
 
 /// @nodoc
@@ -72,7 +72,7 @@ class _$HazardCategoryCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? name = null,
+    Object? name = freezed,
     Object? emoji = freezed,
   }) {
     return _then(_self.copyWith(
@@ -80,10 +80,10 @@ class _$HazardCategoryCopyWithImpl<$Res>
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      name: null == name
+      name: freezed == name
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       emoji: freezed == emoji
           ? _self.emoji
           : emoji // ignore: cast_nullable_to_non_nullable
@@ -185,7 +185,7 @@ extension HazardCategoryPatterns on HazardCategory {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String name, String? emoji)? $default, {
+    TResult Function(String id, String? name, String? emoji)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
@@ -212,7 +212,7 @@ extension HazardCategoryPatterns on HazardCategory {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String name, String? emoji) $default,
+    TResult Function(String id, String? name, String? emoji) $default,
   ) {
     final _that = this;
     switch (_that) {
@@ -237,7 +237,7 @@ extension HazardCategoryPatterns on HazardCategory {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String name, String? emoji)? $default,
+    TResult? Function(String id, String? name, String? emoji)? $default,
   ) {
     final _that = this;
     switch (_that) {
@@ -252,14 +252,14 @@ extension HazardCategoryPatterns on HazardCategory {
 /// @nodoc
 @JsonSerializable()
 class _HazardCategory implements HazardCategory {
-  const _HazardCategory({required this.id, required this.name, this.emoji});
+  const _HazardCategory({required this.id, this.name, this.emoji});
   factory _HazardCategory.fromJson(Map<String, dynamic> json) =>
       _$HazardCategoryFromJson(json);
 
   @override
   final String id;
   @override
-  final String name;
+  final String? name;
   @override
   final String? emoji;
 
@@ -306,7 +306,7 @@ abstract mixin class _$HazardCategoryCopyWith<$Res>
       __$HazardCategoryCopyWithImpl;
   @override
   @useResult
-  $Res call({String id, String name, String? emoji});
+  $Res call({String id, String? name, String? emoji});
 }
 
 /// @nodoc
@@ -323,7 +323,7 @@ class __$HazardCategoryCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
-    Object? name = null,
+    Object? name = freezed,
     Object? emoji = freezed,
   }) {
     return _then(_HazardCategory(
@@ -331,10 +331,10 @@ class __$HazardCategoryCopyWithImpl<$Res>
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      name: null == name
+      name: freezed == name
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       emoji: freezed == emoji
           ? _self.emoji
           : emoji // ignore: cast_nullable_to_non_nullable

@@ -19,7 +19,8 @@ mixin _$Hazard {
   String? get shortDescription;
   HazardSeverity? get severity;
   String? get source;
-  AlrtLocation? get location;
+  double? get latitude;
+  double? get longitude;
   HazardCategory? get category;
   DateTime? get createdAt;
   DateTime? get updatedAt;
@@ -47,8 +48,10 @@ mixin _$Hazard {
             (identical(other.severity, severity) ||
                 other.severity == severity) &&
             (identical(other.source, source) || other.source == source) &&
-            (identical(other.location, location) ||
-                other.location == location) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.createdAt, createdAt) ||
@@ -61,12 +64,23 @@ mixin _$Hazard {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, shortDescription,
-      severity, source, location, category, createdAt, updatedAt, expiresAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      title,
+      shortDescription,
+      severity,
+      source,
+      latitude,
+      longitude,
+      category,
+      createdAt,
+      updatedAt,
+      expiresAt);
 
   @override
   String toString() {
-    return 'Hazard(id: $id, title: $title, shortDescription: $shortDescription, severity: $severity, source: $source, location: $location, category: $category, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
+    return 'Hazard(id: $id, title: $title, shortDescription: $shortDescription, severity: $severity, source: $source, latitude: $latitude, longitude: $longitude, category: $category, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
   }
 }
 
@@ -81,13 +95,13 @@ abstract mixin class $HazardCopyWith<$Res> {
       String? shortDescription,
       HazardSeverity? severity,
       String? source,
-      AlrtLocation? location,
+      double? latitude,
+      double? longitude,
       HazardCategory? category,
       DateTime? createdAt,
       DateTime? updatedAt,
       DateTime? expiresAt});
 
-  $AlrtLocationCopyWith<$Res>? get location;
   $HazardCategoryCopyWith<$Res>? get category;
 }
 
@@ -108,7 +122,8 @@ class _$HazardCopyWithImpl<$Res> implements $HazardCopyWith<$Res> {
     Object? shortDescription = freezed,
     Object? severity = freezed,
     Object? source = freezed,
-    Object? location = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? category = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
@@ -135,10 +150,14 @@ class _$HazardCopyWithImpl<$Res> implements $HazardCopyWith<$Res> {
           ? _self.source
           : source // ignore: cast_nullable_to_non_nullable
               as String?,
-      location: freezed == location
-          ? _self.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as AlrtLocation?,
+      latitude: freezed == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
       category: freezed == category
           ? _self.category
           : category // ignore: cast_nullable_to_non_nullable
@@ -156,20 +175,6 @@ class _$HazardCopyWithImpl<$Res> implements $HazardCopyWith<$Res> {
           : expiresAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
     ));
-  }
-
-  /// Create a copy of Hazard
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $AlrtLocationCopyWith<$Res>? get location {
-    if (_self.location == null) {
-      return null;
-    }
-
-    return $AlrtLocationCopyWith<$Res>(_self.location!, (value) {
-      return _then(_self.copyWith(location: value));
-    });
   }
 
   /// Create a copy of Hazard
@@ -286,7 +291,8 @@ extension HazardPatterns on Hazard {
             String? shortDescription,
             HazardSeverity? severity,
             String? source,
-            AlrtLocation? location,
+            double? latitude,
+            double? longitude,
             HazardCategory? category,
             DateTime? createdAt,
             DateTime? updatedAt,
@@ -303,7 +309,8 @@ extension HazardPatterns on Hazard {
             _that.shortDescription,
             _that.severity,
             _that.source,
-            _that.location,
+            _that.latitude,
+            _that.longitude,
             _that.category,
             _that.createdAt,
             _that.updatedAt,
@@ -334,7 +341,8 @@ extension HazardPatterns on Hazard {
             String? shortDescription,
             HazardSeverity? severity,
             String? source,
-            AlrtLocation? location,
+            double? latitude,
+            double? longitude,
             HazardCategory? category,
             DateTime? createdAt,
             DateTime? updatedAt,
@@ -350,7 +358,8 @@ extension HazardPatterns on Hazard {
             _that.shortDescription,
             _that.severity,
             _that.source,
-            _that.location,
+            _that.latitude,
+            _that.longitude,
             _that.category,
             _that.createdAt,
             _that.updatedAt,
@@ -380,7 +389,8 @@ extension HazardPatterns on Hazard {
             String? shortDescription,
             HazardSeverity? severity,
             String? source,
-            AlrtLocation? location,
+            double? latitude,
+            double? longitude,
             HazardCategory? category,
             DateTime? createdAt,
             DateTime? updatedAt,
@@ -396,7 +406,8 @@ extension HazardPatterns on Hazard {
             _that.shortDescription,
             _that.severity,
             _that.source,
-            _that.location,
+            _that.latitude,
+            _that.longitude,
             _that.category,
             _that.createdAt,
             _that.updatedAt,
@@ -416,7 +427,8 @@ class _Hazard implements Hazard {
       this.shortDescription,
       this.severity,
       this.source,
-      this.location,
+      this.latitude,
+      this.longitude,
       this.category,
       this.createdAt,
       this.updatedAt,
@@ -434,7 +446,9 @@ class _Hazard implements Hazard {
   @override
   final String? source;
   @override
-  final AlrtLocation? location;
+  final double? latitude;
+  @override
+  final double? longitude;
   @override
   final HazardCategory? category;
   @override
@@ -471,8 +485,10 @@ class _Hazard implements Hazard {
             (identical(other.severity, severity) ||
                 other.severity == severity) &&
             (identical(other.source, source) || other.source == source) &&
-            (identical(other.location, location) ||
-                other.location == location) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.createdAt, createdAt) ||
@@ -485,12 +501,23 @@ class _Hazard implements Hazard {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, title, shortDescription,
-      severity, source, location, category, createdAt, updatedAt, expiresAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      title,
+      shortDescription,
+      severity,
+      source,
+      latitude,
+      longitude,
+      category,
+      createdAt,
+      updatedAt,
+      expiresAt);
 
   @override
   String toString() {
-    return 'Hazard(id: $id, title: $title, shortDescription: $shortDescription, severity: $severity, source: $source, location: $location, category: $category, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
+    return 'Hazard(id: $id, title: $title, shortDescription: $shortDescription, severity: $severity, source: $source, latitude: $latitude, longitude: $longitude, category: $category, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
   }
 }
 
@@ -506,14 +533,13 @@ abstract mixin class _$HazardCopyWith<$Res> implements $HazardCopyWith<$Res> {
       String? shortDescription,
       HazardSeverity? severity,
       String? source,
-      AlrtLocation? location,
+      double? latitude,
+      double? longitude,
       HazardCategory? category,
       DateTime? createdAt,
       DateTime? updatedAt,
       DateTime? expiresAt});
 
-  @override
-  $AlrtLocationCopyWith<$Res>? get location;
   @override
   $HazardCategoryCopyWith<$Res>? get category;
 }
@@ -535,7 +561,8 @@ class __$HazardCopyWithImpl<$Res> implements _$HazardCopyWith<$Res> {
     Object? shortDescription = freezed,
     Object? severity = freezed,
     Object? source = freezed,
-    Object? location = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? category = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
@@ -562,10 +589,14 @@ class __$HazardCopyWithImpl<$Res> implements _$HazardCopyWith<$Res> {
           ? _self.source
           : source // ignore: cast_nullable_to_non_nullable
               as String?,
-      location: freezed == location
-          ? _self.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as AlrtLocation?,
+      latitude: freezed == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
       category: freezed == category
           ? _self.category
           : category // ignore: cast_nullable_to_non_nullable
@@ -583,20 +614,6 @@ class __$HazardCopyWithImpl<$Res> implements _$HazardCopyWith<$Res> {
           : expiresAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
     ));
-  }
-
-  /// Create a copy of Hazard
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $AlrtLocationCopyWith<$Res>? get location {
-    if (_self.location == null) {
-      return null;
-    }
-
-    return $AlrtLocationCopyWith<$Res>(_self.location!, (value) {
-      return _then(_self.copyWith(location: value));
-    });
   }
 
   /// Create a copy of Hazard

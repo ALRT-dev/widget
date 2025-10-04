@@ -7,7 +7,7 @@ part 'hazard_category_model.g.dart';
 abstract class HazardCategory with _$HazardCategory {
   const factory HazardCategory({
     required final String id,
-    required final String name,
+    final String? name,
     final String? emoji,
   }) = _HazardCategory;
 

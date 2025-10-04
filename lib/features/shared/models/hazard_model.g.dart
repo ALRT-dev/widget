@@ -12,9 +12,8 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
       shortDescription: json['shortDescription'] as String?,
       severity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['severity']),
       source: json['source'] as String?,
-      location: json['location'] == null
-          ? null
-          : AlrtLocation.fromJson(json['location'] as Map<String, dynamic>),
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
       category: json['category'] == null
           ? null
           : HazardCategory.fromJson(json['category'] as Map<String, dynamic>),
@@ -35,7 +34,8 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
       'shortDescription': instance.shortDescription,
       'severity': _$HazardSeverityEnumMap[instance.severity],
       'source': instance.source,
-      'location': instance.location,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
       'category': instance.category,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),

@@ -43,7 +43,7 @@ class _HazardCategoriesListItemState
               ),
             ),
           Text(
-            widget.hazardCategory.name,
+            widget.hazardCategory.name ?? 'Error',
             style: TextStyle(
               color: isSelected ? AppColors.white : AppColors.grey,
             ),
@@ -67,10 +67,10 @@ class _HazardCategoriesListItemState
     );
   }
 
-  /// Updates the state with the given category.
+  /// Updates the state with the given category and fetches the hazards.
   void _handleCategorySelection() {
-    ref
-        .read(providerOfHazards.notifier)
-        .selectCategory(widget.hazardCategory.id);
+    ref.read(providerOfHazards.notifier)
+      ..selectCategory(widget.hazardCategory.id)
+      ..getHazards();
   }
 }

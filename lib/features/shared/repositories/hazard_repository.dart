@@ -1,6 +1,7 @@
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/dummy_data.dart';
@@ -10,6 +11,8 @@ abstract class HazardRepository {
   Future<Either<List<Hazard>, AppError>> getHazards({
     required final HazardSearchParams searchParams,
   });
+
+  Future<Either<List<HazardCategory>, AppError>> getHazardCategories();
 }
 
 class HazardRepositoryImpl extends HazardRepository {
@@ -34,6 +37,18 @@ class HazardRepositoryImpl extends HazardRepository {
       onError: Failure.new,
     );
   }
+
+  @override
+  Future<Either<List<HazardCategory>, AppError>> getHazardCategories() {
+    return runAsyncCall(
+      name: 'getHazardCategories',
+      future: () async {
+        final result = await _restClient.getHazardCategories();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
 }
 
 class MockHazardRepositoryImpl extends HazardRepositoryImpl {
@@ -44,6 +59,6 @@ class MockHazardRepositoryImpl extends HazardRepositoryImpl {
     required HazardSearchParams searchParams,
   }) async {
     await Future.delayed(const Duration(seconds: 1));
-    return Success(kDummyHazards);
+    return Success(kDummyHazards as List<Hazard>);
   }
 }

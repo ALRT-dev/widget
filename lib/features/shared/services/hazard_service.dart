@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/repository_providers.dart';
 import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
@@ -20,5 +21,10 @@ class HazardService {
     return _hazardRepository.getHazards(
       searchParams: searchParams,
     );
+  }
+
+  /// Fetches the list of hazard categories from the server.
+  Future<Either<List<HazardCategory>, AppError>> getHazardCategories() {
+    return _hazardRepository.getHazardCategories();
   }
 }

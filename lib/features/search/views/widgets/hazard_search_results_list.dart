@@ -47,10 +47,10 @@ class _HazardSearchResultsListState
         children: [
           Text(
             'Nothing to show!',
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16.sp,
               fontWeight: FontWeight.w500,
-              color: Colors.grey,
             ),
           ),
           Consumer(
@@ -66,9 +66,9 @@ class _HazardSearchResultsListState
                 isSearchActive
                     ? 'No results found for your search. Please try changing it.'
                     : 'There are no data available at the moment. Please check back later.',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.sp,
-                  color: Colors.grey,
                 ),
               );
             },

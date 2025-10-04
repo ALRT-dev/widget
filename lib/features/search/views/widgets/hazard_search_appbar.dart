@@ -1,3 +1,4 @@
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -122,13 +123,25 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
 
   /// Updates the state with the given search string.
   void _handleSearchChanged(String value) {
-    ref.read(providerOfHazards.notifier).updateTempSearchString(value.trim());
+    ref.read(providerOfHazards.notifier)
+      ..updateTempSearchString(value.trim())
+      ..updateGetHazardsStateToLoading();
+    EasyDebounce.debounce(
+      'hazards-search',
+      const Duration(milliseconds: 300),
+      () {
+        if (!mounted) return;
+        ref.read(providerOfHazards.notifier).getHazards();
+      },
+    );
   }
 
   /// Clears the search input field.
   void _handleClearSearchPressed() {
     _searchController.clear();
     _searchFocusNode.unfocus();
-    ref.read(providerOfHazards.notifier).updateTempSearchString(null);
+    ref.read(providerOfHazards.notifier)
+      ..updateTempSearchString(null)
+      ..getHazards();
   }
 }

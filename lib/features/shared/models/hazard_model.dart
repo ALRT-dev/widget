@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 
@@ -14,7 +13,8 @@ abstract class Hazard with _$Hazard {
     final String? shortDescription,
     final HazardSeverity? severity,
     final String? source,
-    final AlrtLocation? location,
+    final double? latitude,
+    final double? longitude,
     final HazardCategory? category,
     final DateTime? createdAt,
     final DateTime? updatedAt,

@@ -22,7 +22,7 @@ final providerOfUserRepository = Provider<UserRepository>((ref) {
 
 /// Provides [HazardRepository].
 final providerOfHazardRepository = Provider<HazardRepository>((ref) {
-  return MockHazardRepositoryImpl(
+  return HazardRepositoryImpl(
     restClient: ref.watch(providerOfRestClient),
   );
 });
