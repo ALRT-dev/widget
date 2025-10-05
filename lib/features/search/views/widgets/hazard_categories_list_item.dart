@@ -48,6 +48,12 @@ class _HazardCategoriesListItemState
               color: isSelected ? AppColors.white : AppColors.grey,
             ),
           ),
+          Text(
+            '(${widget.hazardCategory.hazardsCount})',
+            style: TextStyle(
+              color: isSelected ? AppColors.white : AppColors.grey,
+            ),
+          ),
         ],
       ),
       color: WidgetStateProperty.resolveWith((state) {

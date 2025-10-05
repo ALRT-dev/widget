@@ -17,6 +17,7 @@ mixin _$HazardCategory {
   String get id;
   String? get name;
   String? get emoji;
+  int get hazardsCount;
 
   /// Create a copy of HazardCategory
   /// with the given fields replaced by the non-null parameter values.
@@ -36,16 +37,18 @@ mixin _$HazardCategory {
             other is HazardCategory &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.emoji, emoji) || other.emoji == emoji));
+            (identical(other.emoji, emoji) || other.emoji == emoji) &&
+            (identical(other.hazardsCount, hazardsCount) ||
+                other.hazardsCount == hazardsCount));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, emoji);
+  int get hashCode => Object.hash(runtimeType, id, name, emoji, hazardsCount);
 
   @override
   String toString() {
-    return 'HazardCategory(id: $id, name: $name, emoji: $emoji)';
+    return 'HazardCategory(id: $id, name: $name, emoji: $emoji, hazardsCount: $hazardsCount)';
   }
 }
 
@@ -55,7 +58,7 @@ abstract mixin class $HazardCategoryCopyWith<$Res> {
           HazardCategory value, $Res Function(HazardCategory) _then) =
       _$HazardCategoryCopyWithImpl;
   @useResult
-  $Res call({String id, String? name, String? emoji});
+  $Res call({String id, String? name, String? emoji, int hazardsCount});
 }
 
 /// @nodoc
@@ -74,6 +77,7 @@ class _$HazardCategoryCopyWithImpl<$Res>
     Object? id = null,
     Object? name = freezed,
     Object? emoji = freezed,
+    Object? hazardsCount = null,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -88,6 +92,10 @@ class _$HazardCategoryCopyWithImpl<$Res>
           ? _self.emoji
           : emoji // ignore: cast_nullable_to_non_nullable
               as String?,
+      hazardsCount: null == hazardsCount
+          ? _self.hazardsCount
+          : hazardsCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -185,13 +193,14 @@ extension HazardCategoryPatterns on HazardCategory {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String id, String? name, String? emoji)? $default, {
+    TResult Function(String id, String? name, String? emoji, int hazardsCount)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _HazardCategory() when $default != null:
-        return $default(_that.id, _that.name, _that.emoji);
+        return $default(_that.id, _that.name, _that.emoji, _that.hazardsCount);
       case _:
         return orElse();
     }
@@ -212,12 +221,13 @@ extension HazardCategoryPatterns on HazardCategory {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String id, String? name, String? emoji) $default,
+    TResult Function(String id, String? name, String? emoji, int hazardsCount)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardCategory():
-        return $default(_that.id, _that.name, _that.emoji);
+        return $default(_that.id, _that.name, _that.emoji, _that.hazardsCount);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -237,12 +247,13 @@ extension HazardCategoryPatterns on HazardCategory {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String id, String? name, String? emoji)? $default,
+    TResult? Function(String id, String? name, String? emoji, int hazardsCount)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardCategory() when $default != null:
-        return $default(_that.id, _that.name, _that.emoji);
+        return $default(_that.id, _that.name, _that.emoji, _that.hazardsCount);
       case _:
         return null;
     }
@@ -252,7 +263,8 @@ extension HazardCategoryPatterns on HazardCategory {
 /// @nodoc
 @JsonSerializable()
 class _HazardCategory implements HazardCategory {
-  const _HazardCategory({required this.id, this.name, this.emoji});
+  const _HazardCategory(
+      {required this.id, this.name, this.emoji, this.hazardsCount = 0});
   factory _HazardCategory.fromJson(Map<String, dynamic> json) =>
       _$HazardCategoryFromJson(json);
 
@@ -262,6 +274,9 @@ class _HazardCategory implements HazardCategory {
   final String? name;
   @override
   final String? emoji;
+  @override
+  @JsonKey()
+  final int hazardsCount;
 
   /// Create a copy of HazardCategory
   /// with the given fields replaced by the non-null parameter values.
@@ -285,16 +300,18 @@ class _HazardCategory implements HazardCategory {
             other is _HazardCategory &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.emoji, emoji) || other.emoji == emoji));
+            (identical(other.emoji, emoji) || other.emoji == emoji) &&
+            (identical(other.hazardsCount, hazardsCount) ||
+                other.hazardsCount == hazardsCount));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, emoji);
+  int get hashCode => Object.hash(runtimeType, id, name, emoji, hazardsCount);
 
   @override
   String toString() {
-    return 'HazardCategory(id: $id, name: $name, emoji: $emoji)';
+    return 'HazardCategory(id: $id, name: $name, emoji: $emoji, hazardsCount: $hazardsCount)';
   }
 }
 
@@ -306,7 +323,7 @@ abstract mixin class _$HazardCategoryCopyWith<$Res>
       __$HazardCategoryCopyWithImpl;
   @override
   @useResult
-  $Res call({String id, String? name, String? emoji});
+  $Res call({String id, String? name, String? emoji, int hazardsCount});
 }
 
 /// @nodoc
@@ -325,6 +342,7 @@ class __$HazardCategoryCopyWithImpl<$Res>
     Object? id = null,
     Object? name = freezed,
     Object? emoji = freezed,
+    Object? hazardsCount = null,
   }) {
     return _then(_HazardCategory(
       id: null == id
@@ -339,6 +357,10 @@ class __$HazardCategoryCopyWithImpl<$Res>
           ? _self.emoji
           : emoji // ignore: cast_nullable_to_non_nullable
               as String?,
+      hazardsCount: null == hazardsCount
+          ? _self.hazardsCount
+          : hazardsCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }

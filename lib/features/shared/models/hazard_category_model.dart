@@ -9,6 +9,7 @@ abstract class HazardCategory with _$HazardCategory {
     required final String id,
     final String? name,
     final String? emoji,
+    @Default(0) final int hazardsCount,
   }) = _HazardCategory;
 
   factory HazardCategory.fromJson(Map<String, dynamic> json) =>
