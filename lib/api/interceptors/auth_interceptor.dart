@@ -104,18 +104,23 @@ class AuthInterceptor implements Interceptor {
         // save the new access token to the local storage.
         _sharedPreferencesRepository.saveString(
           key: SharedPrefsKey.accessToken,
-          value: success,
+          value: success.$1,
         );
 
-        return success;
+        _sharedPreferencesRepository.saveString(
+          key: SharedPrefsKey.refreshToken,
+          value: success.$2,
+        );
+
+        return success.$1;
       });
     }
 
     return accessToken;
   }
 
-  /// Calls the API to generate new accessToken using the refreshToken.
-  Future<Either<String, AppError>> _generateNewAccessToken() {
+  /// Calls the API to generate new accessToken and refreshToken using the old refreshToken.
+  Future<Either<(String, String), AppError>> _generateNewAccessToken() {
     return runAsyncCall(
       name: 'generateNewAccessToken',
       future: () async {
@@ -140,14 +145,20 @@ class AuthInterceptor implements Interceptor {
         );
 
         final data = request.data;
-        if (data?['data'] == null || data?['data'] is! String) {
+        if (data?['accessToken'] == null || data?['accessToken'] is! String) {
           throw AppError(
             message: 'accessToken could not be generated',
           );
         }
+        if (data?['refreshToken'] == null || data?['refreshToken'] is! String) {
+          throw AppError(
+            message: 'refreshToken could not be generated',
+          );
+        }
 
-        final accessToken = data!['data'] as String;
-        return Success(accessToken);
+        final newAccessToken = data!['accessToken'] as String;
+        final newRefreshToken = data['refreshToken'] as String;
+        return Success((newAccessToken, newRefreshToken));
       },
       onError: Failure.new,
     );
