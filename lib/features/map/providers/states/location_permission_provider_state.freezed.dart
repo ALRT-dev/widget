@@ -15,7 +15,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LocationProviderState {
   /// Current user's location.
-  AlrtLocation? get location;
+  ///
+  /// Defaults to [kDefaultUserLocation].
+  AlrtLocation get location;
 
   /// The state of getting the current user's location.
   GetLocationState get getLocationState;
@@ -63,11 +65,11 @@ abstract mixin class $LocationProviderStateCopyWith<$Res> {
       _$LocationProviderStateCopyWithImpl;
   @useResult
   $Res call(
-      {AlrtLocation? location,
+      {AlrtLocation location,
       GetLocationState getLocationState,
       GetLocationPremissionState getLocationPremissionState});
 
-  $AlrtLocationCopyWith<$Res>? get location;
+  $AlrtLocationCopyWith<$Res> get location;
   $GetLocationStateCopyWith<$Res> get getLocationState;
   $GetLocationPremissionStateCopyWith<$Res> get getLocationPremissionState;
 }
@@ -85,15 +87,15 @@ class _$LocationProviderStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? location = freezed,
+    Object? location = null,
     Object? getLocationState = null,
     Object? getLocationPremissionState = null,
   }) {
     return _then(_self.copyWith(
-      location: freezed == location
+      location: null == location
           ? _self.location
           : location // ignore: cast_nullable_to_non_nullable
-              as AlrtLocation?,
+              as AlrtLocation,
       getLocationState: null == getLocationState
           ? _self.getLocationState
           : getLocationState // ignore: cast_nullable_to_non_nullable
@@ -109,12 +111,8 @@ class _$LocationProviderStateCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $AlrtLocationCopyWith<$Res>? get location {
-    if (_self.location == null) {
-      return null;
-    }
-
-    return $AlrtLocationCopyWith<$Res>(_self.location!, (value) {
+  $AlrtLocationCopyWith<$Res> get location {
+    return $AlrtLocationCopyWith<$Res>(_self.location, (value) {
       return _then(_self.copyWith(location: value));
     });
   }
@@ -234,7 +232,7 @@ extension LocationProviderStatePatterns on LocationProviderState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(AlrtLocation? location, GetLocationState getLocationState,
+    TResult Function(AlrtLocation location, GetLocationState getLocationState,
             GetLocationPremissionState getLocationPremissionState)?
         $default, {
     required TResult orElse(),
@@ -264,7 +262,7 @@ extension LocationProviderStatePatterns on LocationProviderState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(AlrtLocation? location, GetLocationState getLocationState,
+    TResult Function(AlrtLocation location, GetLocationState getLocationState,
             GetLocationPremissionState getLocationPremissionState)
         $default,
   ) {
@@ -292,7 +290,7 @@ extension LocationProviderStatePatterns on LocationProviderState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(AlrtLocation? location, GetLocationState getLocationState,
+    TResult? Function(AlrtLocation location, GetLocationState getLocationState,
             GetLocationPremissionState getLocationPremissionState)?
         $default,
   ) {
@@ -311,14 +309,17 @@ extension LocationProviderStatePatterns on LocationProviderState {
 
 class _LocationProviderState implements LocationProviderState {
   const _LocationProviderState(
-      {this.location,
+      {this.location = kDefaultUserLocation,
       this.getLocationState = const GetLocationState.initial(),
       this.getLocationPremissionState =
           const GetLocationPremissionState.initial()});
 
   /// Current user's location.
+  ///
+  /// Defaults to [kDefaultUserLocation].
   @override
-  final AlrtLocation? location;
+  @JsonKey()
+  final AlrtLocation location;
 
   /// The state of getting the current user's location.
   @override
@@ -373,12 +374,12 @@ abstract mixin class _$LocationProviderStateCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {AlrtLocation? location,
+      {AlrtLocation location,
       GetLocationState getLocationState,
       GetLocationPremissionState getLocationPremissionState});
 
   @override
-  $AlrtLocationCopyWith<$Res>? get location;
+  $AlrtLocationCopyWith<$Res> get location;
   @override
   $GetLocationStateCopyWith<$Res> get getLocationState;
   @override
@@ -398,15 +399,15 @@ class __$LocationProviderStateCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? location = freezed,
+    Object? location = null,
     Object? getLocationState = null,
     Object? getLocationPremissionState = null,
   }) {
     return _then(_LocationProviderState(
-      location: freezed == location
+      location: null == location
           ? _self.location
           : location // ignore: cast_nullable_to_non_nullable
-              as AlrtLocation?,
+              as AlrtLocation,
       getLocationState: null == getLocationState
           ? _self.getLocationState
           : getLocationState // ignore: cast_nullable_to_non_nullable
@@ -422,12 +423,8 @@ class __$LocationProviderStateCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $AlrtLocationCopyWith<$Res>? get location {
-    if (_self.location == null) {
-      return null;
-    }
-
-    return $AlrtLocationCopyWith<$Res>(_self.location!, (value) {
+  $AlrtLocationCopyWith<$Res> get location {
+    return $AlrtLocationCopyWith<$Res>(_self.location, (value) {
       return _then(_self.copyWith(location: value));
     });
   }

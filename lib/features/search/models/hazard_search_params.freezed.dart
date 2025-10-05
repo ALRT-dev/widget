@@ -20,6 +20,12 @@ mixin _$HazardSearchParams {
   /// The list of category IDs to filter hazards.
   List<String> get categoryIds;
 
+  /// The latitude for location-based filtering.
+  double? get latitude;
+
+  /// The longitude for location-based filtering.
+  double? get longitude;
+
   /// The page number for pagination.
   int get page;
 
@@ -46,6 +52,10 @@ mixin _$HazardSearchParams {
                 other.searchString == searchString) &&
             const DeepCollectionEquality()
                 .equals(other.categoryIds, categoryIds) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
             (identical(other.page, page) || other.page == page) &&
             (identical(other.pageSize, pageSize) ||
                 other.pageSize == pageSize));
@@ -53,12 +63,18 @@ mixin _$HazardSearchParams {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, searchString,
-      const DeepCollectionEquality().hash(categoryIds), page, pageSize);
+  int get hashCode => Object.hash(
+      runtimeType,
+      searchString,
+      const DeepCollectionEquality().hash(categoryIds),
+      latitude,
+      longitude,
+      page,
+      pageSize);
 
   @override
   String toString() {
-    return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, page: $page, pageSize: $pageSize)';
+    return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, latitude: $latitude, longitude: $longitude, page: $page, pageSize: $pageSize)';
   }
 }
 
@@ -69,7 +85,12 @@ abstract mixin class $HazardSearchParamsCopyWith<$Res> {
       _$HazardSearchParamsCopyWithImpl;
   @useResult
   $Res call(
-      {String? searchString, List<String> categoryIds, int page, int pageSize});
+      {String? searchString,
+      List<String> categoryIds,
+      double? latitude,
+      double? longitude,
+      int page,
+      int pageSize});
 }
 
 /// @nodoc
@@ -87,6 +108,8 @@ class _$HazardSearchParamsCopyWithImpl<$Res>
   $Res call({
     Object? searchString = freezed,
     Object? categoryIds = null,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? page = null,
     Object? pageSize = null,
   }) {
@@ -99,6 +122,14 @@ class _$HazardSearchParamsCopyWithImpl<$Res>
           ? _self.categoryIds
           : categoryIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      latitude: freezed == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
       page: null == page
           ? _self.page
           : page // ignore: cast_nullable_to_non_nullable
@@ -204,16 +235,16 @@ extension HazardSearchParamsPatterns on HazardSearchParams {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String? searchString, List<String> categoryIds, int page,
-            int pageSize)?
+    TResult Function(String? searchString, List<String> categoryIds,
+            double? latitude, double? longitude, int page, int pageSize)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _HazardSearchParams() when $default != null:
-        return $default(
-            _that.searchString, _that.categoryIds, _that.page, _that.pageSize);
+        return $default(_that.searchString, _that.categoryIds, _that.latitude,
+            _that.longitude, _that.page, _that.pageSize);
       case _:
         return orElse();
     }
@@ -234,15 +265,15 @@ extension HazardSearchParamsPatterns on HazardSearchParams {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String? searchString, List<String> categoryIds, int page,
-            int pageSize)
+    TResult Function(String? searchString, List<String> categoryIds,
+            double? latitude, double? longitude, int page, int pageSize)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardSearchParams():
-        return $default(
-            _that.searchString, _that.categoryIds, _that.page, _that.pageSize);
+        return $default(_that.searchString, _that.categoryIds, _that.latitude,
+            _that.longitude, _that.page, _that.pageSize);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -262,15 +293,15 @@ extension HazardSearchParamsPatterns on HazardSearchParams {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String? searchString, List<String> categoryIds, int page,
-            int pageSize)?
+    TResult? Function(String? searchString, List<String> categoryIds,
+            double? latitude, double? longitude, int page, int pageSize)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _HazardSearchParams() when $default != null:
-        return $default(
-            _that.searchString, _that.categoryIds, _that.page, _that.pageSize);
+        return $default(_that.searchString, _that.categoryIds, _that.latitude,
+            _that.longitude, _that.page, _that.pageSize);
       case _:
         return null;
     }
@@ -283,6 +314,8 @@ class _HazardSearchParams implements HazardSearchParams {
   const _HazardSearchParams(
       {this.searchString,
       final List<String> categoryIds = const <String>[],
+      this.latitude,
+      this.longitude,
       this.page = 1,
       this.pageSize = 20})
       : _categoryIds = categoryIds;
@@ -304,6 +337,14 @@ class _HazardSearchParams implements HazardSearchParams {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_categoryIds);
   }
+
+  /// The latitude for location-based filtering.
+  @override
+  final double? latitude;
+
+  /// The longitude for location-based filtering.
+  @override
+  final double? longitude;
 
   /// The page number for pagination.
   @override
@@ -339,6 +380,10 @@ class _HazardSearchParams implements HazardSearchParams {
                 other.searchString == searchString) &&
             const DeepCollectionEquality()
                 .equals(other._categoryIds, _categoryIds) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
             (identical(other.page, page) || other.page == page) &&
             (identical(other.pageSize, pageSize) ||
                 other.pageSize == pageSize));
@@ -346,12 +391,18 @@ class _HazardSearchParams implements HazardSearchParams {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, searchString,
-      const DeepCollectionEquality().hash(_categoryIds), page, pageSize);
+  int get hashCode => Object.hash(
+      runtimeType,
+      searchString,
+      const DeepCollectionEquality().hash(_categoryIds),
+      latitude,
+      longitude,
+      page,
+      pageSize);
 
   @override
   String toString() {
-    return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, page: $page, pageSize: $pageSize)';
+    return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, latitude: $latitude, longitude: $longitude, page: $page, pageSize: $pageSize)';
   }
 }
 
@@ -364,7 +415,12 @@ abstract mixin class _$HazardSearchParamsCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String? searchString, List<String> categoryIds, int page, int pageSize});
+      {String? searchString,
+      List<String> categoryIds,
+      double? latitude,
+      double? longitude,
+      int page,
+      int pageSize});
 }
 
 /// @nodoc
@@ -382,6 +438,8 @@ class __$HazardSearchParamsCopyWithImpl<$Res>
   $Res call({
     Object? searchString = freezed,
     Object? categoryIds = null,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? page = null,
     Object? pageSize = null,
   }) {
@@ -394,6 +452,14 @@ class __$HazardSearchParamsCopyWithImpl<$Res>
           ? _self._categoryIds
           : categoryIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      latitude: freezed == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
       page: null == page
           ? _self.page
           : page // ignore: cast_nullable_to_non_nullable

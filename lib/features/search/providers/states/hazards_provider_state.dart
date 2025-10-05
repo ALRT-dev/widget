@@ -15,14 +15,22 @@ abstract class HazardsProviderState with _$HazardsProviderState {
     /// The actual search parameters used to fetch hazards.
     @Default(HazardSearchParams()) final HazardSearchParams searchParams,
 
-    /// The list of hazards fetched based on [searchParams] after [getHazardsState] is successful.
-    @Default(<Hazard>[]) final List<Hazard> hazards,
+    /// The list of hazards fetched based on [searchParams] after [getMapHazardsState] is successful.
+    @Default(<Hazard>[]) final List<Hazard> mapHazards,
+
+    /// The list of hazards fetched based on [searchParams] after [getListHazardsState] is successful.
+    @Default(<Hazard>[]) final List<Hazard> listHazards,
 
     /// The list of hazard categories fetched after [getHazardCategoriesState] is successful.
     @Default(<HazardCategory>[]) final List<HazardCategory> hazardCategories,
 
-    /// The state of the get hazards operation.
-    @Default(GetHazardsState.initial()) final GetHazardsState getHazardsState,
+    /// The state of the get hazards for the map.
+    @Default(GetHazardsState.initial())
+    final GetHazardsState getMapHazardsState,
+
+    /// The state of the get hazards for the list.
+    @Default(GetHazardsState.initial())
+    final GetHazardsState getListHazardsState,
 
     /// The state of the get hazard categories operation.
     @Default(GetHazardCategoriesState.initial())

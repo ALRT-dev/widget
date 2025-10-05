@@ -12,6 +12,12 @@ abstract class HazardSearchParams with _$HazardSearchParams {
     /// The list of category IDs to filter hazards.
     @Default(<String>[]) final List<String> categoryIds,
 
+    /// The latitude for location-based filtering.
+    final double? latitude,
+
+    /// The longitude for location-based filtering.
+    final double? longitude,
+
     /// The page number for pagination.
     @Default(1) final int page,
 

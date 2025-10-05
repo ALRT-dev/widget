@@ -20,14 +20,20 @@ mixin _$HazardsProviderState {
   /// The actual search parameters used to fetch hazards.
   HazardSearchParams get searchParams;
 
-  /// The list of hazards fetched based on [searchParams] after [getHazardsState] is successful.
-  List<Hazard> get hazards;
+  /// The list of hazards fetched based on [searchParams] after [getMapHazardsState] is successful.
+  List<Hazard> get mapHazards;
+
+  /// The list of hazards fetched based on [searchParams] after [getListHazardsState] is successful.
+  List<Hazard> get listHazards;
 
   /// The list of hazard categories fetched after [getHazardCategoriesState] is successful.
   List<HazardCategory> get hazardCategories;
 
-  /// The state of the get hazards operation.
-  GetHazardsState get getHazardsState;
+  /// The state of the get hazards for the map.
+  GetHazardsState get getMapHazardsState;
+
+  /// The state of the get hazards for the list.
+  GetHazardsState get getListHazardsState;
 
   /// The state of the get hazard categories operation.
   GetHazardCategoriesState get getHazardCategoriesState;
@@ -49,11 +55,16 @@ mixin _$HazardsProviderState {
                 other.tempSearchParams == tempSearchParams) &&
             (identical(other.searchParams, searchParams) ||
                 other.searchParams == searchParams) &&
-            const DeepCollectionEquality().equals(other.hazards, hazards) &&
+            const DeepCollectionEquality()
+                .equals(other.mapHazards, mapHazards) &&
+            const DeepCollectionEquality()
+                .equals(other.listHazards, listHazards) &&
             const DeepCollectionEquality()
                 .equals(other.hazardCategories, hazardCategories) &&
-            (identical(other.getHazardsState, getHazardsState) ||
-                other.getHazardsState == getHazardsState) &&
+            (identical(other.getMapHazardsState, getMapHazardsState) ||
+                other.getMapHazardsState == getMapHazardsState) &&
+            (identical(other.getListHazardsState, getListHazardsState) ||
+                other.getListHazardsState == getListHazardsState) &&
             (identical(
                     other.getHazardCategoriesState, getHazardCategoriesState) ||
                 other.getHazardCategoriesState == getHazardCategoriesState));
@@ -64,14 +75,16 @@ mixin _$HazardsProviderState {
       runtimeType,
       tempSearchParams,
       searchParams,
-      const DeepCollectionEquality().hash(hazards),
+      const DeepCollectionEquality().hash(mapHazards),
+      const DeepCollectionEquality().hash(listHazards),
       const DeepCollectionEquality().hash(hazardCategories),
-      getHazardsState,
+      getMapHazardsState,
+      getListHazardsState,
       getHazardCategoriesState);
 
   @override
   String toString() {
-    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams, hazards: $hazards, hazardCategories: $hazardCategories, getHazardsState: $getHazardsState, getHazardCategoriesState: $getHazardCategoriesState)';
+    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams, mapHazards: $mapHazards, listHazards: $listHazards, hazardCategories: $hazardCategories, getMapHazardsState: $getMapHazardsState, getListHazardsState: $getListHazardsState, getHazardCategoriesState: $getHazardCategoriesState)';
   }
 }
 
@@ -84,14 +97,17 @@ abstract mixin class $HazardsProviderStateCopyWith<$Res> {
   $Res call(
       {HazardSearchParams tempSearchParams,
       HazardSearchParams searchParams,
-      List<Hazard> hazards,
+      List<Hazard> mapHazards,
+      List<Hazard> listHazards,
       List<HazardCategory> hazardCategories,
-      GetHazardsState getHazardsState,
+      GetHazardsState getMapHazardsState,
+      GetHazardsState getListHazardsState,
       GetHazardCategoriesState getHazardCategoriesState});
 
   $HazardSearchParamsCopyWith<$Res> get tempSearchParams;
   $HazardSearchParamsCopyWith<$Res> get searchParams;
-  $GetHazardsStateCopyWith<$Res> get getHazardsState;
+  $GetHazardsStateCopyWith<$Res> get getMapHazardsState;
+  $GetHazardsStateCopyWith<$Res> get getListHazardsState;
   $GetHazardCategoriesStateCopyWith<$Res> get getHazardCategoriesState;
 }
 
@@ -110,9 +126,11 @@ class _$HazardsProviderStateCopyWithImpl<$Res>
   $Res call({
     Object? tempSearchParams = null,
     Object? searchParams = null,
-    Object? hazards = null,
+    Object? mapHazards = null,
+    Object? listHazards = null,
     Object? hazardCategories = null,
-    Object? getHazardsState = null,
+    Object? getMapHazardsState = null,
+    Object? getListHazardsState = null,
     Object? getHazardCategoriesState = null,
   }) {
     return _then(_self.copyWith(
@@ -124,17 +142,25 @@ class _$HazardsProviderStateCopyWithImpl<$Res>
           ? _self.searchParams
           : searchParams // ignore: cast_nullable_to_non_nullable
               as HazardSearchParams,
-      hazards: null == hazards
-          ? _self.hazards
-          : hazards // ignore: cast_nullable_to_non_nullable
+      mapHazards: null == mapHazards
+          ? _self.mapHazards
+          : mapHazards // ignore: cast_nullable_to_non_nullable
+              as List<Hazard>,
+      listHazards: null == listHazards
+          ? _self.listHazards
+          : listHazards // ignore: cast_nullable_to_non_nullable
               as List<Hazard>,
       hazardCategories: null == hazardCategories
           ? _self.hazardCategories
           : hazardCategories // ignore: cast_nullable_to_non_nullable
               as List<HazardCategory>,
-      getHazardsState: null == getHazardsState
-          ? _self.getHazardsState
-          : getHazardsState // ignore: cast_nullable_to_non_nullable
+      getMapHazardsState: null == getMapHazardsState
+          ? _self.getMapHazardsState
+          : getMapHazardsState // ignore: cast_nullable_to_non_nullable
+              as GetHazardsState,
+      getListHazardsState: null == getListHazardsState
+          ? _self.getListHazardsState
+          : getListHazardsState // ignore: cast_nullable_to_non_nullable
               as GetHazardsState,
       getHazardCategoriesState: null == getHazardCategoriesState
           ? _self.getHazardCategoriesState
@@ -167,9 +193,19 @@ class _$HazardsProviderStateCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $GetHazardsStateCopyWith<$Res> get getHazardsState {
-    return $GetHazardsStateCopyWith<$Res>(_self.getHazardsState, (value) {
-      return _then(_self.copyWith(getHazardsState: value));
+  $GetHazardsStateCopyWith<$Res> get getMapHazardsState {
+    return $GetHazardsStateCopyWith<$Res>(_self.getMapHazardsState, (value) {
+      return _then(_self.copyWith(getMapHazardsState: value));
+    });
+  }
+
+  /// Create a copy of HazardsProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GetHazardsStateCopyWith<$Res> get getListHazardsState {
+    return $GetHazardsStateCopyWith<$Res>(_self.getListHazardsState, (value) {
+      return _then(_self.copyWith(getListHazardsState: value));
     });
   }
 
@@ -281,9 +317,11 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
     TResult Function(
             HazardSearchParams tempSearchParams,
             HazardSearchParams searchParams,
-            List<Hazard> hazards,
+            List<Hazard> mapHazards,
+            List<Hazard> listHazards,
             List<HazardCategory> hazardCategories,
-            GetHazardsState getHazardsState,
+            GetHazardsState getMapHazardsState,
+            GetHazardsState getListHazardsState,
             GetHazardCategoriesState getHazardCategoriesState)?
         $default, {
     required TResult orElse(),
@@ -294,9 +332,11 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
         return $default(
             _that.tempSearchParams,
             _that.searchParams,
-            _that.hazards,
+            _that.mapHazards,
+            _that.listHazards,
             _that.hazardCategories,
-            _that.getHazardsState,
+            _that.getMapHazardsState,
+            _that.getListHazardsState,
             _that.getHazardCategoriesState);
       case _:
         return orElse();
@@ -321,9 +361,11 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
     TResult Function(
             HazardSearchParams tempSearchParams,
             HazardSearchParams searchParams,
-            List<Hazard> hazards,
+            List<Hazard> mapHazards,
+            List<Hazard> listHazards,
             List<HazardCategory> hazardCategories,
-            GetHazardsState getHazardsState,
+            GetHazardsState getMapHazardsState,
+            GetHazardsState getListHazardsState,
             GetHazardCategoriesState getHazardCategoriesState)
         $default,
   ) {
@@ -333,9 +375,11 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
         return $default(
             _that.tempSearchParams,
             _that.searchParams,
-            _that.hazards,
+            _that.mapHazards,
+            _that.listHazards,
             _that.hazardCategories,
-            _that.getHazardsState,
+            _that.getMapHazardsState,
+            _that.getListHazardsState,
             _that.getHazardCategoriesState);
       case _:
         throw StateError('Unexpected subclass');
@@ -359,9 +403,11 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
     TResult? Function(
             HazardSearchParams tempSearchParams,
             HazardSearchParams searchParams,
-            List<Hazard> hazards,
+            List<Hazard> mapHazards,
+            List<Hazard> listHazards,
             List<HazardCategory> hazardCategories,
-            GetHazardsState getHazardsState,
+            GetHazardsState getMapHazardsState,
+            GetHazardsState getListHazardsState,
             GetHazardCategoriesState getHazardCategoriesState)?
         $default,
   ) {
@@ -371,9 +417,11 @@ extension HazardsProviderStatePatterns on HazardsProviderState {
         return $default(
             _that.tempSearchParams,
             _that.searchParams,
-            _that.hazards,
+            _that.mapHazards,
+            _that.listHazards,
             _that.hazardCategories,
-            _that.getHazardsState,
+            _that.getMapHazardsState,
+            _that.getListHazardsState,
             _that.getHazardCategoriesState);
       case _:
         return null;
@@ -387,11 +435,14 @@ class _HazardsProviderState implements HazardsProviderState {
   const _HazardsProviderState(
       {this.tempSearchParams = const HazardSearchParams(),
       this.searchParams = const HazardSearchParams(),
-      final List<Hazard> hazards = const <Hazard>[],
+      final List<Hazard> mapHazards = const <Hazard>[],
+      final List<Hazard> listHazards = const <Hazard>[],
       final List<HazardCategory> hazardCategories = const <HazardCategory>[],
-      this.getHazardsState = const GetHazardsState.initial(),
+      this.getMapHazardsState = const GetHazardsState.initial(),
+      this.getListHazardsState = const GetHazardsState.initial(),
       this.getHazardCategoriesState = const GetHazardCategoriesState.initial()})
-      : _hazards = hazards,
+      : _mapHazards = mapHazards,
+        _listHazards = listHazards,
         _hazardCategories = hazardCategories;
 
   /// The temporary search parameters that are being modified by the user.
@@ -404,16 +455,28 @@ class _HazardsProviderState implements HazardsProviderState {
   @JsonKey()
   final HazardSearchParams searchParams;
 
-  /// The list of hazards fetched based on [searchParams] after [getHazardsState] is successful.
-  final List<Hazard> _hazards;
+  /// The list of hazards fetched based on [searchParams] after [getMapHazardsState] is successful.
+  final List<Hazard> _mapHazards;
 
-  /// The list of hazards fetched based on [searchParams] after [getHazardsState] is successful.
+  /// The list of hazards fetched based on [searchParams] after [getMapHazardsState] is successful.
   @override
   @JsonKey()
-  List<Hazard> get hazards {
-    if (_hazards is EqualUnmodifiableListView) return _hazards;
+  List<Hazard> get mapHazards {
+    if (_mapHazards is EqualUnmodifiableListView) return _mapHazards;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_hazards);
+    return EqualUnmodifiableListView(_mapHazards);
+  }
+
+  /// The list of hazards fetched based on [searchParams] after [getListHazardsState] is successful.
+  final List<Hazard> _listHazards;
+
+  /// The list of hazards fetched based on [searchParams] after [getListHazardsState] is successful.
+  @override
+  @JsonKey()
+  List<Hazard> get listHazards {
+    if (_listHazards is EqualUnmodifiableListView) return _listHazards;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_listHazards);
   }
 
   /// The list of hazard categories fetched after [getHazardCategoriesState] is successful.
@@ -429,10 +492,15 @@ class _HazardsProviderState implements HazardsProviderState {
     return EqualUnmodifiableListView(_hazardCategories);
   }
 
-  /// The state of the get hazards operation.
+  /// The state of the get hazards for the map.
   @override
   @JsonKey()
-  final GetHazardsState getHazardsState;
+  final GetHazardsState getMapHazardsState;
+
+  /// The state of the get hazards for the list.
+  @override
+  @JsonKey()
+  final GetHazardsState getListHazardsState;
 
   /// The state of the get hazard categories operation.
   @override
@@ -457,11 +525,16 @@ class _HazardsProviderState implements HazardsProviderState {
                 other.tempSearchParams == tempSearchParams) &&
             (identical(other.searchParams, searchParams) ||
                 other.searchParams == searchParams) &&
-            const DeepCollectionEquality().equals(other._hazards, _hazards) &&
+            const DeepCollectionEquality()
+                .equals(other._mapHazards, _mapHazards) &&
+            const DeepCollectionEquality()
+                .equals(other._listHazards, _listHazards) &&
             const DeepCollectionEquality()
                 .equals(other._hazardCategories, _hazardCategories) &&
-            (identical(other.getHazardsState, getHazardsState) ||
-                other.getHazardsState == getHazardsState) &&
+            (identical(other.getMapHazardsState, getMapHazardsState) ||
+                other.getMapHazardsState == getMapHazardsState) &&
+            (identical(other.getListHazardsState, getListHazardsState) ||
+                other.getListHazardsState == getListHazardsState) &&
             (identical(
                     other.getHazardCategoriesState, getHazardCategoriesState) ||
                 other.getHazardCategoriesState == getHazardCategoriesState));
@@ -472,14 +545,16 @@ class _HazardsProviderState implements HazardsProviderState {
       runtimeType,
       tempSearchParams,
       searchParams,
-      const DeepCollectionEquality().hash(_hazards),
+      const DeepCollectionEquality().hash(_mapHazards),
+      const DeepCollectionEquality().hash(_listHazards),
       const DeepCollectionEquality().hash(_hazardCategories),
-      getHazardsState,
+      getMapHazardsState,
+      getListHazardsState,
       getHazardCategoriesState);
 
   @override
   String toString() {
-    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams, hazards: $hazards, hazardCategories: $hazardCategories, getHazardsState: $getHazardsState, getHazardCategoriesState: $getHazardCategoriesState)';
+    return 'HazardsProviderState(tempSearchParams: $tempSearchParams, searchParams: $searchParams, mapHazards: $mapHazards, listHazards: $listHazards, hazardCategories: $hazardCategories, getMapHazardsState: $getMapHazardsState, getListHazardsState: $getListHazardsState, getHazardCategoriesState: $getHazardCategoriesState)';
   }
 }
 
@@ -494,9 +569,11 @@ abstract mixin class _$HazardsProviderStateCopyWith<$Res>
   $Res call(
       {HazardSearchParams tempSearchParams,
       HazardSearchParams searchParams,
-      List<Hazard> hazards,
+      List<Hazard> mapHazards,
+      List<Hazard> listHazards,
       List<HazardCategory> hazardCategories,
-      GetHazardsState getHazardsState,
+      GetHazardsState getMapHazardsState,
+      GetHazardsState getListHazardsState,
       GetHazardCategoriesState getHazardCategoriesState});
 
   @override
@@ -504,7 +581,9 @@ abstract mixin class _$HazardsProviderStateCopyWith<$Res>
   @override
   $HazardSearchParamsCopyWith<$Res> get searchParams;
   @override
-  $GetHazardsStateCopyWith<$Res> get getHazardsState;
+  $GetHazardsStateCopyWith<$Res> get getMapHazardsState;
+  @override
+  $GetHazardsStateCopyWith<$Res> get getListHazardsState;
   @override
   $GetHazardCategoriesStateCopyWith<$Res> get getHazardCategoriesState;
 }
@@ -524,9 +603,11 @@ class __$HazardsProviderStateCopyWithImpl<$Res>
   $Res call({
     Object? tempSearchParams = null,
     Object? searchParams = null,
-    Object? hazards = null,
+    Object? mapHazards = null,
+    Object? listHazards = null,
     Object? hazardCategories = null,
-    Object? getHazardsState = null,
+    Object? getMapHazardsState = null,
+    Object? getListHazardsState = null,
     Object? getHazardCategoriesState = null,
   }) {
     return _then(_HazardsProviderState(
@@ -538,17 +619,25 @@ class __$HazardsProviderStateCopyWithImpl<$Res>
           ? _self.searchParams
           : searchParams // ignore: cast_nullable_to_non_nullable
               as HazardSearchParams,
-      hazards: null == hazards
-          ? _self._hazards
-          : hazards // ignore: cast_nullable_to_non_nullable
+      mapHazards: null == mapHazards
+          ? _self._mapHazards
+          : mapHazards // ignore: cast_nullable_to_non_nullable
+              as List<Hazard>,
+      listHazards: null == listHazards
+          ? _self._listHazards
+          : listHazards // ignore: cast_nullable_to_non_nullable
               as List<Hazard>,
       hazardCategories: null == hazardCategories
           ? _self._hazardCategories
           : hazardCategories // ignore: cast_nullable_to_non_nullable
               as List<HazardCategory>,
-      getHazardsState: null == getHazardsState
-          ? _self.getHazardsState
-          : getHazardsState // ignore: cast_nullable_to_non_nullable
+      getMapHazardsState: null == getMapHazardsState
+          ? _self.getMapHazardsState
+          : getMapHazardsState // ignore: cast_nullable_to_non_nullable
+              as GetHazardsState,
+      getListHazardsState: null == getListHazardsState
+          ? _self.getListHazardsState
+          : getListHazardsState // ignore: cast_nullable_to_non_nullable
               as GetHazardsState,
       getHazardCategoriesState: null == getHazardCategoriesState
           ? _self.getHazardCategoriesState
@@ -581,9 +670,19 @@ class __$HazardsProviderStateCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $GetHazardsStateCopyWith<$Res> get getHazardsState {
-    return $GetHazardsStateCopyWith<$Res>(_self.getHazardsState, (value) {
-      return _then(_self.copyWith(getHazardsState: value));
+  $GetHazardsStateCopyWith<$Res> get getMapHazardsState {
+    return $GetHazardsStateCopyWith<$Res>(_self.getMapHazardsState, (value) {
+      return _then(_self.copyWith(getMapHazardsState: value));
+    });
+  }
+
+  /// Create a copy of HazardsProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GetHazardsStateCopyWith<$Res> get getListHazardsState {
+    return $GetHazardsStateCopyWith<$Res>(_self.getListHazardsState, (value) {
+      return _then(_self.copyWith(getListHazardsState: value));
     });
   }
 

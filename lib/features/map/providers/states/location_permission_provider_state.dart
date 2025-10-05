@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/utils/constants.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 
 part 'location_permission_provider_state.freezed.dart';
@@ -8,7 +9,9 @@ part 'location_permission_provider_state.freezed.dart';
 abstract class LocationProviderState with _$LocationProviderState {
   const factory LocationProviderState({
     /// Current user's location.
-    final AlrtLocation? location,
+    ///
+    /// Defaults to [kDefaultUserLocation].
+    @Default(kDefaultUserLocation) final AlrtLocation location,
 
     /// The state of getting the current user's location.
     @Default(GetLocationState.initial())

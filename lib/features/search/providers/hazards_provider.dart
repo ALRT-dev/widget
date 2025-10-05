@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
@@ -54,10 +55,52 @@ class HazardsProvider extends StateNotifier<HazardsProviderState> {
     );
   }
 
-  /// Gets the list of hazards based on the current [HazardsProviderState.searchParams].
+  /// Gets the list of hazards for map view and list view based on the current [HazardsProviderState.searchParams].
   Future<void> getHazards() async {
+    await Future.wait([
+      getMapHazards(),
+      getListHazards(),
+    ]);
+  }
+
+  /// Gets the list of hazards based on the location filter.
+  Future<void> getMapHazards() async {
     state = state.copyWith(
-      getHazardsState: const GetHazardsState.loading(),
+      getMapHazardsState: const GetHazardsState.loading(),
+    );
+
+    // Commit the temporary search parameters before making the API call
+    commitTempSearchParams();
+
+    final userLocation = _ref.read(providerOfLocation).location;
+
+    final result = await _hazardService.getHazards(
+      searchParams: HazardSearchParams(
+        latitude: state.searchParams.latitude ?? userLocation.latitude,
+        longitude: state.searchParams.longitude ?? userLocation.longitude,
+      ),
+    );
+    if (!mounted) return;
+
+    result.when(
+      (hazards) {
+        state = state.copyWith(
+          getMapHazardsState: GetHazardsState.success(hazards),
+        );
+        updateMapHazards(hazards);
+      },
+      (error) {
+        state = state.copyWith(
+          getMapHazardsState: GetHazardsState.error(error),
+        );
+      },
+    );
+  }
+
+  /// Gets the list of hazards based on the current [HazardsProviderState.searchParams] for the list view.
+  Future<void> getListHazards() async {
+    state = state.copyWith(
+      getListHazardsState: const GetHazardsState.loading(),
     );
 
     // Commit the temporary search parameters before making the API call
@@ -71,13 +114,13 @@ class HazardsProvider extends StateNotifier<HazardsProviderState> {
     result.when(
       (hazards) {
         state = state.copyWith(
-          getHazardsState: GetHazardsState.success(hazards),
+          getListHazardsState: GetHazardsState.success(hazards),
         );
-        updateHazards(hazards);
+        updateListHazards(hazards);
       },
       (error) {
         state = state.copyWith(
-          getHazardsState: GetHazardsState.error(error),
+          getListHazardsState: GetHazardsState.error(error),
         );
       },
     );
@@ -137,17 +180,24 @@ class HazardsProvider extends StateNotifier<HazardsProviderState> {
     updateTempCategoryIds(categoryIds);
   }
 
-  /// Updates [HazardsProviderState.getHazardsState] to loading.
-  void updateGetHazardsStateToLoading() {
+  /// Updates [HazardsProviderState.mapHazards] with the given [hazards].
+  void updateMapHazards(final List<Hazard> hazards) {
     state = state.copyWith(
-      getHazardsState: const GetHazardsState.loading(),
+      mapHazards: hazards,
     );
   }
 
-  /// Updates [HazardsProviderState.hazards] with the given [hazards].
-  void updateHazards(final List<Hazard> hazards) {
+  /// Updates [HazardsProviderState.listHazards] with the given [hazards].
+  void updateListHazards(final List<Hazard> hazards) {
     state = state.copyWith(
-      hazards: hazards,
+      listHazards: hazards,
+    );
+  }
+
+  /// Updates [HazardsProviderState.getListHazardsState] to loading.
+  void updateGetListHazardsStateToLoading() {
+    state = state.copyWith(
+      getListHazardsState: const GetHazardsState.loading(),
     );
   }
 

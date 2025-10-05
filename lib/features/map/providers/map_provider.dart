@@ -33,17 +33,15 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
   void _onInit() {
     final currentUserLocation = _ref.read(providerOfLocation).location;
-    if (currentUserLocation != null) {
-      updateCameraPosition(
-        cameraPosition: CameraPosition(
-          target: LatLng(
-            currentUserLocation.latitude,
-            currentUserLocation.longitude,
-          ),
-          zoom: 14.0,
+    updateCameraPosition(
+      cameraPosition: CameraPosition(
+        target: LatLng(
+          currentUserLocation.latitude,
+          currentUserLocation.longitude,
         ),
-      );
-    }
+        zoom: 14.0,
+      ),
+    );
   }
 
   /// Initializes the map controller.
@@ -68,7 +66,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
   ///
   /// Uses [providerOfHazards] to get the list of hazards and creates a marker for each hazard with a valid location.
   void generateMarkers() async {
-    final hazards = _ref.read(providerOfHazards).hazards;
+    final hazards = _ref.read(providerOfHazards).mapHazards;
     final markerFutures = <Future<Marker>>[];
 
     for (final hazard in hazards) {

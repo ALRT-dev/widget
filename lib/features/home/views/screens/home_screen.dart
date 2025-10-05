@@ -60,7 +60,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void _listenToHazardsState() {
     ref.listen(
       providerOfHazards.select(
-        (value) => value.hazards,
+        (value) => value.mapHazards,
       ),
       (prev, next) {
         if (prev != next) {

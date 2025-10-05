@@ -125,7 +125,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
   void _handleSearchChanged(String value) {
     ref.read(providerOfHazards.notifier)
       ..updateTempSearchString(value.trim())
-      ..updateGetHazardsStateToLoading();
+      ..updateGetListHazardsStateToLoading();
     EasyDebounce.debounce(
       'hazards-search',
       const Duration(milliseconds: 300),

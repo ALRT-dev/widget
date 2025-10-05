@@ -69,7 +69,7 @@ class LocationProvider extends StateNotifier<LocationProviderState> {
   }
 
   /// Updates [LocationProviderState.location] with the given [location].
-  void updateLocation(final AlrtLocation? location) {
+  void updateLocation(final AlrtLocation location) {
     state = state.copyWith(
       location: location,
     );

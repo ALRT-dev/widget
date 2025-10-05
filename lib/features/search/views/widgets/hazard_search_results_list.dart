@@ -22,7 +22,7 @@ class _HazardSearchResultsListState
   Widget build(BuildContext context) {
     final getHazardsState = ref.watch(
       providerOfHazards.select(
-        (value) => value.getHazardsState,
+        (value) => value.getListHazardsState,
       ),
     );
 
@@ -104,7 +104,7 @@ class _HazardSearchResultsListState
       builder: (context, ref, child) {
         final hazards = ref.watch(
           providerOfHazards.select(
-            (value) => value.hazards,
+            (value) => value.listHazards,
           ),
         );
         if (hazards.isEmpty) {
