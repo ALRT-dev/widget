@@ -4,9 +4,11 @@ import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/widgets/home_tabbar.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/views/screens/map_screen.dart';
+import 'package:hazard_app/features/notification/views/screens/notifications_screen.dart';
 import 'package:hazard_app/features/report/providers/create_report_provider.dart';
 import 'package:hazard_app/features/report/views/screens/create_report_screen.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
+import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
 import 'package:hazard_app/features/search/views/screens/hazard_search_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -49,7 +51,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           const MapScreen(),
           const HazardSearchScreen(),
           const CreateReportScreen(),
-          const SizedBox(),
+          ProviderScope(
+            overrides: [
+              providerOfHazards.overrideWith(
+                (ref) => HazardsProvider(
+                  ref: ref,
+                  state: HazardsProviderState(),
+                ),
+              )
+            ],
+            child: const NotificationsScreen(),
+          ),
           const SizedBox(),
         ],
       ),
