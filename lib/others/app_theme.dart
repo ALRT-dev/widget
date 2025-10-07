@@ -8,7 +8,7 @@ class AppTheme {
   /// The default theme settings of the app.
   static ThemeData get _defaultTheme {
     final inputBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(100.0),
+      borderRadius: BorderRadius.circular(20.r),
     );
 
     return ThemeData(
@@ -130,12 +130,16 @@ class AppTheme {
         fontFamily: defaultFontFamily,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        backgroundColor: AppColors.white,
+        foregroundColor: AppColors.black,
+        elevation: 0.4,
+        scrolledUnderElevation: 1.5,
+        shadowColor: AppColors.lightGrey.withValues(alpha: 0.5),
+        surfaceTintColor: AppColors.white,
         titleTextStyle: TextStyle(
           fontSize: 20.spMin,
           fontWeight: FontWeight.w600,
-          color: AppColors.white,
+          color: AppColors.black,
           fontFamily: defaultFontFamily,
           letterSpacing: 0.0,
         ),
@@ -198,8 +202,8 @@ class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        backgroundColor: AppColors.lightGrey.withValues(alpha: 0.7),
+        foregroundColor: AppColors.black,
         elevation: 0.0,
       ),
       iconButtonTheme: IconButtonThemeData(
@@ -252,6 +256,35 @@ class AppTheme {
         contentPadding: EdgeInsets.symmetric(
           vertical: 10.spMin,
           horizontal: 20.spMin,
+        ),
+      ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: TextStyle(
+          fontSize: 14.sp,
+          fontFamily: defaultFontFamily,
+          fontWeight: FontWeight.w500,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: inputBorder,
+          enabledBorder: inputBorder.copyWith(
+            borderSide: BorderSide(
+              color: AppColors.lightGrey,
+            ),
+          ),
+          focusedBorder: inputBorder.copyWith(
+            borderSide: BorderSide(
+              color: AppColors.black,
+            ),
+          ),
+          focusedErrorBorder: inputBorder.copyWith(
+            borderSide: BorderSide(
+              color: AppColors.black,
+            ),
+          ),
+          contentPadding: EdgeInsets.symmetric(
+            vertical: 10.spMin,
+            horizontal: 20.spMin,
+          ),
         ),
       ),
     );

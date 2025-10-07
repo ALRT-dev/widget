@@ -11,7 +11,7 @@ class RoundButton extends ConsumerStatefulWidget {
   const RoundButton({
     super.key,
     required this.icon,
-    this.size = 38.0,
+    this.size = 35.0,
     this.backgroundColor,
     this.splashColor,
     this.borderSide,

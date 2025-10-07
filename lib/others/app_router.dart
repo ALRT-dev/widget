@@ -2,6 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/views/screens/auth_screen.dart';
 import 'package:hazard_app/features/home/views/screens/home_screen.dart';
+import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
+import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/splash_screen.dart';
 import 'package:hazard_app/others/app_wrapper.dart';
@@ -36,6 +39,25 @@ class AppRouter {
           path: HomeScreen.route,
           builder: (context, state) {
             return const HomeScreen();
+          },
+        ),
+        GoRoute(
+          path: SelectLocationScreen.route,
+          builder: (context, state) {
+            return ProviderScope(
+              // Create a new ProviderScope to ensure a fresh state for the map screen.
+              overrides: [
+                providerOfMap.overrideWith(
+                  (ref) => MapProvider(
+                    ref: ref,
+                    state: MapProviderState(),
+                  ),
+                ),
+              ],
+              child: SelectLocationScreen(
+                args: state.extra as SelectLocationScreenArgs?,
+              ),
+            );
           },
         ),
       ],

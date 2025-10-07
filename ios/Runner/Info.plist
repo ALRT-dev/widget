@@ -71,5 +71,11 @@
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>This app needs access to your location to show nearby alerts and help you navigate to
       safety.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app needs access to your photo library to upload images and videos.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>This app needs access to your camera to take photos and videos.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app needs access to your microphone to record audio.</string>
   </dict>
 </plist>
