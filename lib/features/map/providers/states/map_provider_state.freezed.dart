@@ -20,6 +20,24 @@ mixin _$MapProviderState {
   /// The set of markers displayed on the map.
   Set<Marker> get markers;
 
+  /// The set of polylines displayed on the map.
+  Set<Polyline> get polylines;
+
+  /// The search string used to fetch places.
+  String get searchString;
+
+  /// The list of places fetched from the map service after [getPlacesState] is successful.
+  List<GooglePlace> get places;
+
+  /// The currently selected place on the map, if any.
+  GooglePlace? get selectedPlace;
+
+  /// The state of fetching places.
+  GetPlacesState get getPlacesState;
+
+  /// The state of fetching directions.
+  GetRouteState get getRouteState;
+
   /// Create a copy of MapProviderState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -35,16 +53,34 @@ mixin _$MapProviderState {
             other is MapProviderState &&
             (identical(other.cameraPosition, cameraPosition) ||
                 other.cameraPosition == cameraPosition) &&
-            const DeepCollectionEquality().equals(other.markers, markers));
+            const DeepCollectionEquality().equals(other.markers, markers) &&
+            const DeepCollectionEquality().equals(other.polylines, polylines) &&
+            (identical(other.searchString, searchString) ||
+                other.searchString == searchString) &&
+            const DeepCollectionEquality().equals(other.places, places) &&
+            (identical(other.selectedPlace, selectedPlace) ||
+                other.selectedPlace == selectedPlace) &&
+            (identical(other.getPlacesState, getPlacesState) ||
+                other.getPlacesState == getPlacesState) &&
+            (identical(other.getRouteState, getRouteState) ||
+                other.getRouteState == getRouteState));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, cameraPosition,
-      const DeepCollectionEquality().hash(markers));
+  int get hashCode => Object.hash(
+      runtimeType,
+      cameraPosition,
+      const DeepCollectionEquality().hash(markers),
+      const DeepCollectionEquality().hash(polylines),
+      searchString,
+      const DeepCollectionEquality().hash(places),
+      selectedPlace,
+      getPlacesState,
+      getRouteState);
 
   @override
   String toString() {
-    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers)';
+    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, searchString: $searchString, places: $places, selectedPlace: $selectedPlace, getPlacesState: $getPlacesState, getRouteState: $getRouteState)';
   }
 }
 
@@ -54,7 +90,19 @@ abstract mixin class $MapProviderStateCopyWith<$Res> {
           MapProviderState value, $Res Function(MapProviderState) _then) =
       _$MapProviderStateCopyWithImpl;
   @useResult
-  $Res call({CameraPosition cameraPosition, Set<Marker> markers});
+  $Res call(
+      {CameraPosition cameraPosition,
+      Set<Marker> markers,
+      Set<Polyline> polylines,
+      String searchString,
+      List<GooglePlace> places,
+      GooglePlace? selectedPlace,
+      GetPlacesState getPlacesState,
+      GetRouteState getRouteState});
+
+  $GooglePlaceCopyWith<$Res>? get selectedPlace;
+  $GetPlacesStateCopyWith<$Res> get getPlacesState;
+  $GetRouteStateCopyWith<$Res> get getRouteState;
 }
 
 /// @nodoc
@@ -72,6 +120,12 @@ class _$MapProviderStateCopyWithImpl<$Res>
   $Res call({
     Object? cameraPosition = null,
     Object? markers = null,
+    Object? polylines = null,
+    Object? searchString = null,
+    Object? places = null,
+    Object? selectedPlace = freezed,
+    Object? getPlacesState = null,
+    Object? getRouteState = null,
   }) {
     return _then(_self.copyWith(
       cameraPosition: null == cameraPosition
@@ -82,7 +136,65 @@ class _$MapProviderStateCopyWithImpl<$Res>
           ? _self.markers
           : markers // ignore: cast_nullable_to_non_nullable
               as Set<Marker>,
+      polylines: null == polylines
+          ? _self.polylines
+          : polylines // ignore: cast_nullable_to_non_nullable
+              as Set<Polyline>,
+      searchString: null == searchString
+          ? _self.searchString
+          : searchString // ignore: cast_nullable_to_non_nullable
+              as String,
+      places: null == places
+          ? _self.places
+          : places // ignore: cast_nullable_to_non_nullable
+              as List<GooglePlace>,
+      selectedPlace: freezed == selectedPlace
+          ? _self.selectedPlace
+          : selectedPlace // ignore: cast_nullable_to_non_nullable
+              as GooglePlace?,
+      getPlacesState: null == getPlacesState
+          ? _self.getPlacesState
+          : getPlacesState // ignore: cast_nullable_to_non_nullable
+              as GetPlacesState,
+      getRouteState: null == getRouteState
+          ? _self.getRouteState
+          : getRouteState // ignore: cast_nullable_to_non_nullable
+              as GetRouteState,
     ));
+  }
+
+  /// Create a copy of MapProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GooglePlaceCopyWith<$Res>? get selectedPlace {
+    if (_self.selectedPlace == null) {
+      return null;
+    }
+
+    return $GooglePlaceCopyWith<$Res>(_self.selectedPlace!, (value) {
+      return _then(_self.copyWith(selectedPlace: value));
+    });
+  }
+
+  /// Create a copy of MapProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GetPlacesStateCopyWith<$Res> get getPlacesState {
+    return $GetPlacesStateCopyWith<$Res>(_self.getPlacesState, (value) {
+      return _then(_self.copyWith(getPlacesState: value));
+    });
+  }
+
+  /// Create a copy of MapProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GetRouteStateCopyWith<$Res> get getRouteState {
+    return $GetRouteStateCopyWith<$Res>(_self.getRouteState, (value) {
+      return _then(_self.copyWith(getRouteState: value));
+    });
   }
 }
 
@@ -179,14 +291,30 @@ extension MapProviderStatePatterns on MapProviderState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(CameraPosition cameraPosition, Set<Marker> markers)?
+    TResult Function(
+            CameraPosition cameraPosition,
+            Set<Marker> markers,
+            Set<Polyline> polylines,
+            String searchString,
+            List<GooglePlace> places,
+            GooglePlace? selectedPlace,
+            GetPlacesState getPlacesState,
+            GetRouteState getRouteState)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _MapProviderState() when $default != null:
-        return $default(_that.cameraPosition, _that.markers);
+        return $default(
+            _that.cameraPosition,
+            _that.markers,
+            _that.polylines,
+            _that.searchString,
+            _that.places,
+            _that.selectedPlace,
+            _that.getPlacesState,
+            _that.getRouteState);
       case _:
         return orElse();
     }
@@ -207,13 +335,29 @@ extension MapProviderStatePatterns on MapProviderState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(CameraPosition cameraPosition, Set<Marker> markers)
+    TResult Function(
+            CameraPosition cameraPosition,
+            Set<Marker> markers,
+            Set<Polyline> polylines,
+            String searchString,
+            List<GooglePlace> places,
+            GooglePlace? selectedPlace,
+            GetPlacesState getPlacesState,
+            GetRouteState getRouteState)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _MapProviderState():
-        return $default(_that.cameraPosition, _that.markers);
+        return $default(
+            _that.cameraPosition,
+            _that.markers,
+            _that.polylines,
+            _that.searchString,
+            _that.places,
+            _that.selectedPlace,
+            _that.getPlacesState,
+            _that.getRouteState);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -233,13 +377,29 @@ extension MapProviderStatePatterns on MapProviderState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(CameraPosition cameraPosition, Set<Marker> markers)?
+    TResult? Function(
+            CameraPosition cameraPosition,
+            Set<Marker> markers,
+            Set<Polyline> polylines,
+            String searchString,
+            List<GooglePlace> places,
+            GooglePlace? selectedPlace,
+            GetPlacesState getPlacesState,
+            GetRouteState getRouteState)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _MapProviderState() when $default != null:
-        return $default(_that.cameraPosition, _that.markers);
+        return $default(
+            _that.cameraPosition,
+            _that.markers,
+            _that.polylines,
+            _that.searchString,
+            _that.places,
+            _that.selectedPlace,
+            _that.getPlacesState,
+            _that.getRouteState);
       case _:
         return null;
     }
@@ -251,8 +411,16 @@ extension MapProviderStatePatterns on MapProviderState {
 class _MapProviderState implements MapProviderState {
   const _MapProviderState(
       {this.cameraPosition = kDefaultCameraPosition,
-      final Set<Marker> markers = const <Marker>{}})
-      : _markers = markers;
+      final Set<Marker> markers = const <Marker>{},
+      final Set<Polyline> polylines = const <Polyline>{},
+      this.searchString = '',
+      final List<GooglePlace> places = const <GooglePlace>[],
+      this.selectedPlace,
+      this.getPlacesState = const GetPlacesState.initial(),
+      this.getRouteState = const GetRouteState.initial()})
+      : _markers = markers,
+        _polylines = polylines,
+        _places = places;
 
   /// The current camera position of the map.
   @override
@@ -271,6 +439,49 @@ class _MapProviderState implements MapProviderState {
     return EqualUnmodifiableSetView(_markers);
   }
 
+  /// The set of polylines displayed on the map.
+  final Set<Polyline> _polylines;
+
+  /// The set of polylines displayed on the map.
+  @override
+  @JsonKey()
+  Set<Polyline> get polylines {
+    if (_polylines is EqualUnmodifiableSetView) return _polylines;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_polylines);
+  }
+
+  /// The search string used to fetch places.
+  @override
+  @JsonKey()
+  final String searchString;
+
+  /// The list of places fetched from the map service after [getPlacesState] is successful.
+  final List<GooglePlace> _places;
+
+  /// The list of places fetched from the map service after [getPlacesState] is successful.
+  @override
+  @JsonKey()
+  List<GooglePlace> get places {
+    if (_places is EqualUnmodifiableListView) return _places;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_places);
+  }
+
+  /// The currently selected place on the map, if any.
+  @override
+  final GooglePlace? selectedPlace;
+
+  /// The state of fetching places.
+  @override
+  @JsonKey()
+  final GetPlacesState getPlacesState;
+
+  /// The state of fetching directions.
+  @override
+  @JsonKey()
+  final GetRouteState getRouteState;
+
   /// Create a copy of MapProviderState
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -286,16 +497,35 @@ class _MapProviderState implements MapProviderState {
             other is _MapProviderState &&
             (identical(other.cameraPosition, cameraPosition) ||
                 other.cameraPosition == cameraPosition) &&
-            const DeepCollectionEquality().equals(other._markers, _markers));
+            const DeepCollectionEquality().equals(other._markers, _markers) &&
+            const DeepCollectionEquality()
+                .equals(other._polylines, _polylines) &&
+            (identical(other.searchString, searchString) ||
+                other.searchString == searchString) &&
+            const DeepCollectionEquality().equals(other._places, _places) &&
+            (identical(other.selectedPlace, selectedPlace) ||
+                other.selectedPlace == selectedPlace) &&
+            (identical(other.getPlacesState, getPlacesState) ||
+                other.getPlacesState == getPlacesState) &&
+            (identical(other.getRouteState, getRouteState) ||
+                other.getRouteState == getRouteState));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, cameraPosition,
-      const DeepCollectionEquality().hash(_markers));
+  int get hashCode => Object.hash(
+      runtimeType,
+      cameraPosition,
+      const DeepCollectionEquality().hash(_markers),
+      const DeepCollectionEquality().hash(_polylines),
+      searchString,
+      const DeepCollectionEquality().hash(_places),
+      selectedPlace,
+      getPlacesState,
+      getRouteState);
 
   @override
   String toString() {
-    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers)';
+    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, searchString: $searchString, places: $places, selectedPlace: $selectedPlace, getPlacesState: $getPlacesState, getRouteState: $getRouteState)';
   }
 }
 
@@ -307,7 +537,22 @@ abstract mixin class _$MapProviderStateCopyWith<$Res>
       __$MapProviderStateCopyWithImpl;
   @override
   @useResult
-  $Res call({CameraPosition cameraPosition, Set<Marker> markers});
+  $Res call(
+      {CameraPosition cameraPosition,
+      Set<Marker> markers,
+      Set<Polyline> polylines,
+      String searchString,
+      List<GooglePlace> places,
+      GooglePlace? selectedPlace,
+      GetPlacesState getPlacesState,
+      GetRouteState getRouteState});
+
+  @override
+  $GooglePlaceCopyWith<$Res>? get selectedPlace;
+  @override
+  $GetPlacesStateCopyWith<$Res> get getPlacesState;
+  @override
+  $GetRouteStateCopyWith<$Res> get getRouteState;
 }
 
 /// @nodoc
@@ -325,6 +570,12 @@ class __$MapProviderStateCopyWithImpl<$Res>
   $Res call({
     Object? cameraPosition = null,
     Object? markers = null,
+    Object? polylines = null,
+    Object? searchString = null,
+    Object? places = null,
+    Object? selectedPlace = freezed,
+    Object? getPlacesState = null,
+    Object? getRouteState = null,
   }) {
     return _then(_MapProviderState(
       cameraPosition: null == cameraPosition
@@ -335,7 +586,856 @@ class __$MapProviderStateCopyWithImpl<$Res>
           ? _self._markers
           : markers // ignore: cast_nullable_to_non_nullable
               as Set<Marker>,
+      polylines: null == polylines
+          ? _self._polylines
+          : polylines // ignore: cast_nullable_to_non_nullable
+              as Set<Polyline>,
+      searchString: null == searchString
+          ? _self.searchString
+          : searchString // ignore: cast_nullable_to_non_nullable
+              as String,
+      places: null == places
+          ? _self._places
+          : places // ignore: cast_nullable_to_non_nullable
+              as List<GooglePlace>,
+      selectedPlace: freezed == selectedPlace
+          ? _self.selectedPlace
+          : selectedPlace // ignore: cast_nullable_to_non_nullable
+              as GooglePlace?,
+      getPlacesState: null == getPlacesState
+          ? _self.getPlacesState
+          : getPlacesState // ignore: cast_nullable_to_non_nullable
+              as GetPlacesState,
+      getRouteState: null == getRouteState
+          ? _self.getRouteState
+          : getRouteState // ignore: cast_nullable_to_non_nullable
+              as GetRouteState,
     ));
+  }
+
+  /// Create a copy of MapProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GooglePlaceCopyWith<$Res>? get selectedPlace {
+    if (_self.selectedPlace == null) {
+      return null;
+    }
+
+    return $GooglePlaceCopyWith<$Res>(_self.selectedPlace!, (value) {
+      return _then(_self.copyWith(selectedPlace: value));
+    });
+  }
+
+  /// Create a copy of MapProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GetPlacesStateCopyWith<$Res> get getPlacesState {
+    return $GetPlacesStateCopyWith<$Res>(_self.getPlacesState, (value) {
+      return _then(_self.copyWith(getPlacesState: value));
+    });
+  }
+
+  /// Create a copy of MapProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GetRouteStateCopyWith<$Res> get getRouteState {
+    return $GetRouteStateCopyWith<$Res>(_self.getRouteState, (value) {
+      return _then(_self.copyWith(getRouteState: value));
+    });
+  }
+}
+
+/// @nodoc
+mixin _$GetPlacesState {
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is GetPlacesState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetPlacesState()';
+  }
+}
+
+/// @nodoc
+class $GetPlacesStateCopyWith<$Res> {
+  $GetPlacesStateCopyWith(GetPlacesState _, $Res Function(GetPlacesState) __);
+}
+
+/// Adds pattern-matching-related methods to [GetPlacesState].
+extension GetPlacesStatePatterns on GetPlacesState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_GetPlacesStateInitial value)? initial,
+    TResult Function(_GetPlacesStateLoading value)? loading,
+    TResult Function(_GetPlacesStateSuccess value)? success,
+    TResult Function(_GetPlacesStateError value)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetPlacesStateInitial() when initial != null:
+        return initial(_that);
+      case _GetPlacesStateLoading() when loading != null:
+        return loading(_that);
+      case _GetPlacesStateSuccess() when success != null:
+        return success(_that);
+      case _GetPlacesStateError() when error != null:
+        return error(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_GetPlacesStateInitial value) initial,
+    required TResult Function(_GetPlacesStateLoading value) loading,
+    required TResult Function(_GetPlacesStateSuccess value) success,
+    required TResult Function(_GetPlacesStateError value) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetPlacesStateInitial():
+        return initial(_that);
+      case _GetPlacesStateLoading():
+        return loading(_that);
+      case _GetPlacesStateSuccess():
+        return success(_that);
+      case _GetPlacesStateError():
+        return error(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_GetPlacesStateInitial value)? initial,
+    TResult? Function(_GetPlacesStateLoading value)? loading,
+    TResult? Function(_GetPlacesStateSuccess value)? success,
+    TResult? Function(_GetPlacesStateError value)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetPlacesStateInitial() when initial != null:
+        return initial(_that);
+      case _GetPlacesStateLoading() when loading != null:
+        return loading(_that);
+      case _GetPlacesStateSuccess() when success != null:
+        return success(_that);
+      case _GetPlacesStateError() when error != null:
+        return error(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(List<GooglePlace> places)? success,
+    TResult Function(AppError error)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetPlacesStateInitial() when initial != null:
+        return initial();
+      case _GetPlacesStateLoading() when loading != null:
+        return loading();
+      case _GetPlacesStateSuccess() when success != null:
+        return success(_that.places);
+      case _GetPlacesStateError() when error != null:
+        return error(_that.error);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(List<GooglePlace> places) success,
+    required TResult Function(AppError error) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetPlacesStateInitial():
+        return initial();
+      case _GetPlacesStateLoading():
+        return loading();
+      case _GetPlacesStateSuccess():
+        return success(_that.places);
+      case _GetPlacesStateError():
+        return error(_that.error);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(List<GooglePlace> places)? success,
+    TResult? Function(AppError error)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetPlacesStateInitial() when initial != null:
+        return initial();
+      case _GetPlacesStateLoading() when loading != null:
+        return loading();
+      case _GetPlacesStateSuccess() when success != null:
+        return success(_that.places);
+      case _GetPlacesStateError() when error != null:
+        return error(_that.error);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _GetPlacesStateInitial implements GetPlacesState {
+  const _GetPlacesStateInitial();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _GetPlacesStateInitial);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetPlacesState.initial()';
+  }
+}
+
+/// @nodoc
+
+class _GetPlacesStateLoading implements GetPlacesState {
+  const _GetPlacesStateLoading();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _GetPlacesStateLoading);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetPlacesState.loading()';
+  }
+}
+
+/// @nodoc
+
+class _GetPlacesStateSuccess implements GetPlacesState {
+  const _GetPlacesStateSuccess(final List<GooglePlace> places)
+      : _places = places;
+
+  final List<GooglePlace> _places;
+  List<GooglePlace> get places {
+    if (_places is EqualUnmodifiableListView) return _places;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_places);
+  }
+
+  /// Create a copy of GetPlacesState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GetPlacesStateSuccessCopyWith<_GetPlacesStateSuccess> get copyWith =>
+      __$GetPlacesStateSuccessCopyWithImpl<_GetPlacesStateSuccess>(
+          this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _GetPlacesStateSuccess &&
+            const DeepCollectionEquality().equals(other._places, _places));
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, const DeepCollectionEquality().hash(_places));
+
+  @override
+  String toString() {
+    return 'GetPlacesState.success(places: $places)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$GetPlacesStateSuccessCopyWith<$Res>
+    implements $GetPlacesStateCopyWith<$Res> {
+  factory _$GetPlacesStateSuccessCopyWith(_GetPlacesStateSuccess value,
+          $Res Function(_GetPlacesStateSuccess) _then) =
+      __$GetPlacesStateSuccessCopyWithImpl;
+  @useResult
+  $Res call({List<GooglePlace> places});
+}
+
+/// @nodoc
+class __$GetPlacesStateSuccessCopyWithImpl<$Res>
+    implements _$GetPlacesStateSuccessCopyWith<$Res> {
+  __$GetPlacesStateSuccessCopyWithImpl(this._self, this._then);
+
+  final _GetPlacesStateSuccess _self;
+  final $Res Function(_GetPlacesStateSuccess) _then;
+
+  /// Create a copy of GetPlacesState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? places = null,
+  }) {
+    return _then(_GetPlacesStateSuccess(
+      null == places
+          ? _self._places
+          : places // ignore: cast_nullable_to_non_nullable
+              as List<GooglePlace>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _GetPlacesStateError implements GetPlacesState {
+  const _GetPlacesStateError(this.error);
+
+  final AppError error;
+
+  /// Create a copy of GetPlacesState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GetPlacesStateErrorCopyWith<_GetPlacesStateError> get copyWith =>
+      __$GetPlacesStateErrorCopyWithImpl<_GetPlacesStateError>(
+          this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _GetPlacesStateError &&
+            (identical(other.error, error) || other.error == error));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, error);
+
+  @override
+  String toString() {
+    return 'GetPlacesState.error(error: $error)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$GetPlacesStateErrorCopyWith<$Res>
+    implements $GetPlacesStateCopyWith<$Res> {
+  factory _$GetPlacesStateErrorCopyWith(_GetPlacesStateError value,
+          $Res Function(_GetPlacesStateError) _then) =
+      __$GetPlacesStateErrorCopyWithImpl;
+  @useResult
+  $Res call({AppError error});
+
+  $AppErrorCopyWith<$Res> get error;
+}
+
+/// @nodoc
+class __$GetPlacesStateErrorCopyWithImpl<$Res>
+    implements _$GetPlacesStateErrorCopyWith<$Res> {
+  __$GetPlacesStateErrorCopyWithImpl(this._self, this._then);
+
+  final _GetPlacesStateError _self;
+  final $Res Function(_GetPlacesStateError) _then;
+
+  /// Create a copy of GetPlacesState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? error = null,
+  }) {
+    return _then(_GetPlacesStateError(
+      null == error
+          ? _self.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as AppError,
+    ));
+  }
+
+  /// Create a copy of GetPlacesState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AppErrorCopyWith<$Res> get error {
+    return $AppErrorCopyWith<$Res>(_self.error, (value) {
+      return _then(_self.copyWith(error: value));
+    });
+  }
+}
+
+/// @nodoc
+mixin _$GetRouteState {
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is GetRouteState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetRouteState()';
+  }
+}
+
+/// @nodoc
+class $GetRouteStateCopyWith<$Res> {
+  $GetRouteStateCopyWith(GetRouteState _, $Res Function(GetRouteState) __);
+}
+
+/// Adds pattern-matching-related methods to [GetRouteState].
+extension GetRouteStatePatterns on GetRouteState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_GetRouteStateInitial value)? initial,
+    TResult Function(_GetRouteStateLoading value)? loading,
+    TResult Function(_GetRouteStateSuccess value)? success,
+    TResult Function(_GetRouteStateError value)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetRouteStateInitial() when initial != null:
+        return initial(_that);
+      case _GetRouteStateLoading() when loading != null:
+        return loading(_that);
+      case _GetRouteStateSuccess() when success != null:
+        return success(_that);
+      case _GetRouteStateError() when error != null:
+        return error(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_GetRouteStateInitial value) initial,
+    required TResult Function(_GetRouteStateLoading value) loading,
+    required TResult Function(_GetRouteStateSuccess value) success,
+    required TResult Function(_GetRouteStateError value) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetRouteStateInitial():
+        return initial(_that);
+      case _GetRouteStateLoading():
+        return loading(_that);
+      case _GetRouteStateSuccess():
+        return success(_that);
+      case _GetRouteStateError():
+        return error(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_GetRouteStateInitial value)? initial,
+    TResult? Function(_GetRouteStateLoading value)? loading,
+    TResult? Function(_GetRouteStateSuccess value)? success,
+    TResult? Function(_GetRouteStateError value)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetRouteStateInitial() when initial != null:
+        return initial(_that);
+      case _GetRouteStateLoading() when loading != null:
+        return loading(_that);
+      case _GetRouteStateSuccess() when success != null:
+        return success(_that);
+      case _GetRouteStateError() when error != null:
+        return error(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function()? success,
+    TResult Function(AppError error)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetRouteStateInitial() when initial != null:
+        return initial();
+      case _GetRouteStateLoading() when loading != null:
+        return loading();
+      case _GetRouteStateSuccess() when success != null:
+        return success();
+      case _GetRouteStateError() when error != null:
+        return error(_that.error);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function() success,
+    required TResult Function(AppError error) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetRouteStateInitial():
+        return initial();
+      case _GetRouteStateLoading():
+        return loading();
+      case _GetRouteStateSuccess():
+        return success();
+      case _GetRouteStateError():
+        return error(_that.error);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function()? success,
+    TResult? Function(AppError error)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetRouteStateInitial() when initial != null:
+        return initial();
+      case _GetRouteStateLoading() when loading != null:
+        return loading();
+      case _GetRouteStateSuccess() when success != null:
+        return success();
+      case _GetRouteStateError() when error != null:
+        return error(_that.error);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _GetRouteStateInitial implements GetRouteState {
+  const _GetRouteStateInitial();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _GetRouteStateInitial);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetRouteState.initial()';
+  }
+}
+
+/// @nodoc
+
+class _GetRouteStateLoading implements GetRouteState {
+  const _GetRouteStateLoading();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _GetRouteStateLoading);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetRouteState.loading()';
+  }
+}
+
+/// @nodoc
+
+class _GetRouteStateSuccess implements GetRouteState {
+  const _GetRouteStateSuccess();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _GetRouteStateSuccess);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetRouteState.success()';
+  }
+}
+
+/// @nodoc
+
+class _GetRouteStateError implements GetRouteState {
+  const _GetRouteStateError(this.error);
+
+  final AppError error;
+
+  /// Create a copy of GetRouteState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GetRouteStateErrorCopyWith<_GetRouteStateError> get copyWith =>
+      __$GetRouteStateErrorCopyWithImpl<_GetRouteStateError>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _GetRouteStateError &&
+            (identical(other.error, error) || other.error == error));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, error);
+
+  @override
+  String toString() {
+    return 'GetRouteState.error(error: $error)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$GetRouteStateErrorCopyWith<$Res>
+    implements $GetRouteStateCopyWith<$Res> {
+  factory _$GetRouteStateErrorCopyWith(
+          _GetRouteStateError value, $Res Function(_GetRouteStateError) _then) =
+      __$GetRouteStateErrorCopyWithImpl;
+  @useResult
+  $Res call({AppError error});
+
+  $AppErrorCopyWith<$Res> get error;
+}
+
+/// @nodoc
+class __$GetRouteStateErrorCopyWithImpl<$Res>
+    implements _$GetRouteStateErrorCopyWith<$Res> {
+  __$GetRouteStateErrorCopyWithImpl(this._self, this._then);
+
+  final _GetRouteStateError _self;
+  final $Res Function(_GetRouteStateError) _then;
+
+  /// Create a copy of GetRouteState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? error = null,
+  }) {
+    return _then(_GetRouteStateError(
+      null == error
+          ? _self.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as AppError,
+    ));
+  }
+
+  /// Create a copy of GetRouteState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AppErrorCopyWith<$Res> get error {
+    return $AppErrorCopyWith<$Res>(_self.error, (value) {
+      return _then(_self.copyWith(error: value));
+    });
   }
 }
 

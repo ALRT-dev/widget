@@ -1,6 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
+import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
@@ -9,6 +12,8 @@ import 'package:hazard_app/features/map/views/widgets/custom_marker.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/others/app_colors.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
 
 final providerOfMap =
@@ -44,6 +49,102 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
+  /// Fetches places from the map service.
+  Future<void> getPlaces({
+    required final String searchString,
+  }) async {
+    state = state.copyWith(
+      getPlacesState: const GetPlacesState.loading(),
+    );
+
+    final result = await _mapService.getPlaces(
+      searchString: searchString,
+      currentUserLocation: _ref.read(providerOfLocation).location,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (places) {
+        state = state.copyWith(
+          getPlacesState: GetPlacesState.success(places),
+          places: places,
+        );
+      },
+      (l) {
+        state = state.copyWith(
+          getPlacesState: GetPlacesState.error(l),
+        );
+      },
+    );
+  }
+
+  /// Fetches route from the map service and updates the state accordingly.
+  /// Optionally avoids specified hazards.
+  Future<void> getRoute({
+    required final LatLng origin,
+    required final LatLng destination,
+    final bool avoidHazards = true,
+  }) async {
+    state = state.copyWith(
+      getRouteState: const GetRouteState.loading(),
+    );
+
+    // Get relevant hazards to avoid if enabled
+    List<Hazard>? hazardsToAvoid;
+    if (avoidHazards) {
+      final hazardsProvider = _ref.read(providerOfHazards);
+      hazardsToAvoid = hazardsProvider.mapHazards;
+    }
+
+    final result = await _mapService.getRoute(
+      origin: origin,
+      destination: destination,
+      hazardsToAvoid: hazardsToAvoid,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (r) {
+        state = state.copyWith(
+          getRouteState: const GetRouteState.success(),
+        );
+
+        if (r.routes.isEmpty ||
+            (r.routes.first.polylinePoints?.isEmpty ?? true)) {
+          return;
+        }
+
+        final points = r.routes.first.polylinePoints!
+            .map((e) => LatLng(e.latitude, e.longitude))
+            .toList();
+
+        // Choose polyline color based on whether we avoided hazards
+        final polylineColor = avoidHazards &&
+                (hazardsToAvoid?.isNotEmpty ?? false)
+            ? AppColors.advice // Different color to indicate hazard-aware route
+            : AppColors.primary;
+
+        final polyLine = Polyline(
+          polylineId: const PolylineId('route'),
+          color: polylineColor,
+          points: points,
+          width: 5,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap,
+          jointType: JointType.round,
+        );
+
+        updatePolylines({polyLine});
+        animateToBounds(bounds: points.toBounds());
+      },
+      (l) {
+        state = state.copyWith(
+          getRouteState: GetRouteState.error(l),
+        );
+      },
+    );
+  }
+
   /// Initializes the map controller.
   Future<void> init({
     required final GoogleMapController googleMapController,
@@ -56,9 +157,25 @@ class MapProvider extends StateNotifier<MapProviderState> {
   /// Animates the camera to the given [position].
   Future<void> animateTo({
     required final LatLng position,
+    final double? zoom,
   }) async {
     await _mapService.animateCamera(
-      cameraUpdate: CameraUpdate.newLatLng(position),
+      cameraUpdate: zoom != null
+          ? CameraUpdate.newLatLngZoom(position, zoom)
+          : CameraUpdate.newLatLng(position),
+    );
+  }
+
+  /// Animates the camera to fit within the given [bounds] with optional [padding].
+  Future<void> animateToBounds({
+    required final LatLngBounds bounds,
+    final double padding = 100.0,
+  }) async {
+    await _mapService.animateCamera(
+      cameraUpdate: CameraUpdate.newLatLngBounds(
+        bounds,
+        padding,
+      ),
     );
   }
 
@@ -95,7 +212,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     final markers = await Future.wait(markerFutures);
 
-    updateMarkers(markers.toSet());
+    final selectedPlaceMarker = state.markers.firstWhereOrNull(
+      (marker) => marker.markerId.value == 'selected_location',
+    );
+    updateMarkers({
+      ...markers.toSet(),
+      if (selectedPlaceMarker != null) selectedPlaceMarker,
+    });
   }
 
   /// Updates [MapProviderState.cameraPosition] to the given [cameraPosition].
@@ -111,6 +234,74 @@ class MapProvider extends StateNotifier<MapProviderState> {
   void updateMarkers(final Set<Marker> markers) {
     state = state.copyWith(
       markers: markers,
+    );
+  }
+
+  /// Adds a marker to the current set of markers.
+  void addToMarkers(final Marker marker) {
+    updateMarkers(
+      {...state.markers, marker},
+    );
+  }
+
+  /// Updates [MapProviderState.polylines] to the given [polylines].
+  void updatePolylines(final Set<Polyline> polylines) {
+    state = state.copyWith(
+      polylines: polylines,
+    );
+  }
+
+  /// Adds a marker for the selected location, replacing any existing selected location marker.
+  void addSelectedLocationMarker(final LatLng position) {
+    final marker = Marker(
+      markerId: const MarkerId('selected_location'),
+      position: position,
+    );
+
+    // Remove existing selected location marker if any
+    final updatedMarkers = Set<Marker>.from(state.markers)
+        .where((m) => m.markerId.value != 'selected_location')
+        .toSet();
+
+    // Add the new selected location marker
+    updatedMarkers.add(marker);
+
+    updateMarkers(updatedMarkers);
+  }
+
+  /// Removes the marker for the selected location if it exists.
+  void removeSelectedLocationMarker() {
+    final updatedMarkers = Set<Marker>.from(state.markers)
+        .where((m) => m.markerId.value != 'selected_location')
+        .toSet();
+    updateMarkers(updatedMarkers);
+  }
+
+  /// Updates [MapProviderState.places] to the given [places].
+  void updatePlaces(final List<GooglePlace> places) {
+    state = state.copyWith(
+      places: places,
+    );
+  }
+
+  /// Updates [MapProviderState.getPlacesState] to loading state.
+  void updateGetPlacesStateToLoading() {
+    state = state.copyWith(
+      getPlacesState: const GetPlacesState.loading(),
+    );
+  }
+
+  /// Updates [MapProviderState.selectedPlace] to the given [place].
+  void updateSelectedPlace(final GooglePlace? place) {
+    state = state.copyWith(
+      selectedPlace: place,
+    );
+  }
+
+  /// Updates [MapProviderState.searchString] to the given [searchString].
+  void updateSearchString(final String searchString) {
+    state = state.copyWith(
+      searchString: searchString,
     );
   }
 }

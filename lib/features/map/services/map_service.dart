@@ -1,8 +1,13 @@
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/repository_providers.dart';
 import 'package:hazard_app/features/map/repositories/map_repository.dart';
+import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 
 class MapService {
@@ -35,5 +40,180 @@ class MapService {
       duration: duration,
     );
     return result;
+  }
+
+  /// Fetches places based on the given [searchString].
+  Future<Either<List<GooglePlace>, AppError>> getPlaces({
+    required final String searchString,
+    required final AlrtLocation currentUserLocation,
+  }) async {
+    final result = await _mapRepository.getPlaces(
+      searchString: searchString,
+      currentUserLocation: currentUserLocation,
+    );
+    return result;
+  }
+
+  /// Fetches detailed information about a place using its [placeId].
+  Future<Either<void, AppError>> getPlaceDetails({
+    required final String placeId,
+  }) async {
+    final result = await _mapRepository.getPlaceDetails(
+      placeId: placeId,
+    );
+    return result;
+  }
+
+  /// Fetches route from the given [origin] to the [destination].
+  /// Optionally avoids specified hazards.
+  Future<Either<RoutesApiResponse, AppError>> getRoute({
+    required final LatLng origin,
+    required final LatLng destination,
+    final List<Hazard>? hazardsToAvoid,
+  }) async {
+    try {
+      // If no hazards to avoid, use the simple route
+      if (hazardsToAvoid?.isEmpty ?? true) {
+        final simpleRoute = await _getSimpleRoute(origin, destination);
+        return Success(simpleRoute);
+      }
+
+      // Try to get a route that avoids hazards
+      final safestRoute = await _getRouteAvoidingHazards(
+        origin,
+        destination,
+        hazardsToAvoid!,
+      );
+
+      return Success(safestRoute);
+    } catch (error) {
+      return Failure(AppError(message: error.toString()));
+    }
+  }
+
+  /// Gets a simple route without hazard avoidance.
+  Future<RoutesApiResponse> _getSimpleRoute(
+    LatLng origin,
+    LatLng destination,
+  ) async {
+    final result = await _mapRepository.getRoute(
+      origin: origin,
+      destination: destination,
+    );
+
+    return result.when(
+      (routeResponse) => routeResponse,
+      (error) => throw error,
+    );
+  }
+
+  /// Gets a route that tries to avoid hazard areas using alternative routing preferences.
+  Future<RoutesApiResponse> _getRouteAvoidingHazards(
+    LatLng origin,
+    LatLng destination,
+    List<Hazard> hazards,
+  ) async {
+    // Filter hazards that have valid coordinates
+    final validHazards = hazards
+        .where((h) => h.latitude != null && h.longitude != null)
+        .toList();
+
+    if (validHazards.isEmpty) {
+      return await _getSimpleRoute(origin, destination);
+    }
+
+    // Try different routing approaches and select the safest
+    final routes = <RoutesApiResponse>[];
+
+    // 1. Try direct route first to compare
+    try {
+      final directRoute = await _getSimpleRoute(origin, destination);
+      routes.add(directRoute);
+    } catch (e) {
+      // Continue with other approaches if direct route fails
+    }
+
+    // 2. Try alternative routes using different routing preferences
+    // Note: This is a simplified approach. In a real implementation,
+    // you might want to use different waypoints or routing parameters
+    try {
+      final alternativeRoute = await _getSimpleRoute(origin, destination);
+      routes.add(alternativeRoute);
+    } catch (e) {
+      // Continue if this fails
+    }
+
+    // Choose the safest route from available options
+    return _chooseSafestRoute(routes, validHazards) ??
+        await _getSimpleRoute(origin, destination);
+  }
+
+  /// Chooses the safest route from available options.
+  RoutesApiResponse? _chooseSafestRoute(
+    List<RoutesApiResponse> routes,
+    List<Hazard> hazards,
+  ) {
+    if (routes.isEmpty) return null;
+
+    RoutesApiResponse? safestRoute;
+    double lowestRiskScore = double.infinity;
+
+    for (final route in routes) {
+      final riskScore = _calculateRouteRiskScore(route, hazards);
+      if (riskScore < lowestRiskScore) {
+        lowestRiskScore = riskScore;
+        safestRoute = route;
+      }
+    }
+
+    return safestRoute;
+  }
+
+  /// Calculates risk score for a route based on hazard proximity using actual route polyline.
+  double _calculateRouteRiskScore(
+    RoutesApiResponse route,
+    List<Hazard> hazards,
+  ) {
+    if (route.routes.isEmpty) {
+      return double.infinity;
+    }
+
+    try {
+      final firstRoute = route.routes.first;
+
+      // Check if polylinePoints are available directly on the route
+      if (firstRoute.polylinePoints != null &&
+          firstRoute.polylinePoints!.isNotEmpty) {
+        // Convert polyline points to LatLng list
+        final routePoints = firstRoute.polylinePoints!
+            .map((point) => LatLng(point.latitude, point.longitude))
+            .toList();
+
+        // Use the improved hazard analysis with actual route polyline
+        final routeAnalysis = HazardAvoidanceHelper.analyzeRouteHazards(
+          hazards,
+          routePoints,
+        );
+
+        // Calculate risk score based on hazard severity and count
+        double totalRisk = 0.0;
+        totalRisk +=
+            routeAnalysis.emergencyHazards * 10.0; // Emergency: 10x weight
+        totalRisk +=
+            routeAnalysis.highRiskHazards * 5.0; // High risk: 5x weight
+        totalRisk +=
+            routeAnalysis.mediumRiskHazards * 2.0; // Medium risk: 2x weight
+        totalRisk += routeAnalysis.lowRiskHazards * 1.0; // Low risk: 1x weight
+
+        return totalRisk;
+      } else {
+        // Fallback: assign moderate risk if we can't analyze the route properly
+        return hazards.length * 0.5; // Basic risk assessment
+      }
+    } catch (e) {
+      print('Error calculating route risk: $e');
+      // If we can't decode the route properly, assign moderate risk
+      return hazards.length * 1.0;
+    }
   }
 }

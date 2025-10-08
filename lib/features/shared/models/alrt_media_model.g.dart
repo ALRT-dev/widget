@@ -22,6 +22,7 @@ Map<String, dynamic> _$AlrtMediaToJson(_AlrtMedia instance) =>
     };
 
 const _$AlrtMediaTypeEnumMap = {
+  AlrtMediaType.unknown: 'unknown',
   AlrtMediaType.image: 'image',
   AlrtMediaType.video: 'video',
 };

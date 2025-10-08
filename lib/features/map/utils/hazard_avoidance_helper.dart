@@ -1,0 +1,322 @@
+import 'dart:math' as math;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/utils/location_helper.dart';
+
+/// Helper class for hazard avoidance functionality
+class HazardAvoidanceHelper {
+  /// Filters hazards that are relevant to a specific route using actual route polyline
+  static List<Hazard> getRelevantHazardsForPolyline(
+    List<Hazard> allHazards,
+    List<LatLng> routePoints, {
+    double bufferKm = 5.0, // Default 5km buffer around route
+  }) {
+    if (routePoints.isEmpty) {
+      print('Warning: Empty route points provided');
+      return [];
+    }
+
+    final filteredHazards = <Hazard>[];
+
+    for (final hazard in allHazards) {
+      if (hazard.latitude == null || hazard.longitude == null) {
+        print('Skipping hazard with null coordinates: ${hazard.id}');
+        continue;
+      }
+
+      final hazardLocation = LatLng(hazard.latitude!, hazard.longitude!);
+      final distanceToRoute = _calculateDistanceToPolyline(
+        hazardLocation,
+        routePoints,
+      );
+
+      final bufferMeters = bufferKm * 1000;
+      final isRelevant = distanceToRoute <= bufferMeters;
+
+      print(
+        'Hazard ${hazard.id}: distance=${distanceToRoute.toStringAsFixed(0)}m, buffer=${bufferMeters.toStringAsFixed(0)}m, relevant=$isRelevant, severity=${hazard.severity}',
+      );
+
+      if (isRelevant) {
+        filteredHazards.add(hazard);
+      }
+    }
+
+    return filteredHazards;
+  }
+
+  /// Filters hazards that are relevant to a specific route (legacy method - kept for backward compatibility)
+  static List<Hazard> getRelevantHazards(
+    List<Hazard> allHazards,
+    LatLng origin,
+    LatLng destination, {
+    double bufferKm = 5.0, // Default 5km buffer around route
+  }) {
+    final filteredHazards = <Hazard>[];
+
+    for (final hazard in allHazards) {
+      if (hazard.latitude == null || hazard.longitude == null) {
+        print('Skipping hazard with null coordinates: ${hazard.id}');
+        continue;
+      }
+
+      final hazardLocation = LatLng(hazard.latitude!, hazard.longitude!);
+      final distanceToRoute = _calculateDistanceToRoute(
+        hazardLocation,
+        origin,
+        destination,
+      );
+
+      final bufferMeters = bufferKm * 1000;
+      final isRelevant = distanceToRoute <= bufferMeters;
+
+      print(
+        'Hazard ${hazard.id}: distance=${distanceToRoute.toStringAsFixed(0)}m, buffer=${bufferMeters.toStringAsFixed(0)}m, relevant=$isRelevant, severity=${hazard.severity}',
+      );
+
+      if (isRelevant) {
+        filteredHazards.add(hazard);
+      }
+    }
+
+    return filteredHazards;
+  }
+
+  /// Gets hazards filtered by severity level
+  static List<Hazard> getHazardsBySeverity(
+    List<Hazard> hazards,
+    List<HazardSeverity> severityLevels,
+  ) {
+    return hazards.where((hazard) {
+      return hazard.severity != null &&
+          severityLevels.contains(hazard.severity);
+    }).toList();
+  }
+
+  /// Gets high-priority hazards that should definitely be avoided
+  static List<Hazard> getHighPriorityHazards(List<Hazard> hazards) {
+    return getHazardsBySeverity(hazards, [
+      HazardSeverity.emergency,
+      HazardSeverity.watchAndAct,
+    ]);
+  }
+
+  /// Creates a summary of hazards for a route using actual route polyline points
+  static RouteHazardSummary analyzeRouteHazards(
+    List<Hazard> hazards,
+    List<LatLng> routePoints, {
+    double bufferKm = 0.1, // 100m buffer around route
+  }) {
+    // First, get only hazards that are relevant to this route
+    final relevantHazards = getRelevantHazardsForPolyline(
+      hazards,
+      routePoints,
+      bufferKm: bufferKm,
+    );
+
+    // Debug: Print the filtering results
+    print('Total hazards: ${hazards.length}');
+    print('Relevant hazards for route: ${relevantHazards.length}');
+    print('Route points: ${routePoints.length}');
+    if (routePoints.isNotEmpty) {
+      print(
+        'Route start: ${routePoints.first.latitude}, ${routePoints.first.longitude}',
+      );
+      print(
+        'Route end: ${routePoints.last.latitude}, ${routePoints.last.longitude}',
+      );
+    }
+
+    // Count hazards by severity
+    final emergencyCount = relevantHazards
+        .where((h) => h.severity == HazardSeverity.emergency)
+        .length;
+
+    final highRiskCount = relevantHazards
+        .where((h) => h.severity == HazardSeverity.watchAndAct)
+        .length;
+
+    final mediumRiskCount = relevantHazards
+        .where((h) => h.severity == HazardSeverity.advice)
+        .length;
+
+    final lowRiskCount =
+        relevantHazards.where((h) => h.severity == HazardSeverity.info).length;
+
+    // Debug: Print the counts
+    print(
+      'Emergency: $emergencyCount, High: $highRiskCount, Medium: $mediumRiskCount, Low: $lowRiskCount',
+    );
+
+    return RouteHazardSummary(
+      totalHazards: relevantHazards.length,
+      emergencyHazards: emergencyCount,
+      highRiskHazards: highRiskCount,
+      mediumRiskHazards: mediumRiskCount,
+      lowRiskHazards: lowRiskCount,
+      hazards: relevantHazards,
+    );
+  }
+
+  /// Determines if a route should use hazard avoidance based on hazard count/severity
+  static bool shouldAvoidHazards(List<Hazard> hazards) {
+    final highPriorityHazards = getHighPriorityHazards(hazards);
+    return highPriorityHazards.isNotEmpty;
+  }
+
+  /// Calculates distance from a point to the closest point on a polyline (actual route)
+  static double _calculateDistanceToPolyline(
+    LatLng point,
+    List<LatLng> routePoints,
+  ) {
+    if (routePoints.isEmpty) return double.infinity;
+    if (routePoints.length == 1) {
+      return _calculateDistance(point, routePoints.first);
+    }
+
+    double minDistance = double.infinity;
+
+    // Check distance to each segment of the route polyline
+    for (int i = 0; i < routePoints.length - 1; i++) {
+      final segmentStart = routePoints[i];
+      final segmentEnd = routePoints[i + 1];
+
+      final distanceToSegment = _calculateDistanceToRoute(
+        point,
+        segmentStart,
+        segmentEnd,
+      );
+
+      minDistance = math.min(minDistance, distanceToSegment);
+    }
+
+    return minDistance;
+  }
+
+  /// Calculates approximate distance from a point to a route line segment (legacy method)
+  static double _calculateDistanceToRoute(
+    LatLng point,
+    LatLng routeStart,
+    LatLng routeEnd,
+  ) {
+    // Simplified distance calculation to line segment
+    final A = point.latitude - routeStart.latitude;
+    final B = point.longitude - routeStart.longitude;
+    final C = routeEnd.latitude - routeStart.latitude;
+    final D = routeEnd.longitude - routeStart.longitude;
+
+    final dot = A * C + B * D;
+    final lenSq = C * C + D * D;
+
+    if (lenSq == 0) {
+      return _calculateDistance(point, routeStart);
+    }
+
+    final param = dot / lenSq;
+    LatLng closestPoint;
+
+    if (param < 0) {
+      closestPoint = routeStart;
+    } else if (param > 1) {
+      closestPoint = routeEnd;
+    } else {
+      closestPoint = LatLng(
+        routeStart.latitude + param * C,
+        routeStart.longitude + param * D,
+      );
+    }
+
+    return _calculateDistance(point, closestPoint);
+  }
+
+  /// Calculates distance between two coordinates in meters using Haversine formula.
+  static double _calculateDistance(LatLng point1, LatLng point2) {
+    return calculateDistanceInMeters(
+      point1.latitude,
+      point1.longitude,
+      point2.latitude,
+      point2.longitude,
+    );
+  }
+}
+
+/// Summary of hazards affecting a route
+class RouteHazardSummary {
+  const RouteHazardSummary({
+    required this.totalHazards,
+    required this.emergencyHazards,
+    required this.highRiskHazards,
+    required this.mediumRiskHazards,
+    required this.lowRiskHazards,
+    required this.hazards,
+  });
+
+  final int totalHazards;
+  final int emergencyHazards;
+  final int highRiskHazards;
+  final int mediumRiskHazards;
+  final int lowRiskHazards;
+  final List<Hazard> hazards;
+
+  bool get hasEmergencyHazards => emergencyHazards > 0;
+  bool get hasHighRiskHazards => highRiskHazards > 0;
+  bool get hasAnyHazards => totalHazards > 0;
+
+  /// Gets a risk level for the route
+  RouteRiskLevel get riskLevel {
+    if (emergencyHazards > 0) return RouteRiskLevel.emergency;
+    if (highRiskHazards > 0) return RouteRiskLevel.high;
+    if (mediumRiskHazards > 0) return RouteRiskLevel.medium;
+    if (lowRiskHazards > 0) return RouteRiskLevel.low;
+    return RouteRiskLevel.safe;
+  }
+
+  /// Gets a human-readable summary message
+  String get summaryMessage {
+    if (totalHazards == 0) {
+      return 'No hazards detected on this route. Safe to proceed.';
+    }
+
+    final messages = <String>[];
+    if (emergencyHazards > 0) {
+      messages.add(
+          '$emergencyHazards emergency hazard${emergencyHazards == 1 ? '' : 's'}');
+    }
+    if (highRiskHazards > 0) {
+      messages.add(
+          '$highRiskHazards high risk hazard${highRiskHazards == 1 ? '' : 's'}');
+    }
+    if (mediumRiskHazards > 0) {
+      messages.add(
+          '$mediumRiskHazards medium risk hazard${mediumRiskHazards == 1 ? '' : 's'}');
+    }
+    if (lowRiskHazards > 0) {
+      messages
+          .add('$lowRiskHazards info hazard${lowRiskHazards == 1 ? '' : 's'}');
+    }
+
+    final hazardText = messages.join(', ');
+
+    switch (riskLevel) {
+      case RouteRiskLevel.emergency:
+        return 'CAUTION: Route contains $hazardText. Consider alternative route.';
+      case RouteRiskLevel.high:
+        return 'WARNING: Route contains $hazardText. Exercise caution.';
+      case RouteRiskLevel.medium:
+        return 'NOTICE: Route contains $hazardText. Stay alert.';
+      case RouteRiskLevel.low:
+        return 'INFO: Route contains $hazardText.';
+      case RouteRiskLevel.safe:
+        return 'Route appears safe.';
+    }
+  }
+}
+
+enum RouteRiskLevel {
+  safe,
+  low,
+  medium,
+  high,
+  emergency,
+}
