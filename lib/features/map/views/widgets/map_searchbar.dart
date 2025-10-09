@@ -41,8 +41,8 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
           boxShadow: [
             BoxShadow(
               color: AppColors.shadowColor,
-              blurRadius: 10.r,
-              offset: Offset(0, 4.h),
+              blurRadius: 10.0,
+              offset: Offset(0, 0.0),
             ),
           ],
         ),
@@ -128,13 +128,27 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
 
   /// Clears the search input field and unfocuses it.
   void _handleClearSearchPressed() {
-    _searchFocusNode.unfocus();
-    _searchController.clear();
-    _dropdownController.close();
-    ref.read(providerOfMap.notifier)
-      ..updateSearchString('')
-      ..updateSelectedPlace(null)
-      ..removeSelectedLocationMarker();
+    final isRoutePresent = ref.read(
+      providerOfMap.select(
+        (value) => value.currentRouteApiResponse != null,
+      ),
+    );
+
+    // if a route is present, only clear the route but keep the selected place
+    // else clear both selected place and route
+    if (isRoutePresent) {
+      ref.read(providerOfMap.notifier)
+        ..updateCurrentRouteApiResponse(null)
+        ..updatePolylines({});
+    } else {
+      _searchFocusNode.unfocus();
+      _searchController.clear();
+      _dropdownController.close();
+      ref.read(providerOfMap.notifier).updateSearchString('');
+      ref.read(providerOfMap.notifier)
+        ..updateSelectedPlace(null)
+        ..removeSelectedLocationMarker();
+    }
   }
 
   /// Updates the selected place in the map provider when a search result is selected.

@@ -103,9 +103,9 @@ class HazardAvoidanceHelper {
   }
 
   /// Creates a summary of hazards for a route using actual route polyline points
-  static RouteHazardSummary analyzeRouteHazards(
-    List<Hazard> hazards,
-    List<LatLng> routePoints, {
+  static RouteHazardSummary analyzeRouteHazards({
+    required List<Hazard> hazards,
+    required List<LatLng> routePoints,
     double bufferKm = 0.1, // 100m buffer around route
   }) {
     // First, get only hazards that are relevant to this route

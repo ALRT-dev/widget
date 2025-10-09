@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
+import 'package:hazard_app/features/map/views/widgets/route_planning.dart';
 import 'package:hazard_app/features/map/views/widgets/selected_location_preview.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -60,7 +61,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           MapSearchbar(),
-          SelectedLocationPreview().pB(20.0),
+          Consumer(
+            builder: (context, ref, child) {
+              final isRoutePresent = ref.watch(
+                providerOfMap.select(
+                  (value) => value.currentRouteApiResponse != null,
+                ),
+              );
+              if (isRoutePresent) {
+                return RoutePlanning().pB(20.0);
+              }
+              return SelectedLocationPreview().pB(20.0);
+            },
+          ),
         ],
       ).pX(20.0),
     );

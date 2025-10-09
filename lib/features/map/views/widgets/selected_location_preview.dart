@@ -83,6 +83,7 @@ class _SelectedLocationPreviewState
                   Icons.close_rounded,
                   size: 20.spMin,
                 ),
+                size: 30.0,
                 onPressed: _clearSelectedLocation,
               ),
             ],

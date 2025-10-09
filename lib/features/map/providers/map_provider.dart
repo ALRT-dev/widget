@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -106,7 +107,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
     result.when(
       (r) {
         state = state.copyWith(
-          getRouteState: const GetRouteState.success(),
+          getRouteState: GetRouteState.success(r),
+          currentRouteApiResponse: r,
         );
 
         if (r.routes.isEmpty ||
@@ -302,6 +304,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
   void updateSearchString(final String searchString) {
     state = state.copyWith(
       searchString: searchString,
+    );
+  }
+
+  /// Updates [MapProviderState.currentRouteApiResponse] to the given [response].
+  void updateCurrentRouteApiResponse(final RoutesApiResponse? response) {
+    state = state.copyWith(
+      currentRouteApiResponse: response,
     );
   }
 }

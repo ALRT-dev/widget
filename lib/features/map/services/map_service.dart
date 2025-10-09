@@ -191,8 +191,8 @@ class MapService {
 
         // Use the improved hazard analysis with actual route polyline
         final routeAnalysis = HazardAvoidanceHelper.analyzeRouteHazards(
-          hazards,
-          routePoints,
+          hazards: hazards,
+          routePoints: routePoints,
         );
 
         // Calculate risk score based on hazard severity and count

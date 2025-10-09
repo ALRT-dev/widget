@@ -47,8 +47,8 @@ class _RouteHazardControlsState extends ConsumerState<RouteHazardControls> {
   void _analyzeRoute() {
     final hazards = ref.read(providerOfHazards).mapHazards;
     _routeHazardSummary = HazardAvoidanceHelper.analyzeRouteHazards(
-      hazards,
-      widget.routePoints,
+      hazards: hazards,
+      routePoints: widget.routePoints,
     );
     setState(() {});
   }
