@@ -137,7 +137,9 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
     // if a route is present, only clear the route but keep the selected place
     // else clear both selected place and route
     if (isRoutePresent) {
-      ref.read(providerOfMap.notifier).updateCurrentRoutePlan(null);
+      ref.read(providerOfMap.notifier)
+        ..updateCurrentRoutePlan(null)
+        ..stopNavigation();
     } else {
       _searchFocusNode.unfocus();
       _searchController.clear();

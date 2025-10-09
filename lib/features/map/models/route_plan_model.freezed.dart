@@ -20,6 +20,9 @@ mixin _$RoutePlan {
   /// Map of travel modes to their corresponding route responses.
   Map<TravelMode, RoutesApiResponse> get travelModeRoutes;
 
+  /// Whether navigation is currently active.
+  bool get isNavigating;
+
   /// Create a copy of RoutePlan
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -35,16 +38,18 @@ mixin _$RoutePlan {
             (identical(other.selectedTravelMode, selectedTravelMode) ||
                 other.selectedTravelMode == selectedTravelMode) &&
             const DeepCollectionEquality()
-                .equals(other.travelModeRoutes, travelModeRoutes));
+                .equals(other.travelModeRoutes, travelModeRoutes) &&
+            (identical(other.isNavigating, isNavigating) ||
+                other.isNavigating == isNavigating));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, selectedTravelMode,
-      const DeepCollectionEquality().hash(travelModeRoutes));
+      const DeepCollectionEquality().hash(travelModeRoutes), isNavigating);
 
   @override
   String toString() {
-    return 'RoutePlan(selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes)';
+    return 'RoutePlan(selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes, isNavigating: $isNavigating)';
   }
 }
 
@@ -55,7 +60,8 @@ abstract mixin class $RoutePlanCopyWith<$Res> {
   @useResult
   $Res call(
       {TravelMode selectedTravelMode,
-      Map<TravelMode, RoutesApiResponse> travelModeRoutes});
+      Map<TravelMode, RoutesApiResponse> travelModeRoutes,
+      bool isNavigating});
 }
 
 /// @nodoc
@@ -72,6 +78,7 @@ class _$RoutePlanCopyWithImpl<$Res> implements $RoutePlanCopyWith<$Res> {
   $Res call({
     Object? selectedTravelMode = null,
     Object? travelModeRoutes = null,
+    Object? isNavigating = null,
   }) {
     return _then(_self.copyWith(
       selectedTravelMode: null == selectedTravelMode
@@ -82,6 +89,10 @@ class _$RoutePlanCopyWithImpl<$Res> implements $RoutePlanCopyWith<$Res> {
           ? _self.travelModeRoutes
           : travelModeRoutes // ignore: cast_nullable_to_non_nullable
               as Map<TravelMode, RoutesApiResponse>,
+      isNavigating: null == isNavigating
+          ? _self.isNavigating
+          : isNavigating // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -179,15 +190,18 @@ extension RoutePlanPatterns on RoutePlan {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(TravelMode selectedTravelMode,
-            Map<TravelMode, RoutesApiResponse> travelModeRoutes)?
+    TResult Function(
+            TravelMode selectedTravelMode,
+            Map<TravelMode, RoutesApiResponse> travelModeRoutes,
+            bool isNavigating)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _RoutePlan() when $default != null:
-        return $default(_that.selectedTravelMode, _that.travelModeRoutes);
+        return $default(_that.selectedTravelMode, _that.travelModeRoutes,
+            _that.isNavigating);
       case _:
         return orElse();
     }
@@ -208,14 +222,17 @@ extension RoutePlanPatterns on RoutePlan {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(TravelMode selectedTravelMode,
-            Map<TravelMode, RoutesApiResponse> travelModeRoutes)
+    TResult Function(
+            TravelMode selectedTravelMode,
+            Map<TravelMode, RoutesApiResponse> travelModeRoutes,
+            bool isNavigating)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _RoutePlan():
-        return $default(_that.selectedTravelMode, _that.travelModeRoutes);
+        return $default(_that.selectedTravelMode, _that.travelModeRoutes,
+            _that.isNavigating);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -235,14 +252,17 @@ extension RoutePlanPatterns on RoutePlan {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(TravelMode selectedTravelMode,
-            Map<TravelMode, RoutesApiResponse> travelModeRoutes)?
+    TResult? Function(
+            TravelMode selectedTravelMode,
+            Map<TravelMode, RoutesApiResponse> travelModeRoutes,
+            bool isNavigating)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _RoutePlan() when $default != null:
-        return $default(_that.selectedTravelMode, _that.travelModeRoutes);
+        return $default(_that.selectedTravelMode, _that.travelModeRoutes,
+            _that.isNavigating);
       case _:
         return null;
     }
@@ -255,7 +275,8 @@ class _RoutePlan extends RoutePlan {
   const _RoutePlan(
       {this.selectedTravelMode = TravelMode.driving,
       final Map<TravelMode, RoutesApiResponse> travelModeRoutes =
-          const <TravelMode, RoutesApiResponse>{}})
+          const <TravelMode, RoutesApiResponse>{},
+      this.isNavigating = false})
       : _travelModeRoutes = travelModeRoutes,
         super._();
 
@@ -276,6 +297,11 @@ class _RoutePlan extends RoutePlan {
     return EqualUnmodifiableMapView(_travelModeRoutes);
   }
 
+  /// Whether navigation is currently active.
+  @override
+  @JsonKey()
+  final bool isNavigating;
+
   /// Create a copy of RoutePlan
   /// with the given fields replaced by the non-null parameter values.
   @override
@@ -292,16 +318,18 @@ class _RoutePlan extends RoutePlan {
             (identical(other.selectedTravelMode, selectedTravelMode) ||
                 other.selectedTravelMode == selectedTravelMode) &&
             const DeepCollectionEquality()
-                .equals(other._travelModeRoutes, _travelModeRoutes));
+                .equals(other._travelModeRoutes, _travelModeRoutes) &&
+            (identical(other.isNavigating, isNavigating) ||
+                other.isNavigating == isNavigating));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, selectedTravelMode,
-      const DeepCollectionEquality().hash(_travelModeRoutes));
+      const DeepCollectionEquality().hash(_travelModeRoutes), isNavigating);
 
   @override
   String toString() {
-    return 'RoutePlan(selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes)';
+    return 'RoutePlan(selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes, isNavigating: $isNavigating)';
   }
 }
 
@@ -315,7 +343,8 @@ abstract mixin class _$RoutePlanCopyWith<$Res>
   @useResult
   $Res call(
       {TravelMode selectedTravelMode,
-      Map<TravelMode, RoutesApiResponse> travelModeRoutes});
+      Map<TravelMode, RoutesApiResponse> travelModeRoutes,
+      bool isNavigating});
 }
 
 /// @nodoc
@@ -332,6 +361,7 @@ class __$RoutePlanCopyWithImpl<$Res> implements _$RoutePlanCopyWith<$Res> {
   $Res call({
     Object? selectedTravelMode = null,
     Object? travelModeRoutes = null,
+    Object? isNavigating = null,
   }) {
     return _then(_RoutePlan(
       selectedTravelMode: null == selectedTravelMode
@@ -342,6 +372,10 @@ class __$RoutePlanCopyWithImpl<$Res> implements _$RoutePlanCopyWith<$Res> {
           ? _self._travelModeRoutes
           : travelModeRoutes // ignore: cast_nullable_to_non_nullable
               as Map<TravelMode, RoutesApiResponse>,
+      isNavigating: null == isNavigating
+          ? _self.isNavigating
+          : isNavigating // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }

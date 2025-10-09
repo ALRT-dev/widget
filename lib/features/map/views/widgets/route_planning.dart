@@ -42,7 +42,15 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
         children: [
           _headerBuilder(),
           _analysisBuilder(),
-          _travelModesBuilder().pT(3.0),
+          Row(
+            spacing: 5.spMin,
+            children: [
+              Expanded(
+                child: _travelModesBuilder(),
+              ),
+              _toggleNavigationButtonBuilder(),
+            ],
+          ).pT(3.0),
         ],
       ),
     );
@@ -65,6 +73,34 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
               ),
+            ),
+            Consumer(
+              builder: (context, ref, child) {
+                final distanceInKm = ref.watch(
+                  providerOfMap.select(
+                    (value) => value.currentRoutePlan?.currentRoute?.routes
+                        .firstOrNull?.distanceKm,
+                  ),
+                );
+                final distanceInMeters = ref.watch(
+                  providerOfMap.select(
+                    (value) => value.currentRoutePlan?.currentRoute?.routes
+                        .firstOrNull?.distanceMeters,
+                  ),
+                );
+
+                return Text(
+                  distanceInKm != null && distanceInKm >= 1
+                      ? '${distanceInKm.toStringAsFixed(2)} km'
+                      : distanceInMeters != null
+                          ? '$distanceInMeters m'
+                          : '',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: AppColors.grey,
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -280,6 +316,29 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
     );
   }
 
+  Widget _toggleNavigationButtonBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isNavigating = ref.watch(
+          providerOfMap.select(
+            (value) => value.currentRoutePlan?.isNavigating ?? false,
+          ),
+        );
+
+        return RoundButton(
+          icon: Icon(
+            isNavigating ? Icons.close_rounded : Icons.navigation_rounded,
+            size: 16.spMin,
+            color: isNavigating ? AppColors.white : AppColors.black,
+          ),
+          size: 30.0,
+          backgroundColor: isNavigating ? AppColors.red : null,
+          onPressed: () => _handleToggleNavigation(),
+        );
+      },
+    );
+  }
+
   /// Returns the route hazard summary from the provider.
   RouteHazardSummary get _routeHazardSummary {
     final hazards = ref.watch(
@@ -321,11 +380,18 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
 
   /// Handles the close button press to clear the current route.
   void _handleClose() {
-    ref.read(providerOfMap.notifier).updateCurrentRoutePlan(null);
+    ref.read(providerOfMap.notifier)
+      ..updateCurrentRoutePlan(null)
+      ..stopNavigation();
   }
 
   /// Handles travel mode change.
   void _handleTravelModeChange(final TravelMode mode) {
     ref.read(providerOfMap.notifier).updateSelectedTravelMode(mode);
+  }
+
+  /// Handles start navigation button press.
+  void _handleToggleNavigation() {
+    ref.read(providerOfMap.notifier).toggleNavigation();
   }
 }

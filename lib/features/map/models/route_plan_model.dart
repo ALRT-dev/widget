@@ -14,6 +14,9 @@ abstract class RoutePlan with _$RoutePlan {
     /// Map of travel modes to their corresponding route responses.
     @Default(<TravelMode, RoutesApiResponse>{})
     final Map<TravelMode, RoutesApiResponse> travelModeRoutes,
+
+    /// Whether navigation is currently active.
+    @Default(false) final bool isNavigating,
   }) = _RoutePlan;
 
   /// Gets the current route based on the selected travel mode.

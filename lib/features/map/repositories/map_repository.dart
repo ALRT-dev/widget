@@ -165,8 +165,7 @@ class MapRepositoryImpl implements MapRepository {
           origin: PointLatLng(origin.latitude, origin.longitude),
           destination: PointLatLng(destination.latitude, destination.longitude),
           travelMode: travelMode,
-          routingPreference: (travelMode == TravelMode.driving ||
-                  travelMode == TravelMode.transit)
+          routingPreference: travelMode == TravelMode.driving
               ? RoutingPreference.trafficAware
               : RoutingPreference.unspecified,
           polylineQuality: PolylineQuality.overview,

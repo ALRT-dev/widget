@@ -1,4 +1,5 @@
 import 'package:app_settings/app_settings.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
@@ -25,6 +26,15 @@ abstract class LocationRepository {
 
   /// Opens the location settings.
   Future<Either<void, AppError>> openLocationSettings();
+
+  Stream<Position> getPositionStream({
+    LocationSettings locationSettings = const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10,
+    ),
+  });
+
+  Stream<double> getHeadingStream();
 }
 
 class LocationRepositoryImpl extends LocationRepository {
@@ -180,6 +190,24 @@ class LocationRepositoryImpl extends LocationRepository {
         return Success(address);
       },
       onError: Failure.new,
+    );
+  }
+
+  @override
+  Stream<Position> getPositionStream({
+    LocationSettings locationSettings = const LocationSettings(
+      accuracy: LocationAccuracy.bestForNavigation,
+    ),
+  }) {
+    return Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    );
+  }
+
+  @override
+  Stream<double> getHeadingStream() {
+    return FlutterCompass.events!.map(
+      (event) => event.heading ?? 0.0,
     );
   }
 }

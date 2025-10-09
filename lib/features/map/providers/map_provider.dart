@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +11,7 @@ import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
+import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_marker.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
@@ -37,6 +40,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
   final Ref _ref;
   MapService get _mapService => _ref.read(providerOfMapService);
+  LocationService get _locationService => _ref.read(providerOfLocationService);
+  StreamSubscription<double>? _headingStreamSubscription;
 
   void _onInit() {
     final currentUserLocation = _ref.read(providerOfLocation).location;
@@ -49,6 +54,10 @@ class MapProvider extends StateNotifier<MapProviderState> {
         zoom: 14.0,
       ),
     );
+
+    _ref.onDispose(() {
+      _headingStreamSubscription?.cancel();
+    });
   }
 
   /// Initializes the map controller.
@@ -154,6 +163,82 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
+  Future<void> animateToCameraUpdate({
+    required final CameraUpdate cameraUpdate,
+  }) async {
+    await _mapService.animateCamera(
+      cameraUpdate: cameraUpdate,
+    );
+  }
+
+  /// Starts navigation by centering the camera on the user's current location.
+  void startNavigation() {
+    updateIsNavigating(true);
+
+    final currentUserLocation = _ref.read(providerOfLocation).location;
+    final zoom = 18.0;
+    final tilt = 30.0;
+
+    final cameraPosition = CameraPosition(
+      target: LatLng(
+        currentUserLocation.latitude,
+        currentUserLocation.longitude,
+      ),
+      zoom: zoom,
+      tilt: tilt,
+    );
+
+    updateCameraPosition(
+      cameraPosition: cameraPosition,
+    );
+    animateToCameraUpdate(
+      cameraUpdate: CameraUpdate.newCameraPosition(
+        cameraPosition,
+      ),
+    );
+
+    double? lastHeading;
+    _headingStreamSubscription?.cancel();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+
+      _headingStreamSubscription =
+          _locationService.getHeadingStream().listen((heading) {
+        if (!mounted) return;
+
+        if (lastHeading == null || (heading - (lastHeading ?? 0)).abs() > 6) {
+          lastHeading = heading;
+          final cameraPosition = state.cameraPosition;
+          animateToCameraUpdate(
+            cameraUpdate: CameraUpdate.newCameraPosition(
+              CameraPosition.fromMap({
+                ...cameraPosition.toMap() as Map<String, dynamic>,
+                'bearing': heading,
+              })!,
+            ),
+          );
+        }
+      });
+    });
+  }
+
+  /// Stops navigation and cancels heading updates.
+  void stopNavigation() {
+    updateIsNavigating(false);
+    _headingStreamSubscription?.cancel();
+    _headingStreamSubscription = null;
+  }
+
+  /// Toggles navigation state between started and stopped.
+  void toggleNavigation() {
+    final isNavigating = state.currentRoutePlan?.isNavigating ?? false;
+    if (isNavigating) {
+      stopNavigation();
+    } else {
+      startNavigation();
+    }
+  }
+
   /// Generates markers for all hazards in [HazardsProviderState.hazards].
   ///
   /// Uses [providerOfHazards] to get the list of hazards and creates a marker for each hazard with a valid location.
@@ -238,18 +323,25 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final selectedTravelMode = state.currentRoutePlan?.selectedTravelMode;
     if (selectedTravelMode == null) return;
 
+    final isNavigating = state.currentRoutePlan?.isNavigating ?? false;
+
     final polyLine = Polyline(
       polylineId: const PolylineId('route'),
       color: AppColors.blue,
       points: routePoints,
-      width: 8,
+      width: 10,
       startCap: Cap.roundCap,
       endCap: Cap.roundCap,
       jointType: JointType.round,
+      patterns: selectedTravelMode == TravelMode.walking
+          ? [PatternItem.dash(3), PatternItem.gap(1)]
+          : [],
     );
 
     updatePolylines({polyLine});
-    animateToBounds(bounds: routePoints.toBounds());
+    if (!isNavigating) {
+      animateToBounds(bounds: routePoints.toBounds());
+    }
   }
 
   /// Adds a marker for the selected location, replacing any existing selected location marker.
@@ -323,6 +415,15 @@ class MapProvider extends StateNotifier<MapProviderState> {
     updateCurrentRoutePlan(
       state.currentRoutePlan?.copyWith(
         selectedTravelMode: mode,
+      ),
+    );
+  }
+
+  /// Updates [MapProviderState.currentRoutePlan]'s isNavigating to the given [isNavigating].
+  void updateIsNavigating(final bool isNavigating) {
+    updateCurrentRoutePlan(
+      state.currentRoutePlan?.copyWith(
+        isNavigating: isNavigating,
       ),
     );
   }
