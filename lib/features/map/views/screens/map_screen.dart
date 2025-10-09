@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
 import 'package:hazard_app/features/map/views/widgets/route_planning.dart';
+import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
 import 'package:hazard_app/features/map/views/widgets/selected_location_preview.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -60,7 +61,20 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          MapSearchbar(),
+          Consumer(
+            builder: (context, ref, child) {
+              final isRoutePresent = ref.watch(
+                providerOfMap.select(
+                  (value) => value.currentRouteApiResponse != null,
+                ),
+              );
+
+              if (isRoutePresent) {
+                return RouteSourceAndDestination();
+              }
+              return MapSearchbar();
+            },
+          ),
           Consumer(
             builder: (context, ref, child) {
               final isRoutePresent = ref.watch(
