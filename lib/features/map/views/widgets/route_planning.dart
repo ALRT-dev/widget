@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -41,6 +42,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
         children: [
           _headerBuilder(),
           _analysisBuilder(),
+          _travelModesBuilder().pT(3.0),
         ],
       ),
     );
@@ -189,6 +191,95 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
     );
   }
 
+  Widget _travelModesBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final selectedTravelMode = ref.watch(
+          providerOfMap.select(
+            (value) => value.currentRoutePlan?.selectedTravelMode,
+          ),
+        );
+
+        final travelModeRoutes = ref.watch(
+          providerOfMap.select(
+            (value) => value.currentRoutePlan?.travelModeRoutes ?? {},
+          ),
+        );
+
+        return Row(
+          spacing: 5.spMin,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            for (final route in travelModeRoutes.entries)
+              Expanded(
+                child: _travelModeItemBuilder(
+                  icon: switch (route.key) {
+                    TravelMode.driving => Icons.directions_car_rounded,
+                    TravelMode.transit => Icons.directions_train_rounded,
+                    TravelMode.walking => Icons.directions_walk_rounded,
+                    TravelMode.bicycling => Icons.directions_bike_rounded,
+                    _ => Icons.directions,
+                  },
+                  duration: route.value.routes.firstOrNull?.durationMinutes !=
+                          null
+                      ? '${route.value.routes.first.durationMinutes?.toStringAsFixed(0)}m'
+                      : null,
+                  isSelected: selectedTravelMode == route.key,
+                  onTap: () => _handleTravelModeChange(route.key),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _travelModeItemBuilder({
+    required final IconData icon,
+    final String? duration,
+    required final bool isSelected,
+    required final VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: 12.spMin,
+          vertical: 6.spMin,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : AppColors.white,
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.lightGrey,
+          ),
+        ),
+        child: Row(
+          spacing: 5.w,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 16.spMin,
+              color: isSelected ? AppColors.primary : AppColors.black,
+            ),
+            if (duration != null)
+              Text(
+                duration,
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  color: isSelected ? AppColors.primary : AppColors.black,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   /// Returns the route hazard summary from the provider.
   RouteHazardSummary get _routeHazardSummary {
     final hazards = ref.watch(
@@ -199,7 +290,8 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
     final routePoints = ref.watch(
       providerOfMap.select(
         (value) =>
-            value.currentRouteApiResponse?.routes.first.polylinePoints
+            value.currentRoutePlan?.currentRoute?.routes.firstOrNull
+                ?.polylinePoints
                 ?.map((e) => LatLng(e.latitude, e.longitude))
                 .toList() ??
             [],
@@ -208,7 +300,6 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
     return HazardAvoidanceHelper.analyzeRouteHazards(
       hazards: hazards,
       routePoints: routePoints,
-      bufferKm: 3.0,
     );
   }
 
@@ -230,8 +321,11 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
 
   /// Handles the close button press to clear the current route.
   void _handleClose() {
-    ref.read(providerOfMap.notifier)
-      ..updateCurrentRouteApiResponse(null)
-      ..updatePolylines({});
+    ref.read(providerOfMap.notifier).updateCurrentRoutePlan(null);
+  }
+
+  /// Handles travel mode change.
+  void _handleTravelModeChange(final TravelMode mode) {
+    ref.read(providerOfMap.notifier).updateSelectedTravelMode(mode);
   }
 }

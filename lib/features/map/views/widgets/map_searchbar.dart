@@ -130,16 +130,14 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
   void _handleClearSearchPressed() {
     final isRoutePresent = ref.read(
       providerOfMap.select(
-        (value) => value.currentRouteApiResponse != null,
+        (value) => value.currentRoutePlan != null,
       ),
     );
 
     // if a route is present, only clear the route but keep the selected place
     // else clear both selected place and route
     if (isRoutePresent) {
-      ref.read(providerOfMap.notifier)
-        ..updateCurrentRouteApiResponse(null)
-        ..updatePolylines({});
+      ref.read(providerOfMap.notifier).updateCurrentRoutePlan(null);
     } else {
       _searchFocusNode.unfocus();
       _searchController.clear();

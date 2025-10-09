@@ -1,7 +1,7 @@
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
+import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/utils/constants.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 
@@ -28,8 +28,8 @@ abstract class MapProviderState with _$MapProviderState {
     /// The currently selected place on the map, if any.
     final GooglePlace? selectedPlace,
 
-    /// The current reponse from the routes API after [getRouteState] is successful.
-    final RoutesApiResponse? currentRouteApiResponse,
+    /// The current route plan, including travel mode and route responses.
+    final RoutePlan? currentRoutePlan,
 
     /// The state of fetching places.
     @Default(GetPlacesState.initial()) final GetPlacesState getPlacesState,
@@ -56,7 +56,7 @@ class GetRouteState with _$GetRouteState {
   const factory GetRouteState.initial() = _GetRouteStateInitial;
   const factory GetRouteState.loading() = _GetRouteStateLoading;
   const factory GetRouteState.success(
-    final RoutesApiResponse routeApiResponse,
+    final RoutePlan routeSettings,
   ) = _GetRouteStateSuccess;
   const factory GetRouteState.error(
     final AppError error,

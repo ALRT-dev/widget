@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
+import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
@@ -47,6 +48,15 @@ class MapProvider extends StateNotifier<MapProviderState> {
         ),
         zoom: 14.0,
       ),
+    );
+  }
+
+  /// Initializes the map controller.
+  Future<void> init({
+    required final GoogleMapController googleMapController,
+  }) async {
+    _mapService.initializeMapController(
+      googleMapController: googleMapController,
     );
   }
 
@@ -97,7 +107,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
       hazardsToAvoid = hazardsProvider.mapHazards;
     }
 
-    final result = await _mapService.getRoute(
+    final result = await _mapService.getRoutePlan(
       origin: origin,
       destination: destination,
       hazardsToAvoid: hazardsToAvoid,
@@ -106,53 +116,16 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     result.when(
       (r) {
+        updateCurrentRoutePlan(r);
         state = state.copyWith(
           getRouteState: GetRouteState.success(r),
-          currentRouteApiResponse: r,
         );
-
-        if (r.routes.isEmpty ||
-            (r.routes.first.polylinePoints?.isEmpty ?? true)) {
-          return;
-        }
-
-        final points = r.routes.first.polylinePoints!
-            .map((e) => LatLng(e.latitude, e.longitude))
-            .toList();
-
-        // Choose polyline color based on whether we avoided hazards
-        final polylineColor = avoidHazards &&
-                (hazardsToAvoid?.isNotEmpty ?? false)
-            ? AppColors.advice // Different color to indicate hazard-aware route
-            : AppColors.primary;
-
-        final polyLine = Polyline(
-          polylineId: const PolylineId('route'),
-          color: polylineColor,
-          points: points,
-          width: 5,
-          startCap: Cap.roundCap,
-          endCap: Cap.roundCap,
-          jointType: JointType.round,
-        );
-
-        updatePolylines({polyLine});
-        animateToBounds(bounds: points.toBounds());
       },
       (l) {
         state = state.copyWith(
           getRouteState: GetRouteState.error(l),
         );
       },
-    );
-  }
-
-  /// Initializes the map controller.
-  Future<void> init({
-    required final GoogleMapController googleMapController,
-  }) async {
-    _mapService.initializeMapController(
-      googleMapController: googleMapController,
     );
   }
 
@@ -253,6 +226,32 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
+  /// Adds a polyline for current route plan.
+  void addPolylineForRoutePlan() {
+    if (state.currentRoutePlan?.currentRoute?.routes.isEmpty ?? true) return;
+    final routePoints = state
+        .currentRoutePlan?.currentRoute?.routes.first.polylinePoints
+        ?.map((e) => LatLng(e.latitude, e.longitude))
+        .toList();
+    if (routePoints == null || routePoints.isEmpty) return;
+
+    final selectedTravelMode = state.currentRoutePlan?.selectedTravelMode;
+    if (selectedTravelMode == null) return;
+
+    final polyLine = Polyline(
+      polylineId: const PolylineId('route'),
+      color: AppColors.blue,
+      points: routePoints,
+      width: 8,
+      startCap: Cap.roundCap,
+      endCap: Cap.roundCap,
+      jointType: JointType.round,
+    );
+
+    updatePolylines({polyLine});
+    animateToBounds(bounds: routePoints.toBounds());
+  }
+
   /// Adds a marker for the selected location, replacing any existing selected location marker.
   void addSelectedLocationMarker(final LatLng position) {
     final marker = Marker(
@@ -307,10 +306,24 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
-  /// Updates [MapProviderState.currentRouteApiResponse] to the given [response].
-  void updateCurrentRouteApiResponse(final RoutesApiResponse? response) {
+  /// Updates [MapProviderState.currentRoutePlan] to the given [routePlan].
+  void updateCurrentRoutePlan(final RoutePlan? routePlan) {
     state = state.copyWith(
-      currentRouteApiResponse: response,
+      currentRoutePlan: routePlan,
+    );
+    if (routePlan == null) {
+      updatePolylines({});
+    } else {
+      addPolylineForRoutePlan();
+    }
+  }
+
+  /// Updates [MapProviderState.currentRoutePlan]'s selected travel mode to the given [mode].
+  void updateSelectedTravelMode(final TravelMode mode) {
+    updateCurrentRoutePlan(
+      state.currentRoutePlan?.copyWith(
+        selectedTravelMode: mode,
+      ),
     );
   }
 }

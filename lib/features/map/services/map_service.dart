@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
+import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/providers/repository_providers.dart';
 import 'package:hazard_app/features/map/repositories/map_repository.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
@@ -64,25 +65,89 @@ class MapService {
     return result;
   }
 
+  Future<Either<RoutePlan, AppError>> getRoutePlan({
+    required final LatLng origin,
+    required final LatLng destination,
+    final List<Hazard>? hazardsToAvoid,
+  }) async {
+    final result = await Future.wait([
+      getRoute(
+        origin: origin,
+        destination: destination,
+        hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.driving,
+      ),
+      getRoute(
+        origin: origin,
+        destination: destination,
+        hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.transit,
+      ),
+      getRoute(
+        origin: origin,
+        destination: destination,
+        hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.walking,
+      ),
+      getRoute(
+        origin: origin,
+        destination: destination,
+        hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.bicycling,
+      ),
+    ]);
+
+    final travelModeDriving = result[0].whenSuccess(
+      (response) => response.hasRoutes ? response : null,
+    );
+    final travelModeTransit = result[1].whenSuccess(
+      (response) => response.hasRoutes ? response : null,
+    );
+    final travelModeWalking = result[2].whenSuccess(
+      (response) => response.hasRoutes ? response : null,
+    );
+    final travelModeBicycling = result[3].whenSuccess(
+      (response) => response.hasRoutes ? response : null,
+    );
+
+    return Success(
+      RoutePlan(
+        travelModeRoutes: {
+          if (travelModeDriving != null) TravelMode.driving: travelModeDriving,
+          if (travelModeTransit != null) TravelMode.transit: travelModeTransit,
+          if (travelModeWalking != null) TravelMode.walking: travelModeWalking,
+          if (travelModeBicycling != null)
+            TravelMode.bicycling: travelModeBicycling,
+        },
+      ),
+    );
+  }
+
   /// Fetches route from the given [origin] to the [destination].
   /// Optionally avoids specified hazards.
   Future<Either<RoutesApiResponse, AppError>> getRoute({
     required final LatLng origin,
     required final LatLng destination,
+    final TravelMode travelMode = TravelMode.driving,
     final List<Hazard>? hazardsToAvoid,
   }) async {
     try {
       // If no hazards to avoid, use the simple route
       if (hazardsToAvoid?.isEmpty ?? true) {
-        final simpleRoute = await _getSimpleRoute(origin, destination);
+        final simpleRoute = await _getSimpleRoute(
+          origin: origin,
+          destination: destination,
+          travelMode: travelMode,
+        );
         return Success(simpleRoute);
       }
 
       // Try to get a route that avoids hazards
       final safestRoute = await _getRouteAvoidingHazards(
-        origin,
-        destination,
-        hazardsToAvoid!,
+        origin: origin,
+        destination: destination,
+        hazards: hazardsToAvoid!,
+        travelMode: travelMode,
       );
 
       return Success(safestRoute);
@@ -92,13 +157,15 @@ class MapService {
   }
 
   /// Gets a simple route without hazard avoidance.
-  Future<RoutesApiResponse> _getSimpleRoute(
-    LatLng origin,
-    LatLng destination,
-  ) async {
+  Future<RoutesApiResponse> _getSimpleRoute({
+    required final LatLng origin,
+    required final LatLng destination,
+    final TravelMode travelMode = TravelMode.driving,
+  }) async {
     final result = await _mapRepository.getRoute(
       origin: origin,
       destination: destination,
+      travelMode: travelMode,
     );
 
     return result.when(
@@ -108,18 +175,23 @@ class MapService {
   }
 
   /// Gets a route that tries to avoid hazard areas using alternative routing preferences.
-  Future<RoutesApiResponse> _getRouteAvoidingHazards(
-    LatLng origin,
-    LatLng destination,
-    List<Hazard> hazards,
-  ) async {
+  Future<RoutesApiResponse> _getRouteAvoidingHazards({
+    required final LatLng origin,
+    required final LatLng destination,
+    required final List<Hazard> hazards,
+    final TravelMode travelMode = TravelMode.driving,
+  }) async {
     // Filter hazards that have valid coordinates
     final validHazards = hazards
         .where((h) => h.latitude != null && h.longitude != null)
         .toList();
 
     if (validHazards.isEmpty) {
-      return await _getSimpleRoute(origin, destination);
+      return await _getSimpleRoute(
+        origin: origin,
+        destination: destination,
+        travelMode: travelMode,
+      );
     }
 
     // Try different routing approaches and select the safest
@@ -127,7 +199,11 @@ class MapService {
 
     // 1. Try direct route first to compare
     try {
-      final directRoute = await _getSimpleRoute(origin, destination);
+      final directRoute = await _getSimpleRoute(
+        origin: origin,
+        destination: destination,
+        travelMode: travelMode,
+      );
       routes.add(directRoute);
     } catch (e) {
       // Continue with other approaches if direct route fails
@@ -137,7 +213,11 @@ class MapService {
     // Note: This is a simplified approach. In a real implementation,
     // you might want to use different waypoints or routing parameters
     try {
-      final alternativeRoute = await _getSimpleRoute(origin, destination);
+      final alternativeRoute = await _getSimpleRoute(
+        origin: origin,
+        destination: destination,
+        travelMode: travelMode,
+      );
       routes.add(alternativeRoute);
     } catch (e) {
       // Continue if this fails
@@ -145,7 +225,11 @@ class MapService {
 
     // Choose the safest route from available options
     return _chooseSafestRoute(routes, validHazards) ??
-        await _getSimpleRoute(origin, destination);
+        await _getSimpleRoute(
+          origin: origin,
+          destination: destination,
+          travelMode: travelMode,
+        );
   }
 
   /// Chooses the safest route from available options.
@@ -211,7 +295,6 @@ class MapService {
         return hazards.length * 0.5; // Basic risk assessment
       }
     } catch (e) {
-      print('Error calculating route risk: $e');
       // If we can't decode the route properly, assign moderate risk
       return hazards.length * 1.0;
     }

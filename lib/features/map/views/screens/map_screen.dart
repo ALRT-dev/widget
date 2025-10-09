@@ -65,7 +65,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             builder: (context, ref, child) {
               final isRoutePresent = ref.watch(
                 providerOfMap.select(
-                  (value) => value.currentRouteApiResponse != null,
+                  (value) => value.currentRoutePlan != null,
                 ),
               );
 
@@ -79,7 +79,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             builder: (context, ref, child) {
               final isRoutePresent = ref.watch(
                 providerOfMap.select(
-                  (value) => value.currentRouteApiResponse != null,
+                  (value) => value.currentRoutePlan != null,
                 ),
               );
               if (isRoutePresent) {

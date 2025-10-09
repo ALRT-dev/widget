@@ -32,8 +32,8 @@ mixin _$MapProviderState {
   /// The currently selected place on the map, if any.
   GooglePlace? get selectedPlace;
 
-  /// The current reponse from the routes API after [getRouteState] is successful.
-  RoutesApiResponse? get currentRouteApiResponse;
+  /// The current route plan, including travel mode and route responses.
+  RoutePlan? get currentRoutePlan;
 
   /// The state of fetching places.
   GetPlacesState get getPlacesState;
@@ -63,9 +63,8 @@ mixin _$MapProviderState {
             const DeepCollectionEquality().equals(other.places, places) &&
             (identical(other.selectedPlace, selectedPlace) ||
                 other.selectedPlace == selectedPlace) &&
-            (identical(
-                    other.currentRouteApiResponse, currentRouteApiResponse) ||
-                other.currentRouteApiResponse == currentRouteApiResponse) &&
+            (identical(other.currentRoutePlan, currentRoutePlan) ||
+                other.currentRoutePlan == currentRoutePlan) &&
             (identical(other.getPlacesState, getPlacesState) ||
                 other.getPlacesState == getPlacesState) &&
             (identical(other.getRouteState, getRouteState) ||
@@ -81,13 +80,13 @@ mixin _$MapProviderState {
       searchString,
       const DeepCollectionEquality().hash(places),
       selectedPlace,
-      currentRouteApiResponse,
+      currentRoutePlan,
       getPlacesState,
       getRouteState);
 
   @override
   String toString() {
-    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, searchString: $searchString, places: $places, selectedPlace: $selectedPlace, currentRouteApiResponse: $currentRouteApiResponse, getPlacesState: $getPlacesState, getRouteState: $getRouteState)';
+    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, searchString: $searchString, places: $places, selectedPlace: $selectedPlace, currentRoutePlan: $currentRoutePlan, getPlacesState: $getPlacesState, getRouteState: $getRouteState)';
   }
 }
 
@@ -104,11 +103,12 @@ abstract mixin class $MapProviderStateCopyWith<$Res> {
       String searchString,
       List<GooglePlace> places,
       GooglePlace? selectedPlace,
-      RoutesApiResponse? currentRouteApiResponse,
+      RoutePlan? currentRoutePlan,
       GetPlacesState getPlacesState,
       GetRouteState getRouteState});
 
   $GooglePlaceCopyWith<$Res>? get selectedPlace;
+  $RoutePlanCopyWith<$Res>? get currentRoutePlan;
   $GetPlacesStateCopyWith<$Res> get getPlacesState;
   $GetRouteStateCopyWith<$Res> get getRouteState;
 }
@@ -132,7 +132,7 @@ class _$MapProviderStateCopyWithImpl<$Res>
     Object? searchString = null,
     Object? places = null,
     Object? selectedPlace = freezed,
-    Object? currentRouteApiResponse = freezed,
+    Object? currentRoutePlan = freezed,
     Object? getPlacesState = null,
     Object? getRouteState = null,
   }) {
@@ -161,10 +161,10 @@ class _$MapProviderStateCopyWithImpl<$Res>
           ? _self.selectedPlace
           : selectedPlace // ignore: cast_nullable_to_non_nullable
               as GooglePlace?,
-      currentRouteApiResponse: freezed == currentRouteApiResponse
-          ? _self.currentRouteApiResponse
-          : currentRouteApiResponse // ignore: cast_nullable_to_non_nullable
-              as RoutesApiResponse?,
+      currentRoutePlan: freezed == currentRoutePlan
+          ? _self.currentRoutePlan
+          : currentRoutePlan // ignore: cast_nullable_to_non_nullable
+              as RoutePlan?,
       getPlacesState: null == getPlacesState
           ? _self.getPlacesState
           : getPlacesState // ignore: cast_nullable_to_non_nullable
@@ -187,6 +187,20 @@ class _$MapProviderStateCopyWithImpl<$Res>
 
     return $GooglePlaceCopyWith<$Res>(_self.selectedPlace!, (value) {
       return _then(_self.copyWith(selectedPlace: value));
+    });
+  }
+
+  /// Create a copy of MapProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RoutePlanCopyWith<$Res>? get currentRoutePlan {
+    if (_self.currentRoutePlan == null) {
+      return null;
+    }
+
+    return $RoutePlanCopyWith<$Res>(_self.currentRoutePlan!, (value) {
+      return _then(_self.copyWith(currentRoutePlan: value));
     });
   }
 
@@ -311,7 +325,7 @@ extension MapProviderStatePatterns on MapProviderState {
             String searchString,
             List<GooglePlace> places,
             GooglePlace? selectedPlace,
-            RoutesApiResponse? currentRouteApiResponse,
+            RoutePlan? currentRoutePlan,
             GetPlacesState getPlacesState,
             GetRouteState getRouteState)?
         $default, {
@@ -327,7 +341,7 @@ extension MapProviderStatePatterns on MapProviderState {
             _that.searchString,
             _that.places,
             _that.selectedPlace,
-            _that.currentRouteApiResponse,
+            _that.currentRoutePlan,
             _that.getPlacesState,
             _that.getRouteState);
       case _:
@@ -357,7 +371,7 @@ extension MapProviderStatePatterns on MapProviderState {
             String searchString,
             List<GooglePlace> places,
             GooglePlace? selectedPlace,
-            RoutesApiResponse? currentRouteApiResponse,
+            RoutePlan? currentRoutePlan,
             GetPlacesState getPlacesState,
             GetRouteState getRouteState)
         $default,
@@ -372,7 +386,7 @@ extension MapProviderStatePatterns on MapProviderState {
             _that.searchString,
             _that.places,
             _that.selectedPlace,
-            _that.currentRouteApiResponse,
+            _that.currentRoutePlan,
             _that.getPlacesState,
             _that.getRouteState);
       case _:
@@ -401,7 +415,7 @@ extension MapProviderStatePatterns on MapProviderState {
             String searchString,
             List<GooglePlace> places,
             GooglePlace? selectedPlace,
-            RoutesApiResponse? currentRouteApiResponse,
+            RoutePlan? currentRoutePlan,
             GetPlacesState getPlacesState,
             GetRouteState getRouteState)?
         $default,
@@ -416,7 +430,7 @@ extension MapProviderStatePatterns on MapProviderState {
             _that.searchString,
             _that.places,
             _that.selectedPlace,
-            _that.currentRouteApiResponse,
+            _that.currentRoutePlan,
             _that.getPlacesState,
             _that.getRouteState);
       case _:
@@ -435,7 +449,7 @@ class _MapProviderState implements MapProviderState {
       this.searchString = '',
       final List<GooglePlace> places = const <GooglePlace>[],
       this.selectedPlace,
-      this.currentRouteApiResponse,
+      this.currentRoutePlan,
       this.getPlacesState = const GetPlacesState.initial(),
       this.getRouteState = const GetRouteState.initial()})
       : _markers = markers,
@@ -492,9 +506,9 @@ class _MapProviderState implements MapProviderState {
   @override
   final GooglePlace? selectedPlace;
 
-  /// The current reponse from the routes API after [getRouteState] is successful.
+  /// The current route plan, including travel mode and route responses.
   @override
-  final RoutesApiResponse? currentRouteApiResponse;
+  final RoutePlan? currentRoutePlan;
 
   /// The state of fetching places.
   @override
@@ -529,9 +543,8 @@ class _MapProviderState implements MapProviderState {
             const DeepCollectionEquality().equals(other._places, _places) &&
             (identical(other.selectedPlace, selectedPlace) ||
                 other.selectedPlace == selectedPlace) &&
-            (identical(
-                    other.currentRouteApiResponse, currentRouteApiResponse) ||
-                other.currentRouteApiResponse == currentRouteApiResponse) &&
+            (identical(other.currentRoutePlan, currentRoutePlan) ||
+                other.currentRoutePlan == currentRoutePlan) &&
             (identical(other.getPlacesState, getPlacesState) ||
                 other.getPlacesState == getPlacesState) &&
             (identical(other.getRouteState, getRouteState) ||
@@ -547,13 +560,13 @@ class _MapProviderState implements MapProviderState {
       searchString,
       const DeepCollectionEquality().hash(_places),
       selectedPlace,
-      currentRouteApiResponse,
+      currentRoutePlan,
       getPlacesState,
       getRouteState);
 
   @override
   String toString() {
-    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, searchString: $searchString, places: $places, selectedPlace: $selectedPlace, currentRouteApiResponse: $currentRouteApiResponse, getPlacesState: $getPlacesState, getRouteState: $getRouteState)';
+    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, searchString: $searchString, places: $places, selectedPlace: $selectedPlace, currentRoutePlan: $currentRoutePlan, getPlacesState: $getPlacesState, getRouteState: $getRouteState)';
   }
 }
 
@@ -572,12 +585,14 @@ abstract mixin class _$MapProviderStateCopyWith<$Res>
       String searchString,
       List<GooglePlace> places,
       GooglePlace? selectedPlace,
-      RoutesApiResponse? currentRouteApiResponse,
+      RoutePlan? currentRoutePlan,
       GetPlacesState getPlacesState,
       GetRouteState getRouteState});
 
   @override
   $GooglePlaceCopyWith<$Res>? get selectedPlace;
+  @override
+  $RoutePlanCopyWith<$Res>? get currentRoutePlan;
   @override
   $GetPlacesStateCopyWith<$Res> get getPlacesState;
   @override
@@ -603,7 +618,7 @@ class __$MapProviderStateCopyWithImpl<$Res>
     Object? searchString = null,
     Object? places = null,
     Object? selectedPlace = freezed,
-    Object? currentRouteApiResponse = freezed,
+    Object? currentRoutePlan = freezed,
     Object? getPlacesState = null,
     Object? getRouteState = null,
   }) {
@@ -632,10 +647,10 @@ class __$MapProviderStateCopyWithImpl<$Res>
           ? _self.selectedPlace
           : selectedPlace // ignore: cast_nullable_to_non_nullable
               as GooglePlace?,
-      currentRouteApiResponse: freezed == currentRouteApiResponse
-          ? _self.currentRouteApiResponse
-          : currentRouteApiResponse // ignore: cast_nullable_to_non_nullable
-              as RoutesApiResponse?,
+      currentRoutePlan: freezed == currentRoutePlan
+          ? _self.currentRoutePlan
+          : currentRoutePlan // ignore: cast_nullable_to_non_nullable
+              as RoutePlan?,
       getPlacesState: null == getPlacesState
           ? _self.getPlacesState
           : getPlacesState // ignore: cast_nullable_to_non_nullable
@@ -658,6 +673,20 @@ class __$MapProviderStateCopyWithImpl<$Res>
 
     return $GooglePlaceCopyWith<$Res>(_self.selectedPlace!, (value) {
       return _then(_self.copyWith(selectedPlace: value));
+    });
+  }
+
+  /// Create a copy of MapProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RoutePlanCopyWith<$Res>? get currentRoutePlan {
+    if (_self.currentRoutePlan == null) {
+      return null;
+    }
+
+    return $RoutePlanCopyWith<$Res>(_self.currentRoutePlan!, (value) {
+      return _then(_self.copyWith(currentRoutePlan: value));
     });
   }
 
@@ -1248,7 +1277,7 @@ extension GetRouteStatePatterns on GetRouteState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(RoutesApiResponse routeApiResponse)? success,
+    TResult Function(RoutePlan routeSettings)? success,
     TResult Function(AppError error)? error,
     required TResult orElse(),
   }) {
@@ -1259,7 +1288,7 @@ extension GetRouteStatePatterns on GetRouteState {
       case _GetRouteStateLoading() when loading != null:
         return loading();
       case _GetRouteStateSuccess() when success != null:
-        return success(_that.routeApiResponse);
+        return success(_that.routeSettings);
       case _GetRouteStateError() when error != null:
         return error(_that.error);
       case _:
@@ -1284,7 +1313,7 @@ extension GetRouteStatePatterns on GetRouteState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(RoutesApiResponse routeApiResponse) success,
+    required TResult Function(RoutePlan routeSettings) success,
     required TResult Function(AppError error) error,
   }) {
     final _that = this;
@@ -1294,7 +1323,7 @@ extension GetRouteStatePatterns on GetRouteState {
       case _GetRouteStateLoading():
         return loading();
       case _GetRouteStateSuccess():
-        return success(_that.routeApiResponse);
+        return success(_that.routeSettings);
       case _GetRouteStateError():
         return error(_that.error);
       case _:
@@ -1318,7 +1347,7 @@ extension GetRouteStatePatterns on GetRouteState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(RoutesApiResponse routeApiResponse)? success,
+    TResult? Function(RoutePlan routeSettings)? success,
     TResult? Function(AppError error)? error,
   }) {
     final _that = this;
@@ -1328,7 +1357,7 @@ extension GetRouteStatePatterns on GetRouteState {
       case _GetRouteStateLoading() when loading != null:
         return loading();
       case _GetRouteStateSuccess() when success != null:
-        return success(_that.routeApiResponse);
+        return success(_that.routeSettings);
       case _GetRouteStateError() when error != null:
         return error(_that.error);
       case _:
@@ -1380,9 +1409,9 @@ class _GetRouteStateLoading implements GetRouteState {
 /// @nodoc
 
 class _GetRouteStateSuccess implements GetRouteState {
-  const _GetRouteStateSuccess(this.routeApiResponse);
+  const _GetRouteStateSuccess(this.routeSettings);
 
-  final RoutesApiResponse routeApiResponse;
+  final RoutePlan routeSettings;
 
   /// Create a copy of GetRouteState
   /// with the given fields replaced by the non-null parameter values.
@@ -1397,16 +1426,16 @@ class _GetRouteStateSuccess implements GetRouteState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _GetRouteStateSuccess &&
-            (identical(other.routeApiResponse, routeApiResponse) ||
-                other.routeApiResponse == routeApiResponse));
+            (identical(other.routeSettings, routeSettings) ||
+                other.routeSettings == routeSettings));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, routeApiResponse);
+  int get hashCode => Object.hash(runtimeType, routeSettings);
 
   @override
   String toString() {
-    return 'GetRouteState.success(routeApiResponse: $routeApiResponse)';
+    return 'GetRouteState.success(routeSettings: $routeSettings)';
   }
 }
 
@@ -1417,7 +1446,9 @@ abstract mixin class _$GetRouteStateSuccessCopyWith<$Res>
           $Res Function(_GetRouteStateSuccess) _then) =
       __$GetRouteStateSuccessCopyWithImpl;
   @useResult
-  $Res call({RoutesApiResponse routeApiResponse});
+  $Res call({RoutePlan routeSettings});
+
+  $RoutePlanCopyWith<$Res> get routeSettings;
 }
 
 /// @nodoc
@@ -1432,14 +1463,24 @@ class __$GetRouteStateSuccessCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? routeApiResponse = null,
+    Object? routeSettings = null,
   }) {
     return _then(_GetRouteStateSuccess(
-      null == routeApiResponse
-          ? _self.routeApiResponse
-          : routeApiResponse // ignore: cast_nullable_to_non_nullable
-              as RoutesApiResponse,
+      null == routeSettings
+          ? _self.routeSettings
+          : routeSettings // ignore: cast_nullable_to_non_nullable
+              as RoutePlan,
     ));
+  }
+
+  /// Create a copy of GetRouteState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $RoutePlanCopyWith<$Res> get routeSettings {
+    return $RoutePlanCopyWith<$Res>(_self.routeSettings, (value) {
+      return _then(_self.copyWith(routeSettings: value));
+    });
   }
 }
 

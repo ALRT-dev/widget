@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:math' as math;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
@@ -13,7 +14,7 @@ class HazardAvoidanceHelper {
     double bufferKm = 5.0, // Default 5km buffer around route
   }) {
     if (routePoints.isEmpty) {
-      print('Warning: Empty route points provided');
+      log('Warning: Empty route points provided');
       return [];
     }
 
@@ -21,7 +22,7 @@ class HazardAvoidanceHelper {
 
     for (final hazard in allHazards) {
       if (hazard.latitude == null || hazard.longitude == null) {
-        print('Skipping hazard with null coordinates: ${hazard.id}');
+        log('Skipping hazard with null coordinates: ${hazard.id}');
         continue;
       }
 
@@ -34,7 +35,7 @@ class HazardAvoidanceHelper {
       final bufferMeters = bufferKm * 1000;
       final isRelevant = distanceToRoute <= bufferMeters;
 
-      print(
+      log(
         'Hazard ${hazard.id}: distance=${distanceToRoute.toStringAsFixed(0)}m, buffer=${bufferMeters.toStringAsFixed(0)}m, relevant=$isRelevant, severity=${hazard.severity}',
       );
 
@@ -57,7 +58,7 @@ class HazardAvoidanceHelper {
 
     for (final hazard in allHazards) {
       if (hazard.latitude == null || hazard.longitude == null) {
-        print('Skipping hazard with null coordinates: ${hazard.id}');
+        log('Skipping hazard with null coordinates: ${hazard.id}');
         continue;
       }
 
@@ -71,7 +72,7 @@ class HazardAvoidanceHelper {
       final bufferMeters = bufferKm * 1000;
       final isRelevant = distanceToRoute <= bufferMeters;
 
-      print(
+      log(
         'Hazard ${hazard.id}: distance=${distanceToRoute.toStringAsFixed(0)}m, buffer=${bufferMeters.toStringAsFixed(0)}m, relevant=$isRelevant, severity=${hazard.severity}',
       );
 
@@ -115,15 +116,15 @@ class HazardAvoidanceHelper {
       bufferKm: bufferKm,
     );
 
-    // Debug: Print the filtering results
-    print('Total hazards: ${hazards.length}');
-    print('Relevant hazards for route: ${relevantHazards.length}');
-    print('Route points: ${routePoints.length}');
+    // Debug: log the filtering results
+    log('Total hazards: ${hazards.length}');
+    log('Relevant hazards for route: ${relevantHazards.length}');
+    log('Route points: ${routePoints.length}');
     if (routePoints.isNotEmpty) {
-      print(
+      log(
         'Route start: ${routePoints.first.latitude}, ${routePoints.first.longitude}',
       );
-      print(
+      log(
         'Route end: ${routePoints.last.latitude}, ${routePoints.last.longitude}',
       );
     }
@@ -144,8 +145,8 @@ class HazardAvoidanceHelper {
     final lowRiskCount =
         relevantHazards.where((h) => h.severity == HazardSeverity.info).length;
 
-    // Debug: Print the counts
-    print(
+    // Debug: log the counts
+    log(
       'Emergency: $emergencyCount, High: $highRiskCount, Medium: $mediumRiskCount, Low: $lowRiskCount',
     );
 

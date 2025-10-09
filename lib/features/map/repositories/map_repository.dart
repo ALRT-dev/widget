@@ -26,6 +26,7 @@ abstract class MapRepository {
   Future<Either<RoutesApiResponse, AppError>> getRoute({
     required final LatLng origin,
     required final LatLng destination,
+    final TravelMode travelMode = TravelMode.driving,
   });
 }
 
@@ -155,6 +156,7 @@ class MapRepositoryImpl implements MapRepository {
   Future<Either<RoutesApiResponse, AppError>> getRoute({
     required LatLng origin,
     required LatLng destination,
+    TravelMode travelMode = TravelMode.driving,
   }) {
     return runAsyncCall(
       name: 'getRoute',
@@ -162,14 +164,23 @@ class MapRepositoryImpl implements MapRepository {
         final request = RoutesApiRequest(
           origin: PointLatLng(origin.latitude, origin.longitude),
           destination: PointLatLng(destination.latitude, destination.longitude),
-          travelMode: TravelMode.driving,
-          routingPreference: RoutingPreference.trafficAware,
+          travelMode: travelMode,
+          routingPreference: (travelMode == TravelMode.driving ||
+                  travelMode == TravelMode.transit)
+              ? RoutingPreference.trafficAware
+              : RoutingPreference.unspecified,
           polylineQuality: PolylineQuality.overview,
         );
 
         final result = await _polylinePoints.getRouteBetweenCoordinatesV2(
           request: request,
         );
+
+        if (!result.isSuccessful) {
+          throw AppError(
+            message: result.errorMessage ?? 'Failed to fetch route',
+          );
+        }
 
         return Success(result);
       },
