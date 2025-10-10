@@ -8,10 +8,13 @@ import 'package:hazard_app/features/search/views/widgets/hazard_categories_list.
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class NotificationsAppBar extends ConsumerStatefulWidget {
   const NotificationsAppBar({super.key});
+
+  static const categoriesKey = 'NotificationsAppBar';
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -31,35 +34,48 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    return SliverAppBar(
-      backgroundColor: context.theme.scaffoldBackgroundColor,
-      surfaceTintColor: AppColors.transparent,
-      floating: true,
-      pinned: true,
-      leading: const SizedBox(),
-      leadingWidth: 0.0,
-      toolbarHeight: 50.spMin,
-      title: Text(
-        'ALRT Feed',
-        style: TextStyle(
-          color: AppColors.black,
-        ),
-      ),
-      bottom: PreferredSize(
-        preferredSize: Size.fromHeight(118.spMin),
-        child: Column(
-          children: [
-            _searchbarBuilder().pX(20.0),
-            15.hSizedBox,
-            HazardCategoriesList(),
-            15.hSizedBox,
-            Divider(
-              height: 0.0,
-              color: AppColors.lightGrey.withValues(alpha: 0.5),
+    return Consumer(
+      builder: (context, ref, child) {
+        final isCategoriesPresent = ref.watch(
+          providerOfHazardCategoriesForNotifications.select(
+            (value) => value.hazardCategories.isNotEmpty,
+          ),
+        );
+        return SliverAppBar(
+          backgroundColor: context.theme.scaffoldBackgroundColor,
+          surfaceTintColor: AppColors.transparent,
+          floating: true,
+          pinned: true,
+          leading: const SizedBox(),
+          leadingWidth: 0.0,
+          toolbarHeight: 50.spMin,
+          title: Text(
+            'ALRT Feed',
+            style: TextStyle(
+              color: AppColors.black,
             ),
-          ],
-        ),
-      ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(
+              isCategoriesPresent ? 118.spMin : 63.spMin,
+            ),
+            child: Column(
+              children: [
+                _searchbarBuilder().pX(20.0),
+                15.hSizedBox,
+                HazardCategoriesList(
+                  categoriesKey: NotificationsAppBar.categoriesKey,
+                ),
+                if (isCategoriesPresent) 15.hSizedBox,
+                Divider(
+                  height: 0.0,
+                  color: AppColors.lightGrey.withValues(alpha: 0.5),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

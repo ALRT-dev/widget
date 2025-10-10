@@ -11,6 +11,7 @@ import 'package:hazard_app/features/search/views/widgets/hazard_categories_list.
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -18,6 +19,7 @@ class HazardSearchAppBar extends ConsumerStatefulWidget {
   const HazardSearchAppBar({super.key});
 
   static const placesSearchKey = 'HazardSearchAppBar';
+  static const categoriesKey = 'HazardSearchAppBar';
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -30,47 +32,61 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
 
   final _dropdownController = AlrtDropdownController();
 
-  late final placesProvider = providerOfPlaces(
+  late final providerOfPlacesForSearch = providerOfPlaces(
     HazardSearchAppBar.placesSearchKey,
   );
 
   @override
   void initState() {
     super.initState();
-    _searchController.text = ref.read(placesProvider).searchString;
+    _searchController.text = ref.read(providerOfPlacesForSearch).searchString;
   }
 
   @override
   Widget build(BuildContext context) {
-    return SliverAppBar(
-      backgroundColor: context.theme.scaffoldBackgroundColor,
-      surfaceTintColor: AppColors.transparent,
-      floating: true,
-      pinned: true,
-      leading: const SizedBox(),
-      leadingWidth: 0.0,
-      toolbarHeight: 50.spMin,
-      title: Text(
-        'ALRT Intelligent Search',
-        style: TextStyle(
-          color: AppColors.black,
-        ),
-      ),
-      bottom: PreferredSize(
-        preferredSize: Size.fromHeight(118.spMin),
-        child: Column(
-          children: [
-            _searchbarBuilder().pX(20.0),
-            15.hSizedBox,
-            HazardCategoriesList(),
-            15.hSizedBox,
-            Divider(
-              height: 0.0,
-              color: AppColors.lightGrey.withValues(alpha: 0.5),
+    return Consumer(
+      builder: (context, ref, child) {
+        final isCategoriesPresent = ref.watch(
+          providerOfHazardCategoriesForSearch.select(
+            (value) => value.hazardCategories.isNotEmpty,
+          ),
+        );
+
+        return SliverAppBar(
+          backgroundColor: context.theme.scaffoldBackgroundColor,
+          surfaceTintColor: AppColors.transparent,
+          floating: true,
+          pinned: true,
+          leading: const SizedBox(),
+          leadingWidth: 0.0,
+          toolbarHeight: 50.spMin,
+          title: Text(
+            'ALRT Intelligent Search',
+            style: TextStyle(
+              color: AppColors.black,
             ),
-          ],
-        ),
-      ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(
+              isCategoriesPresent ? 118.spMin : 63.spMin,
+            ),
+            child: Column(
+              children: [
+                _searchbarBuilder().pX(20.0),
+                15.hSizedBox,
+                HazardCategoriesList(
+                  categoriesKey: HazardSearchAppBar.categoriesKey,
+                ),
+                if (isCategoriesPresent) 15.hSizedBox,
+                Divider(
+                  height: 0.0,
+                  color: AppColors.lightGrey.withValues(alpha: 0.5),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -80,7 +96,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
       button: Consumer(
         builder: (context, ref, child) {
           final isSearchActive = ref.watch(
-            placesProvider.select(
+            providerOfPlacesForSearch.select(
               (value) => value.searchString.isNotEmpty,
             ),
           );
@@ -143,7 +159,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
       _dropdownController.open();
     }
 
-    ref.read(placesProvider.notifier)
+    ref.read(providerOfPlacesForSearch.notifier)
       ..updateSearchString(value.trim())
       ..updateGetPlacesToLoading();
     EasyDebounce.debounce(
@@ -151,7 +167,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
       const Duration(milliseconds: 300),
       () {
         if (!mounted) return;
-        ref.read(placesProvider.notifier).getPlaces();
+        ref.read(providerOfPlacesForSearch.notifier).getPlaces();
       },
     );
   }
@@ -160,13 +176,18 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
   void _handleClearSearchPressed() {
     _searchController.clear();
     _searchFocusNode.unfocus();
-    ref.read(placesProvider.notifier).updateSearchString('');
+    ref.read(providerOfPlacesForSearch.notifier).updateSearchString('');
     _dropdownController.close();
 
     // also clear the searched location and hazards from the main search provider
     ref.read(providerOfMainSearch.notifier)
       ..updateSearchedLocation(null)
       ..updateGetHazardsByLocationStateToInitial();
+
+    // clear hazard categories as well
+    ref
+        .read(providerOfHazardCategoriesForSearch.notifier)
+        .updateGetHazardCategoriesStateToInitial();
   }
 
   /// Handles the selection of a search result place.
@@ -179,5 +200,10 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
     ref.read(providerOfMainSearch.notifier)
       ..updateSearchedLocation(place.toAlrtLocation)
       ..getHazards();
+
+    // fetch hazard categories for the selected location
+    ref
+        .read(providerOfHazardCategoriesForSearch.notifier)
+        .getHazardCategories();
   }
 }

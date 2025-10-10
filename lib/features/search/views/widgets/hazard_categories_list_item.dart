@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class HazardCategoriesListItem extends ConsumerStatefulWidget {
   const HazardCategoriesListItem({
     super.key,
+    required this.categoriesKey,
     required this.hazardCategory,
+    this.onSelected,
   });
 
+  /// The key to identify the categories provider.
+  final String categoriesKey;
+
+  /// The hazard category to be displayed.
   final HazardCategory hazardCategory;
+
+  /// Callback when a category is selected.
+  final Function(HazardCategory)? onSelected;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -23,10 +32,10 @@ class _HazardCategoriesListItemState
   @override
   Widget build(BuildContext context) {
     final isSelected = ref.watch(
-      providerOfHazards.select(
-        (value) => value.tempSearchParams.categoryIds.contains(
-          widget.hazardCategory.id,
-        ),
+      providerOfHazardCategories(widget.categoriesKey).select(
+        (value) => value.selectedCategories
+            .map((e) => e.id)
+            .contains(widget.hazardCategory.id),
       ),
     );
 
@@ -73,10 +82,12 @@ class _HazardCategoriesListItemState
     );
   }
 
-  /// Updates the state with the given category and fetches the hazards.
+  /// Updates the state with the given category.
   void _handleCategorySelection() {
-    ref.read(providerOfHazards.notifier)
-      ..selectCategory(widget.hazardCategory.id)
-      ..getHazards();
+    ref
+        .read(providerOfHazardCategories(widget.categoriesKey).notifier)
+        .toggleSelectedCategory(widget.hazardCategory);
+
+    widget.onSelected?.call(widget.hazardCategory);
   }
 }

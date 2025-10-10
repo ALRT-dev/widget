@@ -12,6 +12,7 @@ import 'package:hazard_app/features/report/views/screens/create_report_screen.da
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/views/screens/hazard_search_screen.dart';
+import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   /// Displays the home screen of the app.
@@ -31,6 +32,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   );
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
+  }
+
+  @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
@@ -46,6 +53,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfPlacesForMap.select((value) => null));
     ref.watch(providerOfPlacesForSearch.select((value) => null));
     ref.watch(providerOfMainSearch.select((value) => null));
+    ref.watch(providerOfHazardCategoriesForSearch.select((value) => null));
+    ref.watch(
+      providerOfHazardCategoriesForNotifications.select((value) => null),
+    );
 
     _listenToHazardsState();
 
@@ -65,6 +76,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         tabController: _tabController,
       ),
     );
+  }
+
+  void _onInit() {
+    ref
+        .read(providerOfHazardCategoriesForNotifications.notifier)
+        .getHazardCategories();
   }
 
   /// Listens to changes in the hazards state and updates the map markers accordingly.
