@@ -15,7 +15,11 @@ abstract class AlrtLocation with _$AlrtLocation {
     final String? name,
   }) = _AlrtLocation;
 
+  /// Converts the [AlrtLocation] to a [LatLng] object.
   LatLng get latLng => LatLng(latitude, longitude);
+
+  /// A user-friendly representation of the location.
+  String get displayName => name ?? address ?? 'Unknown Location';
 
   factory AlrtLocation.fromJson(Map<String, dynamic> json) =>
       _$AlrtLocationFromJson(json);

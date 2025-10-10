@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/places_search_results_menu_content.dart';
+import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/views/widgets/hazard_categories_list.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
@@ -161,6 +162,11 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
     _searchFocusNode.unfocus();
     ref.read(placesProvider.notifier).updateSearchString('');
     _dropdownController.close();
+
+    // also clear the searched location and hazards from the main search provider
+    ref.read(providerOfMainSearch.notifier)
+      ..updateSearchedLocation(null)
+      ..updateGetHazardsByLocationStateToInitial();
   }
 
   /// Handles the selection of a search result place.
@@ -168,5 +174,10 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
     _searchFocusNode.unfocus();
     _dropdownController.close();
     _searchController.text = place.name;
+
+    // update the main search provider with the selected location and fetch hazards.
+    ref.read(providerOfMainSearch.notifier)
+      ..updateSearchedLocation(place.toAlrtLocation)
+      ..getHazards();
   }
 }

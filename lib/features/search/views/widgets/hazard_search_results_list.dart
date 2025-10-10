@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
-import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
+import 'package:hazard_app/features/search/providers/main_search_provider.dart';
+import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
 import 'package:hazard_app/features/search/views/widgets/hazard_search_results_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 
 class HazardSearchResultsList extends ConsumerStatefulWidget {
@@ -20,18 +24,18 @@ class _HazardSearchResultsListState
     extends ConsumerState<HazardSearchResultsList> {
   @override
   Widget build(BuildContext context) {
-    final getHazardsState = ref.watch(
-      providerOfHazards.select(
-        (value) => value.getListHazardsState,
+    final getHazardsByLocationState = ref.watch(
+      providerOfMainSearch.select(
+        (value) => value.getHazardsByLocationState,
       ),
     );
 
-    return switch (getHazardsState) {
-      GetHazardsStateLoading() => _loadingBuilder(),
-      GetHazardsStateError() => _errorBuilder(),
-      GetHazardsStateSuccess() => _dataBuilder(),
-      _ => const SizedBox(),
-    };
+    return getHazardsByLocationState.maybeWhen(
+      loading: () => _loadingBuilder(),
+      error: (error) => _errorBuilder(),
+      success: (hazards) => _dataBuilder(),
+      orElse: () => _emptyBuilder(),
+    );
   }
 
   Widget _loadingBuilder() {
@@ -42,39 +46,76 @@ class _HazardSearchResultsListState
 
   Widget _emptyBuilder() {
     return SliverFillRemaining(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Nothing to show!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
+      child: Consumer(
+        builder: (context, ref, child) {
+          final isSearchActive = ref.watch(
+            providerOfPlacesForSearch.select(
+              (value) => value.searchString.isNotEmpty,
             ),
-          ),
-          Consumer(
-            builder: (context, ref, child) {
-              final isSearchActive = ref.watch(
-                providerOfHazards.select(
-                  (value) =>
-                      value.tempSearchParams.searchString?.isNotEmpty ?? false,
-                ),
-              );
+          );
+          final selectedLocation = ref.watch(
+            providerOfMainSearch.select(
+              (value) => value.searchedLocation,
+            ),
+          );
 
-              return Text(
-                isSearchActive
-                    ? 'No results found for your search. Please try changing it.'
-                    : 'There are no data available at the moment. Please check back later.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14.sp,
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 10.spMin,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/search.svg',
+                width: 40.spMin,
+              ),
+              Column(
+                spacing: 5.spMin,
+                children: [
+                  Text(
+                    isSearchActive
+                        ? selectedLocation != null
+                            ? 'No hazards around "${selectedLocation.displayName}"'
+                            : 'Nothing to show'
+                        : 'Subscribe to a location',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18.spMin,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    isSearchActive
+                        ? selectedLocation != null
+                            ? 'You can still subscribe to get instant alerts and updates around ${selectedLocation.displayName}.'
+                            : 'No results found for your search. Please try changing it.'
+                        : 'Please use the search bar to search for a location to see hazards around it and subscribe to it.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14.spMin,
+                    ),
+                  ),
+                ],
+              ),
+              if (selectedLocation != null)
+                SizedBox(
+                  height: 40.spMin,
+                  child: Button.filled(
+                    width: 130.spMin,
+                    onPressed: () {},
+                    padding: EdgeInsets.zero,
+                    icon: const Icon(
+                      Icons.notifications_active,
+                      size: 18,
+                    ),
+                    value: 'Subscribe',
+                    valueStyle: const TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
-              );
-            },
-          ),
-        ],
-      ).pad(20.0),
+            ],
+          ).pad(20.0);
+        },
+      ),
     );
   }
 

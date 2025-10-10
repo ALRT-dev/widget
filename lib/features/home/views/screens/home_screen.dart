@@ -10,6 +10,7 @@ import 'package:hazard_app/features/notification/views/screens/notifications_scr
 import 'package:hazard_app/features/report/providers/create_report_provider.dart';
 import 'package:hazard_app/features/report/views/screens/create_report_screen.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
+import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/views/screens/hazard_search_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -44,6 +45,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfMapSearchTextEditingController.select((value) => null));
     ref.watch(providerOfPlacesForMap.select((value) => null));
     ref.watch(providerOfPlacesForSearch.select((value) => null));
+    ref.watch(providerOfMainSearch.select((value) => null));
 
     _listenToHazardsState();
 
