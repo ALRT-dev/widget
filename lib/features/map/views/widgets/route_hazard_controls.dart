@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
@@ -56,11 +55,11 @@ class _RouteHazardControlsState extends ConsumerState<RouteHazardControls> {
   }
 
   void _requestRoute() {
-    ref.read(providerOfMap.notifier).getRoute(
-          origin: widget.origin,
-          destination: widget.routePoints.last,
-          avoidHazards: _avoidHazards,
-        );
+    // ref.read(providerOfMap.notifier).getRoute(
+    //       origin: widget.origin,
+    //       destination: widget.routePoints.last,
+    //       avoidHazards: _avoidHazards,
+    //     );
     widget.onRouteRequested?.call();
   }
 

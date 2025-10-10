@@ -11,6 +11,7 @@ _AlrtLocation _$AlrtLocationFromJson(Map<String, dynamic> json) =>
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       address: json['address'] as String?,
+      name: json['name'] as String?,
     );
 
 Map<String, dynamic> _$AlrtLocationToJson(_AlrtLocation instance) =>
@@ -18,4 +19,5 @@ Map<String, dynamic> _$AlrtLocationToJson(_AlrtLocation instance) =>
       'latitude': instance.latitude,
       'longitude': instance.longitude,
       'address': instance.address,
+      'name': instance.name,
     };

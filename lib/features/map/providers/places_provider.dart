@@ -1,0 +1,75 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:hazard_app/features/map/providers/location_provider.dart';
+import 'package:hazard_app/features/map/providers/service_providers.dart';
+import 'package:hazard_app/features/map/providers/states/places_provider_state.dart';
+import 'package:hazard_app/features/map/services/map_service.dart';
+
+final providerOfPlaces =
+    StateNotifierProvider.autoDispose<PlacesProvider, PlacesProviderState>(
+  (ref) => PlacesProvider(
+    ref: ref,
+    state: PlacesProviderState(),
+  ),
+);
+
+class PlacesProvider extends StateNotifier<PlacesProviderState> {
+  PlacesProvider({
+    required final Ref ref,
+    required PlacesProviderState state,
+  })  : _ref = ref,
+        super(state);
+
+  final Ref _ref;
+  MapService get _mapService => _ref.read(providerOfMapService);
+
+  /// Fetches places based on the current search string in the state.
+  Future<void> getPlaces() async {
+    final searchString = state.searchString;
+    if (searchString.isEmpty) {
+      state = state.copyWith(
+        places: [],
+        getPlacesState: const GetPlacesState.success([]),
+      );
+      return;
+    }
+
+    state = state.copyWith(
+      getPlacesState: const GetPlacesState.loading(),
+    );
+
+    final result = await _mapService.getPlaces(
+      currentUserLocation: _ref.read(providerOfLocation).location,
+      searchString: searchString,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (places) {
+        state = state.copyWith(
+          places: places,
+          getPlacesState: GetPlacesState.success(places),
+        );
+      },
+      (error) {
+        state = state.copyWith(
+          getPlacesState: GetPlacesState.error(error),
+        );
+      },
+    );
+  }
+
+  /// Updates [PlacesProviderState.searchString] in with the given [searchString].
+  void updateSearchString(final String searchString) {
+    state = state.copyWith(
+      searchString: searchString,
+    );
+  }
+
+  /// Updates [PlacesProviderState.getPlacesState] to loading state.
+  void updateGetPlacesToLoading() {
+    state = state.copyWith(
+      getPlacesState: const GetPlacesState.loading(),
+    );
+  }
+}

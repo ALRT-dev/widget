@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hazard_app/features/map/providers/location_provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/providers/map_search_text_editing_controller_provider.dart';
+import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -82,39 +85,91 @@ class _RouteSourceAndDestinationState
 
   Widget _locationsBuilder() {
     final origin = ref.watch(
-      providerOfLocation.select(
-        (value) => value.location.address,
+      providerOfMap.select(
+        (value) => value.currentRoutePlan?.origin,
       ),
     );
     final destination = ref.watch(
       providerOfMap.select(
-        (value) => value.selectedPlace?.name,
+        (value) => value.currentRoutePlan?.destination,
       ),
     );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 14.spMin,
       children: [
-        if (origin != null) _locationItemBuilder(origin),
+        if (origin != null)
+          _locationItemBuilder(origin).pB(14.0).onPressed(
+                () => _handleLocationSelection(
+                  location: origin,
+                  isSelectingOrigin: true,
+                ),
+              ),
         Divider(
           height: 0.0,
           color: AppColors.lightGrey,
         ),
-        if (destination != null) _locationItemBuilder(destination),
+        if (destination != null)
+          _locationItemBuilder(destination).pT(14.0).onPressed(
+                () => _handleLocationSelection(
+                  location: destination,
+                  isSelectingOrigin: false,
+                ),
+              ),
       ],
     );
   }
 
-  Widget _locationItemBuilder(final String address) {
-    return Text(
-      address,
-      style: TextStyle(
-        fontSize: 14.spMin,
-        color: AppColors.black,
-        fontWeight: FontWeight.w500,
+  Widget _locationItemBuilder(final AlrtLocation location) {
+    return SizedBox(
+      width: double.infinity,
+      child: Text(
+        location.name ?? location.address ?? 'Unknown location',
+        style: TextStyle(
+          fontSize: 14.spMin,
+          color: AppColors.black,
+          fontWeight: FontWeight.w500,
+        ),
+        overflow: TextOverflow.ellipsis,
       ),
-      overflow: TextOverflow.ellipsis,
     );
+  }
+
+  /// Navigate to select location screen with the given [location].
+  void _handleLocationSelection({
+    required final AlrtLocation location,
+    final bool isSelectingOrigin = false,
+  }) async {
+    final selectedLocation = await context.push(
+      SelectLocationScreen.route,
+      extra: SelectLocationScreenArgs(
+        initialLocation: location,
+      ),
+    );
+    if (!mounted) return;
+    if (selectedLocation != null && selectedLocation is AlrtLocation) {
+      final origin = isSelectingOrigin
+          ? selectedLocation
+          : ref.read(
+              providerOfMap.select(
+                (value) => value.currentRoutePlan?.origin,
+              ),
+            );
+      final destination = !isSelectingOrigin
+          ? selectedLocation
+          : ref.read(
+              providerOfMap.select(
+                (value) => value.currentRoutePlan?.destination,
+              ),
+            );
+      if (origin == null || destination == null) return;
+
+      ref.read(providerOfMap.notifier)
+        ..getRoute(origin: origin, destination: destination)
+        ..updateSelectedLocation(destination)
+        ..addSelectedLocationMarker(destination.latLng);
+      ref.read(providerOfMapSearchTextEditingController).text =
+          destination.name ?? destination.address ?? '';
+    }
   }
 }

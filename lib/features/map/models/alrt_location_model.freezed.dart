@@ -17,6 +17,7 @@ mixin _$AlrtLocation {
   double get latitude;
   double get longitude;
   String? get address;
+  String? get name;
 
   /// Create a copy of AlrtLocation
   /// with the given fields replaced by the non-null parameter values.
@@ -38,16 +39,18 @@ mixin _$AlrtLocation {
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
                 other.longitude == longitude) &&
-            (identical(other.address, address) || other.address == address));
+            (identical(other.address, address) || other.address == address) &&
+            (identical(other.name, name) || other.name == name));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, latitude, longitude, address);
+  int get hashCode =>
+      Object.hash(runtimeType, latitude, longitude, address, name);
 
   @override
   String toString() {
-    return 'AlrtLocation(latitude: $latitude, longitude: $longitude, address: $address)';
+    return 'AlrtLocation(latitude: $latitude, longitude: $longitude, address: $address, name: $name)';
   }
 }
 
@@ -57,7 +60,7 @@ abstract mixin class $AlrtLocationCopyWith<$Res> {
           AlrtLocation value, $Res Function(AlrtLocation) _then) =
       _$AlrtLocationCopyWithImpl;
   @useResult
-  $Res call({double latitude, double longitude, String? address});
+  $Res call({double latitude, double longitude, String? address, String? name});
 }
 
 /// @nodoc
@@ -75,6 +78,7 @@ class _$AlrtLocationCopyWithImpl<$Res> implements $AlrtLocationCopyWith<$Res> {
     Object? latitude = null,
     Object? longitude = null,
     Object? address = freezed,
+    Object? name = freezed,
   }) {
     return _then(_self.copyWith(
       latitude: null == latitude
@@ -88,6 +92,10 @@ class _$AlrtLocationCopyWithImpl<$Res> implements $AlrtLocationCopyWith<$Res> {
       address: freezed == address
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+      name: freezed == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -186,14 +194,16 @@ extension AlrtLocationPatterns on AlrtLocation {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(double latitude, double longitude, String? address)?
+    TResult Function(
+            double latitude, double longitude, String? address, String? name)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _AlrtLocation() when $default != null:
-        return $default(_that.latitude, _that.longitude, _that.address);
+        return $default(
+            _that.latitude, _that.longitude, _that.address, _that.name);
       case _:
         return orElse();
     }
@@ -214,13 +224,15 @@ extension AlrtLocationPatterns on AlrtLocation {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(double latitude, double longitude, String? address)
+    TResult Function(
+            double latitude, double longitude, String? address, String? name)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _AlrtLocation():
-        return $default(_that.latitude, _that.longitude, _that.address);
+        return $default(
+            _that.latitude, _that.longitude, _that.address, _that.name);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -240,13 +252,15 @@ extension AlrtLocationPatterns on AlrtLocation {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(double latitude, double longitude, String? address)?
+    TResult? Function(
+            double latitude, double longitude, String? address, String? name)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _AlrtLocation() when $default != null:
-        return $default(_that.latitude, _that.longitude, _that.address);
+        return $default(
+            _that.latitude, _that.longitude, _that.address, _that.name);
       case _:
         return null;
     }
@@ -255,9 +269,13 @@ extension AlrtLocationPatterns on AlrtLocation {
 
 /// @nodoc
 @JsonSerializable()
-class _AlrtLocation implements AlrtLocation {
+class _AlrtLocation extends AlrtLocation {
   const _AlrtLocation(
-      {required this.latitude, required this.longitude, this.address});
+      {required this.latitude,
+      required this.longitude,
+      this.address,
+      this.name})
+      : super._();
   factory _AlrtLocation.fromJson(Map<String, dynamic> json) =>
       _$AlrtLocationFromJson(json);
 
@@ -267,6 +285,8 @@ class _AlrtLocation implements AlrtLocation {
   final double longitude;
   @override
   final String? address;
+  @override
+  final String? name;
 
   /// Create a copy of AlrtLocation
   /// with the given fields replaced by the non-null parameter values.
@@ -292,16 +312,18 @@ class _AlrtLocation implements AlrtLocation {
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
                 other.longitude == longitude) &&
-            (identical(other.address, address) || other.address == address));
+            (identical(other.address, address) || other.address == address) &&
+            (identical(other.name, name) || other.name == name));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, latitude, longitude, address);
+  int get hashCode =>
+      Object.hash(runtimeType, latitude, longitude, address, name);
 
   @override
   String toString() {
-    return 'AlrtLocation(latitude: $latitude, longitude: $longitude, address: $address)';
+    return 'AlrtLocation(latitude: $latitude, longitude: $longitude, address: $address, name: $name)';
   }
 }
 
@@ -313,7 +335,7 @@ abstract mixin class _$AlrtLocationCopyWith<$Res>
       __$AlrtLocationCopyWithImpl;
   @override
   @useResult
-  $Res call({double latitude, double longitude, String? address});
+  $Res call({double latitude, double longitude, String? address, String? name});
 }
 
 /// @nodoc
@@ -332,6 +354,7 @@ class __$AlrtLocationCopyWithImpl<$Res>
     Object? latitude = null,
     Object? longitude = null,
     Object? address = freezed,
+    Object? name = freezed,
   }) {
     return _then(_AlrtLocation(
       latitude: null == latitude
@@ -345,6 +368,10 @@ class __$AlrtLocationCopyWithImpl<$Res>
       address: freezed == address
           ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+      name: freezed == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }

@@ -14,6 +14,12 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$RoutePlan {
+  /// The origin location for the route.
+  AlrtLocation get origin;
+
+  /// The destination location for the route.
+  AlrtLocation get destination;
+
   /// Currently selected travel mode.
   TravelMode get selectedTravelMode;
 
@@ -35,6 +41,9 @@ mixin _$RoutePlan {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is RoutePlan &&
+            (identical(other.origin, origin) || other.origin == origin) &&
+            (identical(other.destination, destination) ||
+                other.destination == destination) &&
             (identical(other.selectedTravelMode, selectedTravelMode) ||
                 other.selectedTravelMode == selectedTravelMode) &&
             const DeepCollectionEquality()
@@ -44,12 +53,17 @@ mixin _$RoutePlan {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, selectedTravelMode,
-      const DeepCollectionEquality().hash(travelModeRoutes), isNavigating);
+  int get hashCode => Object.hash(
+      runtimeType,
+      origin,
+      destination,
+      selectedTravelMode,
+      const DeepCollectionEquality().hash(travelModeRoutes),
+      isNavigating);
 
   @override
   String toString() {
-    return 'RoutePlan(selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes, isNavigating: $isNavigating)';
+    return 'RoutePlan(origin: $origin, destination: $destination, selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes, isNavigating: $isNavigating)';
   }
 }
 
@@ -59,9 +73,14 @@ abstract mixin class $RoutePlanCopyWith<$Res> {
       _$RoutePlanCopyWithImpl;
   @useResult
   $Res call(
-      {TravelMode selectedTravelMode,
+      {AlrtLocation origin,
+      AlrtLocation destination,
+      TravelMode selectedTravelMode,
       Map<TravelMode, RoutesApiResponse> travelModeRoutes,
       bool isNavigating});
+
+  $AlrtLocationCopyWith<$Res> get origin;
+  $AlrtLocationCopyWith<$Res> get destination;
 }
 
 /// @nodoc
@@ -76,11 +95,21 @@ class _$RoutePlanCopyWithImpl<$Res> implements $RoutePlanCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? origin = null,
+    Object? destination = null,
     Object? selectedTravelMode = null,
     Object? travelModeRoutes = null,
     Object? isNavigating = null,
   }) {
     return _then(_self.copyWith(
+      origin: null == origin
+          ? _self.origin
+          : origin // ignore: cast_nullable_to_non_nullable
+              as AlrtLocation,
+      destination: null == destination
+          ? _self.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as AlrtLocation,
       selectedTravelMode: null == selectedTravelMode
           ? _self.selectedTravelMode
           : selectedTravelMode // ignore: cast_nullable_to_non_nullable
@@ -94,6 +123,26 @@ class _$RoutePlanCopyWithImpl<$Res> implements $RoutePlanCopyWith<$Res> {
           : isNavigating // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
+  }
+
+  /// Create a copy of RoutePlan
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AlrtLocationCopyWith<$Res> get origin {
+    return $AlrtLocationCopyWith<$Res>(_self.origin, (value) {
+      return _then(_self.copyWith(origin: value));
+    });
+  }
+
+  /// Create a copy of RoutePlan
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AlrtLocationCopyWith<$Res> get destination {
+    return $AlrtLocationCopyWith<$Res>(_self.destination, (value) {
+      return _then(_self.copyWith(destination: value));
+    });
   }
 }
 
@@ -191,6 +240,8 @@ extension RoutePlanPatterns on RoutePlan {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
+            AlrtLocation origin,
+            AlrtLocation destination,
             TravelMode selectedTravelMode,
             Map<TravelMode, RoutesApiResponse> travelModeRoutes,
             bool isNavigating)?
@@ -200,7 +251,11 @@ extension RoutePlanPatterns on RoutePlan {
     final _that = this;
     switch (_that) {
       case _RoutePlan() when $default != null:
-        return $default(_that.selectedTravelMode, _that.travelModeRoutes,
+        return $default(
+            _that.origin,
+            _that.destination,
+            _that.selectedTravelMode,
+            _that.travelModeRoutes,
             _that.isNavigating);
       case _:
         return orElse();
@@ -223,6 +278,8 @@ extension RoutePlanPatterns on RoutePlan {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
+            AlrtLocation origin,
+            AlrtLocation destination,
             TravelMode selectedTravelMode,
             Map<TravelMode, RoutesApiResponse> travelModeRoutes,
             bool isNavigating)
@@ -231,7 +288,11 @@ extension RoutePlanPatterns on RoutePlan {
     final _that = this;
     switch (_that) {
       case _RoutePlan():
-        return $default(_that.selectedTravelMode, _that.travelModeRoutes,
+        return $default(
+            _that.origin,
+            _that.destination,
+            _that.selectedTravelMode,
+            _that.travelModeRoutes,
             _that.isNavigating);
       case _:
         throw StateError('Unexpected subclass');
@@ -253,6 +314,8 @@ extension RoutePlanPatterns on RoutePlan {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
+            AlrtLocation origin,
+            AlrtLocation destination,
             TravelMode selectedTravelMode,
             Map<TravelMode, RoutesApiResponse> travelModeRoutes,
             bool isNavigating)?
@@ -261,7 +324,11 @@ extension RoutePlanPatterns on RoutePlan {
     final _that = this;
     switch (_that) {
       case _RoutePlan() when $default != null:
-        return $default(_that.selectedTravelMode, _that.travelModeRoutes,
+        return $default(
+            _that.origin,
+            _that.destination,
+            _that.selectedTravelMode,
+            _that.travelModeRoutes,
             _that.isNavigating);
       case _:
         return null;
@@ -273,12 +340,22 @@ extension RoutePlanPatterns on RoutePlan {
 
 class _RoutePlan extends RoutePlan {
   const _RoutePlan(
-      {this.selectedTravelMode = TravelMode.driving,
+      {required this.origin,
+      required this.destination,
+      this.selectedTravelMode = TravelMode.driving,
       final Map<TravelMode, RoutesApiResponse> travelModeRoutes =
           const <TravelMode, RoutesApiResponse>{},
       this.isNavigating = false})
       : _travelModeRoutes = travelModeRoutes,
         super._();
+
+  /// The origin location for the route.
+  @override
+  final AlrtLocation origin;
+
+  /// The destination location for the route.
+  @override
+  final AlrtLocation destination;
 
   /// Currently selected travel mode.
   @override
@@ -315,6 +392,9 @@ class _RoutePlan extends RoutePlan {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _RoutePlan &&
+            (identical(other.origin, origin) || other.origin == origin) &&
+            (identical(other.destination, destination) ||
+                other.destination == destination) &&
             (identical(other.selectedTravelMode, selectedTravelMode) ||
                 other.selectedTravelMode == selectedTravelMode) &&
             const DeepCollectionEquality()
@@ -324,12 +404,17 @@ class _RoutePlan extends RoutePlan {
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, selectedTravelMode,
-      const DeepCollectionEquality().hash(_travelModeRoutes), isNavigating);
+  int get hashCode => Object.hash(
+      runtimeType,
+      origin,
+      destination,
+      selectedTravelMode,
+      const DeepCollectionEquality().hash(_travelModeRoutes),
+      isNavigating);
 
   @override
   String toString() {
-    return 'RoutePlan(selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes, isNavigating: $isNavigating)';
+    return 'RoutePlan(origin: $origin, destination: $destination, selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes, isNavigating: $isNavigating)';
   }
 }
 
@@ -342,9 +427,16 @@ abstract mixin class _$RoutePlanCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {TravelMode selectedTravelMode,
+      {AlrtLocation origin,
+      AlrtLocation destination,
+      TravelMode selectedTravelMode,
       Map<TravelMode, RoutesApiResponse> travelModeRoutes,
       bool isNavigating});
+
+  @override
+  $AlrtLocationCopyWith<$Res> get origin;
+  @override
+  $AlrtLocationCopyWith<$Res> get destination;
 }
 
 /// @nodoc
@@ -359,11 +451,21 @@ class __$RoutePlanCopyWithImpl<$Res> implements _$RoutePlanCopyWith<$Res> {
   @override
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? origin = null,
+    Object? destination = null,
     Object? selectedTravelMode = null,
     Object? travelModeRoutes = null,
     Object? isNavigating = null,
   }) {
     return _then(_RoutePlan(
+      origin: null == origin
+          ? _self.origin
+          : origin // ignore: cast_nullable_to_non_nullable
+              as AlrtLocation,
+      destination: null == destination
+          ? _self.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as AlrtLocation,
       selectedTravelMode: null == selectedTravelMode
           ? _self.selectedTravelMode
           : selectedTravelMode // ignore: cast_nullable_to_non_nullable
@@ -377,6 +479,26 @@ class __$RoutePlanCopyWithImpl<$Res> implements _$RoutePlanCopyWith<$Res> {
           : isNavigating // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
+  }
+
+  /// Create a copy of RoutePlan
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AlrtLocationCopyWith<$Res> get origin {
+    return $AlrtLocationCopyWith<$Res>(_self.origin, (value) {
+      return _then(_self.copyWith(origin: value));
+    });
+  }
+
+  /// Create a copy of RoutePlan
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AlrtLocationCopyWith<$Res> get destination {
+    return $AlrtLocationCopyWith<$Res>(_self.destination, (value) {
+      return _then(_self.copyWith(destination: value));
+    });
   }
 }
 

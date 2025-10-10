@@ -5,6 +5,7 @@ import 'package:hazard_app/features/home/views/screens/home_screen.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
 import 'package:hazard_app/features/map/views/screens/navigation_screen.dart';
+import 'package:hazard_app/features/map/views/screens/select_location_on_map_screen.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/splash_screen.dart';
@@ -45,6 +46,14 @@ class AppRouter {
         GoRoute(
           path: SelectLocationScreen.route,
           builder: (context, state) {
+            return SelectLocationScreen(
+              args: state.extra as SelectLocationScreenArgs?,
+            );
+          },
+        ),
+        GoRoute(
+          path: SelectLocationOnMapScreen.route,
+          builder: (context, state) {
             return ProviderScope(
               // Create a new ProviderScope to ensure a fresh state for the map screen.
               overrides: [
@@ -55,8 +64,8 @@ class AppRouter {
                   ),
                 ),
               ],
-              child: SelectLocationScreen(
-                args: state.extra as SelectLocationScreenArgs?,
+              child: SelectLocationOnMapScreen(
+                args: state.extra as SelectLocationOnMapScreenArgs?,
               ),
             );
           },

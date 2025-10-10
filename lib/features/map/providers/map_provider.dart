@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
+import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
@@ -101,8 +102,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
   /// Fetches route from the map service and updates the state accordingly.
   /// Optionally avoids specified hazards.
   Future<void> getRoute({
-    required final LatLng origin,
-    required final LatLng destination,
+    required final AlrtLocation origin,
+    required final AlrtLocation destination,
     final bool avoidHazards = true,
   }) async {
     state = state.copyWith(
@@ -133,6 +134,47 @@ class MapProvider extends StateNotifier<MapProviderState> {
       (l) {
         state = state.copyWith(
           getRouteState: GetRouteState.error(l),
+        );
+      },
+    );
+  }
+
+  /// Fetches address from coordinates using the map service and updates the state accordingly.
+  Future<void> getAddressFromCoordinates({
+    required final LatLng coordinates,
+  }) async {
+    final isLoading = state.getAddressFromCoordinatesState.maybeWhen(
+      orElse: () => false,
+      loading: () => true,
+    );
+    if (isLoading) return;
+
+    state = state.copyWith(
+      getAddressFromCoordinatesState:
+          const GetAddressFromCoordinatesState.loading(),
+    );
+
+    final result = await _mapService.getAddressFromCoordinates(
+      coordinates: coordinates,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (address) {
+        final alrtLocation = AlrtLocation(
+          latitude: coordinates.latitude,
+          longitude: coordinates.longitude,
+          address: address,
+        );
+        state = state.copyWith(
+          getAddressFromCoordinatesState:
+              GetAddressFromCoordinatesState.success(alrtLocation),
+        );
+      },
+      (l) {
+        state = state.copyWith(
+          getAddressFromCoordinatesState:
+              GetAddressFromCoordinatesState.error(l),
         );
       },
     );
@@ -384,10 +426,10 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
-  /// Updates [MapProviderState.selectedPlace] to the given [place].
-  void updateSelectedPlace(final GooglePlace? place) {
+  /// Updates [MapProviderState.selectedLocation] to the given [location].
+  void updateSelectedLocation(final AlrtLocation? location) {
     state = state.copyWith(
-      selectedPlace: place,
+      selectedLocation: location,
     );
   }
 
@@ -424,6 +466,24 @@ class MapProvider extends StateNotifier<MapProviderState> {
     updateCurrentRoutePlan(
       state.currentRoutePlan?.copyWith(
         isNavigating: isNavigating,
+      ),
+    );
+  }
+
+  /// Updates [MapProviderState.currentRoutePlan]'s source to the given [source].
+  void updateRouteSource(final AlrtLocation source) {
+    updateCurrentRoutePlan(
+      state.currentRoutePlan?.copyWith(
+        origin: source,
+      ),
+    );
+  }
+
+  /// Updates [MapProviderState.currentRoutePlan]'s destination to the given [destination].
+  void updateRouteDestination(final AlrtLocation destination) {
+    updateCurrentRoutePlan(
+      state.currentRoutePlan?.copyWith(
+        destination: destination,
       ),
     );
   }

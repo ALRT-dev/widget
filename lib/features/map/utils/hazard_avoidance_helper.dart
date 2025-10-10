@@ -35,9 +35,9 @@ class HazardAvoidanceHelper {
       final bufferMeters = bufferKm * 1000;
       final isRelevant = distanceToRoute <= bufferMeters;
 
-      log(
-        'Hazard ${hazard.id}: distance=${distanceToRoute.toStringAsFixed(0)}m, buffer=${bufferMeters.toStringAsFixed(0)}m, relevant=$isRelevant, severity=${hazard.severity}',
-      );
+      // log(
+      //   'Hazard ${hazard.id}: distance=${distanceToRoute.toStringAsFixed(0)}m, buffer=${bufferMeters.toStringAsFixed(0)}m, relevant=$isRelevant, severity=${hazard.severity}',
+      // );
 
       if (isRelevant) {
         filteredHazards.add(hazard);
@@ -117,17 +117,17 @@ class HazardAvoidanceHelper {
     );
 
     // Debug: log the filtering results
-    log('Total hazards: ${hazards.length}');
-    log('Relevant hazards for route: ${relevantHazards.length}');
-    log('Route points: ${routePoints.length}');
-    if (routePoints.isNotEmpty) {
-      log(
-        'Route start: ${routePoints.first.latitude}, ${routePoints.first.longitude}',
-      );
-      log(
-        'Route end: ${routePoints.last.latitude}, ${routePoints.last.longitude}',
-      );
-    }
+    // log('Total hazards: ${hazards.length}');
+    // log('Relevant hazards for route: ${relevantHazards.length}');
+    // log('Route points: ${routePoints.length}');
+    // if (routePoints.isNotEmpty) {
+    //   log(
+    //     'Route start: ${routePoints.first.latitude}, ${routePoints.first.longitude}',
+    //   );
+    //   log(
+    //     'Route end: ${routePoints.last.latitude}, ${routePoints.last.longitude}',
+    //   );
+    // }
 
     // Count hazards by severity
     final emergencyCount = relevantHazards

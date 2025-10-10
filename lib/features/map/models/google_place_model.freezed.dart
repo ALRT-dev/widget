@@ -305,14 +305,15 @@ extension GooglePlacePatterns on GooglePlace {
 
 /// @nodoc
 @JsonSerializable()
-class _GooglePlace implements GooglePlace {
+class _GooglePlace extends GooglePlace {
   const _GooglePlace(
       {@JsonKey(name: 'place_id') required this.placeId,
       required this.description,
       required this.latitude,
       required this.longitude,
       required this.name,
-      required this.address});
+      required this.address})
+      : super._();
   factory _GooglePlace.fromJson(Map<String, dynamic> json) =>
       _$GooglePlaceFromJson(json);
 

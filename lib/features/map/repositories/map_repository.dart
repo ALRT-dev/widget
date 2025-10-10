@@ -19,7 +19,7 @@ abstract class MapRepository {
     required final AlrtLocation currentUserLocation,
   });
 
-  Future<Either<void, AppError>> getPlaceDetails({
+  Future<Either<Map<String, dynamic>, AppError>> getPlaceDetails({
     required final String placeId,
   });
 
@@ -27,6 +27,10 @@ abstract class MapRepository {
     required final LatLng origin,
     required final LatLng destination,
     final TravelMode travelMode = TravelMode.driving,
+  });
+
+  Future<Either<String, AppError>> getAddressFromCoordinates({
+    required final LatLng coordinates,
   });
 }
 
@@ -182,6 +186,44 @@ class MapRepositoryImpl implements MapRepository {
         }
 
         return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<String, AppError>> getAddressFromCoordinates({
+    required LatLng coordinates,
+  }) {
+    return runAsyncCall(
+      name: 'getAddressFromCoordinates',
+      future: () async {
+        final response = await _dio.get(
+          'https://maps.googleapis.com/maps/api/geocode/json',
+          queryParameters: {
+            'latlng': '${coordinates.latitude},${coordinates.longitude}',
+            'key': Env.googleMapsApiKey,
+          },
+        );
+
+        if (response.data['status'] != 'OK' ||
+            response.data['results'] == null ||
+            response.data['results'] is! List ||
+            (response.data['results'] as List).isEmpty) {
+          throw AppError(
+            message: response.data['error_message'] ??
+                'Failed to fetch address from coordinates',
+          );
+        }
+
+        if (response.data['results'][0]['formatted_address'] == null) {
+          throw AppError(
+            message: 'Failed to fetch address from coordinates',
+          );
+        }
+
+        final address = response.data['results'][0]['formatted_address'];
+        return Success(address);
       },
       onError: Failure.new,
     );

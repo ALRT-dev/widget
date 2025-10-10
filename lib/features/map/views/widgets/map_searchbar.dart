@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/providers/map_search_text_editing_controller_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/map_search_results_list.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
@@ -20,7 +21,8 @@ class MapSearchbar extends ConsumerStatefulWidget {
 
 class _MapSearchbarState extends ConsumerState<MapSearchbar> {
   final _searchFocusNode = FocusNode();
-  final _searchController = TextEditingController();
+  TextEditingController get _searchController =>
+      ref.read(providerOfMapSearchTextEditingController);
 
   final _dropdownController = AlrtDropdownController();
 
@@ -146,7 +148,7 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
       _dropdownController.close();
       ref.read(providerOfMap.notifier).updateSearchString('');
       ref.read(providerOfMap.notifier)
-        ..updateSelectedPlace(null)
+        ..updateSelectedLocation(null)
         ..removeSelectedLocationMarker();
     }
   }
@@ -157,8 +159,9 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
     _searchFocusNode.unfocus();
     _searchController.text = place.name;
 
-    ref.read(providerOfMap.notifier).updateSearchString(place.name);
-    ref.read(providerOfMap.notifier).updateSelectedPlace(place);
+    ref.read(providerOfMap.notifier)
+      ..updateSearchString(place.name)
+      ..updateSelectedLocation(place.toAlrtLocation);
 
     // move camera to the selected place
     ref.read(providerOfMap.notifier).animateTo(

@@ -29,8 +29,8 @@ mixin _$MapProviderState {
   /// The list of places fetched from the map service after [getPlacesState] is successful.
   List<GooglePlace> get places;
 
-  /// The currently selected place on the map, if any.
-  GooglePlace? get selectedPlace;
+  /// The currently selected location on the map, if any.
+  AlrtLocation? get selectedLocation;
 
   /// The current route plan, including travel mode and route responses.
   RoutePlan? get currentRoutePlan;
@@ -40,6 +40,9 @@ mixin _$MapProviderState {
 
   /// The state of fetching route.
   GetRouteState get getRouteState;
+
+  /// The state of fetching address from coordinates.
+  GetAddressFromCoordinatesState get getAddressFromCoordinatesState;
 
   /// Create a copy of MapProviderState
   /// with the given fields replaced by the non-null parameter values.
@@ -61,14 +64,18 @@ mixin _$MapProviderState {
             (identical(other.searchString, searchString) ||
                 other.searchString == searchString) &&
             const DeepCollectionEquality().equals(other.places, places) &&
-            (identical(other.selectedPlace, selectedPlace) ||
-                other.selectedPlace == selectedPlace) &&
+            (identical(other.selectedLocation, selectedLocation) ||
+                other.selectedLocation == selectedLocation) &&
             (identical(other.currentRoutePlan, currentRoutePlan) ||
                 other.currentRoutePlan == currentRoutePlan) &&
             (identical(other.getPlacesState, getPlacesState) ||
                 other.getPlacesState == getPlacesState) &&
             (identical(other.getRouteState, getRouteState) ||
-                other.getRouteState == getRouteState));
+                other.getRouteState == getRouteState) &&
+            (identical(other.getAddressFromCoordinatesState,
+                    getAddressFromCoordinatesState) ||
+                other.getAddressFromCoordinatesState ==
+                    getAddressFromCoordinatesState));
   }
 
   @override
@@ -79,14 +86,15 @@ mixin _$MapProviderState {
       const DeepCollectionEquality().hash(polylines),
       searchString,
       const DeepCollectionEquality().hash(places),
-      selectedPlace,
+      selectedLocation,
       currentRoutePlan,
       getPlacesState,
-      getRouteState);
+      getRouteState,
+      getAddressFromCoordinatesState);
 
   @override
   String toString() {
-    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, searchString: $searchString, places: $places, selectedPlace: $selectedPlace, currentRoutePlan: $currentRoutePlan, getPlacesState: $getPlacesState, getRouteState: $getRouteState)';
+    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, searchString: $searchString, places: $places, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getPlacesState: $getPlacesState, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState)';
   }
 }
 
@@ -102,15 +110,18 @@ abstract mixin class $MapProviderStateCopyWith<$Res> {
       Set<Polyline> polylines,
       String searchString,
       List<GooglePlace> places,
-      GooglePlace? selectedPlace,
+      AlrtLocation? selectedLocation,
       RoutePlan? currentRoutePlan,
       GetPlacesState getPlacesState,
-      GetRouteState getRouteState});
+      GetRouteState getRouteState,
+      GetAddressFromCoordinatesState getAddressFromCoordinatesState});
 
-  $GooglePlaceCopyWith<$Res>? get selectedPlace;
+  $AlrtLocationCopyWith<$Res>? get selectedLocation;
   $RoutePlanCopyWith<$Res>? get currentRoutePlan;
   $GetPlacesStateCopyWith<$Res> get getPlacesState;
   $GetRouteStateCopyWith<$Res> get getRouteState;
+  $GetAddressFromCoordinatesStateCopyWith<$Res>
+      get getAddressFromCoordinatesState;
 }
 
 /// @nodoc
@@ -131,10 +142,11 @@ class _$MapProviderStateCopyWithImpl<$Res>
     Object? polylines = null,
     Object? searchString = null,
     Object? places = null,
-    Object? selectedPlace = freezed,
+    Object? selectedLocation = freezed,
     Object? currentRoutePlan = freezed,
     Object? getPlacesState = null,
     Object? getRouteState = null,
+    Object? getAddressFromCoordinatesState = null,
   }) {
     return _then(_self.copyWith(
       cameraPosition: null == cameraPosition
@@ -157,10 +169,10 @@ class _$MapProviderStateCopyWithImpl<$Res>
           ? _self.places
           : places // ignore: cast_nullable_to_non_nullable
               as List<GooglePlace>,
-      selectedPlace: freezed == selectedPlace
-          ? _self.selectedPlace
-          : selectedPlace // ignore: cast_nullable_to_non_nullable
-              as GooglePlace?,
+      selectedLocation: freezed == selectedLocation
+          ? _self.selectedLocation
+          : selectedLocation // ignore: cast_nullable_to_non_nullable
+              as AlrtLocation?,
       currentRoutePlan: freezed == currentRoutePlan
           ? _self.currentRoutePlan
           : currentRoutePlan // ignore: cast_nullable_to_non_nullable
@@ -173,6 +185,10 @@ class _$MapProviderStateCopyWithImpl<$Res>
           ? _self.getRouteState
           : getRouteState // ignore: cast_nullable_to_non_nullable
               as GetRouteState,
+      getAddressFromCoordinatesState: null == getAddressFromCoordinatesState
+          ? _self.getAddressFromCoordinatesState
+          : getAddressFromCoordinatesState // ignore: cast_nullable_to_non_nullable
+              as GetAddressFromCoordinatesState,
     ));
   }
 
@@ -180,13 +196,13 @@ class _$MapProviderStateCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $GooglePlaceCopyWith<$Res>? get selectedPlace {
-    if (_self.selectedPlace == null) {
+  $AlrtLocationCopyWith<$Res>? get selectedLocation {
+    if (_self.selectedLocation == null) {
       return null;
     }
 
-    return $GooglePlaceCopyWith<$Res>(_self.selectedPlace!, (value) {
-      return _then(_self.copyWith(selectedPlace: value));
+    return $AlrtLocationCopyWith<$Res>(_self.selectedLocation!, (value) {
+      return _then(_self.copyWith(selectedLocation: value));
     });
   }
 
@@ -221,6 +237,18 @@ class _$MapProviderStateCopyWithImpl<$Res>
   $GetRouteStateCopyWith<$Res> get getRouteState {
     return $GetRouteStateCopyWith<$Res>(_self.getRouteState, (value) {
       return _then(_self.copyWith(getRouteState: value));
+    });
+  }
+
+  /// Create a copy of MapProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GetAddressFromCoordinatesStateCopyWith<$Res>
+      get getAddressFromCoordinatesState {
+    return $GetAddressFromCoordinatesStateCopyWith<$Res>(
+        _self.getAddressFromCoordinatesState, (value) {
+      return _then(_self.copyWith(getAddressFromCoordinatesState: value));
     });
   }
 }
@@ -324,10 +352,11 @@ extension MapProviderStatePatterns on MapProviderState {
             Set<Polyline> polylines,
             String searchString,
             List<GooglePlace> places,
-            GooglePlace? selectedPlace,
+            AlrtLocation? selectedLocation,
             RoutePlan? currentRoutePlan,
             GetPlacesState getPlacesState,
-            GetRouteState getRouteState)?
+            GetRouteState getRouteState,
+            GetAddressFromCoordinatesState getAddressFromCoordinatesState)?
         $default, {
     required TResult orElse(),
   }) {
@@ -340,10 +369,11 @@ extension MapProviderStatePatterns on MapProviderState {
             _that.polylines,
             _that.searchString,
             _that.places,
-            _that.selectedPlace,
+            _that.selectedLocation,
             _that.currentRoutePlan,
             _that.getPlacesState,
-            _that.getRouteState);
+            _that.getRouteState,
+            _that.getAddressFromCoordinatesState);
       case _:
         return orElse();
     }
@@ -370,10 +400,11 @@ extension MapProviderStatePatterns on MapProviderState {
             Set<Polyline> polylines,
             String searchString,
             List<GooglePlace> places,
-            GooglePlace? selectedPlace,
+            AlrtLocation? selectedLocation,
             RoutePlan? currentRoutePlan,
             GetPlacesState getPlacesState,
-            GetRouteState getRouteState)
+            GetRouteState getRouteState,
+            GetAddressFromCoordinatesState getAddressFromCoordinatesState)
         $default,
   ) {
     final _that = this;
@@ -385,10 +416,11 @@ extension MapProviderStatePatterns on MapProviderState {
             _that.polylines,
             _that.searchString,
             _that.places,
-            _that.selectedPlace,
+            _that.selectedLocation,
             _that.currentRoutePlan,
             _that.getPlacesState,
-            _that.getRouteState);
+            _that.getRouteState,
+            _that.getAddressFromCoordinatesState);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -414,10 +446,11 @@ extension MapProviderStatePatterns on MapProviderState {
             Set<Polyline> polylines,
             String searchString,
             List<GooglePlace> places,
-            GooglePlace? selectedPlace,
+            AlrtLocation? selectedLocation,
             RoutePlan? currentRoutePlan,
             GetPlacesState getPlacesState,
-            GetRouteState getRouteState)?
+            GetRouteState getRouteState,
+            GetAddressFromCoordinatesState getAddressFromCoordinatesState)?
         $default,
   ) {
     final _that = this;
@@ -429,10 +462,11 @@ extension MapProviderStatePatterns on MapProviderState {
             _that.polylines,
             _that.searchString,
             _that.places,
-            _that.selectedPlace,
+            _that.selectedLocation,
             _that.currentRoutePlan,
             _that.getPlacesState,
-            _that.getRouteState);
+            _that.getRouteState,
+            _that.getAddressFromCoordinatesState);
       case _:
         return null;
     }
@@ -448,10 +482,12 @@ class _MapProviderState implements MapProviderState {
       final Set<Polyline> polylines = const <Polyline>{},
       this.searchString = '',
       final List<GooglePlace> places = const <GooglePlace>[],
-      this.selectedPlace,
+      this.selectedLocation,
       this.currentRoutePlan,
       this.getPlacesState = const GetPlacesState.initial(),
-      this.getRouteState = const GetRouteState.initial()})
+      this.getRouteState = const GetRouteState.initial(),
+      this.getAddressFromCoordinatesState =
+          const GetAddressFromCoordinatesState.initial()})
       : _markers = markers,
         _polylines = polylines,
         _places = places;
@@ -502,9 +538,9 @@ class _MapProviderState implements MapProviderState {
     return EqualUnmodifiableListView(_places);
   }
 
-  /// The currently selected place on the map, if any.
+  /// The currently selected location on the map, if any.
   @override
-  final GooglePlace? selectedPlace;
+  final AlrtLocation? selectedLocation;
 
   /// The current route plan, including travel mode and route responses.
   @override
@@ -519,6 +555,11 @@ class _MapProviderState implements MapProviderState {
   @override
   @JsonKey()
   final GetRouteState getRouteState;
+
+  /// The state of fetching address from coordinates.
+  @override
+  @JsonKey()
+  final GetAddressFromCoordinatesState getAddressFromCoordinatesState;
 
   /// Create a copy of MapProviderState
   /// with the given fields replaced by the non-null parameter values.
@@ -541,14 +582,18 @@ class _MapProviderState implements MapProviderState {
             (identical(other.searchString, searchString) ||
                 other.searchString == searchString) &&
             const DeepCollectionEquality().equals(other._places, _places) &&
-            (identical(other.selectedPlace, selectedPlace) ||
-                other.selectedPlace == selectedPlace) &&
+            (identical(other.selectedLocation, selectedLocation) ||
+                other.selectedLocation == selectedLocation) &&
             (identical(other.currentRoutePlan, currentRoutePlan) ||
                 other.currentRoutePlan == currentRoutePlan) &&
             (identical(other.getPlacesState, getPlacesState) ||
                 other.getPlacesState == getPlacesState) &&
             (identical(other.getRouteState, getRouteState) ||
-                other.getRouteState == getRouteState));
+                other.getRouteState == getRouteState) &&
+            (identical(other.getAddressFromCoordinatesState,
+                    getAddressFromCoordinatesState) ||
+                other.getAddressFromCoordinatesState ==
+                    getAddressFromCoordinatesState));
   }
 
   @override
@@ -559,14 +604,15 @@ class _MapProviderState implements MapProviderState {
       const DeepCollectionEquality().hash(_polylines),
       searchString,
       const DeepCollectionEquality().hash(_places),
-      selectedPlace,
+      selectedLocation,
       currentRoutePlan,
       getPlacesState,
-      getRouteState);
+      getRouteState,
+      getAddressFromCoordinatesState);
 
   @override
   String toString() {
-    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, searchString: $searchString, places: $places, selectedPlace: $selectedPlace, currentRoutePlan: $currentRoutePlan, getPlacesState: $getPlacesState, getRouteState: $getRouteState)';
+    return 'MapProviderState(cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, searchString: $searchString, places: $places, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getPlacesState: $getPlacesState, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState)';
   }
 }
 
@@ -584,19 +630,23 @@ abstract mixin class _$MapProviderStateCopyWith<$Res>
       Set<Polyline> polylines,
       String searchString,
       List<GooglePlace> places,
-      GooglePlace? selectedPlace,
+      AlrtLocation? selectedLocation,
       RoutePlan? currentRoutePlan,
       GetPlacesState getPlacesState,
-      GetRouteState getRouteState});
+      GetRouteState getRouteState,
+      GetAddressFromCoordinatesState getAddressFromCoordinatesState});
 
   @override
-  $GooglePlaceCopyWith<$Res>? get selectedPlace;
+  $AlrtLocationCopyWith<$Res>? get selectedLocation;
   @override
   $RoutePlanCopyWith<$Res>? get currentRoutePlan;
   @override
   $GetPlacesStateCopyWith<$Res> get getPlacesState;
   @override
   $GetRouteStateCopyWith<$Res> get getRouteState;
+  @override
+  $GetAddressFromCoordinatesStateCopyWith<$Res>
+      get getAddressFromCoordinatesState;
 }
 
 /// @nodoc
@@ -617,10 +667,11 @@ class __$MapProviderStateCopyWithImpl<$Res>
     Object? polylines = null,
     Object? searchString = null,
     Object? places = null,
-    Object? selectedPlace = freezed,
+    Object? selectedLocation = freezed,
     Object? currentRoutePlan = freezed,
     Object? getPlacesState = null,
     Object? getRouteState = null,
+    Object? getAddressFromCoordinatesState = null,
   }) {
     return _then(_MapProviderState(
       cameraPosition: null == cameraPosition
@@ -643,10 +694,10 @@ class __$MapProviderStateCopyWithImpl<$Res>
           ? _self._places
           : places // ignore: cast_nullable_to_non_nullable
               as List<GooglePlace>,
-      selectedPlace: freezed == selectedPlace
-          ? _self.selectedPlace
-          : selectedPlace // ignore: cast_nullable_to_non_nullable
-              as GooglePlace?,
+      selectedLocation: freezed == selectedLocation
+          ? _self.selectedLocation
+          : selectedLocation // ignore: cast_nullable_to_non_nullable
+              as AlrtLocation?,
       currentRoutePlan: freezed == currentRoutePlan
           ? _self.currentRoutePlan
           : currentRoutePlan // ignore: cast_nullable_to_non_nullable
@@ -659,6 +710,10 @@ class __$MapProviderStateCopyWithImpl<$Res>
           ? _self.getRouteState
           : getRouteState // ignore: cast_nullable_to_non_nullable
               as GetRouteState,
+      getAddressFromCoordinatesState: null == getAddressFromCoordinatesState
+          ? _self.getAddressFromCoordinatesState
+          : getAddressFromCoordinatesState // ignore: cast_nullable_to_non_nullable
+              as GetAddressFromCoordinatesState,
     ));
   }
 
@@ -666,13 +721,13 @@ class __$MapProviderStateCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $GooglePlaceCopyWith<$Res>? get selectedPlace {
-    if (_self.selectedPlace == null) {
+  $AlrtLocationCopyWith<$Res>? get selectedLocation {
+    if (_self.selectedLocation == null) {
       return null;
     }
 
-    return $GooglePlaceCopyWith<$Res>(_self.selectedPlace!, (value) {
-      return _then(_self.copyWith(selectedPlace: value));
+    return $AlrtLocationCopyWith<$Res>(_self.selectedLocation!, (value) {
+      return _then(_self.copyWith(selectedLocation: value));
     });
   }
 
@@ -707,6 +762,18 @@ class __$MapProviderStateCopyWithImpl<$Res>
   $GetRouteStateCopyWith<$Res> get getRouteState {
     return $GetRouteStateCopyWith<$Res>(_self.getRouteState, (value) {
       return _then(_self.copyWith(getRouteState: value));
+    });
+  }
+
+  /// Create a copy of MapProviderState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $GetAddressFromCoordinatesStateCopyWith<$Res>
+      get getAddressFromCoordinatesState {
+    return $GetAddressFromCoordinatesStateCopyWith<$Res>(
+        _self.getAddressFromCoordinatesState, (value) {
+      return _then(_self.copyWith(getAddressFromCoordinatesState: value));
     });
   }
 }
@@ -1550,6 +1617,450 @@ class __$GetRouteStateErrorCopyWithImpl<$Res>
   }
 
   /// Create a copy of GetRouteState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AppErrorCopyWith<$Res> get error {
+    return $AppErrorCopyWith<$Res>(_self.error, (value) {
+      return _then(_self.copyWith(error: value));
+    });
+  }
+}
+
+/// @nodoc
+mixin _$GetAddressFromCoordinatesState {
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is GetAddressFromCoordinatesState);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetAddressFromCoordinatesState()';
+  }
+}
+
+/// @nodoc
+class $GetAddressFromCoordinatesStateCopyWith<$Res> {
+  $GetAddressFromCoordinatesStateCopyWith(GetAddressFromCoordinatesState _,
+      $Res Function(GetAddressFromCoordinatesState) __);
+}
+
+/// Adds pattern-matching-related methods to [GetAddressFromCoordinatesState].
+extension GetAddressFromCoordinatesStatePatterns
+    on GetAddressFromCoordinatesState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_GetAddressFromCoordinatesStateInitial value)? initial,
+    TResult Function(_GetAddressFromCoordinatesStateLoading value)? loading,
+    TResult Function(_GetAddressFromCoordinatesStateSuccess value)? success,
+    TResult Function(_GetAddressFromCoordinatesStateError value)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetAddressFromCoordinatesStateInitial() when initial != null:
+        return initial(_that);
+      case _GetAddressFromCoordinatesStateLoading() when loading != null:
+        return loading(_that);
+      case _GetAddressFromCoordinatesStateSuccess() when success != null:
+        return success(_that);
+      case _GetAddressFromCoordinatesStateError() when error != null:
+        return error(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_GetAddressFromCoordinatesStateInitial value)
+        initial,
+    required TResult Function(_GetAddressFromCoordinatesStateLoading value)
+        loading,
+    required TResult Function(_GetAddressFromCoordinatesStateSuccess value)
+        success,
+    required TResult Function(_GetAddressFromCoordinatesStateError value) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetAddressFromCoordinatesStateInitial():
+        return initial(_that);
+      case _GetAddressFromCoordinatesStateLoading():
+        return loading(_that);
+      case _GetAddressFromCoordinatesStateSuccess():
+        return success(_that);
+      case _GetAddressFromCoordinatesStateError():
+        return error(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_GetAddressFromCoordinatesStateInitial value)? initial,
+    TResult? Function(_GetAddressFromCoordinatesStateLoading value)? loading,
+    TResult? Function(_GetAddressFromCoordinatesStateSuccess value)? success,
+    TResult? Function(_GetAddressFromCoordinatesStateError value)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetAddressFromCoordinatesStateInitial() when initial != null:
+        return initial(_that);
+      case _GetAddressFromCoordinatesStateLoading() when loading != null:
+        return loading(_that);
+      case _GetAddressFromCoordinatesStateSuccess() when success != null:
+        return success(_that);
+      case _GetAddressFromCoordinatesStateError() when error != null:
+        return error(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? initial,
+    TResult Function()? loading,
+    TResult Function(AlrtLocation location)? success,
+    TResult Function(AppError error)? error,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetAddressFromCoordinatesStateInitial() when initial != null:
+        return initial();
+      case _GetAddressFromCoordinatesStateLoading() when loading != null:
+        return loading();
+      case _GetAddressFromCoordinatesStateSuccess() when success != null:
+        return success(_that.location);
+      case _GetAddressFromCoordinatesStateError() when error != null:
+        return error(_that.error);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() initial,
+    required TResult Function() loading,
+    required TResult Function(AlrtLocation location) success,
+    required TResult Function(AppError error) error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetAddressFromCoordinatesStateInitial():
+        return initial();
+      case _GetAddressFromCoordinatesStateLoading():
+        return loading();
+      case _GetAddressFromCoordinatesStateSuccess():
+        return success(_that.location);
+      case _GetAddressFromCoordinatesStateError():
+        return error(_that.error);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? initial,
+    TResult? Function()? loading,
+    TResult? Function(AlrtLocation location)? success,
+    TResult? Function(AppError error)? error,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _GetAddressFromCoordinatesStateInitial() when initial != null:
+        return initial();
+      case _GetAddressFromCoordinatesStateLoading() when loading != null:
+        return loading();
+      case _GetAddressFromCoordinatesStateSuccess() when success != null:
+        return success(_that.location);
+      case _GetAddressFromCoordinatesStateError() when error != null:
+        return error(_that.error);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _GetAddressFromCoordinatesStateInitial
+    implements GetAddressFromCoordinatesState {
+  const _GetAddressFromCoordinatesStateInitial();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _GetAddressFromCoordinatesStateInitial);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetAddressFromCoordinatesState.initial()';
+  }
+}
+
+/// @nodoc
+
+class _GetAddressFromCoordinatesStateLoading
+    implements GetAddressFromCoordinatesState {
+  const _GetAddressFromCoordinatesStateLoading();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _GetAddressFromCoordinatesStateLoading);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'GetAddressFromCoordinatesState.loading()';
+  }
+}
+
+/// @nodoc
+
+class _GetAddressFromCoordinatesStateSuccess
+    implements GetAddressFromCoordinatesState {
+  const _GetAddressFromCoordinatesStateSuccess(this.location);
+
+  final AlrtLocation location;
+
+  /// Create a copy of GetAddressFromCoordinatesState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GetAddressFromCoordinatesStateSuccessCopyWith<
+          _GetAddressFromCoordinatesStateSuccess>
+      get copyWith => __$GetAddressFromCoordinatesStateSuccessCopyWithImpl<
+          _GetAddressFromCoordinatesStateSuccess>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _GetAddressFromCoordinatesStateSuccess &&
+            (identical(other.location, location) ||
+                other.location == location));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, location);
+
+  @override
+  String toString() {
+    return 'GetAddressFromCoordinatesState.success(location: $location)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$GetAddressFromCoordinatesStateSuccessCopyWith<$Res>
+    implements $GetAddressFromCoordinatesStateCopyWith<$Res> {
+  factory _$GetAddressFromCoordinatesStateSuccessCopyWith(
+          _GetAddressFromCoordinatesStateSuccess value,
+          $Res Function(_GetAddressFromCoordinatesStateSuccess) _then) =
+      __$GetAddressFromCoordinatesStateSuccessCopyWithImpl;
+  @useResult
+  $Res call({AlrtLocation location});
+
+  $AlrtLocationCopyWith<$Res> get location;
+}
+
+/// @nodoc
+class __$GetAddressFromCoordinatesStateSuccessCopyWithImpl<$Res>
+    implements _$GetAddressFromCoordinatesStateSuccessCopyWith<$Res> {
+  __$GetAddressFromCoordinatesStateSuccessCopyWithImpl(this._self, this._then);
+
+  final _GetAddressFromCoordinatesStateSuccess _self;
+  final $Res Function(_GetAddressFromCoordinatesStateSuccess) _then;
+
+  /// Create a copy of GetAddressFromCoordinatesState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? location = null,
+  }) {
+    return _then(_GetAddressFromCoordinatesStateSuccess(
+      null == location
+          ? _self.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as AlrtLocation,
+    ));
+  }
+
+  /// Create a copy of GetAddressFromCoordinatesState
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $AlrtLocationCopyWith<$Res> get location {
+    return $AlrtLocationCopyWith<$Res>(_self.location, (value) {
+      return _then(_self.copyWith(location: value));
+    });
+  }
+}
+
+/// @nodoc
+
+class _GetAddressFromCoordinatesStateError
+    implements GetAddressFromCoordinatesState {
+  const _GetAddressFromCoordinatesStateError(this.error);
+
+  final AppError error;
+
+  /// Create a copy of GetAddressFromCoordinatesState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$GetAddressFromCoordinatesStateErrorCopyWith<
+          _GetAddressFromCoordinatesStateError>
+      get copyWith => __$GetAddressFromCoordinatesStateErrorCopyWithImpl<
+          _GetAddressFromCoordinatesStateError>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _GetAddressFromCoordinatesStateError &&
+            (identical(other.error, error) || other.error == error));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, error);
+
+  @override
+  String toString() {
+    return 'GetAddressFromCoordinatesState.error(error: $error)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$GetAddressFromCoordinatesStateErrorCopyWith<$Res>
+    implements $GetAddressFromCoordinatesStateCopyWith<$Res> {
+  factory _$GetAddressFromCoordinatesStateErrorCopyWith(
+          _GetAddressFromCoordinatesStateError value,
+          $Res Function(_GetAddressFromCoordinatesStateError) _then) =
+      __$GetAddressFromCoordinatesStateErrorCopyWithImpl;
+  @useResult
+  $Res call({AppError error});
+
+  $AppErrorCopyWith<$Res> get error;
+}
+
+/// @nodoc
+class __$GetAddressFromCoordinatesStateErrorCopyWithImpl<$Res>
+    implements _$GetAddressFromCoordinatesStateErrorCopyWith<$Res> {
+  __$GetAddressFromCoordinatesStateErrorCopyWithImpl(this._self, this._then);
+
+  final _GetAddressFromCoordinatesStateError _self;
+  final $Res Function(_GetAddressFromCoordinatesStateError) _then;
+
+  /// Create a copy of GetAddressFromCoordinatesState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? error = null,
+  }) {
+    return _then(_GetAddressFromCoordinatesStateError(
+      null == error
+          ? _self.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as AppError,
+    ));
+  }
+
+  /// Create a copy of GetAddressFromCoordinatesState
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')

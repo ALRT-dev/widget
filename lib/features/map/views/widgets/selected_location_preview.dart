@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/providers/map_search_text_editing_controller_provider.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
@@ -21,12 +21,12 @@ class _SelectedLocationPreviewState
     extends ConsumerState<SelectedLocationPreview> {
   @override
   Widget build(BuildContext context) {
-    final selectedPlace = ref.watch(
+    final selectedLocation = ref.watch(
       providerOfMap.select(
-        (value) => value.selectedPlace,
+        (value) => value.selectedLocation,
       ),
     );
-    if (selectedPlace == null) {
+    if (selectedLocation == null) {
       return const SizedBox.shrink();
     }
 
@@ -58,7 +58,7 @@ class _SelectedLocationPreviewState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      selectedPlace.name,
+                      selectedLocation.name ?? 'Unnamed Location',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: TextStyle(
@@ -67,7 +67,7 @@ class _SelectedLocationPreviewState
                       ),
                     ),
                     Text(
-                      selectedPlace.address,
+                      selectedLocation.address ?? 'Unknown Address',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: TextStyle(
@@ -163,29 +163,22 @@ class _SelectedLocationPreviewState
   /// Clears the selected location in the map provider.
   void _clearSelectedLocation() {
     ref.read(providerOfMap.notifier)
-      ..updateSelectedPlace(null)
+      ..updateSelectedLocation(null)
+      ..updateSearchString('')
       ..removeSelectedLocationMarker();
+    ref.read(providerOfMapSearchTextEditingController).clear();
   }
 
   /// Gets the directions to the selected location.
   void _getDirections() {
-    final selectedPlace = ref.read(providerOfMap).selectedPlace;
-    if (selectedPlace == null) return;
+    final selectedLocation = ref.read(providerOfMap).selectedLocation;
+    if (selectedLocation == null) return;
 
     final currentUserLocation = ref.read(providerOfLocation).location;
 
-    final origin = LatLng(
-      currentUserLocation.latitude,
-      currentUserLocation.longitude,
-    );
-    final destination = LatLng(
-      selectedPlace.latitude,
-      selectedPlace.longitude,
-    );
-
     ref.read(providerOfMap.notifier).getRoute(
-          origin: origin,
-          destination: destination,
+          origin: currentUserLocation,
+          destination: selectedLocation,
         );
   }
 }

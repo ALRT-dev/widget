@@ -196,9 +196,7 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
             );
             return _inputBuilder(
               hintText: 'Select a location',
-              value: selectedLocation != null
-                  ? '(${selectedLocation.latitude.toStringAsFixed(4)}, ${selectedLocation.longitude.toStringAsFixed(4)})'
-                  : null,
+              value: selectedLocation?.name ?? selectedLocation?.address,
               enabled: false,
               onPressed: _gotoSelectLocationScreen,
             );

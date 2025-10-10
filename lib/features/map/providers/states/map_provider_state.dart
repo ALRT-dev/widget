@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/utils/constants.dart';
@@ -25,8 +26,8 @@ abstract class MapProviderState with _$MapProviderState {
     /// The list of places fetched from the map service after [getPlacesState] is successful.
     @Default(<GooglePlace>[]) final List<GooglePlace> places,
 
-    /// The currently selected place on the map, if any.
-    final GooglePlace? selectedPlace,
+    /// The currently selected location on the map, if any.
+    final AlrtLocation? selectedLocation,
 
     /// The current route plan, including travel mode and route responses.
     final RoutePlan? currentRoutePlan,
@@ -36,6 +37,10 @@ abstract class MapProviderState with _$MapProviderState {
 
     /// The state of fetching route.
     @Default(GetRouteState.initial()) final GetRouteState getRouteState,
+
+    /// The state of fetching address from coordinates.
+    @Default(GetAddressFromCoordinatesState.initial())
+    final GetAddressFromCoordinatesState getAddressFromCoordinatesState,
   }) = _MapProviderState;
 }
 
@@ -61,4 +66,19 @@ class GetRouteState with _$GetRouteState {
   const factory GetRouteState.error(
     final AppError error,
   ) = _GetRouteStateError;
+}
+
+@freezed
+abstract class GetAddressFromCoordinatesState
+    with _$GetAddressFromCoordinatesState {
+  const factory GetAddressFromCoordinatesState.initial() =
+      _GetAddressFromCoordinatesStateInitial;
+  const factory GetAddressFromCoordinatesState.loading() =
+      _GetAddressFromCoordinatesStateLoading;
+  const factory GetAddressFromCoordinatesState.success(
+    final AlrtLocation location,
+  ) = _GetAddressFromCoordinatesStateSuccess;
+  const factory GetAddressFromCoordinatesState.error(
+    final AppError error,
+  ) = _GetAddressFromCoordinatesStateError;
 }

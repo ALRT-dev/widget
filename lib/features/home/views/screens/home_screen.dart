@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/widgets/home_tabbar.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/providers/map_search_text_editing_controller_provider.dart';
 import 'package:hazard_app/features/map/views/screens/map_screen.dart';
 import 'package:hazard_app/features/notification/views/screens/notifications_screen.dart';
 import 'package:hazard_app/features/report/providers/create_report_provider.dart';
@@ -40,6 +41,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfMap.select((value) => null));
     ref.watch(providerOfHazards.select((value) => null));
     ref.watch(providerOfCreateReport.select((value) => null));
+    ref.watch(providerOfMapSearchTextEditingController.select((value) => null));
 
     _listenToHazardsState();
 

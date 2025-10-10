@@ -65,33 +65,41 @@ class MapService {
     return result;
   }
 
+  Future<Either<String, AppError>> getAddressFromCoordinates({
+    required final LatLng coordinates,
+  }) {
+    return _mapRepository.getAddressFromCoordinates(
+      coordinates: coordinates,
+    );
+  }
+
   Future<Either<RoutePlan, AppError>> getRoutePlan({
-    required final LatLng origin,
-    required final LatLng destination,
+    required final AlrtLocation origin,
+    required final AlrtLocation destination,
     final List<Hazard>? hazardsToAvoid,
   }) async {
     final result = await Future.wait([
       getRoute(
-        origin: origin,
-        destination: destination,
+        origin: origin.latLng,
+        destination: destination.latLng,
         hazardsToAvoid: hazardsToAvoid,
         travelMode: TravelMode.driving,
       ),
       getRoute(
-        origin: origin,
-        destination: destination,
+        origin: origin.latLng,
+        destination: destination.latLng,
         hazardsToAvoid: hazardsToAvoid,
         travelMode: TravelMode.transit,
       ),
       getRoute(
-        origin: origin,
-        destination: destination,
+        origin: origin.latLng,
+        destination: destination.latLng,
         hazardsToAvoid: hazardsToAvoid,
         travelMode: TravelMode.walking,
       ),
       getRoute(
-        origin: origin,
-        destination: destination,
+        origin: origin.latLng,
+        destination: destination.latLng,
         hazardsToAvoid: hazardsToAvoid,
         travelMode: TravelMode.bicycling,
       ),
@@ -112,6 +120,8 @@ class MapService {
 
     return Success(
       RoutePlan(
+        origin: origin,
+        destination: destination,
         travelModeRoutes: {
           if (travelModeDriving != null) TravelMode.driving: travelModeDriving,
           if (travelModeTransit != null) TravelMode.transit: travelModeTransit,
