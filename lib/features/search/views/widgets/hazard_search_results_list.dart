@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
-import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
 import 'package:hazard_app/features/search/views/widgets/hazard_search_results_list_item.dart';
@@ -11,6 +10,7 @@ import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.da
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
+import 'package:hazard_app/others/app_colors.dart';
 
 class HazardSearchResultsList extends ConsumerStatefulWidget {
   const HazardSearchResultsList({super.key});
@@ -59,6 +59,12 @@ class _HazardSearchResultsListState
             ),
           );
 
+          final isSubscribed = ref.watch(
+            providerOfMainSearch.select(
+              (value) => value.subscriptionId != null,
+            ),
+          );
+
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 10.spMin,
@@ -73,8 +79,8 @@ class _HazardSearchResultsListState
                   Text(
                     isSearchActive
                         ? selectedLocation != null
-                            ? 'No hazards around "${selectedLocation.displayName}"'
-                            : 'Nothing to show'
+                              ? 'No hazards around "${selectedLocation.displayName}"'
+                              : 'Nothing to show'
                         : 'Subscribe to a location',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -85,8 +91,10 @@ class _HazardSearchResultsListState
                   Text(
                     isSearchActive
                         ? selectedLocation != null
-                            ? 'You can still subscribe to get instant alerts and updates around ${selectedLocation.displayName}.'
-                            : 'No results found for your search. Please try changing it.'
+                              ? isSubscribed
+                                    ? 'You have already subscribed to get instant alerts and updates around ${selectedLocation.displayName}.'
+                                    : 'You can subscribe to get instant alerts and updates around ${selectedLocation.displayName}.'
+                              : 'No results found for your search. Please try changing it.'
                         : 'Please use the search bar to search for a location to see hazards around it and subscribe to it.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -95,27 +103,63 @@ class _HazardSearchResultsListState
                   ),
                 ],
               ),
-              if (selectedLocation != null)
-                SizedBox(
-                  height: 40.spMin,
-                  child: Button.filled(
-                    width: 130.spMin,
-                    onPressed: () {},
-                    padding: EdgeInsets.zero,
-                    icon: const Icon(
-                      Icons.notifications_active,
-                      size: 18,
-                    ),
-                    value: 'Subscribe',
-                    valueStyle: const TextStyle(
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
+              if (selectedLocation != null) _subscribeButtonBuilder(),
             ],
           ).pad(20.0);
         },
       ),
+    );
+  }
+
+  Widget _subscribeButtonBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isLoading = ref.watch(
+          providerOfMainSearch.select(
+            (value) =>
+                value.subscribeToLocationState.maybeWhen(
+                  orElse: () => false,
+                  loading: () => true,
+                ) ||
+                value.unsubscribeFromLocationState.maybeWhen(
+                  orElse: () => false,
+                  loading: () => true,
+                ),
+          ),
+        );
+        final isSubscribed = ref.watch(
+          providerOfMainSearch.select(
+            (value) => value.subscriptionId != null,
+          ),
+        );
+
+        return SizedBox(
+          height: 40.spMin,
+          child: Button.filled(
+            width: 150.spMin,
+            isLoading: isLoading,
+            onPressed: _handleSubscribePressed,
+            padding: EdgeInsets.zero,
+            color: isSubscribed ? AppColors.grey : null,
+            icon: isLoading
+                ? null
+                : Icon(
+                    isSubscribed
+                        ? Icons.notifications_off_rounded
+                        : Icons.notifications_active_rounded,
+                    size: 18.0,
+                  ),
+            value: isLoading
+                ? null
+                : isSubscribed
+                ? 'Unsubscribe'
+                : 'Subscribe',
+            valueStyle: const TextStyle(
+              fontSize: 14,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -144,8 +188,8 @@ class _HazardSearchResultsListState
     return Consumer(
       builder: (context, ref, child) {
         final hazards = ref.watch(
-          providerOfHazards.select(
-            (value) => value.listHazards,
+          providerOfMainSearch.select(
+            (value) => value.hazards,
           ),
         );
         if (hazards.isEmpty) {
@@ -164,5 +208,10 @@ class _HazardSearchResultsListState
         );
       },
     );
+  }
+
+  /// Handles the subscribe button press.
+  void _handleSubscribePressed() {
+    ref.read(providerOfMainSearch.notifier).toggleSubscription();
   }
 }

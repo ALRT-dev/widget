@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hazard_app/features/map/models/alrt_location_bounds_model.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 
 part 'google_place_model.freezed.dart';
@@ -15,6 +16,7 @@ abstract class GooglePlace with _$GooglePlace {
     required final double longitude,
     required final String name,
     required final String address,
+    required final AlrtLocationBounds bounds,
   }) = _GooglePlace;
 
   /// Converts [GooglePlace] to [AlrtLocation].
@@ -24,6 +26,7 @@ abstract class GooglePlace with _$GooglePlace {
       longitude: longitude,
       address: address,
       name: name,
+      bounds: bounds,
     );
   }
 

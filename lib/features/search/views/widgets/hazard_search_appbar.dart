@@ -196,14 +196,11 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
     _dropdownController.close();
     _searchController.text = place.name;
 
+    ref.read(providerOfPlacesForSearch.notifier).updateSearchString(place.name);
+
     // update the main search provider with the selected location and fetch hazards.
     ref.read(providerOfMainSearch.notifier)
       ..updateSearchedLocation(place.toAlrtLocation)
       ..getHazards();
-
-    // fetch hazard categories for the selected location
-    ref
-        .read(providerOfHazardCategoriesForSearch.notifier)
-        .getHazardCategories();
   }
 }

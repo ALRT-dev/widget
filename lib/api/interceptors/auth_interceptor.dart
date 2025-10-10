@@ -11,8 +11,8 @@ class AuthInterceptor implements Interceptor {
   AuthInterceptor({
     required final Dio dio,
     required final SharedPreferencesRepository sharedPreferencesRepository,
-  })  : _dio = dio,
-        _sharedPreferencesRepository = sharedPreferencesRepository;
+  }) : _dio = dio,
+       _sharedPreferencesRepository = sharedPreferencesRepository;
 
   final Dio _dio;
   final SharedPreferencesRepository _sharedPreferencesRepository;
@@ -104,23 +104,18 @@ class AuthInterceptor implements Interceptor {
         // save the new access token to the local storage.
         _sharedPreferencesRepository.saveString(
           key: SharedPrefsKey.accessToken,
-          value: success.$1,
+          value: success,
         );
 
-        _sharedPreferencesRepository.saveString(
-          key: SharedPrefsKey.refreshToken,
-          value: success.$2,
-        );
-
-        return success.$1;
+        return success;
       });
     }
 
     return accessToken;
   }
 
-  /// Calls the API to generate new accessToken and refreshToken using the old refreshToken.
-  Future<Either<(String, String), AppError>> _generateNewAccessToken() {
+  /// Calls the API to generate new accessToken using the old refreshToken.
+  Future<Either<String, AppError>> _generateNewAccessToken() {
     return runAsyncCall(
       name: 'generateNewAccessToken',
       future: () async {
@@ -150,15 +145,9 @@ class AuthInterceptor implements Interceptor {
             message: 'accessToken could not be generated',
           );
         }
-        if (data?['refreshToken'] == null || data?['refreshToken'] is! String) {
-          throw AppError(
-            message: 'refreshToken could not be generated',
-          );
-        }
 
         final newAccessToken = data!['accessToken'] as String;
-        final newRefreshToken = data['refreshToken'] as String;
-        return Success((newAccessToken, newRefreshToken));
+        return Success(newAccessToken);
       },
       onError: Failure.new,
     );

@@ -104,6 +104,16 @@ class MapRepositoryImpl implements MapRepository {
                     ...data,
                     'latitude': details['geometry']['location']['lat'],
                     'longitude': details['geometry']['location']['lng'],
+                    'bounds': {
+                      'northeastLat': details['geometry']['viewport']
+                          ['northeast']['lat'],
+                      'northeastLng': details['geometry']['viewport']
+                          ['northeast']['lng'],
+                      'southwestLat': details['geometry']['viewport']
+                          ['southwest']['lat'],
+                      'southwestLng': details['geometry']['viewport']
+                          ['southwest']['lng'],
+                    },
                     'name': details['name'],
                     'address': details['formatted_address'],
                   },

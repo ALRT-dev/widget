@@ -7,11 +7,11 @@ part of 'alrt_media_model.dart';
 // **************************************************************************
 
 _AlrtMedia _$AlrtMediaFromJson(Map<String, dynamic> json) => _AlrtMedia(
-      id: json['id'] as String,
-      value: json['value'] as String,
-      type: $enumDecode(_$AlrtMediaTypeEnumMap, json['type']),
-      source: $enumDecode(_$AlrtMediaSourceEnumMap, json['source']),
-    );
+  id: json['id'] as String,
+  value: json['value'] as String,
+  type: $enumDecode(_$AlrtMediaTypeEnumMap, json['type']),
+  source: $enumDecode(_$AlrtMediaSourceEnumMap, json['source']),
+);
 
 Map<String, dynamic> _$AlrtMediaToJson(_AlrtMedia instance) =>
     <String, dynamic>{

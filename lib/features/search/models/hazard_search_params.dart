@@ -13,10 +13,30 @@ abstract class HazardSearchParams with _$HazardSearchParams {
     @Default(<String>[]) final List<String> categoryIds,
 
     /// The latitude for location-based filtering.
-    final double? latitude,
+    @JsonKey(name: 'lat') final double? latitude,
 
     /// The longitude for location-based filtering.
-    final double? longitude,
+    @JsonKey(name: 'lng') final double? longitude,
+
+    /// The bounds for location-based filtering.
+    ///
+    /// If provided, [latitude] and [longitude] will be ignored.
+    final double? northeastLat,
+
+    /// The bounds for location-based filtering.
+    ///
+    /// If provided, [latitude] and [longitude] will be ignored.
+    final double? northeastLng,
+
+    /// The bounds for location-based filtering.
+    ///
+    /// If provided, [latitude] and [longitude] will be ignored.
+    final double? southwestLat,
+
+    /// The bounds for location-based filtering.
+    ///
+    /// If provided, [latitude] and [longitude] will be ignored.
+    final double? southwestLng,
 
     /// The page number for pagination.
     @Default(1) final int page,

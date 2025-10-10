@@ -12,12 +12,16 @@ _AlrtLocation _$AlrtLocationFromJson(Map<String, dynamic> json) =>
       longitude: (json['longitude'] as num).toDouble(),
       address: json['address'] as String?,
       name: json['name'] as String?,
+      bounds: json['bounds'] == null
+          ? null
+          : AlrtLocationBounds.fromJson(json['bounds'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$AlrtLocationToJson(_AlrtLocation instance) =>
     <String, dynamic>{
       'latitude': instance.latitude,
       'longitude': instance.longitude,
-      'address': instance.address,
-      'name': instance.name,
+      'address': ?instance.address,
+      'name': ?instance.name,
+      'bounds': ?instance.bounds?.toJson(),
     };

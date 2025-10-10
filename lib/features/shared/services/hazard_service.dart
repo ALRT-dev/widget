@@ -3,6 +3,7 @@ import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
 import 'package:hazard_app/features/shared/providers/repository_providers.dart';
 import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -19,6 +20,16 @@ class HazardService {
     required final HazardSearchParams searchParams,
   }) {
     return _hazardRepository.getHazards(
+      searchParams: searchParams,
+    );
+  }
+
+  /// Fetches hazards along with categories from the server.
+  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
+  getGetHazardsWithCategories({
+    required final HazardSearchParams searchParams,
+  }) {
+    return _hazardRepository.getGetHazardsWithCategories(
       searchParams: searchParams,
     );
   }
