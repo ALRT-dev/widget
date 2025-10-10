@@ -11,10 +11,13 @@ import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 class PlaceSearchResultsList extends ConsumerStatefulWidget {
   const PlaceSearchResultsList({
     super.key,
+    required this.placesSearchKey,
     this.onPlaceSelected,
   });
 
   final void Function(GooglePlace)? onPlaceSelected;
+
+  final String placesSearchKey;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -26,7 +29,7 @@ class _PlaceSearchResultsListState
   @override
   Widget build(BuildContext context) {
     final getPlacesState = ref.watch(
-      providerOfPlaces.select(
+      providerOfPlaces(widget.placesSearchKey).select(
         (value) => value.getPlacesState,
       ),
     );
@@ -62,7 +65,7 @@ class _PlaceSearchResultsListState
         child: Consumer(
           builder: (context, ref, child) {
             final isSearchActive = ref.watch(
-              providerOfPlaces.select(
+              providerOfPlaces(widget.placesSearchKey).select(
                 (value) => value.searchString.isNotEmpty,
               ),
             );
@@ -104,7 +107,7 @@ class _PlaceSearchResultsListState
   Widget _dataBuilder() {
     return Consumer(builder: (context, ref, child) {
       final places = ref.watch(
-        providerOfPlaces.select(
+        providerOfPlaces(widget.placesSearchKey).select(
           (value) => value.places,
         ),
       );

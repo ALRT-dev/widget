@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
-import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/utils/constants.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -20,20 +19,11 @@ abstract class MapProviderState with _$MapProviderState {
     /// The set of polylines displayed on the map.
     @Default(<Polyline>{}) final Set<Polyline> polylines,
 
-    /// The search string used to fetch places.
-    @Default('') final String searchString,
-
-    /// The list of places fetched from the map service after [getPlacesState] is successful.
-    @Default(<GooglePlace>[]) final List<GooglePlace> places,
-
     /// The currently selected location on the map, if any.
     final AlrtLocation? selectedLocation,
 
     /// The current route plan, including travel mode and route responses.
     final RoutePlan? currentRoutePlan,
-
-    /// The state of fetching places.
-    @Default(GetPlacesState.initial()) final GetPlacesState getPlacesState,
 
     /// The state of fetching route.
     @Default(GetRouteState.initial()) final GetRouteState getRouteState,
@@ -42,18 +32,6 @@ abstract class MapProviderState with _$MapProviderState {
     @Default(GetAddressFromCoordinatesState.initial())
     final GetAddressFromCoordinatesState getAddressFromCoordinatesState,
   }) = _MapProviderState;
-}
-
-@freezed
-class GetPlacesState with _$GetPlacesState {
-  const factory GetPlacesState.initial() = _GetPlacesStateInitial;
-  const factory GetPlacesState.loading() = _GetPlacesStateLoading;
-  const factory GetPlacesState.success(
-    final List<GooglePlace> places,
-  ) = _GetPlacesStateSuccess;
-  const factory GetPlacesState.error(
-    final AppError error,
-  ) = _GetPlacesStateError;
 }
 
 @freezed

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/providers/map_search_text_editing_controller_provider.dart';
+import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
@@ -162,9 +163,9 @@ class _SelectedLocationPreviewState
 
   /// Clears the selected location in the map provider.
   void _clearSelectedLocation() {
+    ref.read(providerOfPlacesForMap.notifier).updateSearchString('');
     ref.read(providerOfMap.notifier)
       ..updateSelectedLocation(null)
-      ..updateSearchString('')
       ..removeSelectedLocationMarker();
     ref.read(providerOfMapSearchTextEditingController).clear();
   }

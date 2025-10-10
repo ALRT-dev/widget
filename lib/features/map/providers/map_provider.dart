@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
-import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
@@ -67,35 +66,6 @@ class MapProvider extends StateNotifier<MapProviderState> {
   }) async {
     _mapService.initializeMapController(
       googleMapController: googleMapController,
-    );
-  }
-
-  /// Fetches places from the map service.
-  Future<void> getPlaces({
-    required final String searchString,
-  }) async {
-    state = state.copyWith(
-      getPlacesState: const GetPlacesState.loading(),
-    );
-
-    final result = await _mapService.getPlaces(
-      searchString: searchString,
-      currentUserLocation: _ref.read(providerOfLocation).location,
-    );
-    if (!mounted) return;
-
-    result.when(
-      (places) {
-        state = state.copyWith(
-          getPlacesState: GetPlacesState.success(places),
-          places: places,
-        );
-      },
-      (l) {
-        state = state.copyWith(
-          getPlacesState: GetPlacesState.error(l),
-        );
-      },
     );
   }
 
@@ -412,31 +382,10 @@ class MapProvider extends StateNotifier<MapProviderState> {
     updateMarkers(updatedMarkers);
   }
 
-  /// Updates [MapProviderState.places] to the given [places].
-  void updatePlaces(final List<GooglePlace> places) {
-    state = state.copyWith(
-      places: places,
-    );
-  }
-
-  /// Updates [MapProviderState.getPlacesState] to loading state.
-  void updateGetPlacesStateToLoading() {
-    state = state.copyWith(
-      getPlacesState: const GetPlacesState.loading(),
-    );
-  }
-
   /// Updates [MapProviderState.selectedLocation] to the given [location].
   void updateSelectedLocation(final AlrtLocation? location) {
     state = state.copyWith(
       selectedLocation: location,
-    );
-  }
-
-  /// Updates [MapProviderState.searchString] to the given [searchString].
-  void updateSearchString(final String searchString) {
-    state = state.copyWith(
-      searchString: searchString,
     );
   }
 

@@ -4,8 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 
-class MapSearchResultsListItem extends ConsumerStatefulWidget {
-  const MapSearchResultsListItem({
+class PlacesSearchResultsMenuContentItem extends ConsumerStatefulWidget {
+  const PlacesSearchResultsMenuContentItem({
     super.key,
     required this.place,
     this.onSelected,
@@ -21,7 +21,7 @@ class MapSearchResultsListItem extends ConsumerStatefulWidget {
 }
 
 class _MapSearchResultsListItemState
-    extends ConsumerState<MapSearchResultsListItem> {
+    extends ConsumerState<PlacesSearchResultsMenuContentItem> {
   @override
   Widget build(BuildContext context) {
     return ListTile(

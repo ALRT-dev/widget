@@ -34,6 +34,8 @@ class SelectLocationScreen extends ConsumerStatefulWidget {
 
   static const String route = '/select-location';
 
+  static const placesSearchKey = 'SelectLocationScreen';
+
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
       _SelectLocationScreenState();
@@ -71,6 +73,7 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
           _chooseOnTheMapBuilder().sliverBox,
           Divider().pX(20.0).sliverBox,
           PlaceSearchResultsList(
+            placesSearchKey: SelectLocationScreen.placesSearchKey,
             onPlaceSelected: _handlePlaceSelected,
           ),
         ],
@@ -123,7 +126,7 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
               Consumer(
                 builder: (context, ref, child) {
                   final isSearchActive = ref.watch(
-                    providerOfPlaces.select(
+                    providerOfPlacesForSelectLocation.select(
                       (value) => value.searchString.isNotEmpty,
                     ),
                   );
@@ -190,7 +193,7 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
 
   /// Updates the search string in the [PlacesProvider] and triggers a debounced to fetch places.
   void _handleSearchChanged(final String value) {
-    ref.read(providerOfPlaces.notifier)
+    ref.read(providerOfPlacesForSelectLocation.notifier)
       ..updateSearchString(value.trim())
       ..updateGetPlacesToLoading();
 
@@ -198,7 +201,7 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
       'location-search-debounce',
       const Duration(milliseconds: 500),
       () {
-        ref.read(providerOfPlaces.notifier).getPlaces();
+        ref.read(providerOfPlacesForSelectLocation.notifier).getPlaces();
       },
     );
   }

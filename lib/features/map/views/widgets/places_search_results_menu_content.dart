@@ -1,29 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
-import 'package:hazard_app/features/map/providers/map_provider.dart';
-import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
-import 'package:hazard_app/features/map/views/widgets/map_search_results_item.dart';
+import 'package:hazard_app/features/map/providers/places_provider.dart';
+import 'package:hazard_app/features/map/providers/states/places_provider_state.dart';
+import 'package:hazard_app/features/map/views/widgets/places_search_results_menu_content_item.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 
-class MapSearchResultsList extends ConsumerStatefulWidget {
-  const MapSearchResultsList({
+class PlacesSearchResultsMenuContent extends ConsumerStatefulWidget {
+  const PlacesSearchResultsMenuContent({
     super.key,
     this.onPlaceSelected,
+    required this.placesSearchKey,
   });
 
   final void Function(GooglePlace)? onPlaceSelected;
+
+  final String placesSearchKey;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
       _MapSearchResultsListState();
 }
 
-class _MapSearchResultsListState extends ConsumerState<MapSearchResultsList> {
+class _MapSearchResultsListState
+    extends ConsumerState<PlacesSearchResultsMenuContent> {
   @override
   Widget build(BuildContext context) {
     final getPlacesState = ref.watch(
-      providerOfMap.select(
+      providerOfPlaces(widget.placesSearchKey).select(
         (value) => value.getPlacesState,
       ),
     );
@@ -61,7 +65,7 @@ class _MapSearchResultsListState extends ConsumerState<MapSearchResultsList> {
   Widget _dataBuilder() {
     return Consumer(builder: (context, ref, child) {
       final places = ref.watch(
-        providerOfMap.select(
+        providerOfPlaces(widget.placesSearchKey).select(
           (value) => value.places,
         ),
       );
@@ -72,7 +76,7 @@ class _MapSearchResultsListState extends ConsumerState<MapSearchResultsList> {
       return ListView.builder(
         itemCount: places.length,
         itemBuilder: (context, index) {
-          return MapSearchResultsListItem(
+          return PlacesSearchResultsMenuContentItem(
             place: places[index],
             onSelected: widget.onPlaceSelected,
           );

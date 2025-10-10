@@ -4,10 +4,23 @@ import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
 import 'package:hazard_app/features/map/providers/states/places_provider_state.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
+import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
+import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
+import 'package:hazard_app/features/search/views/widgets/hazard_search_appbar.dart';
 
-final providerOfPlaces =
-    StateNotifierProvider.autoDispose<PlacesProvider, PlacesProviderState>(
-  (ref) => PlacesProvider(
+final providerOfPlacesForMap = providerOfPlaces(
+  MapSearchbar.placesSearchKey,
+);
+final providerOfPlacesForSearch = providerOfPlaces(
+  HazardSearchAppBar.placesSearchKey,
+);
+final providerOfPlacesForSelectLocation = providerOfPlaces(
+  SelectLocationScreen.placesSearchKey,
+);
+
+final providerOfPlaces = StateNotifierProvider.autoDispose
+    .family<PlacesProvider, PlacesProviderState, String>(
+  (ref, key) => PlacesProvider(
     ref: ref,
     state: PlacesProviderState(),
   ),
