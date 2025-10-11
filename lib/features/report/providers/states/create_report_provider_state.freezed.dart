@@ -23,7 +23,8 @@ mixin _$CreateReportProviderState {
  String? get otherCategoryName;/// The location of the hazard.
  AlrtLocation? get location;/// The description of the hazard.
  String? get description;/// The list of media associated with the hazard report.
- List<AlrtMedia> get medias;/// The list of [CreatingHazardReport.id]s that have been acknowledged.
+ List<AlrtMedia> get medias;/// Whether the report has been submitted.
+ bool get reportSubmitted;/// The list of [CreatingHazardReport.id]s that have been acknowledged.
 ///
 /// i.e A success or error toast has been shown for these reports.
  List<String> get acknowledgedReportIds;/// The the state of creating the hazard report.
@@ -38,16 +39,16 @@ $CreateReportProviderStateCopyWith<CreateReportProviderState> get copyWith => _$
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateReportProviderState&&(identical(other.dateTime, dateTime) || other.dateTime == dateTime)&&(identical(other.category, category) || other.category == category)&&(identical(other.otherCategoryName, otherCategoryName) || other.otherCategoryName == otherCategoryName)&&(identical(other.location, location) || other.location == location)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.medias, medias)&&const DeepCollectionEquality().equals(other.acknowledgedReportIds, acknowledgedReportIds)&&const DeepCollectionEquality().equals(other.creatingHazardReports, creatingHazardReports));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateReportProviderState&&(identical(other.dateTime, dateTime) || other.dateTime == dateTime)&&(identical(other.category, category) || other.category == category)&&(identical(other.otherCategoryName, otherCategoryName) || other.otherCategoryName == otherCategoryName)&&(identical(other.location, location) || other.location == location)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.medias, medias)&&(identical(other.reportSubmitted, reportSubmitted) || other.reportSubmitted == reportSubmitted)&&const DeepCollectionEquality().equals(other.acknowledgedReportIds, acknowledgedReportIds)&&const DeepCollectionEquality().equals(other.creatingHazardReports, creatingHazardReports));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,dateTime,category,otherCategoryName,location,description,const DeepCollectionEquality().hash(medias),const DeepCollectionEquality().hash(acknowledgedReportIds),const DeepCollectionEquality().hash(creatingHazardReports));
+int get hashCode => Object.hash(runtimeType,dateTime,category,otherCategoryName,location,description,const DeepCollectionEquality().hash(medias),reportSubmitted,const DeepCollectionEquality().hash(acknowledgedReportIds),const DeepCollectionEquality().hash(creatingHazardReports));
 
 @override
 String toString() {
-  return 'CreateReportProviderState(dateTime: $dateTime, category: $category, otherCategoryName: $otherCategoryName, location: $location, description: $description, medias: $medias, acknowledgedReportIds: $acknowledgedReportIds, creatingHazardReports: $creatingHazardReports)';
+  return 'CreateReportProviderState(dateTime: $dateTime, category: $category, otherCategoryName: $otherCategoryName, location: $location, description: $description, medias: $medias, reportSubmitted: $reportSubmitted, acknowledgedReportIds: $acknowledgedReportIds, creatingHazardReports: $creatingHazardReports)';
 }
 
 
@@ -58,7 +59,7 @@ abstract mixin class $CreateReportProviderStateCopyWith<$Res>  {
   factory $CreateReportProviderStateCopyWith(CreateReportProviderState value, $Res Function(CreateReportProviderState) _then) = _$CreateReportProviderStateCopyWithImpl;
 @useResult
 $Res call({
- DateTime? dateTime, HazardCategory? category, String? otherCategoryName, AlrtLocation? location, String? description, List<AlrtMedia> medias, List<String> acknowledgedReportIds, List<CreatingHazardReport> creatingHazardReports
+ DateTime? dateTime, HazardCategory? category, String? otherCategoryName, AlrtLocation? location, String? description, List<AlrtMedia> medias, bool reportSubmitted, List<String> acknowledgedReportIds, List<CreatingHazardReport> creatingHazardReports
 });
 
 
@@ -75,7 +76,7 @@ class _$CreateReportProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of CreateReportProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? dateTime = freezed,Object? category = freezed,Object? otherCategoryName = freezed,Object? location = freezed,Object? description = freezed,Object? medias = null,Object? acknowledgedReportIds = null,Object? creatingHazardReports = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? dateTime = freezed,Object? category = freezed,Object? otherCategoryName = freezed,Object? location = freezed,Object? description = freezed,Object? medias = null,Object? reportSubmitted = null,Object? acknowledgedReportIds = null,Object? creatingHazardReports = null,}) {
   return _then(_self.copyWith(
 dateTime: freezed == dateTime ? _self.dateTime : dateTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
@@ -83,7 +84,8 @@ as HazardCategory?,otherCategoryName: freezed == otherCategoryName ? _self.other
 as String?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
 as AlrtLocation?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,medias: null == medias ? _self.medias : medias // ignore: cast_nullable_to_non_nullable
-as List<AlrtMedia>,acknowledgedReportIds: null == acknowledgedReportIds ? _self.acknowledgedReportIds : acknowledgedReportIds // ignore: cast_nullable_to_non_nullable
+as List<AlrtMedia>,reportSubmitted: null == reportSubmitted ? _self.reportSubmitted : reportSubmitted // ignore: cast_nullable_to_non_nullable
+as bool,acknowledgedReportIds: null == acknowledgedReportIds ? _self.acknowledgedReportIds : acknowledgedReportIds // ignore: cast_nullable_to_non_nullable
 as List<String>,creatingHazardReports: null == creatingHazardReports ? _self.creatingHazardReports : creatingHazardReports // ignore: cast_nullable_to_non_nullable
 as List<CreatingHazardReport>,
   ));
@@ -194,10 +196,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime? dateTime,  HazardCategory? category,  String? otherCategoryName,  AlrtLocation? location,  String? description,  List<AlrtMedia> medias,  List<String> acknowledgedReportIds,  List<CreatingHazardReport> creatingHazardReports)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime? dateTime,  HazardCategory? category,  String? otherCategoryName,  AlrtLocation? location,  String? description,  List<AlrtMedia> medias,  bool reportSubmitted,  List<String> acknowledgedReportIds,  List<CreatingHazardReport> creatingHazardReports)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateReportProviderState() when $default != null:
-return $default(_that.dateTime,_that.category,_that.otherCategoryName,_that.location,_that.description,_that.medias,_that.acknowledgedReportIds,_that.creatingHazardReports);case _:
+return $default(_that.dateTime,_that.category,_that.otherCategoryName,_that.location,_that.description,_that.medias,_that.reportSubmitted,_that.acknowledgedReportIds,_that.creatingHazardReports);case _:
   return orElse();
 
 }
@@ -215,10 +217,10 @@ return $default(_that.dateTime,_that.category,_that.otherCategoryName,_that.loca
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime? dateTime,  HazardCategory? category,  String? otherCategoryName,  AlrtLocation? location,  String? description,  List<AlrtMedia> medias,  List<String> acknowledgedReportIds,  List<CreatingHazardReport> creatingHazardReports)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime? dateTime,  HazardCategory? category,  String? otherCategoryName,  AlrtLocation? location,  String? description,  List<AlrtMedia> medias,  bool reportSubmitted,  List<String> acknowledgedReportIds,  List<CreatingHazardReport> creatingHazardReports)  $default,) {final _that = this;
 switch (_that) {
 case _CreateReportProviderState():
-return $default(_that.dateTime,_that.category,_that.otherCategoryName,_that.location,_that.description,_that.medias,_that.acknowledgedReportIds,_that.creatingHazardReports);case _:
+return $default(_that.dateTime,_that.category,_that.otherCategoryName,_that.location,_that.description,_that.medias,_that.reportSubmitted,_that.acknowledgedReportIds,_that.creatingHazardReports);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -235,10 +237,10 @@ return $default(_that.dateTime,_that.category,_that.otherCategoryName,_that.loca
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime? dateTime,  HazardCategory? category,  String? otherCategoryName,  AlrtLocation? location,  String? description,  List<AlrtMedia> medias,  List<String> acknowledgedReportIds,  List<CreatingHazardReport> creatingHazardReports)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime? dateTime,  HazardCategory? category,  String? otherCategoryName,  AlrtLocation? location,  String? description,  List<AlrtMedia> medias,  bool reportSubmitted,  List<String> acknowledgedReportIds,  List<CreatingHazardReport> creatingHazardReports)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateReportProviderState() when $default != null:
-return $default(_that.dateTime,_that.category,_that.otherCategoryName,_that.location,_that.description,_that.medias,_that.acknowledgedReportIds,_that.creatingHazardReports);case _:
+return $default(_that.dateTime,_that.category,_that.otherCategoryName,_that.location,_that.description,_that.medias,_that.reportSubmitted,_that.acknowledgedReportIds,_that.creatingHazardReports);case _:
   return null;
 
 }
@@ -250,7 +252,7 @@ return $default(_that.dateTime,_that.category,_that.otherCategoryName,_that.loca
 
 
 class _CreateReportProviderState implements CreateReportProviderState {
-  const _CreateReportProviderState({this.dateTime, this.category, this.otherCategoryName, this.location, this.description, final  List<AlrtMedia> medias = const <AlrtMedia>[], final  List<String> acknowledgedReportIds = const <String>[], final  List<CreatingHazardReport> creatingHazardReports = const <CreatingHazardReport>[]}): _medias = medias,_acknowledgedReportIds = acknowledgedReportIds,_creatingHazardReports = creatingHazardReports;
+  const _CreateReportProviderState({this.dateTime, this.category, this.otherCategoryName, this.location, this.description, final  List<AlrtMedia> medias = const <AlrtMedia>[], this.reportSubmitted = false, final  List<String> acknowledgedReportIds = const <String>[], final  List<CreatingHazardReport> creatingHazardReports = const <CreatingHazardReport>[]}): _medias = medias,_acknowledgedReportIds = acknowledgedReportIds,_creatingHazardReports = creatingHazardReports;
   
 
 /// The date and time of the hazard.
@@ -275,6 +277,8 @@ class _CreateReportProviderState implements CreateReportProviderState {
   return EqualUnmodifiableListView(_medias);
 }
 
+/// Whether the report has been submitted.
+@override@JsonKey() final  bool reportSubmitted;
 /// The list of [CreatingHazardReport.id]s that have been acknowledged.
 ///
 /// i.e A success or error toast has been shown for these reports.
@@ -308,16 +312,16 @@ _$CreateReportProviderStateCopyWith<_CreateReportProviderState> get copyWith => 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateReportProviderState&&(identical(other.dateTime, dateTime) || other.dateTime == dateTime)&&(identical(other.category, category) || other.category == category)&&(identical(other.otherCategoryName, otherCategoryName) || other.otherCategoryName == otherCategoryName)&&(identical(other.location, location) || other.location == location)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._medias, _medias)&&const DeepCollectionEquality().equals(other._acknowledgedReportIds, _acknowledgedReportIds)&&const DeepCollectionEquality().equals(other._creatingHazardReports, _creatingHazardReports));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateReportProviderState&&(identical(other.dateTime, dateTime) || other.dateTime == dateTime)&&(identical(other.category, category) || other.category == category)&&(identical(other.otherCategoryName, otherCategoryName) || other.otherCategoryName == otherCategoryName)&&(identical(other.location, location) || other.location == location)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._medias, _medias)&&(identical(other.reportSubmitted, reportSubmitted) || other.reportSubmitted == reportSubmitted)&&const DeepCollectionEquality().equals(other._acknowledgedReportIds, _acknowledgedReportIds)&&const DeepCollectionEquality().equals(other._creatingHazardReports, _creatingHazardReports));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,dateTime,category,otherCategoryName,location,description,const DeepCollectionEquality().hash(_medias),const DeepCollectionEquality().hash(_acknowledgedReportIds),const DeepCollectionEquality().hash(_creatingHazardReports));
+int get hashCode => Object.hash(runtimeType,dateTime,category,otherCategoryName,location,description,const DeepCollectionEquality().hash(_medias),reportSubmitted,const DeepCollectionEquality().hash(_acknowledgedReportIds),const DeepCollectionEquality().hash(_creatingHazardReports));
 
 @override
 String toString() {
-  return 'CreateReportProviderState(dateTime: $dateTime, category: $category, otherCategoryName: $otherCategoryName, location: $location, description: $description, medias: $medias, acknowledgedReportIds: $acknowledgedReportIds, creatingHazardReports: $creatingHazardReports)';
+  return 'CreateReportProviderState(dateTime: $dateTime, category: $category, otherCategoryName: $otherCategoryName, location: $location, description: $description, medias: $medias, reportSubmitted: $reportSubmitted, acknowledgedReportIds: $acknowledgedReportIds, creatingHazardReports: $creatingHazardReports)';
 }
 
 
@@ -328,7 +332,7 @@ abstract mixin class _$CreateReportProviderStateCopyWith<$Res> implements $Creat
   factory _$CreateReportProviderStateCopyWith(_CreateReportProviderState value, $Res Function(_CreateReportProviderState) _then) = __$CreateReportProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- DateTime? dateTime, HazardCategory? category, String? otherCategoryName, AlrtLocation? location, String? description, List<AlrtMedia> medias, List<String> acknowledgedReportIds, List<CreatingHazardReport> creatingHazardReports
+ DateTime? dateTime, HazardCategory? category, String? otherCategoryName, AlrtLocation? location, String? description, List<AlrtMedia> medias, bool reportSubmitted, List<String> acknowledgedReportIds, List<CreatingHazardReport> creatingHazardReports
 });
 
 
@@ -345,7 +349,7 @@ class __$CreateReportProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of CreateReportProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? dateTime = freezed,Object? category = freezed,Object? otherCategoryName = freezed,Object? location = freezed,Object? description = freezed,Object? medias = null,Object? acknowledgedReportIds = null,Object? creatingHazardReports = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? dateTime = freezed,Object? category = freezed,Object? otherCategoryName = freezed,Object? location = freezed,Object? description = freezed,Object? medias = null,Object? reportSubmitted = null,Object? acknowledgedReportIds = null,Object? creatingHazardReports = null,}) {
   return _then(_CreateReportProviderState(
 dateTime: freezed == dateTime ? _self.dateTime : dateTime // ignore: cast_nullable_to_non_nullable
 as DateTime?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
@@ -353,7 +357,8 @@ as HazardCategory?,otherCategoryName: freezed == otherCategoryName ? _self.other
 as String?,location: freezed == location ? _self.location : location // ignore: cast_nullable_to_non_nullable
 as AlrtLocation?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,medias: null == medias ? _self._medias : medias // ignore: cast_nullable_to_non_nullable
-as List<AlrtMedia>,acknowledgedReportIds: null == acknowledgedReportIds ? _self._acknowledgedReportIds : acknowledgedReportIds // ignore: cast_nullable_to_non_nullable
+as List<AlrtMedia>,reportSubmitted: null == reportSubmitted ? _self.reportSubmitted : reportSubmitted // ignore: cast_nullable_to_non_nullable
+as bool,acknowledgedReportIds: null == acknowledgedReportIds ? _self._acknowledgedReportIds : acknowledgedReportIds // ignore: cast_nullable_to_non_nullable
 as List<String>,creatingHazardReports: null == creatingHazardReports ? _self._creatingHazardReports : creatingHazardReports // ignore: cast_nullable_to_non_nullable
 as List<CreatingHazardReport>,
   ));

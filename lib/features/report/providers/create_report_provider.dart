@@ -35,6 +35,8 @@ class CreateReportProvider extends StateNotifier<CreateReportProviderState> {
 
   /// Creates a new hazard report using the data in the current state.
   Future<void> createReport() async {
+    updateReportSubmitted(true);
+
     final hazard = Hazard(
       title:
           '${state.category?.name ?? 'Unknown'} Hazard at ${state.location?.name ?? 'Unknown Location'}',
@@ -123,6 +125,11 @@ class CreateReportProvider extends StateNotifier<CreateReportProviderState> {
     updateMedias(
       state.medias.where((media) => media.id != mediaId).toList(),
     );
+  }
+
+  /// Updates [CreateReportProviderState.reportSubmitted] with the given [reportSubmitted].
+  void updateReportSubmitted(final bool reportSubmitted) {
+    state = state.copyWith(reportSubmitted: reportSubmitted);
   }
 
   /// Updates [CreateReportProviderState.creatingHazardReports] with the given [creatingHazardReports].

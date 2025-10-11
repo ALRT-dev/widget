@@ -31,6 +31,9 @@ abstract class CreateReportProviderState with _$CreateReportProviderState {
     /// The list of media associated with the hazard report.
     @Default(<AlrtMedia>[]) final List<AlrtMedia> medias,
 
+    /// Whether the report has been submitted.
+    @Default(false) final bool reportSubmitted,
+
     /// The list of [CreatingHazardReport.id]s that have been acknowledged.
     ///
     /// i.e A success or error toast has been shown for these reports.

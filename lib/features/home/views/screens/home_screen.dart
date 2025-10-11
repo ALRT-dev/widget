@@ -109,7 +109,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           for (final report in newItems) {
             report.state.maybeWhen(
               success: (hazard) => context.showSuccessToast(
-                message: 'Report submitted successfully!',
+                message: 'Report has been reviewed and posted successfully.',
               ),
               error: _handleError,
               orElse: () {},

@@ -34,6 +34,10 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
     super.initState();
     _descriptionController.text =
         ref.read(providerOfCreateReport).description ?? '';
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(providerOfCreateReport.notifier).updateReportSubmitted(false);
+    });
   }
 
   @override
@@ -54,22 +58,69 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
         ],
       ),
       bottomNavigationBar: _submitButtonBuilder(),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20.spMin),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 20.h,
-          children: [
-            _dateTimeBuilder(),
-            _categoryBuilder(),
-            _locationBuilder(),
-            _descriptionBuilder(),
-            _mediaBuilder(),
-            0.hSizedBox,
-          ],
-        ),
+      body: Consumer(
+        builder: (context, ref, child) {
+          final reportSubmitted = ref.watch(
+            providerOfCreateReport.select(
+              (value) => value.reportSubmitted,
+            ),
+          );
+          return reportSubmitted ? _submittedBuilder() : _formBuilder();
+        },
       ),
     ).keyboardDismisser(context);
+  }
+
+  Widget _formBuilder() {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(20.spMin),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 20.h,
+        children: [
+          _dateTimeBuilder(),
+          _categoryBuilder(),
+          _locationBuilder(),
+          _descriptionBuilder(),
+          _mediaBuilder(),
+          0.hSizedBox,
+        ],
+      ),
+    );
+  }
+
+  Widget _submittedBuilder() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.check_circle_rounded,
+            color: AppColors.black,
+            size: 80.spMin,
+          ),
+          10.hSizedBox,
+          Text(
+            'Report Submitted!',
+            style: TextStyle(
+              fontSize: 18.spMin,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          5.hSizedBox,
+          Text(
+            'Your report has been submitted. We will review it shortly and let you know afterwards.',
+            style: TextStyle(
+              fontSize: 14.spMin,
+              fontWeight: FontWeight.normal,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          20.hSizedBox,
+          _submitAnotherButtonBuilder(),
+        ],
+      ).pX(20.0),
+    );
   }
 
   Widget _titleBuilder(final String title) {
@@ -239,23 +290,46 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
   }
 
   Widget _submitButtonBuilder() {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.theme.scaffoldBackgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowColorMedium,
-            blurRadius: 3,
-            offset: const Offset(0, -1),
+    return Consumer(
+      builder: (context, ref, child) {
+        final reportSubmitted = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.reportSubmitted,
           ),
-        ],
-      ),
-      padding: EdgeInsets.all(10.spMin),
-      child: Button.filled(
-        value: 'Submit Report',
-        icon: Icon(Icons.check_rounded),
-        onPressed: _handleSubmitReport,
-      ),
+        );
+        if (reportSubmitted) return const SizedBox.shrink();
+
+        final hasAllRequiredDataEntered = _hasAllRequiredDataEntered(ref);
+        if (!hasAllRequiredDataEntered) return const SizedBox.shrink();
+
+        return Container(
+          decoration: BoxDecoration(
+            color: context.theme.scaffoldBackgroundColor,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorMedium,
+                blurRadius: 3,
+                offset: const Offset(0, -1),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.all(10.spMin),
+          child: Button.filled(
+            value: 'Submit Report',
+            icon: Icon(Icons.check_rounded),
+            onPressed: _handleSubmitReport,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _submitAnotherButtonBuilder() {
+    return Button.filled(
+      width: 300.0,
+      value: 'Submit Another Report',
+      icon: Icon(Icons.add_rounded),
+      onPressed: _handleAnotherReport,
     );
   }
 
@@ -290,6 +364,19 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
             value.location != null ||
             (value.description != null && value.description!.isNotEmpty) ||
             (value.medias.isNotEmpty),
+      ),
+    );
+  }
+
+  /// Checks if all required data has been entered in the form.
+  bool _hasAllRequiredDataEntered(final WidgetRef ref) {
+    return ref.watch(
+      providerOfCreateReport.select(
+        (value) =>
+            value.dateTime != null &&
+            value.category != null &&
+            value.location != null &&
+            (value.description != null && value.description!.isNotEmpty),
       ),
     );
   }
@@ -389,9 +476,11 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
   /// Handles the submission of the report.
   void _handleSubmitReport() {
     ref.read(providerOfCreateReport.notifier).createReport();
-    context.showSuccessToast(
-      message: 'Your report is being submitted...',
-    );
     _clearAll();
+  }
+
+  /// Handles the action when user wants to submit another report.
+  void _handleAnotherReport() {
+    ref.read(providerOfCreateReport.notifier).updateReportSubmitted(false);
   }
 }
