@@ -2,8 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -25,7 +27,7 @@ class _HazardNotificationsListItemState
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: _gotoViewHazard,
       borderRadius: BorderRadius.circular(10.r),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +119,7 @@ class _HazardNotificationsListItemState
                   offset: Offset(0.0, 0.0),
                   blurRadius: 10.0,
                   color: AppColors.black.withValues(alpha: 0.4),
-                )
+                ),
               ],
             ),
           ).pL(3.0).pB(2.0),
@@ -139,6 +141,14 @@ class _HazardNotificationsListItemState
           fit: BoxFit.cover,
         ),
       ),
+    );
+  }
+
+  /// Navigate to the View Hazard screen with the current hazard as an argument.
+  void _gotoViewHazard() {
+    context.push(
+      ViewHazardScreen.route,
+      extra: ViewHazardScreenArgs(hazard: widget.hazard),
     );
   }
 }

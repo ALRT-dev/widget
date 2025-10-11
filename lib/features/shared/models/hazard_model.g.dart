@@ -9,8 +9,9 @@ part of 'hazard_model.dart';
 _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   id: json['id'] as String?,
   title: json['title'] as String?,
-  shortDescription: json['shortDescription'] as String?,
   description: json['description'] as String?,
+  shortDescription: json['shortDescription'] as String?,
+  visibility: json['visibility'] as bool? ?? true,
   severity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['severity']),
   source: json['source'] as String?,
   latitude: (json['latitude'] as num?)?.toDouble(),
@@ -19,6 +20,13 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   category: json['category'] == null
       ? null
       : HazardCategory.fromJson(json['category'] as Map<String, dynamic>),
+  aiSummary: json['aiSummary'] as String?,
+  aiFeedback: json['aiFeedback'] as String?,
+  aiSeverity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['aiSeverity']),
+  aiConfidence: $enumDecodeNullable(
+    _$AIConfidenceEnumMap,
+    json['aiConfidence'],
+  ),
   occuredAt: json['occuredAt'] == null
       ? null
       : DateTime.parse(json['occuredAt'] as String),
@@ -36,14 +44,19 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
 Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'id': ?instance.id,
   'title': ?instance.title,
-  'shortDescription': ?instance.shortDescription,
   'description': ?instance.description,
+  'shortDescription': ?instance.shortDescription,
+  'visibility': instance.visibility,
   'severity': ?_$HazardSeverityEnumMap[instance.severity],
   'source': ?instance.source,
   'latitude': ?instance.latitude,
   'longitude': ?instance.longitude,
   'categoryId': ?instance.categoryId,
   'category': ?instance.category?.toJson(),
+  'aiSummary': ?instance.aiSummary,
+  'aiFeedback': ?instance.aiFeedback,
+  'aiSeverity': ?_$HazardSeverityEnumMap[instance.aiSeverity],
+  'aiConfidence': ?_$AIConfidenceEnumMap[instance.aiConfidence],
   'occuredAt': ?instance.occuredAt?.toIso8601String(),
   'createdAt': ?instance.createdAt?.toIso8601String(),
   'updatedAt': ?instance.updatedAt?.toIso8601String(),
@@ -55,4 +68,10 @@ const _$HazardSeverityEnumMap = {
   HazardSeverity.advice: 'advice',
   HazardSeverity.watchAndAct: 'watchAndAct',
   HazardSeverity.emergency: 'emergency',
+};
+
+const _$AIConfidenceEnumMap = {
+  AIConfidence.low: 'low',
+  AIConfidence.medium: 'medium',
+  AIConfidence.high: 'high',
 };
