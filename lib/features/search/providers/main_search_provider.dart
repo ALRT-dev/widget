@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
@@ -32,6 +34,8 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
   UserService get _userService => _ref.read(providerOfUserService);
   HazardCategoriesProvider get _hazardCategoriesProvider =>
       _ref.read(providerOfHazardCategoriesForSearch.notifier);
+  NotificationsFeedProvider get _notificationsFeedProvider =>
+      _ref.read(providerOfNotificationsFeed.notifier);
 
   /// Fetches hazards for the given location and updates the state accordingly.
   Future<void> getHazards() async {
@@ -50,6 +54,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         northeastLng: location.bounds?.northeastLng,
         southwestLat: location.bounds?.southwestLat,
         southwestLng: location.bounds?.southwestLng,
+        categoryIds: state.selectedCategories.map((e) => e.id).toList(),
       ),
     );
     if (!mounted) return;
@@ -106,6 +111,9 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
             subscription,
           ),
         );
+
+        // after subscribing to a location, refresh the notifications feed
+        _notificationsFeedProvider.getNotificationsFeed();
       },
       (error) {
         state = state.copyWith(
@@ -138,6 +146,9 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         state = state.copyWith(
           unsubscribeFromLocationState: UnsubscribeFromLocationState.success(),
         );
+
+        // after unsubscribing from a location, refresh the notifications feed
+        _notificationsFeedProvider.getNotificationsFeed();
       },
       (error) {
         state = state.copyWith(
@@ -169,6 +180,13 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
 
     // every time the searched location is updated, reset the subscriptionId
     updateSubscriptionId(null);
+  }
+
+  /// Updates [MainSearchProviderState.selectedCategories] with the given [categories].
+  void updateSelectedCategories(final List<HazardCategory> categories) {
+    state = state.copyWith(
+      selectedCategories: categories,
+    );
   }
 
   /// Updates [MainSearchProviderState.hazards] with the given [hazards].

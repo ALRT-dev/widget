@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
 
@@ -11,6 +12,9 @@ abstract class MainSearchProviderState with _$MainSearchProviderState {
   const factory MainSearchProviderState({
     /// The location selected from the search results.
     final AlrtLocation? searchedLocation,
+
+    /// The list of categories selected to filter hazards.
+    @Default(<HazardCategory>[]) final List<HazardCategory> selectedCategories,
 
     /// The hazards fetched from the search results after a successful fetch.
     @Default(<Hazard>[]) final List<Hazard> hazards,

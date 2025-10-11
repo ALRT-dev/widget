@@ -11,6 +11,7 @@ import 'package:hazard_app/features/search/views/widgets/hazard_categories_list.
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -76,6 +77,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
                 15.hSizedBox,
                 HazardCategoriesList(
                   categoriesKey: HazardSearchAppBar.categoriesKey,
+                  onCategoriesSelectionUpdated: _handleCategorySelectionChanged,
                 ),
                 if (isCategoriesPresent) 15.hSizedBox,
                 Divider(
@@ -201,6 +203,15 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
     // update the main search provider with the selected location and fetch hazards.
     ref.read(providerOfMainSearch.notifier)
       ..updateSearchedLocation(place.toAlrtLocation)
+      ..getHazards();
+  }
+
+  /// Handles the event when the category selection changes.
+  void _handleCategorySelectionChanged(
+    final List<HazardCategory> selectedCategories,
+  ) {
+    ref.read(providerOfMainSearch.notifier)
+      ..updateSelectedCategories(selectedCategories)
       ..getHazards();
   }
 }

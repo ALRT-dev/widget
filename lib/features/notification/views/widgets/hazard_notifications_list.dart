@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
+import 'package:hazard_app/features/notification/providers/states/notifications_feed_provider_state.dart';
 import 'package:hazard_app/features/notification/views/widgets/hazard_notifications_list_item.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
-import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
@@ -20,18 +22,18 @@ class _HazardNotificationsListState
     extends ConsumerState<HazardNotificationsList> {
   @override
   Widget build(BuildContext context) {
-    final getHazardsState = ref.watch(
-      providerOfHazards.select(
-        (value) => value.getListHazardsState,
+    final getNotificationsFeedState = ref.watch(
+      providerOfNotificationsFeed.select(
+        (value) => value.getNotificationsFeed,
       ),
     );
 
-    return switch (getHazardsState) {
-      GetHazardsStateLoading() => _loadingBuilder(),
-      GetHazardsStateError() => _errorBuilder(),
-      GetHazardsStateSuccess() => _dataBuilder(),
-      _ => const SizedBox(),
-    };
+    return getNotificationsFeedState.maybeWhen(
+      loading: _loadingBuilder,
+      success: (_) => _dataBuilder(),
+      error: (error) => _errorBuilder(),
+      orElse: () => const SizedBox(),
+    );
   }
 
   Widget _loadingBuilder() {
@@ -42,39 +44,48 @@ class _HazardNotificationsListState
 
   Widget _emptyBuilder() {
     return SliverFillRemaining(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Nothing to show!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
+      child: Consumer(
+        builder: (context, ref, child) {
+          final isSearchActive = ref.watch(
+            providerOfHazards.select(
+              (value) =>
+                  value.tempSearchParams.searchString?.isNotEmpty ?? false,
             ),
-          ),
-          Consumer(
-            builder: (context, ref, child) {
-              final isSearchActive = ref.watch(
-                providerOfHazards.select(
-                  (value) =>
-                      value.tempSearchParams.searchString?.isNotEmpty ?? false,
-                ),
-              );
-
-              return Text(
-                isSearchActive
-                    ? 'No results found for your search. Please try changing it.'
-                    : 'There are no data available at the moment. Please check back later.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                ),
-              );
-            },
-          ),
-        ],
-      ).pad(20.0),
+          );
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 10.spMin,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/notifications_tab_unselected.svg',
+                width: 40.spMin,
+              ),
+              Column(
+                spacing: 5.spMin,
+                children: [
+                  Text(
+                    'Nothing to show!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    isSearchActive
+                        ? 'No results found for your search. Please try changing it.'
+                        : 'There are no hazard notifications at the moment. Please check back later.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ).pad(20.0);
+        },
+      ),
     );
   }
 
@@ -103,8 +114,8 @@ class _HazardNotificationsListState
     return Consumer(
       builder: (context, ref, child) {
         final hazards = ref.watch(
-          providerOfHazards.select(
-            (value) => value.listHazards,
+          providerOfNotificationsFeed.select(
+            (value) => value.hazards,
           ),
         );
         if (hazards.isEmpty) {

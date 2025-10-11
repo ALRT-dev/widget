@@ -17,3 +17,8 @@ const kUrlUnsubscribeLocation = '$kUrlUser/unsubscribe-location';
 const kUrlHazards = '/hazards';
 const kUrlHazardsWithCategories = '$kUrlHazards/hazards-with-categories';
 const kUrlHazardCategories = '/hazard-categories';
+
+// ---------------------------- NOTIFICATION ----------------------------
+
+const kUrlNotifications = '/notifications';
+const kUrlNotificationsFeed = '$kUrlNotifications/feed';

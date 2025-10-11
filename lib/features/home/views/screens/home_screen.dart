@@ -6,6 +6,7 @@ import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/providers/map_search_text_editing_controller_provider.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/views/screens/map_screen.dart';
+import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/views/screens/notifications_screen.dart';
 import 'package:hazard_app/features/report/providers/create_report_provider.dart';
 import 'package:hazard_app/features/report/views/screens/create_report_screen.dart';
@@ -32,12 +33,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   );
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
-  }
-
-  @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
@@ -53,6 +48,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfPlacesForMap.select((value) => null));
     ref.watch(providerOfPlacesForSearch.select((value) => null));
     ref.watch(providerOfMainSearch.select((value) => null));
+    ref.watch(providerOfNotificationsFeed.select((value) => null));
     ref.watch(providerOfHazardCategoriesForSearch.select((value) => null));
     ref.watch(
       providerOfHazardCategoriesForNotifications.select((value) => null),
@@ -76,12 +72,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         tabController: _tabController,
       ),
     );
-  }
-
-  void _onInit() {
-    ref
-        .read(providerOfHazardCategoriesForNotifications.notifier)
-        .getHazardCategories();
   }
 
   /// Listens to changes in the hazards state and updates the map markers accordingly.

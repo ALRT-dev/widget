@@ -61,4 +61,11 @@ abstract class RestClient {
 
   @GET(kUrlHazardCategories)
   Future<List<HazardCategory>> getHazardCategories();
+
+  // ---------------------------- NOTIFICATION ----------------------------
+
+  @GET(kUrlNotificationsFeed)
+  Future<GetHazardsWithCategoriesResponse> getNotificationsFeed({
+    @Queries() final HazardSearchParams? searchParams,
+  });
 }
