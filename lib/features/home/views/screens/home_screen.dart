@@ -9,10 +9,13 @@ import 'package:hazard_app/features/map/views/screens/map_screen.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/views/screens/notifications_screen.dart';
 import 'package:hazard_app/features/report/providers/create_report_provider.dart';
+import 'package:hazard_app/features/report/providers/states/create_report_provider_state.dart';
 import 'package:hazard_app/features/report/views/screens/create_report_screen.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/views/screens/hazard_search_screen.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
+import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -55,6 +58,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
 
     _listenToHazardsState();
+    _listenToCreateReportState();
 
     return Scaffold(
       body: TabBarView(
@@ -85,6 +89,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ref.read(providerOfMap.notifier).generateMarkers();
         }
       },
+    );
+  }
+
+  /// Listens to changes in the create report state and shows appropriate toasts.
+  void _listenToCreateReportState() {
+    ref.listen(
+      providerOfCreateReport.select(
+        (value) => value.creatingHazardReports,
+      ),
+      (prev, next) {
+        if (prev != next) {
+          final newItems = next.where(
+            (item) => !(prev ?? []).any(
+              (prevItem) => prevItem.state == item.state,
+            ),
+          );
+
+          for (final report in newItems) {
+            report.state.maybeWhen(
+              success: (hazard) => context.showSuccessToast(
+                message: 'Report submitted successfully!',
+              ),
+              error: _handleError,
+              orElse: () {},
+            );
+          }
+        }
+      },
+    );
+  }
+
+  /// Handles errors by showing a toast message.
+  void _handleError(AppError error) {
+    context.showErrorToast(
+      message: error.message,
     );
   }
 }

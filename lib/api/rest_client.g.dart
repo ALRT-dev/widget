@@ -195,6 +195,33 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<Hazard> createHazardReport({required Hazard hazard}) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = hazard;
+    final _options = _setStreamType<Hazard>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/hazards',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late Hazard _value;
+    try {
+      _value = Hazard.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<GetHazardsWithCategoriesResponse> getGetHazardsWithCategories({
     required HazardSearchParams searchParams,
   }) async {

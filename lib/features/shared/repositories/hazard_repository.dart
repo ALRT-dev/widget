@@ -13,6 +13,10 @@ abstract class HazardRepository {
     required final HazardSearchParams searchParams,
   });
 
+  Future<Either<Hazard, AppError>> createHazardReport({
+    required final Hazard hazard,
+  });
+
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
   getGetHazardsWithCategories({
     required final HazardSearchParams searchParams,
@@ -67,6 +71,20 @@ class HazardRepositoryImpl extends HazardRepository {
       name: 'getHazardCategories',
       future: () async {
         final result = await _restClient.getHazardCategories();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<Hazard, AppError>> createHazardReport({
+    required Hazard hazard,
+  }) {
+    return runAsyncCall(
+      name: 'createHazardReport',
+      future: () async {
+        final result = await _restClient.createHazardReport(hazard: hazard);
         return Success(result);
       },
       onError: Failure.new,

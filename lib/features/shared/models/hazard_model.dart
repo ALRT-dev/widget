@@ -8,14 +8,17 @@ part 'hazard_model.g.dart';
 @freezed
 abstract class Hazard with _$Hazard {
   const factory Hazard({
-    required final String id,
+    final String? id,
     final String? title,
     final String? shortDescription,
+    final String? description,
     final HazardSeverity? severity,
     final String? source,
     final double? latitude,
     final double? longitude,
+    final String? categoryId,
     final HazardCategory? category,
+    final DateTime? occuredAt,
     final DateTime? createdAt,
     final DateTime? updatedAt,
     final DateTime? expiresAt,

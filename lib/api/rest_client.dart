@@ -54,6 +54,11 @@ abstract class RestClient {
     @Queries() required final HazardSearchParams searchParams,
   });
 
+  @POST(kUrlHazards)
+  Future<Hazard> createHazardReport({
+    @Body() required final Hazard hazard,
+  });
+
   @GET(kUrlHazardsWithCategories)
   Future<GetHazardsWithCategoriesResponse> getGetHazardsWithCategories({
     @Queries() required final HazardSearchParams searchParams,

@@ -165,7 +165,8 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
             return CategoriesDropdown(
               button: _inputBuilder(
                 hintText: 'Select a category',
-                value: selectedCategory?.emoji != null &&
+                value:
+                    selectedCategory?.emoji != null &&
                         selectedCategory?.name != null
                     ? '${selectedCategory!.emoji} ${selectedCategory.name}'
                     : selectedCategory?.name,
@@ -253,21 +254,43 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
       child: Button.filled(
         value: 'Submit Report',
         icon: Icon(Icons.check_rounded),
-        onPressed: () {},
+        onPressed: _handleSubmitReport,
       ),
     );
   }
 
   Widget _clearAllBuilder() {
-    return RoundButton(
-      icon: Icon(
-        Icons.delete_rounded,
-        color: AppColors.black,
-        size: 24.spMin,
+    return Consumer(
+      builder: (context, ref, child) {
+        final hasAnyDataEntered = _hasAnyDataEntered(ref);
+        if (!hasAnyDataEntered) {
+          return const SizedBox.shrink();
+        }
+        return RoundButton(
+          icon: Icon(
+            Icons.delete_rounded,
+            color: AppColors.black,
+            size: 24.spMin,
+          ),
+          size: 35.0,
+          backgroundColor: AppColors.lightGrey.withValues(alpha: 0.7),
+          onPressed: _clearAll,
+        );
+      },
+    );
+  }
+
+  /// Checks if any data has been entered in the form.
+  bool _hasAnyDataEntered(final WidgetRef ref) {
+    return ref.watch(
+      providerOfCreateReport.select(
+        (value) =>
+            value.dateTime != null ||
+            value.category != null ||
+            value.location != null ||
+            (value.description != null && value.description!.isNotEmpty) ||
+            (value.medias.isNotEmpty),
       ),
-      size: 35.0,
-      backgroundColor: AppColors.lightGrey.withValues(alpha: 0.7),
-      onPressed: _clearAll,
     );
   }
 
@@ -275,7 +298,8 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
   void _openDateTimePicker() {
     context.unfocusInputs();
 
-    final initialDate = ref.read(providerOfCreateReport).dateTime ??
+    final initialDate =
+        ref.read(providerOfCreateReport).dateTime ??
         // DateTime.now() is not working here somehow so using this workaround
         DateTime(
           DateTime.now().year,
@@ -358,8 +382,16 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
   /// Clears all the inputs and resets the state.
   void _clearAll() {
     context.unfocusInputs();
-
     _descriptionController.clear();
-    ref.invalidate(providerOfCreateReport);
+    ref.read(providerOfCreateReport.notifier).resetAllFields();
+  }
+
+  /// Handles the submission of the report.
+  void _handleSubmitReport() {
+    ref.read(providerOfCreateReport.notifier).createReport();
+    context.showSuccessToast(
+      message: 'Your report is being submitted...',
+    );
+    _clearAll();
   }
 }

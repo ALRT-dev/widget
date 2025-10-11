@@ -24,6 +24,15 @@ class HazardService {
     );
   }
 
+  /// Creates a new hazard report on the server.
+  Future<Either<Hazard, AppError>> createHazardReport({
+    required final Hazard hazard,
+  }) {
+    return _hazardRepository.createHazardReport(
+      hazard: hazard,
+    );
+  }
+
   /// Fetches hazards along with categories from the server.
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
   getGetHazardsWithCategories({

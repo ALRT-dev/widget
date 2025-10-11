@@ -23,18 +23,18 @@ import 'package:widget_to_marker/widget_to_marker.dart';
 
 final providerOfMap =
     StateNotifierProvider.autoDispose<MapProvider, MapProviderState>(
-  (ref) => MapProvider(
-    ref: ref,
-    state: MapProviderState(),
-  ),
-);
+      (ref) => MapProvider(
+        ref: ref,
+        state: MapProviderState(),
+      ),
+    );
 
 class MapProvider extends StateNotifier<MapProviderState> {
   MapProvider({
     required final Ref ref,
     required final MapProviderState state,
-  })  : _ref = ref,
-        super(state) {
+  }) : _ref = ref,
+       super(state) {
     _onInit();
   }
 
@@ -143,8 +143,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
       },
       (l) {
         state = state.copyWith(
-          getAddressFromCoordinatesState:
-              GetAddressFromCoordinatesState.error(l),
+          getAddressFromCoordinatesState: GetAddressFromCoordinatesState.error(
+            l,
+          ),
         );
       },
     );
@@ -214,8 +215,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
     Future.delayed(const Duration(milliseconds: 500), () {
       if (!mounted) return;
 
-      _headingStreamSubscription =
-          _locationService.getHeadingStream().listen((heading) {
+      _headingStreamSubscription = _locationService.getHeadingStream().listen((
+        heading,
+      ) {
         if (!mounted) return;
 
         if (lastHeading == null || (heading - (lastHeading ?? 0)).abs() > 6) {
@@ -260,24 +262,29 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     for (final hazard in hazards) {
       if (hazard.latitude != null && hazard.longitude != null) {
-        final markerFuture = CustomMarker(
-          markerImagePath:
-              hazard.severity?.markerPath ?? HazardSeverity.info.markerPath,
-          emoji: hazard.category?.emoji ?? '❗',
-        ).toBitmapDescriptor().then((bitmapDescriptor) {
-          return Marker(
-            markerId: MarkerId(hazard.id),
-            position: LatLng(
-              hazard.latitude!,
-              hazard.longitude!,
-            ),
-            infoWindow: InfoWindow(
-              title: hazard.title,
-              snippet: hazard.shortDescription,
-            ),
-            icon: bitmapDescriptor,
-          );
-        });
+        final markerFuture =
+            CustomMarker(
+              markerImagePath:
+                  hazard.severity?.markerPath ?? HazardSeverity.info.markerPath,
+              emoji: hazard.category?.emoji ?? '❗',
+            ).toBitmapDescriptor().then(
+              (bitmapDescriptor) {
+                return Marker(
+                  markerId: MarkerId(
+                    hazard.id ?? '${hazard.latitude},${hazard.longitude}',
+                  ),
+                  position: LatLng(
+                    hazard.latitude!,
+                    hazard.longitude!,
+                  ),
+                  infoWindow: InfoWindow(
+                    title: hazard.title,
+                    snippet: hazard.shortDescription,
+                  ),
+                  icon: bitmapDescriptor,
+                );
+              },
+            );
         markerFutures.add(markerFuture);
       }
     }
@@ -327,7 +334,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
   void addPolylineForRoutePlan() {
     if (state.currentRoutePlan?.currentRoute?.routes.isEmpty ?? true) return;
     final routePoints = state
-        .currentRoutePlan?.currentRoute?.routes.first.polylinePoints
+        .currentRoutePlan
+        ?.currentRoute
+        ?.routes
+        .first
+        .polylinePoints
         ?.map((e) => LatLng(e.latitude, e.longitude))
         .toList();
     if (routePoints == null || routePoints.isEmpty) return;
@@ -364,9 +375,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
 
     // Remove existing selected location marker if any
-    final updatedMarkers = Set<Marker>.from(state.markers)
-        .where((m) => m.markerId.value != 'selected_location')
-        .toSet();
+    final updatedMarkers = Set<Marker>.from(
+      state.markers,
+    ).where((m) => m.markerId.value != 'selected_location').toSet();
 
     // Add the new selected location marker
     updatedMarkers.add(marker);
@@ -376,9 +387,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
   /// Removes the marker for the selected location if it exists.
   void removeSelectedLocationMarker() {
-    final updatedMarkers = Set<Marker>.from(state.markers)
-        .where((m) => m.markerId.value != 'selected_location')
-        .toSet();
+    final updatedMarkers = Set<Marker>.from(
+      state.markers,
+    ).where((m) => m.markerId.value != 'selected_location').toSet();
     updateMarkers(updatedMarkers);
   }
 

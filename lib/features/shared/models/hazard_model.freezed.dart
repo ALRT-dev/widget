@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Hazard {
 
- String get id; String? get title; String? get shortDescription; HazardSeverity? get severity; String? get source; double? get latitude; double? get longitude; HazardCategory? get category; DateTime? get createdAt; DateTime? get updatedAt; DateTime? get expiresAt;
+ String? get id; String? get title; String? get shortDescription; String? get description; HazardSeverity? get severity; String? get source; double? get latitude; double? get longitude; String? get categoryId; HazardCategory? get category; DateTime? get occuredAt; DateTime? get createdAt; DateTime? get updatedAt; DateTime? get expiresAt;
 /// Create a copy of Hazard
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $HazardCopyWith<Hazard> get copyWith => _$HazardCopyWithImpl<Hazard>(this as Haz
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Hazard&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.shortDescription, shortDescription) || other.shortDescription == shortDescription)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.source, source) || other.source == source)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.category, category) || other.category == category)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Hazard&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.shortDescription, shortDescription) || other.shortDescription == shortDescription)&&(identical(other.description, description) || other.description == description)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.source, source) || other.source == source)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.category, category) || other.category == category)&&(identical(other.occuredAt, occuredAt) || other.occuredAt == occuredAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,shortDescription,severity,source,latitude,longitude,category,createdAt,updatedAt,expiresAt);
+int get hashCode => Object.hash(runtimeType,id,title,shortDescription,description,severity,source,latitude,longitude,categoryId,category,occuredAt,createdAt,updatedAt,expiresAt);
 
 @override
 String toString() {
-  return 'Hazard(id: $id, title: $title, shortDescription: $shortDescription, severity: $severity, source: $source, latitude: $latitude, longitude: $longitude, category: $category, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
+  return 'Hazard(id: $id, title: $title, shortDescription: $shortDescription, description: $description, severity: $severity, source: $source, latitude: $latitude, longitude: $longitude, categoryId: $categoryId, category: $category, occuredAt: $occuredAt, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $HazardCopyWith<$Res>  {
   factory $HazardCopyWith(Hazard value, $Res Function(Hazard) _then) = _$HazardCopyWithImpl;
 @useResult
 $Res call({
- String id, String? title, String? shortDescription, HazardSeverity? severity, String? source, double? latitude, double? longitude, HazardCategory? category, DateTime? createdAt, DateTime? updatedAt, DateTime? expiresAt
+ String? id, String? title, String? shortDescription, String? description, HazardSeverity? severity, String? source, double? latitude, double? longitude, String? categoryId, HazardCategory? category, DateTime? occuredAt, DateTime? createdAt, DateTime? updatedAt, DateTime? expiresAt
 });
 
 
@@ -65,17 +65,20 @@ class _$HazardCopyWithImpl<$Res>
 
 /// Create a copy of Hazard
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = freezed,Object? shortDescription = freezed,Object? severity = freezed,Object? source = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? category = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? expiresAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? title = freezed,Object? shortDescription = freezed,Object? description = freezed,Object? severity = freezed,Object? source = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? categoryId = freezed,Object? category = freezed,Object? occuredAt = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? expiresAt = freezed,}) {
   return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,shortDescription: freezed == shortDescription ? _self.shortDescription : shortDescription // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,severity: freezed == severity ? _self.severity : severity // ignore: cast_nullable_to_non_nullable
 as HazardSeverity?,source: freezed == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
 as String?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as HazardCategory?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as double?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
+as String?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
+as HazardCategory?,occuredAt: freezed == occuredAt ? _self.occuredAt : occuredAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -175,10 +178,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? title,  String? shortDescription,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  HazardCategory? category,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? title,  String? shortDescription,  String? description,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  String? categoryId,  HazardCategory? category,  DateTime? occuredAt,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Hazard() when $default != null:
-return $default(_that.id,_that.title,_that.shortDescription,_that.severity,_that.source,_that.latitude,_that.longitude,_that.category,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
+return $default(_that.id,_that.title,_that.shortDescription,_that.description,_that.severity,_that.source,_that.latitude,_that.longitude,_that.categoryId,_that.category,_that.occuredAt,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
   return orElse();
 
 }
@@ -196,10 +199,10 @@ return $default(_that.id,_that.title,_that.shortDescription,_that.severity,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? title,  String? shortDescription,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  HazardCategory? category,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? title,  String? shortDescription,  String? description,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  String? categoryId,  HazardCategory? category,  DateTime? occuredAt,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)  $default,) {final _that = this;
 switch (_that) {
 case _Hazard():
-return $default(_that.id,_that.title,_that.shortDescription,_that.severity,_that.source,_that.latitude,_that.longitude,_that.category,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
+return $default(_that.id,_that.title,_that.shortDescription,_that.description,_that.severity,_that.source,_that.latitude,_that.longitude,_that.categoryId,_that.category,_that.occuredAt,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -216,10 +219,10 @@ return $default(_that.id,_that.title,_that.shortDescription,_that.severity,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? title,  String? shortDescription,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  HazardCategory? category,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? title,  String? shortDescription,  String? description,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  String? categoryId,  HazardCategory? category,  DateTime? occuredAt,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Hazard() when $default != null:
-return $default(_that.id,_that.title,_that.shortDescription,_that.severity,_that.source,_that.latitude,_that.longitude,_that.category,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
+return $default(_that.id,_that.title,_that.shortDescription,_that.description,_that.severity,_that.source,_that.latitude,_that.longitude,_that.categoryId,_that.category,_that.occuredAt,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
   return null;
 
 }
@@ -231,17 +234,20 @@ return $default(_that.id,_that.title,_that.shortDescription,_that.severity,_that
 @JsonSerializable()
 
 class _Hazard implements Hazard {
-  const _Hazard({required this.id, this.title, this.shortDescription, this.severity, this.source, this.latitude, this.longitude, this.category, this.createdAt, this.updatedAt, this.expiresAt});
+  const _Hazard({this.id, this.title, this.shortDescription, this.description, this.severity, this.source, this.latitude, this.longitude, this.categoryId, this.category, this.occuredAt, this.createdAt, this.updatedAt, this.expiresAt});
   factory _Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);
 
-@override final  String id;
+@override final  String? id;
 @override final  String? title;
 @override final  String? shortDescription;
+@override final  String? description;
 @override final  HazardSeverity? severity;
 @override final  String? source;
 @override final  double? latitude;
 @override final  double? longitude;
+@override final  String? categoryId;
 @override final  HazardCategory? category;
+@override final  DateTime? occuredAt;
 @override final  DateTime? createdAt;
 @override final  DateTime? updatedAt;
 @override final  DateTime? expiresAt;
@@ -259,16 +265,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Hazard&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.shortDescription, shortDescription) || other.shortDescription == shortDescription)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.source, source) || other.source == source)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.category, category) || other.category == category)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Hazard&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.shortDescription, shortDescription) || other.shortDescription == shortDescription)&&(identical(other.description, description) || other.description == description)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.source, source) || other.source == source)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.category, category) || other.category == category)&&(identical(other.occuredAt, occuredAt) || other.occuredAt == occuredAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,title,shortDescription,severity,source,latitude,longitude,category,createdAt,updatedAt,expiresAt);
+int get hashCode => Object.hash(runtimeType,id,title,shortDescription,description,severity,source,latitude,longitude,categoryId,category,occuredAt,createdAt,updatedAt,expiresAt);
 
 @override
 String toString() {
-  return 'Hazard(id: $id, title: $title, shortDescription: $shortDescription, severity: $severity, source: $source, latitude: $latitude, longitude: $longitude, category: $category, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
+  return 'Hazard(id: $id, title: $title, shortDescription: $shortDescription, description: $description, severity: $severity, source: $source, latitude: $latitude, longitude: $longitude, categoryId: $categoryId, category: $category, occuredAt: $occuredAt, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
 }
 
 
@@ -279,7 +285,7 @@ abstract mixin class _$HazardCopyWith<$Res> implements $HazardCopyWith<$Res> {
   factory _$HazardCopyWith(_Hazard value, $Res Function(_Hazard) _then) = __$HazardCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? title, String? shortDescription, HazardSeverity? severity, String? source, double? latitude, double? longitude, HazardCategory? category, DateTime? createdAt, DateTime? updatedAt, DateTime? expiresAt
+ String? id, String? title, String? shortDescription, String? description, HazardSeverity? severity, String? source, double? latitude, double? longitude, String? categoryId, HazardCategory? category, DateTime? occuredAt, DateTime? createdAt, DateTime? updatedAt, DateTime? expiresAt
 });
 
 
@@ -296,17 +302,20 @@ class __$HazardCopyWithImpl<$Res>
 
 /// Create a copy of Hazard
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = freezed,Object? shortDescription = freezed,Object? severity = freezed,Object? source = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? category = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? expiresAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? title = freezed,Object? shortDescription = freezed,Object? description = freezed,Object? severity = freezed,Object? source = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? categoryId = freezed,Object? category = freezed,Object? occuredAt = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? expiresAt = freezed,}) {
   return _then(_Hazard(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String?,shortDescription: freezed == shortDescription ? _self.shortDescription : shortDescription // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,severity: freezed == severity ? _self.severity : severity // ignore: cast_nullable_to_non_nullable
 as HazardSeverity?,source: freezed == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
 as String?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
-as HazardCategory?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as double?,categoryId: freezed == categoryId ? _self.categoryId : categoryId // ignore: cast_nullable_to_non_nullable
+as String?,category: freezed == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
+as HazardCategory?,occuredAt: freezed == occuredAt ? _self.occuredAt : occuredAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
