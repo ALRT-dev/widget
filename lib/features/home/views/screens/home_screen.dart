@@ -8,6 +8,7 @@ import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/views/screens/map_screen.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/views/screens/notifications_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/profile_screen.dart';
 import 'package:hazard_app/features/report/providers/create_report_provider.dart';
 import 'package:hazard_app/features/report/providers/states/create_report_provider_state.dart';
 import 'package:hazard_app/features/report/views/screens/create_report_screen.dart';
@@ -69,7 +70,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           const HazardSearchScreen(),
           const CreateReportScreen(),
           const NotificationsScreen(),
-          const SizedBox(),
+          const ProfileScreen(),
         ],
       ),
       bottomNavigationBar: HomeTabbar(
