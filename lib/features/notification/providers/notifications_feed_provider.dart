@@ -164,6 +164,10 @@ class NotificationsFeedProvider
 
   /// Adds a new hazard to the existing list of hazards in the state.
   void addToHazards(final Hazard newHazard) {
+    final index = state.hazards.indexWhere(
+      (hazard) => hazard.id == newHazard.id,
+    );
+    if (index != -1) return; // hazard already exists, do not add it again
     updateHazards([newHazard, ...state.hazards]);
   }
 
