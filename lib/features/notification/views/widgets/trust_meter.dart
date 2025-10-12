@@ -70,6 +70,7 @@ class _TrustMeterState extends ConsumerState<TrustMeter> {
         ],
       ),
       child: Row(
+        spacing: 3.spMin,
         children: [
           // Downvote zone
           GestureDetector(

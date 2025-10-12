@@ -47,7 +47,7 @@ class _HazardCategoriesListItemState
             Text(
               widget.hazardCategory.emoji!,
               style: TextStyle(
-                fontSize: 16.sp,
+                fontSize: 16.spMin,
                 height: 1.0,
               ),
             ),

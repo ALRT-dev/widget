@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/notification/views/widgets/trust_meter.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
+import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
@@ -43,7 +44,7 @@ class _HazardNotificationsListItemState
       borderRadius: BorderRadius.circular(10.r),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 10.w,
+        spacing: 10.spMin,
         children: [
           _iconBuilder(),
           Expanded(
@@ -59,7 +60,7 @@ class _HazardNotificationsListItemState
                       TextSpan(
                         text: widget.hazard.title ?? 'No Title',
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 15.spMin,
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
                         ),
@@ -68,7 +69,7 @@ class _HazardNotificationsListItemState
                         TextSpan(
                           text: ' • ',
                           style: TextStyle(
-                            fontSize: 12.sp,
+                            fontSize: 12.spMin,
                             color: AppColors.grey,
                           ),
                         ),
@@ -80,7 +81,7 @@ class _HazardNotificationsListItemState
                               )
                               .replaceAll('~', ''),
                           style: TextStyle(
-                            fontSize: 10.sp,
+                            fontSize: 10.spMin,
                             color: AppColors.grey,
                             fontWeight: FontWeight.w500,
                           ),
@@ -98,7 +99,7 @@ class _HazardNotificationsListItemState
                       color: Colors.grey[600],
                     ),
                   ),
-                SizedBox(height: 8.h),
+                8.hSizedBox,
                 Consumer(
                   builder: (context, ref, child) {
                     final voteType = ref.watch(
@@ -125,13 +126,13 @@ class _HazardNotificationsListItemState
 
   Widget _iconBuilder() {
     return Container(
-      width: 45.w,
-      height: 45.w,
+      width: 45.spMin,
+      height: 45.spMin,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: widget.hazard.severity?.color,
       ),
-      padding: EdgeInsets.all(8.w),
+      padding: EdgeInsets.all(8.spMin),
       child: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -141,7 +142,7 @@ class _HazardNotificationsListItemState
           child: Text(
             widget.hazard.category?.emoji ?? '❗',
             style: TextStyle(
-              fontSize: 16.sp,
+              fontSize: 16.spMin,
               shadows: [
                 Shadow(
                   offset: Offset(0.0, 0.0),
