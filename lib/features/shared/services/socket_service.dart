@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/api/interceptors/auth_interceptor.dart';
+import 'package:hazard_app/features/shared/enums/socket_event_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/providers/dio_instance_provider.dart';
 import 'package:hazard_app/features/shared/providers/repository_providers.dart';
@@ -32,6 +33,11 @@ class SocketService {
   Stream<bool> get onSocketConnectionChanged =>
       _onSocketConnectionChangedStreamController.stream;
 
+  StreamSubscription<bool>? _onSocketConnectionChangedListener;
+  final Map<String, void Function(dynamic)> _pendingEventListeners = {};
+  final Map<String, void Function(dynamic)> _activeEventListeners = {};
+
+  /// Connects to the Socket.IO server with authentication.
   Future<Either<void, AppError>> connect() {
     return runAsyncCall(
       name: 'connectSocket',
@@ -72,6 +78,13 @@ class SocketService {
           _isSocketConnected = true;
           _onSocketConnectionChangedStreamController.add(true);
 
+          // Register any pending event listeners
+          _pendingEventListeners.forEach((eventName, callback) {
+            _socket.on(eventName, callback);
+            _activeEventListeners[eventName] = callback;
+          });
+          _pendingEventListeners.clear();
+
           if (!completer.isCompleted) {
             completer.complete();
           }
@@ -82,6 +95,9 @@ class SocketService {
 
           _isSocketConnected = false;
           _onSocketConnectionChangedStreamController.add(false);
+
+          // Clear active listeners as socket is disconnected
+          _activeEventListeners.clear();
         });
 
         _socket.onError((error) {
@@ -125,48 +141,90 @@ class SocketService {
     );
   }
 
+  /// Disconnects from the Socket.IO server if connected.
   Future<Either<void, AppError>> disconnect() {
     return runAsyncCall(
       name: 'disconnectSocket',
       future: () async {
-        if (_isSocketConnected) _socket.dispose();
+        if (_isSocketConnected) {
+          _socket.dispose();
+          _activeEventListeners.clear();
+          _pendingEventListeners.clear();
+          _onSocketConnectionChangedListener?.cancel();
+          _onSocketConnectionChangedListener = null;
+        }
         return Success(null);
       },
       onError: Failure.new,
     );
   }
 
-  /// Test method to check if the Socket.IO server is reachable
-  Future<Either<void, AppError>> testSocketConnection() {
-    return runAsyncCall(
-      name: 'testSocketConnection',
-      future: () async {
-        final socketUrl = _dioInstance.options.baseUrl.substring(
-          0,
-          _dioInstance.options.baseUrl.length - 4,
-        );
+  /// Listens to the specified [event] and invokes [onData] when the event is received.
+  /// If the same event is registered multiple times, the previous listener will be replaced.
+  Future<void> listenToEvent(
+    SocketEvent event,
+    void Function(dynamic data) onData,
+  ) async {
+    final eventName = event.name;
 
-        log('Testing Socket.IO connection to: $socketUrl');
+    if (_isSocketConnected) {
+      // Remove existing listener if any
+      if (_activeEventListeners.containsKey(eventName)) {
+        _socket.off(eventName);
+      }
 
-        try {
-          // Try to make a simple HTTP request to the socket.io endpoint
-          final response = await _dioInstance.get('$socketUrl/socket.io/');
-          log('Socket.IO endpoint test response: ${response.statusCode}');
-          return Success(null);
-        } catch (e) {
-          log('Socket.IO endpoint test failed: $e');
-          throw AppError(
-            message:
-                'Socket.IO server not reachable at $socketUrl/socket.io/\n'
-                'Please check:\n'
-                '1. Is your backend server running?\n'
-                '2. Is Socket.IO configured correctly?\n'
-                '3. Is the correct port (9000) being used?\n'
-                'Error: $e',
+      // Add new listener
+      _socket.on(eventName, onData);
+      _activeEventListeners[eventName] = onData;
+    } else {
+      // Store the listener to be registered when socket connects
+      _pendingEventListeners[eventName] = onData;
+
+      // Set up connection listener only if not already listening
+      _onSocketConnectionChangedListener ??=
+          _onSocketConnectionChangedStreamController.stream.listen(
+            (isConnected) {
+              if (isConnected && _pendingEventListeners.isNotEmpty) {
+                // Listeners will be registered in the onConnect callback
+                _onSocketConnectionChangedListener?.cancel();
+                _onSocketConnectionChangedListener = null;
+              }
+            },
           );
-        }
-      },
-      onError: Failure.new,
-    );
+    }
+  }
+
+  /// Removes the listener for the specified [event].
+  void removeEventListener(final SocketEvent event) {
+    final eventName = event.name;
+
+    if (_isSocketConnected && _activeEventListeners.containsKey(eventName)) {
+      _socket.off(eventName);
+      _activeEventListeners.remove(eventName);
+    }
+
+    // Also remove from pending listeners
+    _pendingEventListeners.remove(eventName);
+  }
+
+  /// Removes all event listeners.
+  void removeAllEventListeners() {
+    if (_isSocketConnected) {
+      for (final eventName in _activeEventListeners.keys) {
+        _socket.off(eventName);
+      }
+    }
+
+    _activeEventListeners.clear();
+    _pendingEventListeners.clear();
+    _onSocketConnectionChangedListener?.cancel();
+    _onSocketConnectionChangedListener = null;
+  }
+
+  /// Disposes of all resources and closes the socket connection.
+  /// Call this when the SocketService is no longer needed.
+  Future<void> dispose() async {
+    await disconnect();
+    await _onSocketConnectionChangedStreamController.close();
   }
 }

@@ -35,7 +35,7 @@ class HomeProvider extends StateNotifier<HomeProviderState> {
   Future<void> _connectSocket() async {
     _socketService.connect();
     _ref.onDispose(
-      () => _socketService.disconnect(),
+      () => _socketService.dispose(),
     );
   }
 

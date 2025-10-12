@@ -4,11 +4,13 @@ import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
+import 'package:hazard_app/features/shared/enums/socket_event_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
+import 'package:hazard_app/features/shared/services/socket_service.dart';
 import 'package:hazard_app/features/shared/services/user_service.dart';
 
 final providerOfMainSearch =
@@ -27,15 +29,43 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
     required final Ref ref,
     required final MainSearchProviderState state,
   }) : _ref = ref,
-       super(state);
+       super(state) {
+    _listenToSocketForHazards();
+  }
 
   final Ref _ref;
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   UserService get _userService => _ref.read(providerOfUserService);
+  SocketService get _socketService => _ref.read(providerOfSocketService);
   HazardCategoriesProvider get _hazardCategoriesProvider =>
       _ref.read(providerOfHazardCategoriesForSearch.notifier);
   NotificationsFeedProvider get _notificationsFeedProvider =>
       _ref.read(providerOfNotificationsFeed.notifier);
+
+  /// Sets up socket listeners for hazard updates and deletions.
+  void _listenToSocketForHazards() {
+    _socketService.listenToEvent(
+      SocketEvent.updateHazard,
+      (data) {
+        if (data is Map<String, dynamic>) {
+          final updatedHazard = Hazard.fromJson(data);
+          updateHazard(updatedHazard);
+        }
+      },
+    );
+
+    _socketService.listenToEvent(
+      SocketEvent.deleteHazard,
+      (data) {
+        if (data is Map<String, dynamic>) {
+          final hazardId = data['id'] as String?;
+          if (hazardId != null) {
+            removeFromHazards(hazardId);
+          }
+        }
+      },
+    );
+  }
 
   /// Fetches hazards for the given location and updates the state accordingly.
   Future<void> getHazards() async {
@@ -193,6 +223,29 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
   void updateHazards(List<Hazard> hazards) {
     state = state.copyWith(
       hazards: hazards,
+    );
+  }
+
+  /// Updates a single hazard in [MainSearchProviderState.hazards] with the given [updatedHazard].
+  void updateHazard(final Hazard updatedHazard) {
+    final updatedHazards = state.hazards.map((hazard) {
+      if (hazard.id == updatedHazard.id) {
+        return updatedHazard;
+      }
+      return hazard;
+    }).toList();
+    updateHazards(updatedHazards);
+  }
+
+  /// Adds a new hazard to the existing list of hazards in the state.
+  void addToHazards(final Hazard newHazard) {
+    updateHazards([newHazard, ...state.hazards]);
+  }
+
+  /// Removes a hazard from the existing list of hazards in the state.
+  void removeFromHazards(final String hazardId) {
+    updateHazards(
+      state.hazards.where((hazard) => hazard.id != hazardId).toList(),
     );
   }
 

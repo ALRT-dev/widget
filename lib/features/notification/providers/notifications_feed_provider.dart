@@ -31,7 +31,8 @@ class NotificationsFeedProvider
     required final NotificationsFeedProviderState state,
   }) : _ref = ref,
        super(state) {
-    _onInit();
+    getNotificationsFeed();
+    _listenToSocketForHazards();
   }
 
   final Ref _ref;
@@ -41,40 +42,10 @@ class NotificationsFeedProvider
   HazardCategoriesProvider get _hazardCategoriesProvider =>
       _ref.read(providerOfHazardCategoriesForNotifications.notifier);
 
-  StreamSubscription<bool>? _onSocketConnectionChangedListener;
-
-  void _onInit() async {
-    await getNotificationsFeed();
-    if (!mounted) return;
-
-    if (_socketService.isSocketConnected) {
-      _listenToSocketForNewHazards();
-    } else {
-      _onSocketConnectionChangedListener?.cancel();
-      _onSocketConnectionChangedListener = _socketService
-          .onSocketConnectionChanged
-          .listen(
-            (isConnected) {
-              if (isConnected) {
-                _listenToSocketForNewHazards();
-              } else {
-                _socketService.socket.off(SocketEvent.newHazard.name);
-              }
-            },
-          );
-    }
-
-    _ref.onDispose(() {
-      _onSocketConnectionChangedListener?.cancel();
-      _onSocketConnectionChangedListener = null;
-      _socketService.socket.off(SocketEvent.newHazard.name);
-    });
-  }
-
-  /// Listens to the socket for new hazards and adds them to the notifications feed.
-  void _listenToSocketForNewHazards() {
-    _socketService.socket.on(
-      SocketEvent.newHazard.name,
+  /// Listens to the socket for hazards and adds/updates/removes them from the notifications feed.
+  void _listenToSocketForHazards() {
+    _socketService.listenToEvent(
+      SocketEvent.newHazard,
       (data) {
         if (data is Map<String, dynamic>) {
           final newHazard = Hazard.fromJson(data);
@@ -95,6 +66,28 @@ class NotificationsFeedProvider
             }
           } else {
             addToHazards(newHazard);
+          }
+        }
+      },
+    );
+
+    _socketService.listenToEvent(
+      SocketEvent.updateHazard,
+      (data) {
+        if (data is Map<String, dynamic>) {
+          final updatedHazard = Hazard.fromJson(data);
+          updateHazard(updatedHazard);
+        }
+      },
+    );
+
+    _socketService.listenToEvent(
+      SocketEvent.deleteHazard,
+      (data) {
+        if (data is Map<String, dynamic>) {
+          final hazardId = data['id'] as String?;
+          if (hazardId != null) {
+            removeFromHazards(hazardId);
           }
         }
       },
@@ -158,9 +151,27 @@ class NotificationsFeedProvider
     );
   }
 
+  /// Updates a hazard in the existing list of hazards in the state.
+  void updateHazard(final Hazard updatedHazard) {
+    final updatedHazards = state.hazards.map((hazard) {
+      if (hazard.id == updatedHazard.id) {
+        return updatedHazard;
+      }
+      return hazard;
+    }).toList();
+    updateHazards(updatedHazards);
+  }
+
   /// Adds a new hazard to the existing list of hazards in the state.
   void addToHazards(final Hazard newHazard) {
     updateHazards([newHazard, ...state.hazards]);
+  }
+
+  /// Removes a hazard from the existing list of hazards in the state.
+  void removeFromHazards(final String hazardId) {
+    updateHazards(
+      state.hazards.where((hazard) => hazard.id != hazardId).toList(),
+    );
   }
 
   /// Updates [NotificationsFeedProviderState.getNotificationsFeed] to loading state.
