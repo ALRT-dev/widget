@@ -1,21 +1,38 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
+import 'package:hazard_app/features/shared/utils/error_codes.dart';
 
 abstract class NotificationRepository {
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
   getNotificationsFeed({final HazardSearchParams? searchParams});
+
+  Future<Either<String, AppError>> getFCMToken({
+    final String? vapidKey,
+  });
+
+  Future<Either<void, AppError>> sendPushNotificationToken({
+    required final String token,
+  });
+
+  Future<Either<RemoteMessage?, AppError>> getInitialPushNotificationMessage();
+
+  Stream<RemoteMessage> onPushNotificationMessageOpenedApp();
 }
 
 class NotificationRepositoryImpl implements NotificationRepository {
   NotificationRepositoryImpl({
     required final RestClient restClient,
-  }) : _restClient = restClient;
+    required final FirebaseMessaging firebaseMessaging,
+  }) : _restClient = restClient,
+       _firebaseMessaging = firebaseMessaging;
 
   final RestClient _restClient;
+  final FirebaseMessaging _firebaseMessaging;
 
   @override
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
@@ -32,5 +49,81 @@ class NotificationRepositoryImpl implements NotificationRepository {
       },
       onError: Failure.new,
     );
+  }
+
+  @override
+  Future<Either<String, AppError>> getFCMToken({
+    String? vapidKey,
+  }) {
+    return runAsyncCall(
+      name: 'getNotificationToken',
+      future: () async {
+        final notificationSettings = await _firebaseMessaging.requestPermission(
+          carPlay: true,
+        );
+        if (notificationSettings.authorizationStatus ==
+            AuthorizationStatus.authorized) {
+          final token = await _firebaseMessaging.getToken(
+            vapidKey: vapidKey,
+          );
+
+          if (token == null) {
+            throw AppError(
+              message: 'Failed to get notification token.',
+            );
+          }
+
+          return Success(token);
+        } else if (notificationSettings.authorizationStatus ==
+                AuthorizationStatus.denied ||
+            notificationSettings.authorizationStatus ==
+                AuthorizationStatus.notDetermined) {
+          throw AppError(
+            code: ksNotificationPermissionDenied,
+            message:
+                'User declined or has not accepted the notification permission.',
+          );
+        }
+
+        throw AppError(
+          code: ksUnknownErrorCode,
+          message: ksUnknownErrorMessage,
+        );
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> sendPushNotificationToken({
+    required String token,
+  }) {
+    return runAsyncCall(
+      name: 'sendPushNotificationToken',
+      future: () async {
+        await _restClient.sendPushNotificationToken(
+          token: token,
+        );
+        return Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<RemoteMessage?, AppError>> getInitialPushNotificationMessage() {
+    return runAsyncCall(
+      name: 'getInitialNotificationMessage',
+      future: () async {
+        final remoteMessage = await _firebaseMessaging.getInitialMessage();
+        return Success(remoteMessage);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Stream<RemoteMessage> onPushNotificationMessageOpenedApp() {
+    return FirebaseMessaging.onMessageOpenedApp;
   }
 }

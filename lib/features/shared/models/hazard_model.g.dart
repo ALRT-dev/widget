@@ -27,6 +27,9 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
     _$AIConfidenceEnumMap,
     json['aiConfidence'],
   ),
+  reportedBy: json['reportedBy'] == null
+      ? null
+      : AppUser.fromJson(json['reportedBy'] as Map<String, dynamic>),
   occuredAt: json['occuredAt'] == null
       ? null
       : DateTime.parse(json['occuredAt'] as String),
@@ -57,6 +60,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'aiFeedback': ?instance.aiFeedback,
   'aiSeverity': ?_$HazardSeverityEnumMap[instance.aiSeverity],
   'aiConfidence': ?_$AIConfidenceEnumMap[instance.aiConfidence],
+  'reportedBy': ?instance.reportedBy?.toJson(),
   'occuredAt': ?instance.occuredAt?.toIso8601String(),
   'createdAt': ?instance.createdAt?.toIso8601String(),
   'updatedAt': ?instance.updatedAt?.toIso8601String(),

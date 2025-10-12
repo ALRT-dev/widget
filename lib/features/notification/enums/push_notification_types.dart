@@ -1,0 +1,4 @@
+enum PushNotificationType {
+  unknown,
+  viewHazard,
+}

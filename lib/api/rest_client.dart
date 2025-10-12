@@ -73,4 +73,9 @@ abstract class RestClient {
   Future<GetHazardsWithCategoriesResponse> getNotificationsFeed({
     @Queries() final HazardSearchParams? searchParams,
   });
+
+  @POST(kUrlNotificationsPushNotificationToken)
+  Future<HttpResponse> sendPushNotificationToken({
+    @Field() required final String token,
+  });
 }

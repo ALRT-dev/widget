@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 
 part 'hazard_model.freezed.dart';
@@ -53,6 +54,9 @@ abstract class Hazard with _$Hazard {
 
     /// The AI-determined confidence level of the hazard.
     final AIConfidence? aiConfidence,
+
+    /// The user who reported the hazard.
+    final AppUser? reportedBy,
 
     /// The date and time when the hazard occurred.
     final DateTime? occuredAt,

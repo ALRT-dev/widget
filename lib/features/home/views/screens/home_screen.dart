@@ -1,12 +1,19 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
+import 'package:hazard_app/features/home/providers/home_provider.dart';
 import 'package:hazard_app/features/home/widgets/home_tabbar.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/providers/map_search_text_editing_controller_provider.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/views/screens/map_screen.dart';
+import 'package:hazard_app/features/notification/enums/push_notification_types.dart';
+import 'package:hazard_app/features/notification/extensions/remote_message_extension.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
+import 'package:hazard_app/features/notification/providers/push_notification_message_provider.dart';
 import 'package:hazard_app/features/notification/views/screens/notifications_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/profile_screen.dart';
 import 'package:hazard_app/features/report/providers/create_report_provider.dart';
@@ -17,7 +24,9 @@ import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/views/screens/hazard_search_screen.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
+import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   /// Displays the home screen of the app.
@@ -45,6 +54,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   Widget build(BuildContext context) {
     // register this provider to the lifecycle of this screen
+    ref.watch(providerOfHome.select((value) => null));
     ref.watch(providerOfMap.select((value) => null));
     ref.watch(providerOfHazards.select((value) => null));
     ref.watch(providerOfCreateReport.select((value) => null));
@@ -57,9 +67,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(
       providerOfHazardCategoriesForNotifications.select((value) => null),
     );
+    ref.watch(providerOfPushNotificationMessage.select((value) => null));
 
     _listenToHazardsState();
     _listenToCreateReportState();
+    _listenToTheMessageRecievedFromThePushNotification();
 
     return Scaffold(
       body: TabBarView(
@@ -109,12 +121,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
           for (final report in newItems) {
             report.state.maybeWhen(
-              success: (hazard) => context.showSuccessToast(
-                message: 'Report has been reviewed and posted successfully.',
-              ),
+              success: (hazard) {
+                if (hazard.visibility) {
+                  context.showSuccessToast(
+                    message:
+                        'Your alrt report has been reviewed and posted successfully.',
+                  );
+                } else {
+                  context.showErrorToast(
+                    message:
+                        hazard.aiFeedback ?? 'Your alrt report is invalid.',
+                  );
+                }
+              },
               error: _handleError,
               orElse: () {},
             );
+          }
+        }
+      },
+    );
+  }
+
+  /// Listens to the message received from the push notification.
+  void _listenToTheMessageRecievedFromThePushNotification() {
+    ref.listen(
+      providerOfPushNotificationMessage.select(
+        (value) => value.receivedPushNotifMessage,
+      ),
+      (prev, remoteMessage) {
+        if (remoteMessage != null) {
+          log('Remote Message: ${remoteMessage.data}');
+
+          switch (remoteMessage.type) {
+            case PushNotificationType.viewHazard:
+              return _gotoViewHazardScreen(
+                Hazard.fromJson(remoteMessage.payload),
+              );
+            default:
           }
         }
       },
@@ -125,6 +169,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void _handleError(AppError error) {
     context.showErrorToast(
       message: error.message,
+    );
+  }
+
+  /// Navigates to the view hazard screen with the hazard from the [data].
+  void _gotoViewHazardScreen(final Hazard hazard) {
+    context.push(
+      ViewHazardScreen.route,
+      extra: ViewHazardScreenArgs(hazard: hazard),
     );
   }
 }

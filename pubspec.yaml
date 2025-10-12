@@ -45,6 +45,8 @@ dependencies:
   mime: ^2.0.0
   collection: ^1.19.1
   flutter_compass: ^0.8.1
+  firebase_core: ^4.1.1
+  firebase_messaging: ^16.0.2
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -15,8 +16,8 @@ final providerOfConnectivityInstance = Provider<Connectivity>(
 /// Provider of [InternetConnectionChecker] instance.
 final providerOfInternetConnectionCheckerInstance =
     Provider<InternetConnectionChecker>(
-  (ref) => InternetConnectionChecker.instance,
-);
+      (ref) => InternetConnectionChecker.instance,
+    );
 
 /// Provider of [SharedPreferences] instance.
 final providerOfSharedPreferencesInstance = StateProvider<SharedPreferences?>(
@@ -33,4 +34,9 @@ final providerOfPolylinePointsInstance = Provider<PolylinePoints>(
   (ref) => PolylinePoints(
     apiKey: Env.googleMapsApiKey,
   ),
+);
+
+/// Provider of [FirebaseMessaging] instance.
+final providerOfFirebaseMessagingInstance = Provider<FirebaseMessaging>(
+  (ref) => FirebaseMessaging.instance,
 );
