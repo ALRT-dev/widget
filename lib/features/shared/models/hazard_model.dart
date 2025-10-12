@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 
@@ -9,6 +10,8 @@ part 'hazard_model.g.dart';
 
 @freezed
 abstract class Hazard with _$Hazard {
+  const Hazard._();
+
   const factory Hazard({
     /// The id of the hazard.
     final String? id,
@@ -58,6 +61,15 @@ abstract class Hazard with _$Hazard {
     /// The user who reported the hazard.
     final AppUser? reportedBy,
 
+    /// The vote type (upvote or downvote) by the current user.
+    final HazardVoteType? userVoteType,
+
+    /// The total number of upvotes for the hazard.
+    @Default(0) final int upvoteCount,
+
+    /// The total number of downvotes for the hazard.
+    @Default(0) final int downvoteCount,
+
     /// The date and time when the hazard occurred.
     final DateTime? occuredAt,
 
@@ -70,6 +82,9 @@ abstract class Hazard with _$Hazard {
     /// The date and time when the hazard expires.
     final DateTime? expiresAt,
   }) = _Hazard;
+
+  /// The net vote count (upvotes - downvotes) for the hazard.
+  int get voteCount => upvoteCount - downvoteCount;
 
   factory Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);
 }

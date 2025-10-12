@@ -30,6 +30,12 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   reportedBy: json['reportedBy'] == null
       ? null
       : AppUser.fromJson(json['reportedBy'] as Map<String, dynamic>),
+  userVoteType: $enumDecodeNullable(
+    _$HazardVoteTypeEnumMap,
+    json['userVoteType'],
+  ),
+  upvoteCount: (json['upvoteCount'] as num?)?.toInt() ?? 0,
+  downvoteCount: (json['downvoteCount'] as num?)?.toInt() ?? 0,
   occuredAt: json['occuredAt'] == null
       ? null
       : DateTime.parse(json['occuredAt'] as String),
@@ -61,6 +67,9 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'aiSeverity': ?_$HazardSeverityEnumMap[instance.aiSeverity],
   'aiConfidence': ?_$AIConfidenceEnumMap[instance.aiConfidence],
   'reportedBy': ?instance.reportedBy?.toJson(),
+  'userVoteType': ?_$HazardVoteTypeEnumMap[instance.userVoteType],
+  'upvoteCount': instance.upvoteCount,
+  'downvoteCount': instance.downvoteCount,
   'occuredAt': ?instance.occuredAt?.toIso8601String(),
   'createdAt': ?instance.createdAt?.toIso8601String(),
   'updatedAt': ?instance.updatedAt?.toIso8601String(),
@@ -78,4 +87,9 @@ const _$AIConfidenceEnumMap = {
   AIConfidence.low: 'low',
   AIConfidence.medium: 'medium',
   AIConfidence.high: 'high',
+};
+
+const _$HazardVoteTypeEnumMap = {
+  HazardVoteType.upvote: 'upvote',
+  HazardVoteType.downvote: 'downvote',
 };

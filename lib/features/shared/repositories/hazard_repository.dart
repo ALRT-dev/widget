@@ -1,5 +1,6 @@
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
@@ -23,6 +24,11 @@ abstract class HazardRepository {
   });
 
   Future<Either<List<HazardCategory>, AppError>> getHazardCategories();
+
+  Future<Either<void, AppError>> voteHazard({
+    required final String hazardId,
+    required final HazardVoteType voteType,
+  });
 }
 
 class HazardRepositoryImpl extends HazardRepository {
@@ -86,6 +92,24 @@ class HazardRepositoryImpl extends HazardRepository {
       future: () async {
         final result = await _restClient.createHazardReport(hazard: hazard);
         return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> voteHazard({
+    required String hazardId,
+    required HazardVoteType voteType,
+  }) {
+    return runAsyncCall(
+      name: 'voteHazard',
+      future: () async {
+        await _restClient.voteHazard(
+          hazardId: hazardId,
+          voteType: voteType.name,
+        );
+        return Success(null);
       },
       onError: Failure.new,
     );

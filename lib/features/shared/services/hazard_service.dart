@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
@@ -46,5 +47,16 @@ class HazardService {
   /// Fetches the list of hazard categories from the server.
   Future<Either<List<HazardCategory>, AppError>> getHazardCategories() {
     return _hazardRepository.getHazardCategories();
+  }
+
+  /// Votes on a hazard report.
+  Future<Either<void, AppError>> voteOnHazard({
+    required final String hazardId,
+    required final HazardVoteType voteType,
+  }) {
+    return _hazardRepository.voteHazard(
+      hazardId: hazardId,
+      voteType: voteType,
+    );
   }
 }

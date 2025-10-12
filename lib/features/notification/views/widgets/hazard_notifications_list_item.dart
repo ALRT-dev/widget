@@ -1,11 +1,15 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/notification/views/widgets/trust_meter.dart';
+import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
+import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -25,8 +29,15 @@ class HazardNotificationsListItem extends ConsumerStatefulWidget {
 
 class _HazardNotificationsListItemState
     extends ConsumerState<HazardNotificationsListItem> {
+  late final provider = providerOfHazardItem(widget.hazard);
+
   @override
   Widget build(BuildContext context) {
+    // register this provider to the lifecycle of this widget
+    ref.watch(provider.select((value) => null));
+
+    _listenToVoteHazardState();
+
     return InkWell(
       onTap: _gotoViewHazard,
       borderRadius: BorderRadius.circular(10.r),
@@ -87,10 +98,26 @@ class _HazardNotificationsListItemState
                       color: Colors.grey[600],
                     ),
                   ),
+                SizedBox(height: 8.h),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final voteType = ref.watch(
+                      provider.select((value) => value.hazard.userVoteType),
+                    );
+                    final voteCount = ref.watch(
+                      provider.select((value) => value.hazard.voteCount),
+                    );
+
+                    return TrustMeter(
+                      initialVoteType: voteType,
+                      initialVoteCount: voteCount,
+                      onVotePressed: _voteOnHazard,
+                    );
+                  },
+                ),
               ],
             ),
           ),
-          _imageBuilder(),
         ],
       ).pad(10.0),
     ).pX(10.0);
@@ -129,19 +156,27 @@ class _HazardNotificationsListItemState
     );
   }
 
-  Widget _imageBuilder() {
-    return Container(
-      width: 50.w,
-      height: 50.w,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.r),
-        image: DecorationImage(
-          image: CachedNetworkImageProvider(
-            'https://c.files.bbci.co.uk/132A8/production/_127840587_brazillandslide.png',
-          ),
-          fit: BoxFit.cover,
-        ),
+  /// Listen to changes in the vote hazard state and show error messages if any.
+  void _listenToVoteHazardState() {
+    ref.listen<VoteHazardState>(
+      provider.select(
+        (value) => value.voteState,
       ),
+      (previous, next) {
+        if (previous != next) {
+          next.maybeWhen(
+            error: _handleErrors,
+            orElse: () {},
+          );
+        }
+      },
+    );
+  }
+
+  /// Handle error messages from the vote hazard state.
+  void _handleErrors(final AppError error) {
+    context.showErrorToast(
+      message: 'Unable to vote. Please try again.',
     );
   }
 
@@ -152,5 +187,10 @@ class _HazardNotificationsListItemState
       ViewHazardScreen.route,
       extra: ViewHazardScreenArgs(hazard: widget.hazard),
     );
+  }
+
+  /// Handle voting on the hazard by updating the provider and calling the vote function.
+  void _voteOnHazard(final HazardVoteType type) {
+    ref.read(provider.notifier).voteHazard(voteType: type);
   }
 }

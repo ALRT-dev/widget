@@ -67,6 +67,12 @@ abstract class RestClient {
   @GET(kUrlHazardCategories)
   Future<List<HazardCategory>> getHazardCategories();
 
+  @POST(kUrlHazardVote)
+  Future<HttpResponse> voteHazard({
+    @Path() required final String hazardId,
+    @Field() required final String voteType,
+  });
+
   // ---------------------------- NOTIFICATION ----------------------------
 
   @GET(kUrlNotificationsFeed)

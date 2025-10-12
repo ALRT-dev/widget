@@ -31,7 +31,10 @@ mixin _$Hazard {
  String? get aiFeedback;/// The AI-determined severity of the hazard.
  HazardSeverity? get aiSeverity;/// The AI-determined confidence level of the hazard.
  AIConfidence? get aiConfidence;/// The user who reported the hazard.
- AppUser? get reportedBy;/// The date and time when the hazard occurred.
+ AppUser? get reportedBy;/// The vote type (upvote or downvote) by the current user.
+ HazardVoteType? get userVoteType;/// The total number of upvotes for the hazard.
+ int get upvoteCount;/// The total number of downvotes for the hazard.
+ int get downvoteCount;/// The date and time when the hazard occurred.
  DateTime? get occuredAt;/// The date and time when the hazard was reported.
  DateTime? get createdAt;/// The date and time when the hazard was last updated.
  DateTime? get updatedAt;/// The date and time when the hazard expires.
@@ -48,16 +51,16 @@ $HazardCopyWith<Hazard> get copyWith => _$HazardCopyWithImpl<Hazard>(this as Haz
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Hazard&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.shortDescription, shortDescription) || other.shortDescription == shortDescription)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.source, source) || other.source == source)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.category, category) || other.category == category)&&(identical(other.aiSummary, aiSummary) || other.aiSummary == aiSummary)&&(identical(other.aiFeedback, aiFeedback) || other.aiFeedback == aiFeedback)&&(identical(other.aiSeverity, aiSeverity) || other.aiSeverity == aiSeverity)&&(identical(other.aiConfidence, aiConfidence) || other.aiConfidence == aiConfidence)&&(identical(other.reportedBy, reportedBy) || other.reportedBy == reportedBy)&&(identical(other.occuredAt, occuredAt) || other.occuredAt == occuredAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Hazard&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.shortDescription, shortDescription) || other.shortDescription == shortDescription)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.source, source) || other.source == source)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.category, category) || other.category == category)&&(identical(other.aiSummary, aiSummary) || other.aiSummary == aiSummary)&&(identical(other.aiFeedback, aiFeedback) || other.aiFeedback == aiFeedback)&&(identical(other.aiSeverity, aiSeverity) || other.aiSeverity == aiSeverity)&&(identical(other.aiConfidence, aiConfidence) || other.aiConfidence == aiConfidence)&&(identical(other.reportedBy, reportedBy) || other.reportedBy == reportedBy)&&(identical(other.userVoteType, userVoteType) || other.userVoteType == userVoteType)&&(identical(other.upvoteCount, upvoteCount) || other.upvoteCount == upvoteCount)&&(identical(other.downvoteCount, downvoteCount) || other.downvoteCount == downvoteCount)&&(identical(other.occuredAt, occuredAt) || other.occuredAt == occuredAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,title,description,shortDescription,visibility,severity,source,latitude,longitude,categoryId,category,aiSummary,aiFeedback,aiSeverity,aiConfidence,reportedBy,occuredAt,createdAt,updatedAt,expiresAt]);
+int get hashCode => Object.hashAll([runtimeType,id,title,description,shortDescription,visibility,severity,source,latitude,longitude,categoryId,category,aiSummary,aiFeedback,aiSeverity,aiConfidence,reportedBy,userVoteType,upvoteCount,downvoteCount,occuredAt,createdAt,updatedAt,expiresAt]);
 
 @override
 String toString() {
-  return 'Hazard(id: $id, title: $title, description: $description, shortDescription: $shortDescription, visibility: $visibility, severity: $severity, source: $source, latitude: $latitude, longitude: $longitude, categoryId: $categoryId, category: $category, aiSummary: $aiSummary, aiFeedback: $aiFeedback, aiSeverity: $aiSeverity, aiConfidence: $aiConfidence, reportedBy: $reportedBy, occuredAt: $occuredAt, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
+  return 'Hazard(id: $id, title: $title, description: $description, shortDescription: $shortDescription, visibility: $visibility, severity: $severity, source: $source, latitude: $latitude, longitude: $longitude, categoryId: $categoryId, category: $category, aiSummary: $aiSummary, aiFeedback: $aiFeedback, aiSeverity: $aiSeverity, aiConfidence: $aiConfidence, reportedBy: $reportedBy, userVoteType: $userVoteType, upvoteCount: $upvoteCount, downvoteCount: $downvoteCount, occuredAt: $occuredAt, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
 }
 
 
@@ -68,7 +71,7 @@ abstract mixin class $HazardCopyWith<$Res>  {
   factory $HazardCopyWith(Hazard value, $Res Function(Hazard) _then) = _$HazardCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? title, String? description, String? shortDescription, bool visibility, HazardSeverity? severity, String? source, double? latitude, double? longitude, String? categoryId, HazardCategory? category, String? aiSummary, String? aiFeedback, HazardSeverity? aiSeverity, AIConfidence? aiConfidence, AppUser? reportedBy, DateTime? occuredAt, DateTime? createdAt, DateTime? updatedAt, DateTime? expiresAt
+ String? id, String? title, String? description, String? shortDescription, bool visibility, HazardSeverity? severity, String? source, double? latitude, double? longitude, String? categoryId, HazardCategory? category, String? aiSummary, String? aiFeedback, HazardSeverity? aiSeverity, AIConfidence? aiConfidence, AppUser? reportedBy, HazardVoteType? userVoteType, int upvoteCount, int downvoteCount, DateTime? occuredAt, DateTime? createdAt, DateTime? updatedAt, DateTime? expiresAt
 });
 
 
@@ -85,7 +88,7 @@ class _$HazardCopyWithImpl<$Res>
 
 /// Create a copy of Hazard
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? title = freezed,Object? description = freezed,Object? shortDescription = freezed,Object? visibility = null,Object? severity = freezed,Object? source = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? categoryId = freezed,Object? category = freezed,Object? aiSummary = freezed,Object? aiFeedback = freezed,Object? aiSeverity = freezed,Object? aiConfidence = freezed,Object? reportedBy = freezed,Object? occuredAt = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? expiresAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? title = freezed,Object? description = freezed,Object? shortDescription = freezed,Object? visibility = null,Object? severity = freezed,Object? source = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? categoryId = freezed,Object? category = freezed,Object? aiSummary = freezed,Object? aiFeedback = freezed,Object? aiSeverity = freezed,Object? aiConfidence = freezed,Object? reportedBy = freezed,Object? userVoteType = freezed,Object? upvoteCount = null,Object? downvoteCount = null,Object? occuredAt = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? expiresAt = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -103,7 +106,10 @@ as String?,aiFeedback: freezed == aiFeedback ? _self.aiFeedback : aiFeedback // 
 as String?,aiSeverity: freezed == aiSeverity ? _self.aiSeverity : aiSeverity // ignore: cast_nullable_to_non_nullable
 as HazardSeverity?,aiConfidence: freezed == aiConfidence ? _self.aiConfidence : aiConfidence // ignore: cast_nullable_to_non_nullable
 as AIConfidence?,reportedBy: freezed == reportedBy ? _self.reportedBy : reportedBy // ignore: cast_nullable_to_non_nullable
-as AppUser?,occuredAt: freezed == occuredAt ? _self.occuredAt : occuredAt // ignore: cast_nullable_to_non_nullable
+as AppUser?,userVoteType: freezed == userVoteType ? _self.userVoteType : userVoteType // ignore: cast_nullable_to_non_nullable
+as HazardVoteType?,upvoteCount: null == upvoteCount ? _self.upvoteCount : upvoteCount // ignore: cast_nullable_to_non_nullable
+as int,downvoteCount: null == downvoteCount ? _self.downvoteCount : downvoteCount // ignore: cast_nullable_to_non_nullable
+as int,occuredAt: freezed == occuredAt ? _self.occuredAt : occuredAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
@@ -216,10 +222,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? title,  String? description,  String? shortDescription,  bool visibility,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  String? categoryId,  HazardCategory? category,  String? aiSummary,  String? aiFeedback,  HazardSeverity? aiSeverity,  AIConfidence? aiConfidence,  AppUser? reportedBy,  DateTime? occuredAt,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? title,  String? description,  String? shortDescription,  bool visibility,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  String? categoryId,  HazardCategory? category,  String? aiSummary,  String? aiFeedback,  HazardSeverity? aiSeverity,  AIConfidence? aiConfidence,  AppUser? reportedBy,  HazardVoteType? userVoteType,  int upvoteCount,  int downvoteCount,  DateTime? occuredAt,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Hazard() when $default != null:
-return $default(_that.id,_that.title,_that.description,_that.shortDescription,_that.visibility,_that.severity,_that.source,_that.latitude,_that.longitude,_that.categoryId,_that.category,_that.aiSummary,_that.aiFeedback,_that.aiSeverity,_that.aiConfidence,_that.reportedBy,_that.occuredAt,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
+return $default(_that.id,_that.title,_that.description,_that.shortDescription,_that.visibility,_that.severity,_that.source,_that.latitude,_that.longitude,_that.categoryId,_that.category,_that.aiSummary,_that.aiFeedback,_that.aiSeverity,_that.aiConfidence,_that.reportedBy,_that.userVoteType,_that.upvoteCount,_that.downvoteCount,_that.occuredAt,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
   return orElse();
 
 }
@@ -237,10 +243,10 @@ return $default(_that.id,_that.title,_that.description,_that.shortDescription,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? title,  String? description,  String? shortDescription,  bool visibility,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  String? categoryId,  HazardCategory? category,  String? aiSummary,  String? aiFeedback,  HazardSeverity? aiSeverity,  AIConfidence? aiConfidence,  AppUser? reportedBy,  DateTime? occuredAt,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? title,  String? description,  String? shortDescription,  bool visibility,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  String? categoryId,  HazardCategory? category,  String? aiSummary,  String? aiFeedback,  HazardSeverity? aiSeverity,  AIConfidence? aiConfidence,  AppUser? reportedBy,  HazardVoteType? userVoteType,  int upvoteCount,  int downvoteCount,  DateTime? occuredAt,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)  $default,) {final _that = this;
 switch (_that) {
 case _Hazard():
-return $default(_that.id,_that.title,_that.description,_that.shortDescription,_that.visibility,_that.severity,_that.source,_that.latitude,_that.longitude,_that.categoryId,_that.category,_that.aiSummary,_that.aiFeedback,_that.aiSeverity,_that.aiConfidence,_that.reportedBy,_that.occuredAt,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
+return $default(_that.id,_that.title,_that.description,_that.shortDescription,_that.visibility,_that.severity,_that.source,_that.latitude,_that.longitude,_that.categoryId,_that.category,_that.aiSummary,_that.aiFeedback,_that.aiSeverity,_that.aiConfidence,_that.reportedBy,_that.userVoteType,_that.upvoteCount,_that.downvoteCount,_that.occuredAt,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -257,10 +263,10 @@ return $default(_that.id,_that.title,_that.description,_that.shortDescription,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? title,  String? description,  String? shortDescription,  bool visibility,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  String? categoryId,  HazardCategory? category,  String? aiSummary,  String? aiFeedback,  HazardSeverity? aiSeverity,  AIConfidence? aiConfidence,  AppUser? reportedBy,  DateTime? occuredAt,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? title,  String? description,  String? shortDescription,  bool visibility,  HazardSeverity? severity,  String? source,  double? latitude,  double? longitude,  String? categoryId,  HazardCategory? category,  String? aiSummary,  String? aiFeedback,  HazardSeverity? aiSeverity,  AIConfidence? aiConfidence,  AppUser? reportedBy,  HazardVoteType? userVoteType,  int upvoteCount,  int downvoteCount,  DateTime? occuredAt,  DateTime? createdAt,  DateTime? updatedAt,  DateTime? expiresAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Hazard() when $default != null:
-return $default(_that.id,_that.title,_that.description,_that.shortDescription,_that.visibility,_that.severity,_that.source,_that.latitude,_that.longitude,_that.categoryId,_that.category,_that.aiSummary,_that.aiFeedback,_that.aiSeverity,_that.aiConfidence,_that.reportedBy,_that.occuredAt,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
+return $default(_that.id,_that.title,_that.description,_that.shortDescription,_that.visibility,_that.severity,_that.source,_that.latitude,_that.longitude,_that.categoryId,_that.category,_that.aiSummary,_that.aiFeedback,_that.aiSeverity,_that.aiConfidence,_that.reportedBy,_that.userVoteType,_that.upvoteCount,_that.downvoteCount,_that.occuredAt,_that.createdAt,_that.updatedAt,_that.expiresAt);case _:
   return null;
 
 }
@@ -271,8 +277,8 @@ return $default(_that.id,_that.title,_that.description,_that.shortDescription,_t
 /// @nodoc
 @JsonSerializable()
 
-class _Hazard implements Hazard {
-  const _Hazard({this.id, this.title, this.description, this.shortDescription, this.visibility = true, this.severity, this.source, this.latitude, this.longitude, this.categoryId, this.category, this.aiSummary, this.aiFeedback, this.aiSeverity, this.aiConfidence, this.reportedBy, this.occuredAt, this.createdAt, this.updatedAt, this.expiresAt});
+class _Hazard extends Hazard {
+  const _Hazard({this.id, this.title, this.description, this.shortDescription, this.visibility = true, this.severity, this.source, this.latitude, this.longitude, this.categoryId, this.category, this.aiSummary, this.aiFeedback, this.aiSeverity, this.aiConfidence, this.reportedBy, this.userVoteType, this.upvoteCount = 0, this.downvoteCount = 0, this.occuredAt, this.createdAt, this.updatedAt, this.expiresAt}): super._();
   factory _Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);
 
 /// The id of the hazard.
@@ -307,6 +313,12 @@ class _Hazard implements Hazard {
 @override final  AIConfidence? aiConfidence;
 /// The user who reported the hazard.
 @override final  AppUser? reportedBy;
+/// The vote type (upvote or downvote) by the current user.
+@override final  HazardVoteType? userVoteType;
+/// The total number of upvotes for the hazard.
+@override@JsonKey() final  int upvoteCount;
+/// The total number of downvotes for the hazard.
+@override@JsonKey() final  int downvoteCount;
 /// The date and time when the hazard occurred.
 @override final  DateTime? occuredAt;
 /// The date and time when the hazard was reported.
@@ -329,16 +341,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Hazard&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.shortDescription, shortDescription) || other.shortDescription == shortDescription)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.source, source) || other.source == source)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.category, category) || other.category == category)&&(identical(other.aiSummary, aiSummary) || other.aiSummary == aiSummary)&&(identical(other.aiFeedback, aiFeedback) || other.aiFeedback == aiFeedback)&&(identical(other.aiSeverity, aiSeverity) || other.aiSeverity == aiSeverity)&&(identical(other.aiConfidence, aiConfidence) || other.aiConfidence == aiConfidence)&&(identical(other.reportedBy, reportedBy) || other.reportedBy == reportedBy)&&(identical(other.occuredAt, occuredAt) || other.occuredAt == occuredAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Hazard&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.shortDescription, shortDescription) || other.shortDescription == shortDescription)&&(identical(other.visibility, visibility) || other.visibility == visibility)&&(identical(other.severity, severity) || other.severity == severity)&&(identical(other.source, source) || other.source == source)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.categoryId, categoryId) || other.categoryId == categoryId)&&(identical(other.category, category) || other.category == category)&&(identical(other.aiSummary, aiSummary) || other.aiSummary == aiSummary)&&(identical(other.aiFeedback, aiFeedback) || other.aiFeedback == aiFeedback)&&(identical(other.aiSeverity, aiSeverity) || other.aiSeverity == aiSeverity)&&(identical(other.aiConfidence, aiConfidence) || other.aiConfidence == aiConfidence)&&(identical(other.reportedBy, reportedBy) || other.reportedBy == reportedBy)&&(identical(other.userVoteType, userVoteType) || other.userVoteType == userVoteType)&&(identical(other.upvoteCount, upvoteCount) || other.upvoteCount == upvoteCount)&&(identical(other.downvoteCount, downvoteCount) || other.downvoteCount == downvoteCount)&&(identical(other.occuredAt, occuredAt) || other.occuredAt == occuredAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,title,description,shortDescription,visibility,severity,source,latitude,longitude,categoryId,category,aiSummary,aiFeedback,aiSeverity,aiConfidence,reportedBy,occuredAt,createdAt,updatedAt,expiresAt]);
+int get hashCode => Object.hashAll([runtimeType,id,title,description,shortDescription,visibility,severity,source,latitude,longitude,categoryId,category,aiSummary,aiFeedback,aiSeverity,aiConfidence,reportedBy,userVoteType,upvoteCount,downvoteCount,occuredAt,createdAt,updatedAt,expiresAt]);
 
 @override
 String toString() {
-  return 'Hazard(id: $id, title: $title, description: $description, shortDescription: $shortDescription, visibility: $visibility, severity: $severity, source: $source, latitude: $latitude, longitude: $longitude, categoryId: $categoryId, category: $category, aiSummary: $aiSummary, aiFeedback: $aiFeedback, aiSeverity: $aiSeverity, aiConfidence: $aiConfidence, reportedBy: $reportedBy, occuredAt: $occuredAt, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
+  return 'Hazard(id: $id, title: $title, description: $description, shortDescription: $shortDescription, visibility: $visibility, severity: $severity, source: $source, latitude: $latitude, longitude: $longitude, categoryId: $categoryId, category: $category, aiSummary: $aiSummary, aiFeedback: $aiFeedback, aiSeverity: $aiSeverity, aiConfidence: $aiConfidence, reportedBy: $reportedBy, userVoteType: $userVoteType, upvoteCount: $upvoteCount, downvoteCount: $downvoteCount, occuredAt: $occuredAt, createdAt: $createdAt, updatedAt: $updatedAt, expiresAt: $expiresAt)';
 }
 
 
@@ -349,7 +361,7 @@ abstract mixin class _$HazardCopyWith<$Res> implements $HazardCopyWith<$Res> {
   factory _$HazardCopyWith(_Hazard value, $Res Function(_Hazard) _then) = __$HazardCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? title, String? description, String? shortDescription, bool visibility, HazardSeverity? severity, String? source, double? latitude, double? longitude, String? categoryId, HazardCategory? category, String? aiSummary, String? aiFeedback, HazardSeverity? aiSeverity, AIConfidence? aiConfidence, AppUser? reportedBy, DateTime? occuredAt, DateTime? createdAt, DateTime? updatedAt, DateTime? expiresAt
+ String? id, String? title, String? description, String? shortDescription, bool visibility, HazardSeverity? severity, String? source, double? latitude, double? longitude, String? categoryId, HazardCategory? category, String? aiSummary, String? aiFeedback, HazardSeverity? aiSeverity, AIConfidence? aiConfidence, AppUser? reportedBy, HazardVoteType? userVoteType, int upvoteCount, int downvoteCount, DateTime? occuredAt, DateTime? createdAt, DateTime? updatedAt, DateTime? expiresAt
 });
 
 
@@ -366,7 +378,7 @@ class __$HazardCopyWithImpl<$Res>
 
 /// Create a copy of Hazard
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? title = freezed,Object? description = freezed,Object? shortDescription = freezed,Object? visibility = null,Object? severity = freezed,Object? source = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? categoryId = freezed,Object? category = freezed,Object? aiSummary = freezed,Object? aiFeedback = freezed,Object? aiSeverity = freezed,Object? aiConfidence = freezed,Object? reportedBy = freezed,Object? occuredAt = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? expiresAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? title = freezed,Object? description = freezed,Object? shortDescription = freezed,Object? visibility = null,Object? severity = freezed,Object? source = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? categoryId = freezed,Object? category = freezed,Object? aiSummary = freezed,Object? aiFeedback = freezed,Object? aiSeverity = freezed,Object? aiConfidence = freezed,Object? reportedBy = freezed,Object? userVoteType = freezed,Object? upvoteCount = null,Object? downvoteCount = null,Object? occuredAt = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? expiresAt = freezed,}) {
   return _then(_Hazard(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,title: freezed == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -384,7 +396,10 @@ as String?,aiFeedback: freezed == aiFeedback ? _self.aiFeedback : aiFeedback // 
 as String?,aiSeverity: freezed == aiSeverity ? _self.aiSeverity : aiSeverity // ignore: cast_nullable_to_non_nullable
 as HazardSeverity?,aiConfidence: freezed == aiConfidence ? _self.aiConfidence : aiConfidence // ignore: cast_nullable_to_non_nullable
 as AIConfidence?,reportedBy: freezed == reportedBy ? _self.reportedBy : reportedBy // ignore: cast_nullable_to_non_nullable
-as AppUser?,occuredAt: freezed == occuredAt ? _self.occuredAt : occuredAt // ignore: cast_nullable_to_non_nullable
+as AppUser?,userVoteType: freezed == userVoteType ? _self.userVoteType : userVoteType // ignore: cast_nullable_to_non_nullable
+as HazardVoteType?,upvoteCount: null == upvoteCount ? _self.upvoteCount : upvoteCount // ignore: cast_nullable_to_non_nullable
+as int,downvoteCount: null == downvoteCount ? _self.downvoteCount : downvoteCount // ignore: cast_nullable_to_non_nullable
+as int,occuredAt: freezed == occuredAt ? _self.occuredAt : occuredAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
