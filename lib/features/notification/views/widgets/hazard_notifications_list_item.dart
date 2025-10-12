@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
@@ -146,6 +147,7 @@ class _HazardNotificationsListItemState
 
   /// Navigate to the View Hazard screen with the current hazard as an argument.
   void _gotoViewHazard() {
+    context.unfocusInputs();
     context.push(
       ViewHazardScreen.route,
       extra: ViewHazardScreenArgs(hazard: widget.hazard),

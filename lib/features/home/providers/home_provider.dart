@@ -4,6 +4,8 @@ import 'package:hazard_app/features/home/providers/states/home_provider_state.da
 import 'package:hazard_app/features/notification/providers/service_providers.dart';
 import 'package:hazard_app/features/notification/services/notification_service.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/providers/service_providers.dart';
+import 'package:hazard_app/features/shared/services/socket_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 
 final providerOfHome =
@@ -20,12 +22,22 @@ class HomeProvider extends StateNotifier<HomeProviderState> {
     required final HomeProviderState state,
   }) : _ref = ref,
        super(state) {
+    _connectSocket();
     _sendPushNotificationToken();
   }
 
   final Ref _ref;
   NotificationService get _notificationService =>
       _ref.read(providerOfNotificationService);
+  SocketService get _socketService => _ref.read(providerOfSocketService);
+
+  /// Connects to the socket.
+  Future<void> _connectSocket() async {
+    _socketService.connect();
+    _ref.onDispose(
+      () => _socketService.disconnect(),
+    );
+  }
 
   /// Sends the push notification token to the server.
   Future<void> _sendPushNotificationToken() async {

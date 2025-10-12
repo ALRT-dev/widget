@@ -5,7 +5,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/providers/states/notifications_feed_provider_state.dart';
 import 'package:hazard_app/features/notification/views/widgets/hazard_notifications_list_item.dart';
-import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
@@ -47,9 +46,8 @@ class _HazardNotificationsListState
       child: Consumer(
         builder: (context, ref, child) {
           final isSearchActive = ref.watch(
-            providerOfHazards.select(
-              (value) =>
-                  value.tempSearchParams.searchString?.isNotEmpty ?? false,
+            providerOfNotificationsFeed.select(
+              (value) => value.searchString.isNotEmpty,
             ),
           );
           return Column(

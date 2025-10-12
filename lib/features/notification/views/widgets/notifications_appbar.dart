@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
+import 'package:hazard_app/features/notification/providers/states/notifications_feed_provider_state.dart';
 import 'package:hazard_app/features/search/views/widgets/hazard_categories_list.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
@@ -41,9 +42,18 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
             (value) => value.hazardCategories.isNotEmpty,
           ),
         );
+        final isHazardsLoading = ref.watch(
+          providerOfNotificationsFeed.select(
+            (value) => value.getNotificationsFeed.maybeWhen(
+              orElse: () => false,
+              loading: () => true,
+            ),
+          ),
+        );
         final isHazardsPresent = ref.watch(
           providerOfNotificationsFeed.select(
-            (value) => value.hazards.isNotEmpty,
+            (value) =>
+                value.searchString.isNotEmpty ? true : value.hazards.isNotEmpty,
           ),
         );
         return SliverAppBar(
@@ -60,7 +70,7 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
               color: AppColors.black,
             ),
           ),
-          bottom: !isHazardsPresent
+          bottom: !isHazardsPresent && !isHazardsLoading
               ? PreferredSize(
                   preferredSize: Size.fromHeight(0),
                   child: Divider(

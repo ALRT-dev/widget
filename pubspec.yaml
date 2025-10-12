@@ -47,6 +47,7 @@ dependencies:
   flutter_compass: ^0.8.1
   firebase_core: ^4.1.1
   firebase_messaging: ^16.0.2
+  socket_io_client: ^3.1.2
 
 dev_dependencies:
   flutter_test:
