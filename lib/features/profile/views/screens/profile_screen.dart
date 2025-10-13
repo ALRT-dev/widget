@@ -222,7 +222,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildStatItem(
-              'Hazards Viewed',
+              'Alrts Viewed',
               '1,247',
               Icons.visibility_outlined,
             ),
@@ -231,13 +231,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               height: 40.spMin,
               color: AppColors.lightGrey,
             ),
-            _buildStatItem('Reports Made', '23', Icons.report_outlined),
+            _buildStatItem(
+              'Alrts Made',
+              '23',
+              Icons.report_outlined,
+            ),
             Container(
               width: 1,
               height: 40.spMin,
               color: AppColors.lightGrey,
             ),
-            _buildStatItem('Helped Others', '156', Icons.help_outline),
+            _buildStatItem(
+              'Upvotes Received',
+              '156',
+              Icons.thumb_up_alt_outlined,
+            ),
           ],
         ),
       ),
