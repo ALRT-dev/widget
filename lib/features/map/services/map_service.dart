@@ -47,10 +47,12 @@ class MapService {
   Future<Either<List<GooglePlace>, AppError>> getPlaces({
     required final String searchString,
     required final AlrtLocation currentUserLocation,
+    final bool showOnlyCities = false,
   }) async {
     final result = await _mapRepository.getPlaces(
       searchString: searchString,
       currentUserLocation: currentUserLocation,
+      showOnlyCities: showOnlyCities,
     );
     return result;
   }

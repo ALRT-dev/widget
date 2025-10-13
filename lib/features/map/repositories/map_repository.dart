@@ -17,6 +17,7 @@ abstract class MapRepository {
   Future<Either<List<GooglePlace>, AppError>> getPlaces({
     required final String searchString,
     required final AlrtLocation currentUserLocation,
+    final bool showOnlyCities = false,
   });
 
   Future<Either<Map<String, dynamic>, AppError>> getPlaceDetails({
@@ -39,9 +40,9 @@ class MapRepositoryImpl implements MapRepository {
     required GoogleMapController googleMapController,
     required Dio dio,
     required PolylinePoints polylinePoints,
-  })  : _googleMapController = googleMapController,
-        _dio = dio,
-        _polylinePoints = polylinePoints;
+  }) : _googleMapController = googleMapController,
+       _dio = dio,
+       _polylinePoints = polylinePoints;
 
   final GoogleMapController _googleMapController;
   final Dio _dio;
@@ -69,63 +70,68 @@ class MapRepositoryImpl implements MapRepository {
   Future<Either<List<GooglePlace>, AppError>> getPlaces({
     required String searchString,
     required AlrtLocation currentUserLocation,
+    bool showOnlyCities = false,
   }) {
     return runAsyncCall(
       name: 'getPlaces',
       future: () async {
-        final result = await _dio.get(
-          'https://maps.googleapis.com/maps/api/place/autocomplete/json',
-          queryParameters: {
-            'input': searchString,
-            'key': Env.googleMapsApiKey,
-            'locationbias':
-                'circle:50000@${currentUserLocation.latitude},${currentUserLocation.longitude}',
-          },
-        ).then((response) async {
-          final predictions = response.data['predictions'];
-          if (predictions == null || predictions is! List) {
-            return <Map<String, dynamic>>[];
-          }
+        final result = await _dio
+            .get(
+              'https://maps.googleapis.com/maps/api/place/autocomplete/json',
+              queryParameters: {
+                'input': searchString,
+                'key': Env.googleMapsApiKey,
+                'locationbias':
+                    'circle:50000@${currentUserLocation.latitude},${currentUserLocation.longitude}',
+                if (showOnlyCities) "types": ["locality"],
+              },
+            )
+            .then((response) async {
+              final predictions = response.data['predictions'];
+              if (predictions == null || predictions is! List) {
+                return <Map<String, dynamic>>[];
+              }
 
-          final futures = <Future<Map<String, dynamic>>>[];
+              final futures = <Future<Map<String, dynamic>>>[];
 
-          for (final prediction in predictions) {
-            if (prediction is Map<String, dynamic> &&
-                prediction.containsKey('place_id')) {
-              final data = {
-                'place_id': prediction['place_id'],
-                'description': prediction['description'],
-              };
-              final future = getPlaceDetails(
-                placeId: prediction['place_id'],
-              ).then(
-                (value) => value.when(
-                  (details) => {
-                    ...data,
-                    'latitude': details['geometry']['location']['lat'],
-                    'longitude': details['geometry']['location']['lng'],
-                    'bounds': {
-                      'northeastLat': details['geometry']['viewport']
-                          ['northeast']['lat'],
-                      'northeastLng': details['geometry']['viewport']
-                          ['northeast']['lng'],
-                      'southwestLat': details['geometry']['viewport']
-                          ['southwest']['lat'],
-                      'southwestLng': details['geometry']['viewport']
-                          ['southwest']['lng'],
-                    },
-                    'name': details['name'],
-                    'address': details['formatted_address'],
-                  },
-                  (error) => data,
-                ),
-              );
-              futures.add(future);
-            }
-          }
+              for (final prediction in predictions) {
+                if (prediction is Map<String, dynamic> &&
+                    prediction.containsKey('place_id')) {
+                  final data = {
+                    'place_id': prediction['place_id'],
+                    'description': prediction['description'],
+                  };
+                  final future =
+                      getPlaceDetails(
+                        placeId: prediction['place_id'],
+                      ).then(
+                        (value) => value.when(
+                          (details) => {
+                            ...data,
+                            'latitude': details['geometry']['location']['lat'],
+                            'longitude': details['geometry']['location']['lng'],
+                            'bounds': {
+                              'northeastLat':
+                                  details['geometry']['viewport']['northeast']['lat'],
+                              'northeastLng':
+                                  details['geometry']['viewport']['northeast']['lng'],
+                              'southwestLat':
+                                  details['geometry']['viewport']['southwest']['lat'],
+                              'southwestLng':
+                                  details['geometry']['viewport']['southwest']['lng'],
+                            },
+                            'name': details['name'],
+                            'address': details['formatted_address'],
+                          },
+                          (error) => data,
+                        ),
+                      );
+                  futures.add(future);
+                }
+              }
 
-          return Future.wait(futures);
-        });
+              return Future.wait(futures);
+            });
         final places = result.map((e) => GooglePlace.fromJson(e)).toList();
         return Success(places);
       },
@@ -153,7 +159,8 @@ class MapRepositoryImpl implements MapRepository {
             response.data['result'] == null ||
             response.data['result'] is! Map<String, dynamic>) {
           throw AppError(
-            message: response.data['error_message'] ??
+            message:
+                response.data['error_message'] ??
                 'Failed to fetch place details',
           );
         }
@@ -221,7 +228,8 @@ class MapRepositoryImpl implements MapRepository {
             response.data['results'] is! List ||
             (response.data['results'] as List).isEmpty) {
           throw AppError(
-            message: response.data['error_message'] ??
+            message:
+                response.data['error_message'] ??
                 'Failed to fetch address from coordinates',
           );
         }

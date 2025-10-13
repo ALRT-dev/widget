@@ -20,24 +20,26 @@ final providerOfPlacesForSelectLocation = providerOfPlaces(
 
 final providerOfPlaces = StateNotifierProvider.autoDispose
     .family<PlacesProvider, PlacesProviderState, String>(
-  (ref, key) => PlacesProvider(
-    ref: ref,
-    state: PlacesProviderState(),
-  ),
-);
+      (ref, key) => PlacesProvider(
+        ref: ref,
+        state: PlacesProviderState(),
+      ),
+    );
 
 class PlacesProvider extends StateNotifier<PlacesProviderState> {
   PlacesProvider({
     required final Ref ref,
     required PlacesProviderState state,
-  })  : _ref = ref,
-        super(state);
+  }) : _ref = ref,
+       super(state);
 
   final Ref _ref;
   MapService get _mapService => _ref.read(providerOfMapService);
 
   /// Fetches places based on the current search string in the state.
-  Future<void> getPlaces() async {
+  Future<void> getPlaces({
+    final bool showOnlyCities = false,
+  }) async {
     final searchString = state.searchString;
     if (searchString.isEmpty) {
       state = state.copyWith(
@@ -54,6 +56,7 @@ class PlacesProvider extends StateNotifier<PlacesProviderState> {
     final result = await _mapService.getPlaces(
       currentUserLocation: _ref.read(providerOfLocation).location,
       searchString: searchString,
+      showOnlyCities: showOnlyCities,
     );
     if (!mounted) return;
 

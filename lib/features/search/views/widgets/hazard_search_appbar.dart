@@ -169,7 +169,9 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
       const Duration(milliseconds: 300),
       () {
         if (!mounted) return;
-        ref.read(providerOfPlacesForSearch.notifier).getPlaces();
+        ref
+            .read(providerOfPlacesForSearch.notifier)
+            .getPlaces(showOnlyCities: true);
       },
     );
   }
