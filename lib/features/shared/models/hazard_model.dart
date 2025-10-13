@@ -71,7 +71,7 @@ abstract class Hazard with _$Hazard {
     @Default(0) final int downvoteCount,
 
     /// The date and time when the hazard occurred.
-    final DateTime? occuredAt,
+    final DateTime? occurredAt,
 
     /// The date and time when the hazard was reported.
     final DateTime? createdAt,

@@ -36,9 +36,9 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   ),
   upvoteCount: (json['upvoteCount'] as num?)?.toInt() ?? 0,
   downvoteCount: (json['downvoteCount'] as num?)?.toInt() ?? 0,
-  occuredAt: json['occuredAt'] == null
+  occurredAt: json['occurredAt'] == null
       ? null
-      : DateTime.parse(json['occuredAt'] as String),
+      : DateTime.parse(json['occurredAt'] as String),
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
@@ -70,7 +70,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'userVoteType': ?_$HazardVoteTypeEnumMap[instance.userVoteType],
   'upvoteCount': instance.upvoteCount,
   'downvoteCount': instance.downvoteCount,
-  'occuredAt': ?instance.occuredAt?.toIso8601String(),
+  'occurredAt': ?instance.occurredAt?.toIso8601String(),
   'createdAt': ?instance.createdAt?.toIso8601String(),
   'updatedAt': ?instance.updatedAt?.toIso8601String(),
   'expiresAt': ?instance.expiresAt?.toIso8601String(),

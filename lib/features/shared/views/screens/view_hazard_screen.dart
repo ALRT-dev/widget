@@ -59,7 +59,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     24.spMin.hSizedBox,
                     _buildAISummarySection(),
                   ],
-                  if (widget.args.hazard.aiFeedback != null) ...[
+                  if (widget.args.hazard.aiConfidence != null) ...[
                     24.spMin.hSizedBox,
                     _buildAIFeedbackSection(),
                   ],
@@ -373,14 +373,14 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       icon: Icons.schedule_outlined,
       child: Column(
         children: [
-          if (widget.args.hazard.occuredAt != null)
+          if (widget.args.hazard.occurredAt != null)
             _buildTimestampRow(
               'Occurred',
-              widget.args.hazard.occuredAt!,
+              widget.args.hazard.occurredAt!,
               Icons.event_outlined,
             ),
           if (widget.args.hazard.createdAt != null) ...[
-            if (widget.args.hazard.occuredAt != null) 12.spMin.hSizedBox,
+            if (widget.args.hazard.occurredAt != null) 12.spMin.hSizedBox,
             _buildTimestampRow(
               'Reported',
               widget.args.hazard.createdAt!,
@@ -388,7 +388,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             ),
           ],
           if (widget.args.hazard.expiresAt != null) ...[
-            if (widget.args.hazard.occuredAt != null ||
+            if (widget.args.hazard.occurredAt != null ||
                 widget.args.hazard.createdAt != null)
               12.spMin.hSizedBox,
             _buildTimestampRow(
@@ -546,41 +546,42 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               16.spMin.hSizedBox,
             ],
             // AI Feedback Section
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  Icons.psychology,
-                  color: AppColors.green,
-                  size: 20.spMin,
-                ),
-                12.spMin.wSizedBox,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Analysis',
-                        style: TextStyle(
-                          fontSize: 14.spMin,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.green,
-                        ),
-                      ),
-                      8.spMin.hSizedBox,
-                      Text(
-                        widget.args.hazard.aiFeedback!,
-                        style: TextStyle(
-                          fontSize: 14.spMin,
-                          height: 1.5,
-                          color: AppColors.black,
-                        ),
-                      ),
-                    ],
+            if (widget.args.hazard.aiFeedback != null)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.psychology,
+                    color: AppColors.green,
+                    size: 20.spMin,
                   ),
-                ),
-              ],
-            ),
+                  12.spMin.wSizedBox,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Analysis',
+                          style: TextStyle(
+                            fontSize: 14.spMin,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.green,
+                          ),
+                        ),
+                        8.spMin.hSizedBox,
+                        Text(
+                          widget.args.hazard.aiFeedback!,
+                          style: TextStyle(
+                            fontSize: 14.spMin,
+                            height: 1.5,
+                            color: AppColors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
           ],
         ),
       ),

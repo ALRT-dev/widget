@@ -40,7 +40,7 @@ class CreateReportProvider extends StateNotifier<CreateReportProviderState> {
     final hazard = Hazard(
       title:
           '${state.category?.name ?? 'Unknown'} Hazard at ${state.location?.name ?? 'Unknown Location'}',
-      occuredAt: state.dateTime,
+      occurredAt: state.dateTime,
       categoryId: state.category!.id,
       latitude: state.location?.latitude,
       longitude: state.location?.longitude,
