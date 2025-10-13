@@ -17,19 +17,19 @@ final providerOfHazardCategoriesForNotifications = providerOfHazardCategories(
 
 final providerOfHazardCategories = StateNotifierProvider.autoDispose
     .family<HazardCategoriesProvider, HazardCategoriesProviderState, String>(
-  (ref, id) => HazardCategoriesProvider(
-    ref: ref,
-    state: const HazardCategoriesProviderState(),
-  ),
-);
+      (ref, id) => HazardCategoriesProvider(
+        ref: ref,
+        state: const HazardCategoriesProviderState(),
+      ),
+    );
 
 class HazardCategoriesProvider
     extends StateNotifier<HazardCategoriesProviderState> {
   HazardCategoriesProvider({
     required final Ref ref,
     required final HazardCategoriesProviderState state,
-  })  : _ref = ref,
-        super(state);
+  }) : _ref = ref,
+       super(state);
 
   final Ref _ref;
   HazardService get _hazardService => _ref.read(providerOfHazardService);
@@ -65,6 +65,43 @@ class HazardCategoriesProvider
     state = state.copyWith(
       hazardCategories: hazardCategories,
     );
+  }
+
+  /// Updates a [HazardCategory] in the list of hazard categories.
+  void updateHazardCategory(HazardCategory updatedCategory) {
+    final index = state.hazardCategories.indexWhere(
+      (category) => category.id == updatedCategory.id,
+    );
+    if (index != -1) {
+      final updatedCategories = [...state.hazardCategories];
+      updatedCategories[index] = updatedCategory;
+      updateHazardCategories(updatedCategories);
+      sortHazardCategoriesByHazardCount();
+    }
+  }
+
+  /// Adds a [HazardCategory] to the list of hazard categories.
+  ///
+  /// Also sorts the categories by [HazardCategory.hazardsCount] in descending order.
+  void addToHazardCategories(final HazardCategory category) {
+    updateHazardCategories([...state.hazardCategories, category]);
+    sortHazardCategoriesByHazardCount();
+  }
+
+  /// Removes a [HazardCategory] with id [categoryId] from the list of hazard categories.
+  void removeFromHazardCategories(final String categoryId) {
+    updateHazardCategories(
+      state.hazardCategories
+          .where((element) => element.id != categoryId)
+          .toList(),
+    );
+  }
+
+  /// Sorts the hazard categories by [HazardCategory.hazardsCount] in descending order.
+  void sortHazardCategoriesByHazardCount() {
+    final sortedCategories = [...state.hazardCategories];
+    sortedCategories.sort((a, b) => b.hazardsCount.compareTo(a.hazardsCount));
+    updateHazardCategories(sortedCategories);
   }
 
   /// Updates [HazardCategoriesProviderState.selectedCategories] with the provided [selectedCategories].

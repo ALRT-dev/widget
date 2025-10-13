@@ -4,6 +4,7 @@ import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_source_model.dart';
 
 part 'hazard_model.freezed.dart';
 part 'hazard_model.g.dart';
@@ -31,9 +32,6 @@ abstract class Hazard with _$Hazard {
     /// The severity level of the hazard as per user input or source.
     final HazardSeverity? severity,
 
-    /// The source of the hazard report (e.g., user, system).
-    final String? source,
-
     /// The latitude of the hazard location.
     final double? latitude,
 
@@ -45,6 +43,9 @@ abstract class Hazard with _$Hazard {
 
     /// The category the hazard belongs to.
     final HazardCategory? category,
+
+    /// The source details of the hazard.
+    final HazardSource? source,
 
     /// The AI-generated summary of the hazard.
     final String? aiSummary,

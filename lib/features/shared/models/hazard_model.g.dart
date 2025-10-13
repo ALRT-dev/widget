@@ -13,13 +13,15 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   shortDescription: json['shortDescription'] as String?,
   visibility: json['visibility'] as bool? ?? true,
   severity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['severity']),
-  source: json['source'] as String?,
   latitude: (json['latitude'] as num?)?.toDouble(),
   longitude: (json['longitude'] as num?)?.toDouble(),
   categoryId: json['categoryId'] as String?,
   category: json['category'] == null
       ? null
       : HazardCategory.fromJson(json['category'] as Map<String, dynamic>),
+  source: json['source'] == null
+      ? null
+      : HazardSource.fromJson(json['source'] as Map<String, dynamic>),
   aiSummary: json['aiSummary'] as String?,
   aiFeedback: json['aiFeedback'] as String?,
   aiSeverity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['aiSeverity']),
@@ -57,11 +59,11 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'shortDescription': ?instance.shortDescription,
   'visibility': instance.visibility,
   'severity': ?_$HazardSeverityEnumMap[instance.severity],
-  'source': ?instance.source,
   'latitude': ?instance.latitude,
   'longitude': ?instance.longitude,
   'categoryId': ?instance.categoryId,
   'category': ?instance.category?.toJson(),
+  'source': ?instance.source?.toJson(),
   'aiSummary': ?instance.aiSummary,
   'aiFeedback': ?instance.aiFeedback,
   'aiSeverity': ?_$HazardSeverityEnumMap[instance.aiSeverity],

@@ -63,9 +63,15 @@ class NotificationsFeedProvider
                   state.searchString.toLowerCase(),
                 )) {
               addToHazards(newHazard);
+              if (newHazard.category != null) {
+                processCategoryFromSocket(newHazard.category!);
+              }
             }
           } else {
             addToHazards(newHazard);
+            if (newHazard.category != null) {
+              processCategoryFromSocket(newHazard.category!);
+            }
           }
         }
       },
@@ -176,6 +182,26 @@ class NotificationsFeedProvider
     updateHazards(
       state.hazards.where((hazard) => hazard.id != hazardId).toList(),
     );
+  }
+
+  /// Processes a [HazardCategory] received from the socket by adding or updating it in the hazard categories provider.
+  void processCategoryFromSocket(final HazardCategory category) {
+    final existingCategories = _ref
+        .read(providerOfHazardCategoriesForNotifications)
+        .hazardCategories;
+
+    final index = existingCategories.indexWhere((c) => c.id == category.id);
+    if (index == -1) {
+      // category does not exist, add it
+      _hazardCategoriesProvider.addToHazardCategories(category);
+    } else {
+      // category exists, update the hazards count
+      final existingCategory = existingCategories[index];
+      final updatedCategory = existingCategory.copyWith(
+        hazardsCount: existingCategory.hazardsCount + 1,
+      );
+      _hazardCategoriesProvider.updateHazardCategory(updatedCategory);
+    }
   }
 
   /// Updates [NotificationsFeedProviderState.getNotificationsFeed] to loading state.

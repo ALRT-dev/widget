@@ -54,6 +54,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   24.spMin.hSizedBox,
                   _buildSeveritySection(),
                   24.spMin.hSizedBox,
+                  if (widget.args.hazard.source != null) ...[
+                    _buildSourceSection(),
+                    24.spMin.hSizedBox,
+                  ],
                   _buildTimestampSection(),
                   if (widget.args.hazard.aiSummary != null) ...[
                     24.spMin.hSizedBox,
@@ -365,6 +369,107 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       case HazardSeverity.emergency:
         return 'Immediate action required for safety';
     }
+  }
+
+  Widget _buildSourceSection() {
+    final source = widget.args.hazard.source;
+    if (source == null) return const SizedBox.shrink();
+
+    return _buildSection(
+      title: 'Source',
+      icon: Icons.source_outlined,
+      child: Container(
+        padding: EdgeInsets.all(16.spMin),
+        decoration: BoxDecoration(
+          color: AppColors.extraLightGrey,
+          borderRadius: BorderRadius.circular(12.spMin),
+        ),
+        child: Column(
+          children: [
+            if (source.name != null) ...[
+              Row(
+                children: [
+                  Icon(
+                    Icons.label_outline,
+                    color: AppColors.grey,
+                    size: 20.spMin,
+                  ),
+                  12.spMin.wSizedBox,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Source Name',
+                          style: TextStyle(
+                            fontSize: 12.spMin,
+                            color: AppColors.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        4.spMin.hSizedBox,
+                        Text(
+                          source.name!,
+                          style: TextStyle(
+                            fontSize: 14.spMin,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              if (source.url != null) 16.spMin.hSizedBox,
+            ],
+            if (source.url != null)
+              Row(
+                children: [
+                  Icon(
+                    Icons.link_outlined,
+                    color: AppColors.blue,
+                    size: 20.spMin,
+                  ),
+                  12.spMin.wSizedBox,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Source URL',
+                          style: TextStyle(
+                            fontSize: 12.spMin,
+                            color: AppColors.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        4.spMin.hSizedBox,
+                        GestureDetector(
+                          onTap: () {
+                            // TODO: Open URL in browser
+                            // You can implement URL launcher here
+                          },
+                          child: Text(
+                            source.url!,
+                            style: TextStyle(
+                              fontSize: 14.spMin,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.blue,
+                              decoration: TextDecoration.underline,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildTimestampSection() {

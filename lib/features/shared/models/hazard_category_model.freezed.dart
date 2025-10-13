@@ -15,7 +15,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HazardCategory {
 
- String get id; String? get name; String? get emoji; int get hazardsCount;
+/// The unique identifier for the hazard category.
+ String get id;/// The name of the hazard category.
+ String? get name;/// The emoji representing the hazard category.
+ String? get emoji;/// The number of hazards associated with this category.
+ int get hazardsCount;
 /// Create a copy of HazardCategory
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -215,9 +219,13 @@ class _HazardCategory implements HazardCategory {
   const _HazardCategory({required this.id, this.name, this.emoji, this.hazardsCount = 0});
   factory _HazardCategory.fromJson(Map<String, dynamic> json) => _$HazardCategoryFromJson(json);
 
+/// The unique identifier for the hazard category.
 @override final  String id;
+/// The name of the hazard category.
 @override final  String? name;
+/// The emoji representing the hazard category.
 @override final  String? emoji;
+/// The number of hazards associated with this category.
 @override@JsonKey() final  int hazardsCount;
 
 /// Create a copy of HazardCategory
