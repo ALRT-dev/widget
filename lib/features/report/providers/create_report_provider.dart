@@ -5,6 +5,7 @@ import 'package:hazard_app/features/report/providers/states/create_report_provid
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/repository_providers.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/repositories/media_repository.dart';
@@ -67,6 +68,15 @@ class CreateReportProvider extends StateNotifier<CreateReportProviderState> {
             state: CreatingHazardReportState.success(hazard),
           ),
         );
+
+        // update user's hazardsReportedCount by 1
+        _ref
+            .read(providerOfLoggedInUser.notifier)
+            .update(
+              (user) => user?.copyWith(
+                hazardsReportedCount: user.hazardsReportedCount + 1,
+              ),
+            );
       },
       (error) {
         updateCreatingHazardReport(

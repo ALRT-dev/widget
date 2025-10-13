@@ -193,7 +193,11 @@ class NotificationsFeedProvider
     final index = existingCategories.indexWhere((c) => c.id == category.id);
     if (index == -1) {
       // category does not exist, add it
-      _hazardCategoriesProvider.addToHazardCategories(category);
+      _hazardCategoriesProvider.addToHazardCategories(
+        category.copyWith(
+          hazardsCount: 1,
+        ),
+      );
     } else {
       // category exists, update the hazards count
       final existingCategory = existingCategories[index];

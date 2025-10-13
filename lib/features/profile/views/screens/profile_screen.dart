@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
-import 'package:hazard_app/features/shared/models/app_user_model.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/avatar.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -15,13 +15,6 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  // Mock data - replace with actual providers/services
-  final AppUser _mockUser = const AppUser(
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,39 +93,54 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
           child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                40.spMin.hSizedBox,
-                Hero(
-                  tag: 'profile_avatar',
-                  child: Avatar.initials(
-                    initials: _getInitials(_mockUser.name ?? 'User'),
-                    size: 80.spMin,
-                    backgroundColor: AppColors.white.withValues(alpha: 0.2),
-                    foregroundColor: AppColors.white,
-                    borderWidth: 3,
-                    borderColor: AppColors.white,
+            child: Consumer(
+              builder: (context, ref, child) {
+                final userName = ref.watch(
+                  providerOfLoggedInUser.select(
+                    (value) => value?.name ?? 'User',
                   ),
-                ),
-                12.spMin.hSizedBox,
-                Text(
-                  _mockUser.name ?? 'User',
-                  style: TextStyle(
-                    fontSize: 24.spMin,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.white,
+                );
+                final userEmail = ref.watch(
+                  providerOfLoggedInUser.select(
+                    (value) => value?.email,
                   ),
-                ),
-                4.spMin.hSizedBox,
-                Text(
-                  _mockUser.email ?? '',
-                  style: TextStyle(
-                    fontSize: 14.spMin,
-                    color: AppColors.white.withValues(alpha: 0.8),
-                  ),
-                ),
-              ],
+                );
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    40.spMin.hSizedBox,
+                    Hero(
+                      tag: 'profile_avatar',
+                      child: Avatar.initials(
+                        initials: _getInitials(userName),
+                        size: 80.spMin,
+                        backgroundColor: AppColors.white.withValues(alpha: 0.2),
+                        foregroundColor: AppColors.white,
+                        borderWidth: 3,
+                        borderColor: AppColors.white,
+                      ),
+                    ),
+                    12.spMin.hSizedBox,
+                    Text(
+                      userName,
+                      style: TextStyle(
+                        fontSize: 24.spMin,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.white,
+                      ),
+                    ),
+                    if (userEmail != null) 4.spMin.hSizedBox,
+                    if (userEmail != null)
+                      Text(
+                        userEmail,
+                        style: TextStyle(
+                          fontSize: 14.spMin,
+                          color: AppColors.white.withValues(alpha: 0.8),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -150,29 +158,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           color: AppColors.extraLightGrey,
           borderRadius: BorderRadius.circular(12.spMin),
         ),
-        child: Column(
-          children: [
-            _buildInfoRow(
-              'Joined',
-              timeago.format(
-                DateTime.now().subtract(const Duration(days: 365)),
+        child: Consumer(
+          builder: (context, ref, child) {
+            final userCreatedAt = ref.watch(
+              providerOfLoggedInUser.select(
+                (value) => value?.createdAt,
               ),
-              Icons.calendar_today_outlined,
-            ),
-            12.spMin.hSizedBox,
-            _buildInfoRow(
-              'Last Active',
-              timeago.format(DateTime.now().subtract(const Duration(hours: 2))),
-              Icons.access_time_outlined,
-            ),
-            12.spMin.hSizedBox,
-            _buildInfoRow(
-              'Member Status',
-              'Verified Reporter',
-              Icons.verified_outlined,
-              valueColor: AppColors.green,
-            ),
-          ],
+            );
+            return Column(
+              spacing: 12.spMin,
+              children: [
+                if (userCreatedAt != null)
+                  _buildInfoRow(
+                    'Joined',
+                    timeago.format(userCreatedAt),
+                    Icons.calendar_today_outlined,
+                  ),
+                _buildInfoRow(
+                  'Last Active',
+                  'now',
+                  Icons.access_time_outlined,
+                  valueColor: AppColors.green,
+                ),
+                _buildInfoRow(
+                  'Member Status',
+                  'Normal',
+                  Icons.verified_outlined,
+                  valueColor: AppColors.black,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -185,22 +201,41 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       child: Row(
         children: [
           Expanded(
-            child: _buildScoreCard(
-              'XP Score',
-              '2,450',
-              Icons.star_outline,
-              AppColors.orange,
-              '+150 this month',
+            child: Consumer(
+              builder: (context, ref, child) {
+                final xpPoints = ref.watch(
+                  providerOfLoggedInUser.select(
+                    (value) => value?.xpPoints ?? 0,
+                  ),
+                );
+                return _buildScoreCard(
+                  'XP Score',
+                  xpPoints.toString(),
+                  Icons.star_outline,
+                  AppColors.orange,
+                  '',
+                );
+              },
             ),
           ),
           16.spMin.wSizedBox,
           Expanded(
-            child: _buildScoreCard(
-              'Reliability',
-              '94%',
-              Icons.shield_outlined,
-              AppColors.green,
-              'Excellent',
+            child: Consumer(
+              builder: (context, ref, child) {
+                final reliabilityScore = ref.watch(
+                  providerOfLoggedInUser.select(
+                    (value) => (value?.reliabilityScore ?? 0.0) * 100,
+                  ),
+                );
+
+                return _buildScoreCard(
+                  'Reliability',
+                  '${reliabilityScore.toStringAsFixed(0)}%',
+                  Icons.shield_outlined,
+                  AppColors.green,
+                  '',
+                );
+              },
             ),
           ),
         ],
@@ -221,30 +256,57 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildStatItem(
-              'Alrts Viewed',
-              '1,247',
-              Icons.visibility_outlined,
+            Consumer(
+              builder: (context, ref, child) {
+                final alertsViewed = ref.watch(
+                  providerOfLoggedInUser.select(
+                    (value) => value?.hazardsViewedCount ?? 0,
+                  ),
+                );
+                return _buildStatItem(
+                  'Alrts Viewed',
+                  alertsViewed.toString(),
+                  Icons.visibility_outlined,
+                );
+              },
             ),
             Container(
               width: 1,
               height: 40.spMin,
               color: AppColors.lightGrey,
             ),
-            _buildStatItem(
-              'Alrts Made',
-              '23',
-              Icons.report_outlined,
+            Consumer(
+              builder: (context, ref, child) {
+                final alertsMade = ref.watch(
+                  providerOfLoggedInUser.select(
+                    (value) => value?.hazardsReportedCount ?? 0,
+                  ),
+                );
+                return _buildStatItem(
+                  'Alrts Made',
+                  alertsMade.toString(),
+                  Icons.report_outlined,
+                );
+              },
             ),
             Container(
               width: 1,
               height: 40.spMin,
               color: AppColors.lightGrey,
             ),
-            _buildStatItem(
-              'Upvotes Received',
-              '156',
-              Icons.thumb_up_alt_outlined,
+            Consumer(
+              builder: (context, ref, child) {
+                final upvotesReceived = ref.watch(
+                  providerOfLoggedInUser.select(
+                    (value) => value?.upvotesReceivedCount ?? 0,
+                  ),
+                );
+                return _buildStatItem(
+                  'Upvotes Received',
+                  upvotesReceived.toString(),
+                  Icons.thumb_up_alt_outlined,
+                );
+              },
             ),
           ],
         ),
