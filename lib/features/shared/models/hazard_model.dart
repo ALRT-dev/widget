@@ -56,6 +56,8 @@ abstract class Hazard with _$Hazard {
     final AIConfidence? aiConfidence,
 
     /// The user who reported the hazard.
+    ///
+    /// If source is provided, this may be null.
     final AppUser? reportedBy,
 
     /// The status of the hazard review.

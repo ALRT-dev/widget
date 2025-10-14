@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'dart:math' as math;
@@ -36,6 +38,10 @@ class ViewHazardScreen extends ConsumerStatefulWidget {
 class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   @override
   Widget build(BuildContext context) {
+    final loggedInUserId = ref.watch(
+      providerOfLoggedInUser.select((value) => value?.id),
+    );
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -47,7 +53,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeaderSection(),
-                  if (widget.args.hazard.reviewFeedback != null) ...[
+                  if (widget.args.hazard.reportedBy?.id == loggedInUserId &&
+                      widget.args.hazard.reviewStatus ==
+                          HazardReviewStatus.rejected &&
+                      widget.args.hazard.reviewFeedback != null) ...[
                     24.spMin.hSizedBox,
                     _buildReviewFeedbackSection(),
                   ],
@@ -69,9 +78,15 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   ],
                   if (widget.args.hazard.aiConfidence != null) ...[
                     24.spMin.hSizedBox,
-                    _buildAIFeedbackSection(),
+                    _buildAIAnalysisSection(),
                   ],
-
+                  if (widget.args.hazard.reportedBy?.id == loggedInUserId &&
+                      widget.args.hazard.reviewStatus ==
+                          HazardReviewStatus.accepted &&
+                      widget.args.hazard.reviewFeedback != null) ...[
+                    24.spMin.hSizedBox,
+                    _buildReviewFeedbackSection(),
+                  ],
                   32.spMin.hSizedBox,
                 ],
               ),
@@ -593,7 +608,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
-  Widget _buildAIFeedbackSection() {
+  Widget _buildAIAnalysisSection() {
     return _buildSection(
       title: 'AI Analysis',
       icon: Icons.psychology_outlined,
@@ -653,62 +668,100 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   }
 
   Widget _buildReviewFeedbackSection() {
-    return Container(
-      padding: EdgeInsets.all(16.spMin),
-      decoration: BoxDecoration(
-        color: AppColors.red.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12.spMin),
-        border: Border.all(
-          color: AppColors.red.withValues(alpha: 0.2),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 5.spMin,
+      children: [
+        Text(
+          'Only visible to you',
+          style: TextStyle(
+            fontSize: 12.spMin,
+            color: AppColors.grey,
+            fontStyle: FontStyle.italic,
+          ),
         ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 50.spMin,
-            height: 50.spMin,
-            decoration: BoxDecoration(
-              color: AppColors.red.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(25.spMin),
-              border: Border.all(
-                color: AppColors.red.withValues(alpha: 0.3),
-                width: 2,
+        Container(
+          padding: EdgeInsets.all(16.spMin),
+          decoration: BoxDecoration(
+            color:
+                widget.args.hazard.reviewStatus == HazardReviewStatus.accepted
+                ? AppColors.green.withValues(alpha: 0.05)
+                : AppColors.red.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12.spMin),
+            border: Border.all(
+              color:
+                  widget.args.hazard.reviewStatus == HazardReviewStatus.accepted
+                  ? AppColors.green.withValues(alpha: 0.2)
+                  : AppColors.red.withValues(alpha: 0.2),
+            ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 50.spMin,
+                height: 50.spMin,
+                decoration: BoxDecoration(
+                  color:
+                      widget.args.hazard.reviewStatus ==
+                          HazardReviewStatus.accepted
+                      ? AppColors.green.withValues(alpha: 0.1)
+                      : AppColors.red.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(25.spMin),
+                  border: Border.all(
+                    color:
+                        widget.args.hazard.reviewStatus ==
+                            HazardReviewStatus.accepted
+                        ? AppColors.green.withValues(alpha: 0.3)
+                        : AppColors.red.withValues(alpha: 0.3),
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  widget.args.hazard.reviewStatus == HazardReviewStatus.accepted
+                      ? Icons.feedback_outlined
+                      : Icons.warning_outlined,
+                  color:
+                      widget.args.hazard.reviewStatus ==
+                          HazardReviewStatus.accepted
+                      ? AppColors.green
+                      : AppColors.red,
+                  size: 24.spMin,
+                ),
               ),
-            ),
-            child: Icon(
-              Icons.warning_outlined,
-              color: AppColors.red,
-              size: 24.spMin,
-            ),
-          ),
-          16.spMin.wSizedBox,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Reviewer Feedback',
-                  style: TextStyle(
-                    fontSize: 14.spMin,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.red,
-                  ),
+              16.spMin.wSizedBox,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Reviewer Feedback',
+                      style: TextStyle(
+                        fontSize: 14.spMin,
+                        fontWeight: FontWeight.w600,
+                        color:
+                            widget.args.hazard.reviewStatus ==
+                                HazardReviewStatus.accepted
+                            ? AppColors.green
+                            : AppColors.red,
+                      ),
+                    ),
+                    4.hSizedBox,
+                    Text(
+                      widget.args.hazard.reviewFeedback!,
+                      style: TextStyle(
+                        fontSize: 14.spMin,
+                        color: AppColors.black,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
                 ),
-                8.spMin.hSizedBox,
-                Text(
-                  widget.args.hazard.reviewFeedback!,
-                  style: TextStyle(
-                    fontSize: 14.spMin,
-                    color: AppColors.black,
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
