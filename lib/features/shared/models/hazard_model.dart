@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hazard_app/features/shared/converters/date_time_converter.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
@@ -26,9 +28,6 @@ abstract class Hazard with _$Hazard {
     /// The short description of the hazard.
     final String? shortDescription,
 
-    /// Whether the hazard is visible to others.
-    @Default(true) final bool visibility,
-
     /// The severity level of the hazard as per user input or source.
     final HazardSeverity? severity,
 
@@ -50,9 +49,6 @@ abstract class Hazard with _$Hazard {
     /// The AI-generated summary of the hazard.
     final String? aiSummary,
 
-    /// The AI-generated feedback on the hazard.
-    final String? aiFeedback,
-
     /// The AI-determined severity of the hazard.
     final HazardSeverity? aiSeverity,
 
@@ -61,6 +57,20 @@ abstract class Hazard with _$Hazard {
 
     /// The user who reported the hazard.
     final AppUser? reportedBy,
+
+    /// The status of the hazard review.
+    final HazardReviewStatus? reviewStatus,
+
+    /// The feedback provided during the review of the hazard.
+    final String? reviewFeedback,
+
+    /// The id of the user who reviewed the hazard.
+    ///
+    /// If AI reviewed the hazard, this will be "ai",
+    final String? reviewedById,
+
+    /// The date and time when the hazard was reviewed.
+    @DateTimeConverter() final DateTime? reviewedAt,
 
     /// The vote type (upvote or downvote) by the current user.
     final HazardVoteType? userVoteType,
@@ -72,16 +82,16 @@ abstract class Hazard with _$Hazard {
     @Default(0) final int downvoteCount,
 
     /// The date and time when the hazard occurred.
-    final DateTime? occurredAt,
+    @DateTimeConverter() final DateTime? occurredAt,
 
     /// The date and time when the hazard was reported.
-    final DateTime? createdAt,
+    @DateTimeConverter() final DateTime? createdAt,
 
     /// The date and time when the hazard was last updated.
-    final DateTime? updatedAt,
+    @DateTimeConverter() final DateTime? updatedAt,
 
     /// The date and time when the hazard expires.
-    final DateTime? expiresAt,
+    @DateTimeConverter() final DateTime? expiresAt,
   }) = _Hazard;
 
   /// The net vote count (upvotes - downvotes) for the hazard.

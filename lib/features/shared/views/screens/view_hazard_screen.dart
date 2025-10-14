@@ -47,6 +47,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeaderSection(),
+                  if (widget.args.hazard.reviewFeedback != null) ...[
+                    24.spMin.hSizedBox,
+                    _buildReviewFeedbackSection(),
+                  ],
                   24.spMin.hSizedBox,
                   _buildLocationSection(),
                   24.spMin.hSizedBox,
@@ -67,6 +71,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     24.spMin.hSizedBox,
                     _buildAIFeedbackSection(),
                   ],
+
                   32.spMin.hSizedBox,
                 ],
               ),
@@ -601,94 +606,108 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             color: AppColors.green.withValues(alpha: 0.2),
           ),
         ),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // AI Confidence Section
-            if (widget.args.hazard.aiConfidence != null) ...[
-              Row(
+            _buildConfidenceDial(widget.args.hazard.aiConfidence!),
+            16.spMin.wSizedBox,
+            Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildConfidenceDial(widget.args.hazard.aiConfidence!),
-                  16.spMin.wSizedBox,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'AI Confidence Level',
-                          style: TextStyle(
-                            fontSize: 14.spMin,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.green,
-                          ),
-                        ),
-                        4.spMin.hSizedBox,
-                        Text(
-                          _getConfidenceTitle(widget.args.hazard.aiConfidence!),
-                          style: TextStyle(
-                            fontSize: 16.spMin,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.black,
-                          ),
-                        ),
-                        4.spMin.hSizedBox,
-                        Text(
-                          _getConfidenceDescription(
-                            widget.args.hazard.aiConfidence!,
-                          ),
-                          style: TextStyle(
-                            fontSize: 12.spMin,
-                            color: AppColors.grey,
-                            height: 1.3,
-                          ),
-                        ),
-                      ],
+                  Text(
+                    'AI Confidence Level',
+                    style: TextStyle(
+                      fontSize: 14.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.green,
+                    ),
+                  ),
+                  4.spMin.hSizedBox,
+                  Text(
+                    _getConfidenceTitle(widget.args.hazard.aiConfidence!),
+                    style: TextStyle(
+                      fontSize: 16.spMin,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  4.spMin.hSizedBox,
+                  Text(
+                    _getConfidenceDescription(
+                      widget.args.hazard.aiConfidence!,
+                    ),
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      color: AppColors.grey,
+                      height: 1.3,
                     ),
                   ),
                 ],
               ),
-              16.spMin.hSizedBox,
-            ],
-            // AI Feedback Section
-            if (widget.args.hazard.aiFeedback != null)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.psychology,
-                    color: AppColors.green,
-                    size: 20.spMin,
-                  ),
-                  12.spMin.wSizedBox,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Analysis',
-                          style: TextStyle(
-                            fontSize: 14.spMin,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.green,
-                          ),
-                        ),
-                        8.spMin.hSizedBox,
-                        Text(
-                          widget.args.hazard.aiFeedback!,
-                          style: TextStyle(
-                            fontSize: 14.spMin,
-                            height: 1.5,
-                            color: AppColors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildReviewFeedbackSection() {
+    return Container(
+      padding: EdgeInsets.all(16.spMin),
+      decoration: BoxDecoration(
+        color: AppColors.red.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12.spMin),
+        border: Border.all(
+          color: AppColors.red.withValues(alpha: 0.2),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 50.spMin,
+            height: 50.spMin,
+            decoration: BoxDecoration(
+              color: AppColors.red.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(25.spMin),
+              border: Border.all(
+                color: AppColors.red.withValues(alpha: 0.3),
+                width: 2,
+              ),
+            ),
+            child: Icon(
+              Icons.warning_outlined,
+              color: AppColors.red,
+              size: 24.spMin,
+            ),
+          ),
+          16.spMin.wSizedBox,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Reviewer Feedback',
+                  style: TextStyle(
+                    fontSize: 14.spMin,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.red,
+                  ),
+                ),
+                8.spMin.hSizedBox,
+                Text(
+                  widget.args.hazard.reviewFeedback!,
+                  style: TextStyle(
+                    fontSize: 14.spMin,
+                    color: AppColors.black,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

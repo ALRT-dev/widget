@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
@@ -10,18 +9,18 @@ import 'package:hazard_app/features/shared/services/hazard_service.dart';
 
 final providerOfHazards =
     StateNotifierProvider.autoDispose<HazardsProvider, HazardsProviderState>(
-  (ref) => HazardsProvider(
-    ref: ref,
-    state: HazardsProviderState(),
-  ),
-);
+      (ref) => HazardsProvider(
+        ref: ref,
+        state: HazardsProviderState(),
+      ),
+    );
 
 class HazardsProvider extends StateNotifier<HazardsProviderState> {
   HazardsProvider({
     required final Ref ref,
     required final HazardsProviderState state,
-  })  : _ref = ref,
-        super(state) {
+  }) : _ref = ref,
+       super(state) {
     getHazardCategories();
     getHazards();
   }
@@ -72,13 +71,8 @@ class HazardsProvider extends StateNotifier<HazardsProviderState> {
     // Commit the temporary search parameters before making the API call
     commitTempSearchParams();
 
-    final userLocation = _ref.read(providerOfLocation).location;
-
     final result = await _hazardService.getHazards(
-      searchParams: HazardSearchParams(
-        latitude: state.searchParams.latitude ?? userLocation.latitude,
-        longitude: state.searchParams.longitude ?? userLocation.longitude,
-      ),
+      searchParams: HazardSearchParams(),
     );
     if (!mounted) return;
 

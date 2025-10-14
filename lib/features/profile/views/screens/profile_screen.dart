@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/profile/providers/profile_provider.dart';
+import 'package:hazard_app/features/profile/views/widgets/needs_update_reports_widgets/needs_update_reports_list.dart';
+import 'package:hazard_app/features/profile/views/widgets/recent_reports_widgets/recent_reports_list.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
+import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/avatar.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -34,9 +38,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   _buildStatsSection(),
                   24.spMin.hSizedBox,
                   _buildSubmittedHazardsSection(),
-                  24.spMin.hSizedBox,
                   _buildFailedReviewsSection(),
-                  24.spMin.hSizedBox,
                   _buildEmergencyContactsSection(),
                   24.spMin.hSizedBox,
                   _buildLogoutSection(),
@@ -315,65 +317,54 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildSubmittedHazardsSection() {
-    return _buildSection(
-      title: 'Recent Reports',
-      icon: Icons.list_alt_outlined,
-      child: Column(
-        children: [
-          _buildHazardItem(
-            'Flooded Road on Main Street',
-            'Emergency',
-            DateTime.now().subtract(const Duration(hours: 3)),
-            Icons.water_damage_outlined,
-            AppColors.red,
-            'Under Review',
+    return Consumer(
+      builder: (context, ref, child) {
+        final isEmpty = ref.watch(
+          providerOfProfile.select(
+            (value) => value.myAcceptedHazards.isEmpty,
           ),
-          12.spMin.hSizedBox,
-          _buildHazardItem(
-            'Fallen Tree Branch',
-            'Watch and Act',
-            DateTime.now().subtract(const Duration(days: 1)),
-            Icons.nature_outlined,
-            AppColors.orange,
-            'Approved',
+        );
+        if (isEmpty) return const SizedBox();
+
+        return _buildSection(
+          title: 'Recent Reports',
+          icon: Icons.list_alt_outlined,
+          child: Column(
+            spacing: 12.spMin,
+            children: [
+              RecentReportsList(),
+              _buildViewAllButton(
+                'View All Reports',
+              ),
+            ],
           ),
-          12.spMin.hSizedBox,
-          _buildHazardItem(
-            'Ice on Sidewalk',
-            'Advice',
-            DateTime.now().subtract(const Duration(days: 3)),
-            Icons.ac_unit_outlined,
-            AppColors.yellow,
-            'Approved',
-          ),
-          12.spMin.hSizedBox,
-          _buildViewAllButton('View All Reports'),
-        ],
-      ),
+        ).pB(24.0);
+      },
     );
   }
 
   Widget _buildFailedReviewsSection() {
-    return _buildSection(
-      title: 'Needs Update',
-      icon: Icons.warning_amber_outlined,
-      child: Column(
-        children: [
-          _buildReviewItem(
-            'Pothole on Oak Avenue',
-            'Requires more specific location details',
-            DateTime.now().subtract(const Duration(days: 2)),
+    return Consumer(
+      builder: (context, ref, child) {
+        final isEmpty = ref.watch(
+          providerOfProfile.select(
+            (value) => value.myAcceptedHazards.isEmpty,
           ),
-          12.spMin.hSizedBox,
-          _buildReviewItem(
-            'Damaged Street Light',
-            'Image quality too low, please retake',
-            DateTime.now().subtract(const Duration(days: 5)),
+        );
+        if (isEmpty) return const SizedBox();
+
+        return _buildSection(
+          title: 'Needs Update',
+          icon: Icons.warning_amber_outlined,
+          child: Column(
+            spacing: 12.spMin,
+            children: [
+              NeedsUpdateReportsList(),
+              _buildViewAllButton('View All Pending'),
+            ],
           ),
-          12.spMin.hSizedBox,
-          _buildViewAllButton('View All Pending'),
-        ],
-      ),
+        ).pB(24.0);
+      },
     );
   }
 
@@ -637,156 +628,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           textAlign: TextAlign.center,
         ),
       ],
-    );
-  }
-
-  Widget _buildHazardItem(
-    String title,
-    String severity,
-    DateTime reportedAt,
-    IconData icon,
-    Color severityColor,
-    String status,
-  ) {
-    return Container(
-      padding: EdgeInsets.all(12.spMin),
-      decoration: BoxDecoration(
-        color: AppColors.extraLightGrey,
-        borderRadius: BorderRadius.circular(8.spMin),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(8.spMin),
-            decoration: BoxDecoration(
-              color: severityColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8.spMin),
-            ),
-            child: Icon(
-              icon,
-              size: 20.spMin,
-              color: severityColor,
-            ),
-          ),
-          12.spMin.wSizedBox,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14.spMin,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                4.spMin.hSizedBox,
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 6.spMin,
-                        vertical: 2.spMin,
-                      ),
-                      decoration: BoxDecoration(
-                        color: severityColor.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(4.spMin),
-                      ),
-                      child: Text(
-                        severity,
-                        style: TextStyle(
-                          fontSize: 10.spMin,
-                          color: severityColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    8.spMin.wSizedBox,
-                    Text(
-                      timeago.format(reportedAt),
-                      style: TextStyle(
-                        fontSize: 10.spMin,
-                        color: AppColors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 8.spMin,
-              vertical: 4.spMin,
-            ),
-            decoration: BoxDecoration(
-              color: status == 'Approved' ? AppColors.green : AppColors.orange,
-              borderRadius: BorderRadius.circular(4.spMin),
-            ),
-            child: Text(
-              status,
-              style: TextStyle(
-                fontSize: 10.spMin,
-                color: AppColors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReviewItem(String title, String reason, DateTime reportedAt) {
-    return Container(
-      padding: EdgeInsets.all(12.spMin),
-      decoration: BoxDecoration(
-        color: AppColors.orange.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(8.spMin),
-        border: Border.all(
-          color: AppColors.orange.withValues(alpha: 0.2),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.edit_outlined,
-            size: 20.spMin,
-            color: AppColors.orange,
-          ),
-          12.spMin.wSizedBox,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14.spMin,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                4.spMin.hSizedBox,
-                Text(
-                  reason,
-                  style: TextStyle(
-                    fontSize: 12.spMin,
-                    color: AppColors.grey,
-                  ),
-                ),
-                4.spMin.hSizedBox,
-                Text(
-                  timeago.format(reportedAt),
-                  style: TextStyle(
-                    fontSize: 10.spMin,
-                    color: AppColors.grey,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 

@@ -70,7 +70,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
   /// Fetches hazards for the given location and updates the state accordingly.
   Future<void> getHazards() async {
     final location = state.searchedLocation;
-    if (location == null) return;
+    if (location?.bounds == null) return;
 
     state = state.copyWith(
       getHazardsByLocationState: const GetHazardsByLocationState.loading(),
@@ -78,9 +78,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
 
     final result = await _hazardService.getGetHazardsWithCategories(
       searchParams: HazardSearchParams(
-        latitude: location.latitude,
-        longitude: location.longitude,
-        northeastLat: location.bounds?.northeastLat,
+        northeastLat: location!.bounds?.northeastLat,
         northeastLng: location.bounds?.northeastLng,
         southwestLat: location.bounds?.southwestLat,
         southwestLng: location.bounds?.southwestLng,

@@ -15,23 +15,22 @@ import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class HazardNotificationsListItem extends ConsumerStatefulWidget {
-  const HazardNotificationsListItem({
+class RecentReportsListItem extends ConsumerStatefulWidget {
+  const RecentReportsListItem({
     super.key,
-    required this.hazard,
+    required this.report,
   });
 
   /// The hazard to display in this list item.
-  final Hazard hazard;
+  final Hazard report;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _HazardNotificationsListItemState();
+      _RecentReportsListItemState();
 }
 
-class _HazardNotificationsListItemState
-    extends ConsumerState<HazardNotificationsListItem> {
-  late final provider = providerOfHazardItem(widget.hazard);
+class _RecentReportsListItemState extends ConsumerState<RecentReportsListItem> {
+  late final provider = providerOfHazardItem(widget.report);
 
   @override
   Widget build(BuildContext context) {
@@ -59,14 +58,14 @@ class _HazardNotificationsListItemState
                     style: DefaultTextStyle.of(context).style,
                     children: [
                       TextSpan(
-                        text: widget.hazard.title ?? 'No Title',
+                        text: widget.report.title ?? 'No Title',
                         style: TextStyle(
                           fontSize: 15.spMin,
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
                         ),
                       ),
-                      if (widget.hazard.createdAt != null) ...[
+                      if (widget.report.createdAt != null) ...[
                         TextSpan(
                           text: ' • ',
                           style: TextStyle(
@@ -77,7 +76,7 @@ class _HazardNotificationsListItemState
                         TextSpan(
                           text: timeago
                               .format(
-                                widget.hazard.createdAt!,
+                                widget.report.createdAt!,
                                 locale: 'en_short',
                               )
                               .replaceAll('~', ''),
@@ -91,9 +90,9 @@ class _HazardNotificationsListItemState
                     ],
                   ),
                 ),
-                if (widget.hazard.shortDescription != null)
+                if (widget.report.shortDescription != null)
                   Text(
-                    widget.hazard.shortDescription!,
+                    widget.report.shortDescription!,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                     style: TextStyle(
@@ -122,7 +121,7 @@ class _HazardNotificationsListItemState
           ),
         ],
       ).pad(10.0),
-    ).pX(10.0);
+    );
   }
 
   Widget _iconBuilder() {
@@ -131,7 +130,7 @@ class _HazardNotificationsListItemState
       height: 45.spMin,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: widget.hazard.severity?.color,
+        color: widget.report.severity?.color,
       ),
       padding: EdgeInsets.all(8.spMin),
       child: Container(
@@ -141,7 +140,7 @@ class _HazardNotificationsListItemState
         ),
         child: Center(
           child: Text(
-            widget.hazard.category?.emoji ?? '❗',
+            widget.report.category?.emoji ?? '❗',
             style: TextStyle(
               fontSize: 16.spMin,
               shadows: [
@@ -187,7 +186,7 @@ class _HazardNotificationsListItemState
     context.unfocusInputs();
     context.push(
       ViewHazardScreen.route,
-      extra: ViewHazardScreenArgs(hazard: widget.hazard),
+      extra: ViewHazardScreenArgs(hazard: widget.report),
     );
   }
 

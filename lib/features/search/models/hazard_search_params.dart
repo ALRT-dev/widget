@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 
 part 'hazard_search_params.freezed.dart';
 part 'hazard_search_params.g.dart';
@@ -12,30 +13,24 @@ abstract class HazardSearchParams with _$HazardSearchParams {
     /// The list of category IDs to filter hazards.
     @Default(<String>[]) final List<String> categoryIds,
 
-    /// The latitude for location-based filtering.
-    final double? latitude,
+    /// The id of the user who reported the hazard to filter hazards.
+    final String? reportedById,
 
-    /// The longitude for location-based filtering.
-    final double? longitude,
+    /// The review status to filter hazards.
+    ///
+    /// Defaults to [HazardReviewStatus.accepted] to show only accepted hazards.
+    @Default(HazardReviewStatus.accepted) final HazardReviewStatus reviewStatus,
 
     /// The bounds for location-based filtering.
-    ///
-    /// If provided, [latitude] and [longitude] will be ignored.
     final double? northeastLat,
 
     /// The bounds for location-based filtering.
-    ///
-    /// If provided, [latitude] and [longitude] will be ignored.
     final double? northeastLng,
 
     /// The bounds for location-based filtering.
-    ///
-    /// If provided, [latitude] and [longitude] will be ignored.
     final double? southwestLat,
 
     /// The bounds for location-based filtering.
-    ///
-    /// If provided, [latitude] and [longitude] will be ignored.
     final double? southwestLng,
 
     /// The page number for pagination.

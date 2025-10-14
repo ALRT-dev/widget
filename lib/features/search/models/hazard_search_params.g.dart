@@ -14,8 +14,13 @@ _HazardSearchParams _$HazardSearchParamsFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const <String>[],
-      latitude: (json['lat'] as num?)?.toDouble(),
-      longitude: (json['lng'] as num?)?.toDouble(),
+      reportedById: json['reportedById'] as String?,
+      reviewStatus:
+          $enumDecodeNullable(
+            _$HazardReviewStatusEnumMap,
+            json['reviewStatus'],
+          ) ??
+          HazardReviewStatus.accepted,
       northeastLat: (json['northeastLat'] as num?)?.toDouble(),
       northeastLng: (json['northeastLng'] as num?)?.toDouble(),
       southwestLat: (json['southwestLat'] as num?)?.toDouble(),
@@ -28,8 +33,8 @@ Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
     <String, dynamic>{
       'searchString': ?instance.searchString,
       'categoryIds': instance.categoryIds,
-      'lat': ?instance.latitude,
-      'lng': ?instance.longitude,
+      'reportedById': ?instance.reportedById,
+      'reviewStatus': _$HazardReviewStatusEnumMap[instance.reviewStatus]!,
       'northeastLat': ?instance.northeastLat,
       'northeastLng': ?instance.northeastLng,
       'southwestLat': ?instance.southwestLat,
@@ -37,3 +42,9 @@ Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
       'page': instance.page,
       'pageSize': instance.pageSize,
     };
+
+const _$HazardReviewStatusEnumMap = {
+  HazardReviewStatus.pending: 'pending',
+  HazardReviewStatus.accepted: 'accepted',
+  HazardReviewStatus.rejected: 'rejected',
+};

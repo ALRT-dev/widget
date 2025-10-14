@@ -11,7 +11,6 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   title: json['title'] as String?,
   description: json['description'] as String?,
   shortDescription: json['shortDescription'] as String?,
-  visibility: json['visibility'] as bool? ?? true,
   severity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['severity']),
   latitude: (json['latitude'] as num?)?.toDouble(),
   longitude: (json['longitude'] as num?)?.toDouble(),
@@ -23,7 +22,6 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
       ? null
       : HazardSource.fromJson(json['source'] as Map<String, dynamic>),
   aiSummary: json['aiSummary'] as String?,
-  aiFeedback: json['aiFeedback'] as String?,
   aiSeverity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['aiSeverity']),
   aiConfidence: $enumDecodeNullable(
     _$AIConfidenceEnumMap,
@@ -32,24 +30,38 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   reportedBy: json['reportedBy'] == null
       ? null
       : AppUser.fromJson(json['reportedBy'] as Map<String, dynamic>),
+  reviewStatus: $enumDecodeNullable(
+    _$HazardReviewStatusEnumMap,
+    json['reviewStatus'],
+  ),
+  reviewFeedback: json['reviewFeedback'] as String?,
+  reviewedById: json['reviewedById'] as String?,
+  reviewedAt: _$JsonConverterFromJson<String, DateTime>(
+    json['reviewedAt'],
+    const DateTimeConverter().fromJson,
+  ),
   userVoteType: $enumDecodeNullable(
     _$HazardVoteTypeEnumMap,
     json['userVoteType'],
   ),
   upvoteCount: (json['upvoteCount'] as num?)?.toInt() ?? 0,
   downvoteCount: (json['downvoteCount'] as num?)?.toInt() ?? 0,
-  occurredAt: json['occurredAt'] == null
-      ? null
-      : DateTime.parse(json['occurredAt'] as String),
-  createdAt: json['createdAt'] == null
-      ? null
-      : DateTime.parse(json['createdAt'] as String),
-  updatedAt: json['updatedAt'] == null
-      ? null
-      : DateTime.parse(json['updatedAt'] as String),
-  expiresAt: json['expiresAt'] == null
-      ? null
-      : DateTime.parse(json['expiresAt'] as String),
+  occurredAt: _$JsonConverterFromJson<String, DateTime>(
+    json['occurredAt'],
+    const DateTimeConverter().fromJson,
+  ),
+  createdAt: _$JsonConverterFromJson<String, DateTime>(
+    json['createdAt'],
+    const DateTimeConverter().fromJson,
+  ),
+  updatedAt: _$JsonConverterFromJson<String, DateTime>(
+    json['updatedAt'],
+    const DateTimeConverter().fromJson,
+  ),
+  expiresAt: _$JsonConverterFromJson<String, DateTime>(
+    json['expiresAt'],
+    const DateTimeConverter().fromJson,
+  ),
 );
 
 Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
@@ -57,7 +69,6 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'title': ?instance.title,
   'description': ?instance.description,
   'shortDescription': ?instance.shortDescription,
-  'visibility': instance.visibility,
   'severity': ?_$HazardSeverityEnumMap[instance.severity],
   'latitude': ?instance.latitude,
   'longitude': ?instance.longitude,
@@ -65,17 +76,35 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'category': ?instance.category?.toJson(),
   'source': ?instance.source?.toJson(),
   'aiSummary': ?instance.aiSummary,
-  'aiFeedback': ?instance.aiFeedback,
   'aiSeverity': ?_$HazardSeverityEnumMap[instance.aiSeverity],
   'aiConfidence': ?_$AIConfidenceEnumMap[instance.aiConfidence],
   'reportedBy': ?instance.reportedBy?.toJson(),
+  'reviewStatus': ?_$HazardReviewStatusEnumMap[instance.reviewStatus],
+  'reviewFeedback': ?instance.reviewFeedback,
+  'reviewedById': ?instance.reviewedById,
+  'reviewedAt': ?_$JsonConverterToJson<String, DateTime>(
+    instance.reviewedAt,
+    const DateTimeConverter().toJson,
+  ),
   'userVoteType': ?_$HazardVoteTypeEnumMap[instance.userVoteType],
   'upvoteCount': instance.upvoteCount,
   'downvoteCount': instance.downvoteCount,
-  'occurredAt': ?instance.occurredAt?.toIso8601String(),
-  'createdAt': ?instance.createdAt?.toIso8601String(),
-  'updatedAt': ?instance.updatedAt?.toIso8601String(),
-  'expiresAt': ?instance.expiresAt?.toIso8601String(),
+  'occurredAt': ?_$JsonConverterToJson<String, DateTime>(
+    instance.occurredAt,
+    const DateTimeConverter().toJson,
+  ),
+  'createdAt': ?_$JsonConverterToJson<String, DateTime>(
+    instance.createdAt,
+    const DateTimeConverter().toJson,
+  ),
+  'updatedAt': ?_$JsonConverterToJson<String, DateTime>(
+    instance.updatedAt,
+    const DateTimeConverter().toJson,
+  ),
+  'expiresAt': ?_$JsonConverterToJson<String, DateTime>(
+    instance.expiresAt,
+    const DateTimeConverter().toJson,
+  ),
 };
 
 const _$HazardSeverityEnumMap = {
@@ -91,7 +120,23 @@ const _$AIConfidenceEnumMap = {
   AIConfidence.high: 'high',
 };
 
+const _$HazardReviewStatusEnumMap = {
+  HazardReviewStatus.pending: 'pending',
+  HazardReviewStatus.accepted: 'accepted',
+  HazardReviewStatus.rejected: 'rejected',
+};
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) => json == null ? null : fromJson(json as Json);
+
 const _$HazardVoteTypeEnumMap = {
   HazardVoteType.upvote: 'upvote',
   HazardVoteType.downvote: 'downvote',
 };
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) => value == null ? null : toJson(value);

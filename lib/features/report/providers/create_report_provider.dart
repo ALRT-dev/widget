@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/profile/providers/profile_provider.dart';
 import 'package:hazard_app/features/report/providers/states/create_report_provider_state.dart';
+import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
@@ -33,6 +35,7 @@ class CreateReportProvider extends StateNotifier<CreateReportProviderState> {
   final Ref _ref;
   MediaRepository get _mediaRepository => _ref.read(providerOfMediaRepository);
   HazardService get _hazardService => _ref.read(providerOfHazardService);
+  ProfileProvider get _profileProvider => _ref.read(providerOfProfile.notifier);
 
   /// Creates a new hazard report using the data in the current state.
   Future<void> createReport() async {
@@ -69,7 +72,7 @@ class CreateReportProvider extends StateNotifier<CreateReportProviderState> {
           ),
         );
 
-        // update user's hazardsReportedCount by 1
+        // Update user's hazardsReportedCount by 1
         _ref
             .read(providerOfLoggedInUser.notifier)
             .update(
@@ -77,6 +80,13 @@ class CreateReportProvider extends StateNotifier<CreateReportProviderState> {
                 hazardsReportedCount: user.hazardsReportedCount + 1,
               ),
             );
+
+        // Add the newly created hazard to the appropriate list in ProfileProvider
+        if (hazard.reviewStatus == HazardReviewStatus.accepted) {
+          _profileProvider.addToMyAcceptedHazards(hazard);
+        } else if (hazard.reviewStatus == HazardReviewStatus.rejected) {
+          _profileProvider.addToMyRejectedHazards(hazard);
+        }
       },
       (error) {
         updateCreatingHazardReport(

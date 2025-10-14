@@ -17,20 +17,14 @@ mixin _$HazardSearchParams {
 
 /// The search string to filter hazards by their title or description.
  String? get searchString;/// The list of category IDs to filter hazards.
- List<String> get categoryIds;/// The latitude for location-based filtering.
-@JsonKey(name: 'lat') double? get latitude;/// The longitude for location-based filtering.
-@JsonKey(name: 'lng') double? get longitude;/// The bounds for location-based filtering.
+ List<String> get categoryIds;/// The id of the user who reported the hazard to filter hazards.
+ String? get reportedById;/// The review status to filter hazards.
 ///
-/// If provided, [latitude] and [longitude] will be ignored.
+/// Defaults to [HazardReviewStatus.accepted] to show only accepted hazards.
+ HazardReviewStatus get reviewStatus;/// The bounds for location-based filtering.
  double? get northeastLat;/// The bounds for location-based filtering.
-///
-/// If provided, [latitude] and [longitude] will be ignored.
  double? get northeastLng;/// The bounds for location-based filtering.
-///
-/// If provided, [latitude] and [longitude] will be ignored.
  double? get southwestLat;/// The bounds for location-based filtering.
-///
-/// If provided, [latitude] and [longitude] will be ignored.
  double? get southwestLng;/// The page number for pagination.
  int get page;/// The number of items per page for pagination.
  int get pageSize;
@@ -46,16 +40,16 @@ $HazardSearchParamsCopyWith<HazardSearchParams> get copyWith => _$HazardSearchPa
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other.categoryIds, categoryIds)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other.categoryIds, categoryIds)&&(identical(other.reportedById, reportedById) || other.reportedById == reportedById)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(categoryIds),latitude,longitude,northeastLat,northeastLng,southwestLat,southwestLng,page,pageSize);
+int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(categoryIds),reportedById,reviewStatus,northeastLat,northeastLng,southwestLat,southwestLng,page,pageSize);
 
 @override
 String toString() {
-  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, latitude: $latitude, longitude: $longitude, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, page: $page, pageSize: $pageSize)';
+  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, reportedById: $reportedById, reviewStatus: $reviewStatus, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, page: $page, pageSize: $pageSize)';
 }
 
 
@@ -66,7 +60,7 @@ abstract mixin class $HazardSearchParamsCopyWith<$Res>  {
   factory $HazardSearchParamsCopyWith(HazardSearchParams value, $Res Function(HazardSearchParams) _then) = _$HazardSearchParamsCopyWithImpl;
 @useResult
 $Res call({
- String? searchString, List<String> categoryIds,@JsonKey(name: 'lat') double? latitude,@JsonKey(name: 'lng') double? longitude, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, int page, int pageSize
+ String? searchString, List<String> categoryIds, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, int page, int pageSize
 });
 
 
@@ -83,13 +77,13 @@ class _$HazardSearchParamsCopyWithImpl<$Res>
 
 /// Create a copy of HazardSearchParams
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? latitude = freezed,Object? longitude = freezed,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? page = null,Object? pageSize = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? reportedById = freezed,Object? reviewStatus = null,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? page = null,Object? pageSize = null,}) {
   return _then(_self.copyWith(
 searchString: freezed == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
 as String?,categoryIds: null == categoryIds ? _self.categoryIds : categoryIds // ignore: cast_nullable_to_non_nullable
-as List<String>,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
-as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double?,northeastLat: freezed == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
+as List<String>,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
+as String?,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
+as HazardReviewStatus,northeastLat: freezed == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
 as double?,northeastLng: freezed == northeastLng ? _self.northeastLng : northeastLng // ignore: cast_nullable_to_non_nullable
 as double?,southwestLat: freezed == southwestLat ? _self.southwestLat : southwestLat // ignore: cast_nullable_to_non_nullable
 as double?,southwestLng: freezed == southwestLng ? _self.southwestLng : southwestLng // ignore: cast_nullable_to_non_nullable
@@ -180,10 +174,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds, @JsonKey(name: 'lat')  double? latitude, @JsonKey(name: 'lng')  double? longitude,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  int page,  int pageSize)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  int page,  int pageSize)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardSearchParams() when $default != null:
-return $default(_that.searchString,_that.categoryIds,_that.latitude,_that.longitude,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.page,_that.pageSize);case _:
+return $default(_that.searchString,_that.categoryIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.page,_that.pageSize);case _:
   return orElse();
 
 }
@@ -201,10 +195,10 @@ return $default(_that.searchString,_that.categoryIds,_that.latitude,_that.longit
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds, @JsonKey(name: 'lat')  double? latitude, @JsonKey(name: 'lng')  double? longitude,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  int page,  int pageSize)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  int page,  int pageSize)  $default,) {final _that = this;
 switch (_that) {
 case _HazardSearchParams():
-return $default(_that.searchString,_that.categoryIds,_that.latitude,_that.longitude,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.page,_that.pageSize);case _:
+return $default(_that.searchString,_that.categoryIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.page,_that.pageSize);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -221,10 +215,10 @@ return $default(_that.searchString,_that.categoryIds,_that.latitude,_that.longit
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? searchString,  List<String> categoryIds, @JsonKey(name: 'lat')  double? latitude, @JsonKey(name: 'lng')  double? longitude,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  int page,  int pageSize)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? searchString,  List<String> categoryIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  int page,  int pageSize)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardSearchParams() when $default != null:
-return $default(_that.searchString,_that.categoryIds,_that.latitude,_that.longitude,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.page,_that.pageSize);case _:
+return $default(_that.searchString,_that.categoryIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.page,_that.pageSize);case _:
   return null;
 
 }
@@ -236,7 +230,7 @@ return $default(_that.searchString,_that.categoryIds,_that.latitude,_that.longit
 @JsonSerializable()
 
 class _HazardSearchParams implements HazardSearchParams {
-  const _HazardSearchParams({this.searchString, final  List<String> categoryIds = const <String>[], @JsonKey(name: 'lat') this.latitude, @JsonKey(name: 'lng') this.longitude, this.northeastLat, this.northeastLng, this.southwestLat, this.southwestLng, this.page = 1, this.pageSize = 20}): _categoryIds = categoryIds;
+  const _HazardSearchParams({this.searchString, final  List<String> categoryIds = const <String>[], this.reportedById, this.reviewStatus = HazardReviewStatus.accepted, this.northeastLat, this.northeastLng, this.southwestLat, this.southwestLng, this.page = 1, this.pageSize = 20}): _categoryIds = categoryIds;
   factory _HazardSearchParams.fromJson(Map<String, dynamic> json) => _$HazardSearchParamsFromJson(json);
 
 /// The search string to filter hazards by their title or description.
@@ -250,25 +244,19 @@ class _HazardSearchParams implements HazardSearchParams {
   return EqualUnmodifiableListView(_categoryIds);
 }
 
-/// The latitude for location-based filtering.
-@override@JsonKey(name: 'lat') final  double? latitude;
-/// The longitude for location-based filtering.
-@override@JsonKey(name: 'lng') final  double? longitude;
-/// The bounds for location-based filtering.
+/// The id of the user who reported the hazard to filter hazards.
+@override final  String? reportedById;
+/// The review status to filter hazards.
 ///
-/// If provided, [latitude] and [longitude] will be ignored.
+/// Defaults to [HazardReviewStatus.accepted] to show only accepted hazards.
+@override@JsonKey() final  HazardReviewStatus reviewStatus;
+/// The bounds for location-based filtering.
 @override final  double? northeastLat;
 /// The bounds for location-based filtering.
-///
-/// If provided, [latitude] and [longitude] will be ignored.
 @override final  double? northeastLng;
 /// The bounds for location-based filtering.
-///
-/// If provided, [latitude] and [longitude] will be ignored.
 @override final  double? southwestLat;
 /// The bounds for location-based filtering.
-///
-/// If provided, [latitude] and [longitude] will be ignored.
 @override final  double? southwestLng;
 /// The page number for pagination.
 @override@JsonKey() final  int page;
@@ -288,16 +276,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other._categoryIds, _categoryIds)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other._categoryIds, _categoryIds)&&(identical(other.reportedById, reportedById) || other.reportedById == reportedById)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(_categoryIds),latitude,longitude,northeastLat,northeastLng,southwestLat,southwestLng,page,pageSize);
+int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(_categoryIds),reportedById,reviewStatus,northeastLat,northeastLng,southwestLat,southwestLng,page,pageSize);
 
 @override
 String toString() {
-  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, latitude: $latitude, longitude: $longitude, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, page: $page, pageSize: $pageSize)';
+  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, reportedById: $reportedById, reviewStatus: $reviewStatus, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, page: $page, pageSize: $pageSize)';
 }
 
 
@@ -308,7 +296,7 @@ abstract mixin class _$HazardSearchParamsCopyWith<$Res> implements $HazardSearch
   factory _$HazardSearchParamsCopyWith(_HazardSearchParams value, $Res Function(_HazardSearchParams) _then) = __$HazardSearchParamsCopyWithImpl;
 @override @useResult
 $Res call({
- String? searchString, List<String> categoryIds,@JsonKey(name: 'lat') double? latitude,@JsonKey(name: 'lng') double? longitude, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, int page, int pageSize
+ String? searchString, List<String> categoryIds, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, int page, int pageSize
 });
 
 
@@ -325,13 +313,13 @@ class __$HazardSearchParamsCopyWithImpl<$Res>
 
 /// Create a copy of HazardSearchParams
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? latitude = freezed,Object? longitude = freezed,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? page = null,Object? pageSize = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? reportedById = freezed,Object? reviewStatus = null,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? page = null,Object? pageSize = null,}) {
   return _then(_HazardSearchParams(
 searchString: freezed == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
 as String?,categoryIds: null == categoryIds ? _self._categoryIds : categoryIds // ignore: cast_nullable_to_non_nullable
-as List<String>,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
-as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double?,northeastLat: freezed == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
+as List<String>,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
+as String?,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
+as HazardReviewStatus,northeastLat: freezed == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
 as double?,northeastLng: freezed == northeastLng ? _self.northeastLng : northeastLng // ignore: cast_nullable_to_non_nullable
 as double?,southwestLat: freezed == southwestLat ? _self.southwestLat : southwestLat // ignore: cast_nullable_to_non_nullable
 as double?,southwestLng: freezed == southwestLng ? _self.southwestLng : southwestLng // ignore: cast_nullable_to_non_nullable
