@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/providers/hazard_socket_notifier.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
@@ -25,11 +27,30 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
     required final Ref ref,
     required final HazardItemProviderState state,
   }) : _ref = ref,
-       super(state);
+       super(state) {
+    _listenToHazardUpdates();
+  }
 
   final Ref _ref;
 
   HazardService get _hazardService => _ref.read(providerOfHazardService);
+
+  /// Listens to the global hazard update stream and updates the hazard in the state if it matches the current hazard.
+  void _listenToHazardUpdates() {
+    final updateHazardSubscription = _ref
+        .read(providerOfHazardSocketManager)
+        .hazardUpdateStream
+        .listen((updatedHazard) {
+          if (updatedHazard.id == state.hazard.id) {
+            updateHazard(updatedHazard);
+          }
+        });
+
+    // Clean up subscription when provider is disposed
+    _ref.onDispose(() {
+      updateHazardSubscription.cancel();
+    });
+  }
 
   /// Handles voting on the hazard.
   Future<void> voteHazard({

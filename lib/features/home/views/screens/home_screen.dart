@@ -28,6 +28,7 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_socket_notifier.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -71,6 +72,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       providerOfHazardCategoriesForNotifications.select((value) => null),
     );
     ref.watch(providerOfPushNotificationMessage.select((value) => null));
+    ref.watch(providerOfHazardSocketManager.select((value) => null));
 
     _listenToHazardsState();
     _listenToCreateReportState();

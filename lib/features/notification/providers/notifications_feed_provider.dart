@@ -6,12 +6,10 @@ import 'package:hazard_app/features/notification/providers/service_providers.dar
 import 'package:hazard_app/features/notification/providers/states/notifications_feed_provider_state.dart';
 import 'package:hazard_app/features/notification/services/notification_service.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
-import 'package:hazard_app/features/shared/enums/socket_event_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
-import 'package:hazard_app/features/shared/providers/service_providers.dart';
-import 'package:hazard_app/features/shared/services/socket_service.dart';
+import 'package:hazard_app/features/shared/providers/hazard_socket_notifier.dart';
 
 final providerOfNotificationsFeed =
     StateNotifierProvider.autoDispose<
@@ -36,20 +34,18 @@ class NotificationsFeedProvider
   }
 
   final Ref _ref;
+
   NotificationService get _notificationService =>
       _ref.read(providerOfNotificationService);
-  SocketService get _socketService => _ref.read(providerOfSocketService);
   HazardCategoriesProvider get _hazardCategoriesProvider =>
       _ref.read(providerOfHazardCategoriesForNotifications.notifier);
 
-  /// Listens to the socket for hazards and adds/updates/removes them from the notifications feed.
+  /// Listens to the socket for hazard updates, new hazards, and deletions.
   void _listenToSocketForHazards() {
-    _socketService.listenToEvent(
-      SocketEvent.newHazard,
-      (data) {
-        if (data is Map<String, dynamic>) {
-          final newHazard = Hazard.fromJson(data);
-
+    final newHazardSubscription = _ref
+        .read(providerOfHazardSocketManager)
+        .newHazardStream
+        .listen((newHazard) {
           // if search string is not empty, check if the new hazard matches the search string
           // if it does, add it to the list of hazards
           // otherwise, ignore it
@@ -73,31 +69,24 @@ class NotificationsFeedProvider
               processCategoryFromSocket(newHazard.category!);
             }
           }
-        }
-      },
-    );
+        });
 
-    _socketService.listenToEvent(
-      SocketEvent.updateHazard,
-      (data) {
-        if (data is Map<String, dynamic>) {
-          final updatedHazard = Hazard.fromJson(data);
-          updateHazard(updatedHazard);
-        }
-      },
-    );
+    final updateHazardSubscription = _ref
+        .read(providerOfHazardSocketManager)
+        .hazardUpdateStream
+        .listen(updateHazard);
 
-    _socketService.listenToEvent(
-      SocketEvent.deleteHazard,
-      (data) {
-        if (data is Map<String, dynamic>) {
-          final hazardId = data['id'] as String?;
-          if (hazardId != null) {
-            removeFromHazards(hazardId);
-          }
-        }
-      },
-    );
+    final deleteHazardSubscription = _ref
+        .read(providerOfHazardSocketManager)
+        .deleteHazardStream
+        .listen(removeFromHazards);
+
+    // Clean up subscription when provider is disposed
+    _ref.onDispose(() {
+      newHazardSubscription.cancel();
+      updateHazardSubscription.cancel();
+      deleteHazardSubscription.cancel();
+    });
   }
 
   /// Fetches the hazards that the user has subscribed to for notifications

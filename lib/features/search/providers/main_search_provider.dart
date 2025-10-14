@@ -1,16 +1,16 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
-import 'package:hazard_app/features/shared/enums/socket_event_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_socket_notifier.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
-import 'package:hazard_app/features/shared/services/socket_service.dart';
 import 'package:hazard_app/features/shared/services/user_service.dart';
 
 final providerOfMainSearch =
@@ -34,37 +34,31 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
   }
 
   final Ref _ref;
+
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   UserService get _userService => _ref.read(providerOfUserService);
-  SocketService get _socketService => _ref.read(providerOfSocketService);
   HazardCategoriesProvider get _hazardCategoriesProvider =>
       _ref.read(providerOfHazardCategoriesForSearch.notifier);
   NotificationsFeedProvider get _notificationsFeedProvider =>
       _ref.read(providerOfNotificationsFeed.notifier);
 
-  /// Sets up socket listeners for hazard updates and deletions.
+  /// Listens to the global hazard streams for updates and deletions.
   void _listenToSocketForHazards() {
-    _socketService.listenToEvent(
-      SocketEvent.updateHazard,
-      (data) {
-        if (data is Map<String, dynamic>) {
-          final updatedHazard = Hazard.fromJson(data);
-          updateHazard(updatedHazard);
-        }
-      },
-    );
+    final updateHazardSubscription = _ref
+        .read(providerOfHazardSocketManager)
+        .hazardUpdateStream
+        .listen(updateHazard);
 
-    _socketService.listenToEvent(
-      SocketEvent.deleteHazard,
-      (data) {
-        if (data is Map<String, dynamic>) {
-          final hazardId = data['id'] as String?;
-          if (hazardId != null) {
-            removeFromHazards(hazardId);
-          }
-        }
-      },
-    );
+    final deleteHazardSubscription = _ref
+        .read(providerOfHazardSocketManager)
+        .deleteHazardStream
+        .listen(removeFromHazards);
+
+    // Clean up subscription when provider is disposed
+    _ref.onDispose(() {
+      updateHazardSubscription.cancel();
+      deleteHazardSubscription.cancel();
+    });
   }
 
   /// Fetches hazards for the given location and updates the state accordingly.

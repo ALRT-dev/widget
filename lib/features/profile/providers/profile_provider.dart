@@ -122,9 +122,7 @@ class ProfileProvider extends StateNotifier<ProfileProviderState> {
   void addToMyAcceptedHazards(final Hazard hazard) {
     final updatedHazards = List<Hazard>.from(state.myAcceptedHazards)
       ..insert(0, hazard);
-    state = state.copyWith(
-      myAcceptedHazards: updatedHazards,
-    );
+    updateMyAcceptedHazards(updatedHazards);
   }
 
   /// Removes a hazard from [ProfileProviderState.myAcceptedHazards] by its [hazardId].
@@ -132,9 +130,7 @@ class ProfileProvider extends StateNotifier<ProfileProviderState> {
     final updatedHazards = state.myAcceptedHazards
         .where((hazard) => hazard.id != hazardId)
         .toList();
-    state = state.copyWith(
-      myAcceptedHazards: updatedHazards,
-    );
+    updateMyAcceptedHazards(updatedHazards);
   }
 
   /// Updates [ProfileProviderState.myRejectedHazards] with the given [hazards].
@@ -151,9 +147,7 @@ class ProfileProvider extends StateNotifier<ProfileProviderState> {
   void addToMyRejectedHazards(final Hazard hazard) {
     final updatedHazards = List<Hazard>.from(state.myRejectedHazards)
       ..insert(0, hazard);
-    state = state.copyWith(
-      myRejectedHazards: updatedHazards,
-    );
+    updateMyRejectedHazards(updatedHazards);
   }
 
   /// Removes a hazard from [ProfileProviderState.myRejectedHazards] by its [hazardId].
@@ -161,8 +155,6 @@ class ProfileProvider extends StateNotifier<ProfileProviderState> {
     final updatedHazards = state.myRejectedHazards
         .where((hazard) => hazard.id != hazardId)
         .toList();
-    state = state.copyWith(
-      myRejectedHazards: updatedHazards,
-    );
+    updateMyRejectedHazards(updatedHazards);
   }
 }
