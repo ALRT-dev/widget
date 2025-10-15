@@ -64,6 +64,7 @@ class _RecentReportsListState extends ConsumerState<RecentReportsList> {
             itemBuilder: (context, index) {
               final report = recentReports[index];
               return RecentReportsListItem(
+                key: ValueKey(report.id),
                 report: report,
               );
             },

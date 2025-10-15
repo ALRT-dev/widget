@@ -125,6 +125,7 @@ class _HazardNotificationsListState
           itemBuilder: (context, index) {
             final hazard = hazards[index];
             return HazardNotificationsListItem(
+              key: ValueKey(hazard.id),
               hazard: hazard,
             );
           },

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_socket_notifier.dart';
+import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';

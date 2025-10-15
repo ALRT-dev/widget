@@ -9,7 +9,7 @@ import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
-import 'package:hazard_app/features/shared/providers/hazard_socket_notifier.dart';
+import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 
 final providerOfNotificationsFeed =
     StateNotifierProvider.autoDispose<

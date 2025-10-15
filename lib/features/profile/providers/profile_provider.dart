@@ -9,6 +9,7 @@ import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
+import 'package:hazard_app/features/shared/providers/user_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 
 final providerOfProfile =
@@ -25,16 +26,64 @@ class ProfileProvider extends StateNotifier<ProfileProviderState> {
     required final ProfileProviderState state,
   }) : _ref = ref,
        super(state) {
+    _listenToSocketEvents();
+
     getMyAcceptedHazards();
     getMyRejectedHazards();
   }
 
   final Ref _ref;
   HazardService get _hazardService => _ref.read(providerOfHazardService);
+  UserSocketManager get _userSocketManager =>
+      _ref.read(providerOfUserSocketManager);
   AppUser? get _loggedInUser => _ref.read(providerOfLoggedInUser);
 
   // Only fetch 3 items for preview.
   final pageSize = 3;
+
+  /// Listens to socket events and updates the logged-in user accordingly.
+  void _listenToSocketEvents() {
+    final xpUpdatesListener = _userSocketManager.userXpUpdateStream.listen(
+      (xpPoints) {
+        _ref
+            .read(providerOfLoggedInUser.notifier)
+            .update((user) => user?.copyWith(xpPoints: xpPoints));
+      },
+    );
+
+    final reliabilityUpdatesListener = _userSocketManager
+        .userReliabilityUpdateStream
+        .listen(
+          (reliabilityScore) {
+            _ref
+                .read(providerOfLoggedInUser.notifier)
+                .update(
+                  (user) => user?.copyWith(reliabilityScore: reliabilityScore),
+                );
+          },
+        );
+
+    final upvotesReceivedCountListener = _userSocketManager
+        .userUpvotesReceivedCountUpdateStream
+        .listen(
+          (upvotesReceivedCount) {
+            _ref
+                .read(providerOfLoggedInUser.notifier)
+                .update(
+                  (user) => user?.copyWith(
+                    upvotesReceivedCount: upvotesReceivedCount,
+                  ),
+                );
+          },
+        );
+
+    // Cancel the subscriptions when the provider is disposed.
+    _ref.onDispose(() {
+      xpUpdatesListener.cancel();
+      reliabilityUpdatesListener.cancel();
+      upvotesReceivedCountListener.cancel();
+    });
+  }
 
   /// Fetches hazards reported by the logged-in user that have been accepted.
   Future<void> getMyAcceptedHazards() async {
