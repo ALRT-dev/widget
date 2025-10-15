@@ -1,6 +1,6 @@
 // const kUrlBase = 'http://3.26.195.127/api';
-const kUrlBase = 'http://192.168.1.252:9000/api';
-const kUrlBaseDev = 'http://192.168.1.252:9000/api';
+const kUrlBase = 'http://192.168.1.67:9000/api';
+const kUrlBaseDev = 'http://192.168.1.67:9000/api';
 
 // ---------------------------- AUTH ----------------------------
 

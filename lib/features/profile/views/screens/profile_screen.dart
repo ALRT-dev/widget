@@ -57,96 +57,143 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       expandedHeight: 200.spMin,
       floating: false,
       pinned: true,
-      backgroundColor: AppColors.blue,
-      foregroundColor: AppColors.white,
+      backgroundColor: AppColors.white,
+      foregroundColor: AppColors.black,
       elevation: 0,
-      leading: IconButton(
-        icon: Icon(
-          Icons.settings,
-          size: 24.spMin,
-          color: AppColors.white,
-        ),
-        onPressed: () {
-          // Navigate to settings
+      flexibleSpace: LayoutBuilder(
+        builder: (context, constraints) {
+          // Calculate the collapse ratio
+          final collapsedHeight =
+              kToolbarHeight + MediaQuery.of(context).padding.top;
+          final currentHeight = constraints.maxHeight;
+
+          // When currentHeight equals collapsedHeight, it's fully collapsed
+          final isCollapsed =
+              currentHeight <= collapsedHeight + 10; // Small buffer
+
+          return FlexibleSpaceBar(
+            centerTitle: false,
+            titlePadding: EdgeInsets.only(
+              left: 20.spMin,
+              bottom: 16.spMin,
+            ),
+            title: isCollapsed
+                ? Row(
+                    spacing: 10.spMin,
+                    children: [
+                      _buildUserAvatar(
+                        size: 40.0,
+                        backgroundColor: AppColors.black,
+                        borderColor: AppColors.white,
+                        borderWidth: 2.0,
+                      ),
+                      _buildUserName(
+                        color: AppColors.black,
+                        fontSize: 20.0,
+                      ),
+                    ],
+                  )
+                : null,
+            background: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    AppColors.black.withValues(alpha: 0.85),
+                    AppColors.black,
+                  ],
+                ),
+              ),
+              child: Center(
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final userEmail = ref.watch(
+                      providerOfLoggedInUser.select(
+                        (value) => value?.email,
+                      ),
+                    );
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        40.spMin.hSizedBox,
+                        _buildUserAvatar(),
+                        12.spMin.hSizedBox,
+                        _buildUserName(),
+                        if (userEmail != null) 4.spMin.hSizedBox,
+                        if (userEmail != null)
+                          Text(
+                            userEmail,
+                            style: TextStyle(
+                              fontSize: 14.spMin,
+                              color: AppColors.white.withValues(alpha: 0.8),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          );
         },
       ),
-      actions: [
-        IconButton(
-          icon: Icon(
-            Icons.edit,
-            size: 24.spMin,
-            color: AppColors.white,
+    );
+  }
+
+  Widget _buildUserName({
+    final double fontSize = 24.0,
+    final Color color = AppColors.white,
+  }) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final userName = ref.watch(
+          providerOfLoggedInUser.select(
+            (value) => value?.name ?? 'User',
           ),
-          onPressed: () {
-            // Navigate to edit profile
-          },
-        ),
-      ],
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppColors.blue,
-                AppColors.blue.withValues(alpha: 0.8),
-              ],
-            ),
+        );
+        return Text(
+          userName,
+          style: TextStyle(
+            fontSize: fontSize.spMin,
+            fontWeight: FontWeight.bold,
+            color: color,
           ),
-          child: Center(
-            child: Consumer(
-              builder: (context, ref, child) {
-                final userName = ref.watch(
-                  providerOfLoggedInUser.select(
-                    (value) => value?.name ?? 'User',
-                  ),
-                );
-                final userEmail = ref.watch(
-                  providerOfLoggedInUser.select(
-                    (value) => value?.email,
-                  ),
-                );
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    40.spMin.hSizedBox,
-                    Hero(
-                      tag: 'profile_avatar',
-                      child: Avatar.initials(
-                        initials: _getInitials(userName),
-                        size: 80.spMin,
-                        backgroundColor: AppColors.white.withValues(alpha: 0.2),
-                        foregroundColor: AppColors.white,
-                        borderWidth: 3,
-                        borderColor: AppColors.white,
-                      ),
-                    ),
-                    12.spMin.hSizedBox,
-                    Text(
-                      userName,
-                      style: TextStyle(
-                        fontSize: 24.spMin,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.white,
-                      ),
-                    ),
-                    if (userEmail != null) 4.spMin.hSizedBox,
-                    if (userEmail != null)
-                      Text(
-                        userEmail,
-                        style: TextStyle(
-                          fontSize: 14.spMin,
-                          color: AppColors.white.withValues(alpha: 0.8),
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
+        );
+      },
+    );
+  }
+
+  Widget _buildUserAvatar({
+    final double size = 80.0,
+    final Color? backgroundColor,
+    final Color foregroundColor = AppColors.white,
+    final Color borderColor = AppColors.white,
+    final double borderWidth = 3,
+  }) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final userName = ref.watch(
+          providerOfLoggedInUser.select(
+            (value) => value?.name ?? 'User',
           ),
-        ),
-      ),
+        );
+        return Hero(
+          tag: 'profile_avatar',
+          child: Avatar.initials(
+            initials: _getInitials(userName),
+            size: size,
+            backgroundColor:
+                backgroundColor ??
+                AppColors.white.withValues(
+                  alpha: 0.2,
+                ),
+            foregroundColor: foregroundColor,
+            borderWidth: borderWidth,
+            borderColor: borderColor,
+          ),
+        );
+      },
     );
   }
 
