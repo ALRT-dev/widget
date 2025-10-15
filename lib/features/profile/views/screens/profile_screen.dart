@@ -46,7 +46,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   24.spMin.hSizedBox,
                   _buildSubmittedHazardsSection(),
                   _buildFailedReviewsSection(),
-                  _buildEmergencyContactsSection(),
                   24.spMin.hSizedBox,
                   _buildLogoutSection(),
                   32.spMin.hSizedBox,
@@ -422,6 +421,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildEmergencyContactsSection() {
     return _buildSection(
       title: 'Emergency Contacts',
