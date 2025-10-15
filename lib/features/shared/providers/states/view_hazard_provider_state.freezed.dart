@@ -16,7 +16,8 @@ mixin _$ViewHazardProviderState {
 
 /// The hazard being viewed.
  Hazard? get hazard;/// The state of viewing the hazard.
- ViewHazardState get viewState;
+ ViewHazardState get viewHazardState;/// The state of deleting the hazard.
+ DeleteHazardState get deleteHazardState;
 /// Create a copy of ViewHazardProviderState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,16 +28,16 @@ $ViewHazardProviderStateCopyWith<ViewHazardProviderState> get copyWith => _$View
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ViewHazardProviderState&&(identical(other.hazard, hazard) || other.hazard == hazard)&&(identical(other.viewState, viewState) || other.viewState == viewState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ViewHazardProviderState&&(identical(other.hazard, hazard) || other.hazard == hazard)&&(identical(other.viewHazardState, viewHazardState) || other.viewHazardState == viewHazardState)&&(identical(other.deleteHazardState, deleteHazardState) || other.deleteHazardState == deleteHazardState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,hazard,viewState);
+int get hashCode => Object.hash(runtimeType,hazard,viewHazardState,deleteHazardState);
 
 @override
 String toString() {
-  return 'ViewHazardProviderState(hazard: $hazard, viewState: $viewState)';
+  return 'ViewHazardProviderState(hazard: $hazard, viewHazardState: $viewHazardState, deleteHazardState: $deleteHazardState)';
 }
 
 
@@ -47,11 +48,11 @@ abstract mixin class $ViewHazardProviderStateCopyWith<$Res>  {
   factory $ViewHazardProviderStateCopyWith(ViewHazardProviderState value, $Res Function(ViewHazardProviderState) _then) = _$ViewHazardProviderStateCopyWithImpl;
 @useResult
 $Res call({
- Hazard? hazard, ViewHazardState viewState
+ Hazard? hazard, ViewHazardState viewHazardState, DeleteHazardState deleteHazardState
 });
 
 
-$HazardCopyWith<$Res>? get hazard;$ViewHazardStateCopyWith<$Res> get viewState;
+$HazardCopyWith<$Res>? get hazard;$ViewHazardStateCopyWith<$Res> get viewHazardState;$DeleteHazardStateCopyWith<$Res> get deleteHazardState;
 
 }
 /// @nodoc
@@ -64,11 +65,12 @@ class _$ViewHazardProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of ViewHazardProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? hazard = freezed,Object? viewState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? hazard = freezed,Object? viewHazardState = null,Object? deleteHazardState = null,}) {
   return _then(_self.copyWith(
 hazard: freezed == hazard ? _self.hazard : hazard // ignore: cast_nullable_to_non_nullable
-as Hazard?,viewState: null == viewState ? _self.viewState : viewState // ignore: cast_nullable_to_non_nullable
-as ViewHazardState,
+as Hazard?,viewHazardState: null == viewHazardState ? _self.viewHazardState : viewHazardState // ignore: cast_nullable_to_non_nullable
+as ViewHazardState,deleteHazardState: null == deleteHazardState ? _self.deleteHazardState : deleteHazardState // ignore: cast_nullable_to_non_nullable
+as DeleteHazardState,
   ));
 }
 /// Create a copy of ViewHazardProviderState
@@ -87,10 +89,19 @@ $HazardCopyWith<$Res>? get hazard {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$ViewHazardStateCopyWith<$Res> get viewState {
+$ViewHazardStateCopyWith<$Res> get viewHazardState {
   
-  return $ViewHazardStateCopyWith<$Res>(_self.viewState, (value) {
-    return _then(_self.copyWith(viewState: value));
+  return $ViewHazardStateCopyWith<$Res>(_self.viewHazardState, (value) {
+    return _then(_self.copyWith(viewHazardState: value));
+  });
+}/// Create a copy of ViewHazardProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DeleteHazardStateCopyWith<$Res> get deleteHazardState {
+  
+  return $DeleteHazardStateCopyWith<$Res>(_self.deleteHazardState, (value) {
+    return _then(_self.copyWith(deleteHazardState: value));
   });
 }
 }
@@ -174,10 +185,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Hazard? hazard,  ViewHazardState viewState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Hazard? hazard,  ViewHazardState viewHazardState,  DeleteHazardState deleteHazardState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ViewHazardProviderState() when $default != null:
-return $default(_that.hazard,_that.viewState);case _:
+return $default(_that.hazard,_that.viewHazardState,_that.deleteHazardState);case _:
   return orElse();
 
 }
@@ -195,10 +206,10 @@ return $default(_that.hazard,_that.viewState);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Hazard? hazard,  ViewHazardState viewState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Hazard? hazard,  ViewHazardState viewHazardState,  DeleteHazardState deleteHazardState)  $default,) {final _that = this;
 switch (_that) {
 case _ViewHazardProviderState():
-return $default(_that.hazard,_that.viewState);case _:
+return $default(_that.hazard,_that.viewHazardState,_that.deleteHazardState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -215,10 +226,10 @@ return $default(_that.hazard,_that.viewState);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Hazard? hazard,  ViewHazardState viewState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Hazard? hazard,  ViewHazardState viewHazardState,  DeleteHazardState deleteHazardState)?  $default,) {final _that = this;
 switch (_that) {
 case _ViewHazardProviderState() when $default != null:
-return $default(_that.hazard,_that.viewState);case _:
+return $default(_that.hazard,_that.viewHazardState,_that.deleteHazardState);case _:
   return null;
 
 }
@@ -230,13 +241,15 @@ return $default(_that.hazard,_that.viewState);case _:
 
 
 class _ViewHazardProviderState implements ViewHazardProviderState {
-  const _ViewHazardProviderState({this.hazard, this.viewState = const ViewHazardState.initial()});
+  const _ViewHazardProviderState({this.hazard, this.viewHazardState = const ViewHazardState.initial(), this.deleteHazardState = const DeleteHazardState.initial()});
   
 
 /// The hazard being viewed.
 @override final  Hazard? hazard;
 /// The state of viewing the hazard.
-@override@JsonKey() final  ViewHazardState viewState;
+@override@JsonKey() final  ViewHazardState viewHazardState;
+/// The state of deleting the hazard.
+@override@JsonKey() final  DeleteHazardState deleteHazardState;
 
 /// Create a copy of ViewHazardProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -248,16 +261,16 @@ _$ViewHazardProviderStateCopyWith<_ViewHazardProviderState> get copyWith => __$V
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ViewHazardProviderState&&(identical(other.hazard, hazard) || other.hazard == hazard)&&(identical(other.viewState, viewState) || other.viewState == viewState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ViewHazardProviderState&&(identical(other.hazard, hazard) || other.hazard == hazard)&&(identical(other.viewHazardState, viewHazardState) || other.viewHazardState == viewHazardState)&&(identical(other.deleteHazardState, deleteHazardState) || other.deleteHazardState == deleteHazardState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,hazard,viewState);
+int get hashCode => Object.hash(runtimeType,hazard,viewHazardState,deleteHazardState);
 
 @override
 String toString() {
-  return 'ViewHazardProviderState(hazard: $hazard, viewState: $viewState)';
+  return 'ViewHazardProviderState(hazard: $hazard, viewHazardState: $viewHazardState, deleteHazardState: $deleteHazardState)';
 }
 
 
@@ -268,11 +281,11 @@ abstract mixin class _$ViewHazardProviderStateCopyWith<$Res> implements $ViewHaz
   factory _$ViewHazardProviderStateCopyWith(_ViewHazardProviderState value, $Res Function(_ViewHazardProviderState) _then) = __$ViewHazardProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- Hazard? hazard, ViewHazardState viewState
+ Hazard? hazard, ViewHazardState viewHazardState, DeleteHazardState deleteHazardState
 });
 
 
-@override $HazardCopyWith<$Res>? get hazard;@override $ViewHazardStateCopyWith<$Res> get viewState;
+@override $HazardCopyWith<$Res>? get hazard;@override $ViewHazardStateCopyWith<$Res> get viewHazardState;@override $DeleteHazardStateCopyWith<$Res> get deleteHazardState;
 
 }
 /// @nodoc
@@ -285,11 +298,12 @@ class __$ViewHazardProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of ViewHazardProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? hazard = freezed,Object? viewState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? hazard = freezed,Object? viewHazardState = null,Object? deleteHazardState = null,}) {
   return _then(_ViewHazardProviderState(
 hazard: freezed == hazard ? _self.hazard : hazard // ignore: cast_nullable_to_non_nullable
-as Hazard?,viewState: null == viewState ? _self.viewState : viewState // ignore: cast_nullable_to_non_nullable
-as ViewHazardState,
+as Hazard?,viewHazardState: null == viewHazardState ? _self.viewHazardState : viewHazardState // ignore: cast_nullable_to_non_nullable
+as ViewHazardState,deleteHazardState: null == deleteHazardState ? _self.deleteHazardState : deleteHazardState // ignore: cast_nullable_to_non_nullable
+as DeleteHazardState,
   ));
 }
 
@@ -309,10 +323,19 @@ $HazardCopyWith<$Res>? get hazard {
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$ViewHazardStateCopyWith<$Res> get viewState {
+$ViewHazardStateCopyWith<$Res> get viewHazardState {
   
-  return $ViewHazardStateCopyWith<$Res>(_self.viewState, (value) {
-    return _then(_self.copyWith(viewState: value));
+  return $ViewHazardStateCopyWith<$Res>(_self.viewHazardState, (value) {
+    return _then(_self.copyWith(viewHazardState: value));
+  });
+}/// Create a copy of ViewHazardProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$DeleteHazardStateCopyWith<$Res> get deleteHazardState {
+  
+  return $DeleteHazardStateCopyWith<$Res>(_self.deleteHazardState, (value) {
+    return _then(_self.copyWith(deleteHazardState: value));
   });
 }
 }
@@ -698,6 +721,355 @@ as AppError,
 }
 
 /// Create a copy of ViewHazardState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppErrorCopyWith<$Res> get error {
+  
+  return $AppErrorCopyWith<$Res>(_self.error, (value) {
+    return _then(_self.copyWith(error: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$DeleteHazardState {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is DeleteHazardState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'DeleteHazardState()';
+}
+
+
+}
+
+/// @nodoc
+class $DeleteHazardStateCopyWith<$Res>  {
+$DeleteHazardStateCopyWith(DeleteHazardState _, $Res Function(DeleteHazardState) __);
+}
+
+
+/// Adds pattern-matching-related methods to [DeleteHazardState].
+extension DeleteHazardStatePatterns on DeleteHazardState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _DeleteHazardStateInitial value)?  initial,TResult Function( _DeleteHazardStateLoading value)?  loading,TResult Function( _DeleteHazardStateSuccess value)?  success,TResult Function( _DeleteHazardStateError value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _DeleteHazardStateInitial() when initial != null:
+return initial(_that);case _DeleteHazardStateLoading() when loading != null:
+return loading(_that);case _DeleteHazardStateSuccess() when success != null:
+return success(_that);case _DeleteHazardStateError() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _DeleteHazardStateInitial value)  initial,required TResult Function( _DeleteHazardStateLoading value)  loading,required TResult Function( _DeleteHazardStateSuccess value)  success,required TResult Function( _DeleteHazardStateError value)  error,}){
+final _that = this;
+switch (_that) {
+case _DeleteHazardStateInitial():
+return initial(_that);case _DeleteHazardStateLoading():
+return loading(_that);case _DeleteHazardStateSuccess():
+return success(_that);case _DeleteHazardStateError():
+return error(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _DeleteHazardStateInitial value)?  initial,TResult? Function( _DeleteHazardStateLoading value)?  loading,TResult? Function( _DeleteHazardStateSuccess value)?  success,TResult? Function( _DeleteHazardStateError value)?  error,}){
+final _that = this;
+switch (_that) {
+case _DeleteHazardStateInitial() when initial != null:
+return initial(_that);case _DeleteHazardStateLoading() when loading != null:
+return loading(_that);case _DeleteHazardStateSuccess() when success != null:
+return success(_that);case _DeleteHazardStateError() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  success,TResult Function( AppError error)?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _DeleteHazardStateInitial() when initial != null:
+return initial();case _DeleteHazardStateLoading() when loading != null:
+return loading();case _DeleteHazardStateSuccess() when success != null:
+return success();case _DeleteHazardStateError() when error != null:
+return error(_that.error);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  success,required TResult Function( AppError error)  error,}) {final _that = this;
+switch (_that) {
+case _DeleteHazardStateInitial():
+return initial();case _DeleteHazardStateLoading():
+return loading();case _DeleteHazardStateSuccess():
+return success();case _DeleteHazardStateError():
+return error(_that.error);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  success,TResult? Function( AppError error)?  error,}) {final _that = this;
+switch (_that) {
+case _DeleteHazardStateInitial() when initial != null:
+return initial();case _DeleteHazardStateLoading() when loading != null:
+return loading();case _DeleteHazardStateSuccess() when success != null:
+return success();case _DeleteHazardStateError() when error != null:
+return error(_that.error);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _DeleteHazardStateInitial implements DeleteHazardState {
+  const _DeleteHazardStateInitial();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DeleteHazardStateInitial);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'DeleteHazardState.initial()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _DeleteHazardStateLoading implements DeleteHazardState {
+  const _DeleteHazardStateLoading();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DeleteHazardStateLoading);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'DeleteHazardState.loading()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _DeleteHazardStateSuccess implements DeleteHazardState {
+  const _DeleteHazardStateSuccess();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DeleteHazardStateSuccess);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'DeleteHazardState.success()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _DeleteHazardStateError implements DeleteHazardState {
+  const _DeleteHazardStateError(this.error);
+  
+
+ final  AppError error;
+
+/// Create a copy of DeleteHazardState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$DeleteHazardStateErrorCopyWith<_DeleteHazardStateError> get copyWith => __$DeleteHazardStateErrorCopyWithImpl<_DeleteHazardStateError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _DeleteHazardStateError&&(identical(other.error, error) || other.error == error));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,error);
+
+@override
+String toString() {
+  return 'DeleteHazardState.error(error: $error)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$DeleteHazardStateErrorCopyWith<$Res> implements $DeleteHazardStateCopyWith<$Res> {
+  factory _$DeleteHazardStateErrorCopyWith(_DeleteHazardStateError value, $Res Function(_DeleteHazardStateError) _then) = __$DeleteHazardStateErrorCopyWithImpl;
+@useResult
+$Res call({
+ AppError error
+});
+
+
+$AppErrorCopyWith<$Res> get error;
+
+}
+/// @nodoc
+class __$DeleteHazardStateErrorCopyWithImpl<$Res>
+    implements _$DeleteHazardStateErrorCopyWith<$Res> {
+  __$DeleteHazardStateErrorCopyWithImpl(this._self, this._then);
+
+  final _DeleteHazardStateError _self;
+  final $Res Function(_DeleteHazardStateError) _then;
+
+/// Create a copy of DeleteHazardState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
+  return _then(_DeleteHazardStateError(
+null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as AppError,
+  ));
+}
+
+/// Create a copy of DeleteHazardState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')

@@ -5,10 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
+import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
+import 'package:hazard_app/features/shared/providers/states/view_hazard_provider_state.dart';
 import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
+import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'dart:math' as math;
@@ -55,6 +59,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         (value) => null,
       ),
     );
+
+    _listenToTheDeleteHazardState();
 
     final loggedInUserId = ref.watch(
       providerOfLoggedInUser.select((value) => value?.id),
@@ -130,6 +136,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         ),
         onPressed: () => context.pop(),
       ),
+      actions: [
+        _buildDeleteButton(),
+        5.wSizedBox,
+        _buildEditButton(),
+        10.wSizedBox,
+      ],
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
           decoration: BoxDecoration(
@@ -151,6 +163,56 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildEditButton() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final loggedInUserId = ref.watch(
+          providerOfLoggedInUser.select((value) => value?.id),
+        );
+        final isOwner = ref.watch(
+          providerOfViewHazard(widget.args.hazard.id!).select(
+            (value) => value.hazard?.reportedBy?.id == loggedInUserId,
+          ),
+        );
+        if (!isOwner) {
+          return const SizedBox.shrink();
+        }
+
+        return IconButton(
+          icon: Icon(
+            Icons.edit_rounded,
+          ),
+          onPressed: () {},
+        );
+      },
+    );
+  }
+
+  Widget _buildDeleteButton() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final loggedInUserId = ref.watch(
+          providerOfLoggedInUser.select((value) => value?.id),
+        );
+        final isOwner = ref.watch(
+          providerOfViewHazard(widget.args.hazard.id!).select(
+            (value) => value.hazard?.reportedBy?.id == loggedInUserId,
+          ),
+        );
+        if (!isOwner) {
+          return const SizedBox.shrink();
+        }
+
+        return IconButton(
+          icon: Icon(
+            Icons.delete_outline_rounded,
+          ),
+          onPressed: _handleDeletePressed,
+        );
+      },
     );
   }
 
@@ -932,6 +994,45 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     ref
         .read(providerOfViewHazard(widget.args.hazard.id!).notifier)
         .updateHazard(widget.args.hazard);
+  }
+
+  /// Listen to the delete hazard state and handle success or error.
+  void _listenToTheDeleteHazardState() {
+    ref.listen(
+      providerOfViewHazard(widget.args.hazard.id!).select(
+        (value) => value.deleteHazardState,
+      ),
+      (previous, next) {
+        if (previous != next) {
+          next.maybeWhen(
+            success: context.pop,
+            error: _handleError,
+            orElse: () {},
+          );
+        }
+      },
+    );
+  }
+
+  /// Handle error by showing a toast message.
+  void _handleError(final AppError error) {
+    context.showErrorToast(
+      message: error.message,
+    );
+  }
+
+  /// Handle delete button pressed.
+  void _handleDeletePressed() {
+    showConfirmationSheet(
+      context: context,
+      title: 'Delete Alrt',
+      description:
+          'Are you sure you want to delete this alrt report? This action cannot be undone.',
+      confirmButtonText: 'Delete',
+      onPressedConfirmAsync: (context, ref) => ref
+          .read(providerOfViewHazard(widget.args.hazard.id!).notifier)
+          .deleteHazard(),
+    );
   }
 }
 

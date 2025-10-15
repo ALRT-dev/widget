@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/notification/providers/service_providers.dart';
@@ -71,20 +72,22 @@ class NotificationsFeedProvider
           }
         });
 
-    final updateHazardSubscription = _ref
-        .read(providerOfHazardSocketManager)
-        .hazardUpdateStream
-        .listen(updateHazard);
-
     final deleteHazardSubscription = _ref
         .read(providerOfHazardSocketManager)
         .deleteHazardStream
-        .listen(removeFromHazards);
+        .listen((hazardId) {
+          final hazard = state.hazards.firstWhereOrNull(
+            (hazard) => hazard.id == hazardId,
+          );
+          removeFromHazards(hazardId);
+          if (hazard != null && hazard.category != null) {
+            removeCategoryFromSocket(hazard.category!.id);
+          }
+        });
 
     // Clean up subscription when provider is disposed
     _ref.onDispose(() {
       newHazardSubscription.cancel();
-      updateHazardSubscription.cancel();
       deleteHazardSubscription.cancel();
     });
   }
@@ -194,6 +197,27 @@ class NotificationsFeedProvider
         hazardsCount: existingCategory.hazardsCount + 1,
       );
       _hazardCategoriesProvider.updateHazardCategory(updatedCategory);
+    }
+  }
+
+  /// Removes a [HazardCategory] from the hazard categories provider or updates its hazards count based on the provided [categoryId].
+  void removeCategoryFromSocket(final String categoryId) {
+    final existingCategories = _ref
+        .read(providerOfHazardCategoriesForNotifications)
+        .hazardCategories;
+
+    final index = existingCategories.indexWhere((c) => c.id == categoryId);
+    if (index != -1) {
+      final existingCategory = existingCategories[index];
+      final updatedCount = existingCategory.hazardsCount - 1;
+      if (updatedCount <= 0) {
+        _hazardCategoriesProvider.removeFromHazardCategories(categoryId);
+      } else {
+        final updatedCategory = existingCategory.copyWith(
+          hazardsCount: updatedCount,
+        );
+        _hazardCategoriesProvider.updateHazardCategory(updatedCategory);
+      }
     }
   }
 

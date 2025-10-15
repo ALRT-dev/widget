@@ -26,15 +26,6 @@ class HazardService {
     );
   }
 
-  /// Creates a new hazard report on the server.
-  Future<Either<Hazard, AppError>> createHazardReport({
-    required final Hazard hazard,
-  }) {
-    return _hazardRepository.createHazardReport(
-      hazard: hazard,
-    );
-  }
-
   /// Fetches hazards along with categories from the server.
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
   getGetHazardsWithCategories({
@@ -48,6 +39,41 @@ class HazardService {
   /// Fetches the list of hazard categories from the server.
   Future<Either<List<HazardCategory>, AppError>> getHazardCategories() {
     return _hazardRepository.getHazardCategories();
+  }
+
+  /// Creates a new hazard report on the server.
+  Future<Either<Hazard, AppError>> createHazardReport({
+    required final Hazard hazard,
+  }) {
+    return _hazardRepository.createHazardReport(
+      hazard: hazard,
+    );
+  }
+
+  /// Updates an existing hazard report on the server.
+  Future<Either<Hazard, AppError>> updateHazardReport({
+    required final Hazard hazard,
+  }) async {
+    if (hazard.id == null) {
+      return Failure(
+        AppError(
+          message: 'Hazard ID is required for updating a hazard report.',
+        ),
+      );
+    }
+
+    return _hazardRepository.updateHazardReport(
+      hazard: hazard,
+    );
+  }
+
+  /// Deletes a hazard report from the server.
+  Future<Either<void, AppError>> deleteHazard({
+    required final String hazardId,
+  }) {
+    return _hazardRepository.deleteHazard(
+      hazardId: hazardId,
+    );
   }
 
   /// Votes on a hazard report.

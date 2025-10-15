@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
@@ -35,11 +38,13 @@ class ViewHazardProvider extends StateNotifier<ViewHazardProviderState> {
   final Ref _ref;
   final String _hazardId;
   HazardService get _hazardService => _ref.read(providerOfHazardService);
+  MyHazardsProvider get _myHazardsProvider =>
+      _ref.read(providerOfMyHazards.notifier);
 
   /// Handles viewing the hazard.
   Future<void> viewHazard() async {
     state = state.copyWith(
-      viewState: const ViewHazardState.loading(),
+      viewHazardState: const ViewHazardState.loading(),
     );
 
     final result = await _hazardService.viewHazard(
@@ -50,7 +55,7 @@ class ViewHazardProvider extends StateNotifier<ViewHazardProviderState> {
     result.when(
       (response) {
         state = state.copyWith(
-          viewState: ViewHazardState.success(response),
+          viewHazardState: ViewHazardState.success(response),
         );
 
         // Updates the hazardsViewedCount for the user by 1 if the view is recorded
@@ -66,7 +71,46 @@ class ViewHazardProvider extends StateNotifier<ViewHazardProviderState> {
       },
       (error) {
         state = state.copyWith(
-          viewState: ViewHazardState.error(error),
+          viewHazardState: ViewHazardState.error(error),
+        );
+      },
+    );
+  }
+
+  /// Handles deleting the hazard.
+  Future<void> deleteHazard() async {
+    state = state.copyWith(
+      deleteHazardState: const DeleteHazardState.loading(),
+    );
+
+    final result = await _hazardService.deleteHazard(
+      hazardId: _hazardId,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (_) {
+        state = state.copyWith(
+          deleteHazardState: const DeleteHazardState.success(),
+        );
+
+        // Updates the hazardsReportedCount for the user by -1
+        _ref
+            .read(providerOfLoggedInUser.notifier)
+            .update(
+              (user) => user?.copyWith(
+                hazardsReportedCount: max(user.hazardsReportedCount - 1, 0),
+              ),
+            );
+
+        // Remove the hazard from MyHazardsProvider
+        _myHazardsProvider
+          ..removeFromMyAcceptedHazards(_hazardId)
+          ..removeFromMyRejectedHazards(_hazardId);
+      },
+      (error) {
+        state = state.copyWith(
+          deleteHazardState: DeleteHazardState.error(error),
         );
       },
     );

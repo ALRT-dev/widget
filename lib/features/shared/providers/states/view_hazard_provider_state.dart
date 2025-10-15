@@ -12,7 +12,11 @@ abstract class ViewHazardProviderState with _$ViewHazardProviderState {
     final Hazard? hazard,
 
     /// The state of viewing the hazard.
-    @Default(ViewHazardState.initial()) final ViewHazardState viewState,
+    @Default(ViewHazardState.initial()) final ViewHazardState viewHazardState,
+
+    /// The state of deleting the hazard.
+    @Default(DeleteHazardState.initial())
+    final DeleteHazardState deleteHazardState,
   }) = _ViewHazardProviderState;
 }
 
@@ -25,4 +29,13 @@ class ViewHazardState with _$ViewHazardState {
   ) = _ViewHazardStateSuccess;
   const factory ViewHazardState.error(final AppError error) =
       _ViewHazardStateError;
+}
+
+@freezed
+class DeleteHazardState with _$DeleteHazardState {
+  const factory DeleteHazardState.initial() = _DeleteHazardStateInitial;
+  const factory DeleteHazardState.loading() = _DeleteHazardStateLoading;
+  const factory DeleteHazardState.success() = _DeleteHazardStateSuccess;
+  const factory DeleteHazardState.error(final AppError error) =
+      _DeleteHazardStateError;
 }

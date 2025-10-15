@@ -15,16 +15,24 @@ abstract class HazardRepository {
     required final HazardSearchParams searchParams,
   });
 
-  Future<Either<Hazard, AppError>> createHazardReport({
-    required final Hazard hazard,
-  });
-
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
   getGetHazardsWithCategories({
     required final HazardSearchParams searchParams,
   });
 
   Future<Either<List<HazardCategory>, AppError>> getHazardCategories();
+
+  Future<Either<Hazard, AppError>> createHazardReport({
+    required final Hazard hazard,
+  });
+
+  Future<Either<Hazard, AppError>> updateHazardReport({
+    required final Hazard hazard,
+  });
+
+  Future<Either<void, AppError>> deleteHazard({
+    required final String hazardId,
+  });
 
   Future<Either<void, AppError>> voteHazard({
     required final String hazardId,
@@ -129,6 +137,37 @@ class HazardRepositoryImpl extends HazardRepository {
       future: () async {
         final result = await _restClient.viewHazard(
           hazardId: hazardId,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> deleteHazard({required String hazardId}) {
+    return runAsyncCall(
+      name: 'deleteHazard',
+      future: () async {
+        await _restClient.deleteHazardReport(
+          hazardId: hazardId,
+        );
+        return Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<Hazard, AppError>> updateHazardReport({
+    required Hazard hazard,
+  }) {
+    return runAsyncCall(
+      name: 'updateHazardReport',
+      future: () async {
+        final result = await _restClient.updateHazardReport(
+          hazardId: hazard.id!,
+          hazard: hazard,
         );
         return Success(result);
       },

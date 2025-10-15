@@ -55,11 +55,6 @@ abstract class RestClient {
     @Queries() required final HazardSearchParams searchParams,
   });
 
-  @POST(kUrlHazards)
-  Future<Hazard> createHazardReport({
-    @Body() required final Hazard hazard,
-  });
-
   @GET(kUrlHazardsWithCategories)
   Future<GetHazardsWithCategoriesResponse> getGetHazardsWithCategories({
     @Queries() required final HazardSearchParams searchParams,
@@ -67,6 +62,22 @@ abstract class RestClient {
 
   @GET(kUrlHazardCategories)
   Future<List<HazardCategory>> getHazardCategories();
+
+  @POST(kUrlHazards)
+  Future<Hazard> createHazardReport({
+    @Body() required final Hazard hazard,
+  });
+
+  @PUT('$kUrlHazards/{hazardId}')
+  Future<Hazard> updateHazardReport({
+    @Path() required final String hazardId,
+    @Body() required final Hazard hazard,
+  });
+
+  @DELETE('$kUrlHazards/{hazardId}')
+  Future<void> deleteHazardReport({
+    @Path() required final String hazardId,
+  });
 
   @POST(kUrlHazardVote)
   Future<HttpResponse> voteHazard({
