@@ -348,7 +348,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       builder: (context, ref, child) {
         final isEmpty = ref.watch(
           providerOfProfile.select(
-            (value) => value.myAcceptedHazards.isEmpty,
+            (value) => value.myRejectedHazards.isEmpty,
           ),
         );
         if (isEmpty) return const SizedBox();
