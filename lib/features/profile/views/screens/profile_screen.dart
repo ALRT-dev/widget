@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
+import 'package:hazard_app/features/profile/providers/states/profile_provider_state.dart';
 import 'package:hazard_app/features/profile/views/widgets/needs_update_reports_widgets/needs_update_reports_list.dart';
 import 'package:hazard_app/features/profile/views/widgets/recent_reports_widgets/recent_reports_list.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
+import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/avatar.dart';
+import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:hazard_app/others/app_wrapper.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -21,6 +26,8 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+    _listenToLogoutState();
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -483,39 +490,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildLogoutSection() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          _showLogoutDialog();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.red,
-          foregroundColor: AppColors.white,
-          padding: EdgeInsets.symmetric(vertical: 16.spMin),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.spMin),
-          ),
-          elevation: 0,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.logout,
-              size: 20.spMin,
-            ),
-            8.spMin.wSizedBox,
-            Text(
-              'Logout',
-              style: TextStyle(
-                fontSize: 16.spMin,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return Button.filled(
+      value: 'Logout',
+      icon: Icon(Icons.logout),
+      onPressed: () {
+        _showLogoutDialog();
+      },
     );
   }
 
@@ -784,30 +764,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  /// Listens to the logout state changes and navigates to the AppWrapper on success.
+  void _listenToLogoutState() {
+    ref.listen<LogoutState>(
+      providerOfProfile.select((value) => value.logoutState),
+      (previous, next) {
+        next.maybeWhen(
+          success: () => context.go(AppWrapper.route),
+          orElse: () {},
+        );
+      },
+    );
+  }
+
+  /// Shows a confirmation dialog for logging out.
   void _showLogoutDialog() {
-    showDialog(
+    showConfirmationSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // Perform logout
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.red,
-              foregroundColor: AppColors.white,
-            ),
-            child: const Text('Logout'),
-          ),
-        ],
-      ),
+      title: 'Are you sure you want to logout?',
+      description: 'You will need to log in again to access your account.',
+      onPressedConfirmAsync: (context, ref) =>
+          ref.read(providerOfProfile.notifier).logout(),
     );
   }
 

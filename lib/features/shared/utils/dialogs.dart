@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hazard_app/features/shared/views/widgets/confirmation_sheet_content.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 /// Displays a custom implementation of [showCupertinoModalPopup].
@@ -11,7 +13,7 @@ Future<T?> showCustomCupertinoModalPopup<T>({
     context: context,
     barrierDismissible: barrierDismissible,
     barrierLabel: 'Dismiss',
-    barrierColor: AppColors.black.withValues(alpha: 0.2),
+    barrierColor: AppColors.black.withValues(alpha: 0.5),
     transitionDuration: Duration(milliseconds: 300),
     transitionBuilder: (context, animation, secondaryAnimation, child) {
       final curvedAnimation = CurvedAnimation(
@@ -29,5 +31,32 @@ Future<T?> showCustomCupertinoModalPopup<T>({
       );
     },
     pageBuilder: (context, animation, secondaryAnimation) => builder(context),
+  );
+}
+
+/// Displays a confirmation sheet.
+Future<void> showConfirmationSheet({
+  required final BuildContext context,
+  required final String title,
+  final String? description,
+  final String? cancelButtonText,
+  final String? confirmButtonText,
+  final Function(BuildContext, WidgetRef)? onPressedConfirm,
+  final Future Function(BuildContext, WidgetRef)? onPressedConfirmAsync,
+  final Function(BuildContext, WidgetRef)? onPressedCancel,
+  final bool popOnActionButtonsPressed = true,
+}) {
+  return showCustomCupertinoModalPopup(
+    context: context,
+    builder: (_) => ConfirmationSheetContent(
+      title: title,
+      description: description,
+      cancelButtonText: cancelButtonText,
+      confirmButtonText: confirmButtonText,
+      onPressedConfirm: onPressedConfirm,
+      onPressedConfirmAsync: onPressedConfirmAsync,
+      onPressedCancel: onPressedCancel,
+      popOnActionButtonsPressed: popOnActionButtonsPressed,
+    ),
   );
 }

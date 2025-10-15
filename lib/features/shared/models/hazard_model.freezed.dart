@@ -29,6 +29,8 @@ mixin _$Hazard {
  String? get aiSummary;/// The AI-determined severity of the hazard.
  HazardSeverity? get aiSeverity;/// The AI-determined confidence level of the hazard.
  AIConfidence? get aiConfidence;/// The user who reported the hazard.
+///
+/// If source is provided, this may be null.
  AppUser? get reportedBy;/// The status of the hazard review.
  HazardReviewStatus? get reviewStatus;/// The feedback provided during the review of the hazard.
  String? get reviewFeedback;/// The id of the user who reviewed the hazard.
@@ -326,6 +328,8 @@ class _Hazard extends Hazard {
 /// The AI-determined confidence level of the hazard.
 @override final  AIConfidence? aiConfidence;
 /// The user who reported the hazard.
+///
+/// If source is provided, this may be null.
 @override final  AppUser? reportedBy;
 /// The status of the hazard review.
 @override final  HazardReviewStatus? reviewStatus;

@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:hazard_app/features/auth/providers/service_providers.dart';
+import 'package:hazard_app/features/auth/services/auth_service.dart';
 import 'package:hazard_app/features/profile/providers/states/profile_provider_state.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
@@ -33,6 +35,7 @@ class ProfileProvider extends StateNotifier<ProfileProviderState> {
   }
 
   final Ref _ref;
+  AuthService get _authService => _ref.read(providerOfAuthService);
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   UserSocketManager get _userSocketManager =>
       _ref.read(providerOfUserSocketManager);
@@ -152,6 +155,29 @@ class ProfileProvider extends StateNotifier<ProfileProviderState> {
           getMyRejectedHazardsState: GetMyHazardsState.error(
             error,
           ),
+        );
+      },
+    );
+  }
+
+  /// Logout the current user.
+  Future<void> logout() async {
+    state = state.copyWith(
+      logoutState: const LogoutState.loading(),
+    );
+
+    final result = await _authService.logout();
+    if (!mounted) return;
+
+    result.when(
+      (_) {
+        state = state.copyWith(
+          logoutState: const LogoutState.success(),
+        );
+      },
+      (error) {
+        state = state.copyWith(
+          logoutState: LogoutState.error(error),
         );
       },
     );

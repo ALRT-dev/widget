@@ -82,8 +82,9 @@ class AuthService {
   }
 
   /// Logs out the user by deleting the access token from local storage.
-  Future<void> logOut() async {
-    return _deleteAccessToken();
+  Future<Either<void, AppError>> logout() async {
+    await _deleteAccessToken();
+    return Success(null);
   }
 
   // --------------------------------------- LOCAL STORAGE --------------------------------------- //

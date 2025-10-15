@@ -20,6 +20,9 @@ abstract class ProfileProviderState with _$ProfileProviderState {
     /// The state of fetching hazards reported by the logged-in user.
     @Default(GetMyHazardsState.initial())
     final GetMyHazardsState getMyRejectedHazardsState,
+
+    /// The state of logging out the user.
+    @Default(LogoutState.initial()) final LogoutState logoutState,
   }) = _ProfileProviderState;
 }
 
@@ -33,4 +36,14 @@ class GetMyHazardsState with _$GetMyHazardsState {
   const factory GetMyHazardsState.error(
     final AppError error,
   ) = _GetMyHazardsStateError;
+}
+
+@freezed
+class LogoutState with _$LogoutState {
+  const factory LogoutState.initial() = _LogoutStateInitial;
+  const factory LogoutState.loading() = _LogoutStateLoading;
+  const factory LogoutState.success() = _LogoutStateSuccess;
+  const factory LogoutState.error(
+    final AppError error,
+  ) = _LogoutStateError;
 }
