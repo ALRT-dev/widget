@@ -5,6 +5,7 @@ import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:hazard_app/features/shared/providers/repository_providers.dart';
 import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -50,13 +51,22 @@ class HazardService {
   }
 
   /// Votes on a hazard report.
-  Future<Either<void, AppError>> voteOnHazard({
+  Future<Either<void, AppError>> voteHazard({
     required final String hazardId,
     required final HazardVoteType voteType,
   }) {
     return _hazardRepository.voteHazard(
       hazardId: hazardId,
       voteType: voteType,
+    );
+  }
+
+  /// Views a hazard report.
+  Future<Either<ViewHazardResponse, AppError>> viewHazard({
+    required final String hazardId,
+  }) {
+    return _hazardRepository.viewHazard(
+      hazardId: hazardId,
     );
   }
 }

@@ -97,7 +97,7 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
       }
     }
 
-    final result = await _hazardService.voteOnHazard(
+    final result = await _hazardService.voteHazard(
       hazardId: state.hazard.id!,
       voteType: voteType,
     );

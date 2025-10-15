@@ -5,6 +5,7 @@ import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/dummy_data.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -28,6 +29,10 @@ abstract class HazardRepository {
   Future<Either<void, AppError>> voteHazard({
     required final String hazardId,
     required final HazardVoteType voteType,
+  });
+
+  Future<Either<ViewHazardResponse, AppError>> viewHazard({
+    required final String hazardId,
   });
 }
 
@@ -110,6 +115,22 @@ class HazardRepositoryImpl extends HazardRepository {
           voteType: voteType.name,
         );
         return Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<ViewHazardResponse, AppError>> viewHazard({
+    required String hazardId,
+  }) {
+    return runAsyncCall(
+      name: 'viewHazard',
+      future: () async {
+        final result = await _restClient.viewHazard(
+          hazardId: hazardId,
+        );
+        return Success(result);
       },
       onError: Failure.new,
     );

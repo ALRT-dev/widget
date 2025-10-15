@@ -308,6 +308,33 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<ViewHazardResponse> viewHazard({required String hazardId}) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<ViewHazardResponse>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/hazards/${hazardId}/view',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late ViewHazardResponse _value;
+    try {
+      _value = ViewHazardResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<GetHazardsWithCategoriesResponse> getNotificationsFeed({
     HazardSearchParams? searchParams,
   }) async {

@@ -7,6 +7,7 @@ import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
+import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'rest_client.g.dart';
@@ -71,6 +72,11 @@ abstract class RestClient {
   Future<HttpResponse> voteHazard({
     @Path() required final String hazardId,
     @Field() required final String voteType,
+  });
+
+  @POST(kUrlHazardView)
+  Future<ViewHazardResponse> viewHazard({
+    @Path() required final String hazardId,
   });
 
   // ---------------------------- NOTIFICATION ----------------------------

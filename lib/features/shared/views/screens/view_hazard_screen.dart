@@ -8,6 +8,7 @@ import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
+import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'dart:math' as math;
@@ -37,7 +38,24 @@ class ViewHazardScreen extends ConsumerStatefulWidget {
 
 class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (widget.args.hazard.id == null) {
+      throw Exception('Hazard ID is required to view hazard.');
+    }
+
+    // register this provider to the lifecycle of this widget
+    ref.watch(
+      providerOfViewHazard(widget.args.hazard.id!).select(
+        (value) => null,
+      ),
+    );
+
     final loggedInUserId = ref.watch(
       providerOfLoggedInUser.select((value) => value?.id),
     );
@@ -908,6 +926,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         child,
       ],
     );
+  }
+
+  void _onInit() {
+    ref
+        .read(providerOfViewHazard(widget.args.hazard.id!).notifier)
+        .updateHazard(widget.args.hazard);
   }
 }
 
