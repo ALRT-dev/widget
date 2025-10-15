@@ -15,6 +15,7 @@ import 'package:hazard_app/features/notification/extensions/remote_message_exten
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/providers/push_notification_message_provider.dart';
 import 'package:hazard_app/features/notification/views/screens/notifications_screen.dart';
+import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
 import 'package:hazard_app/features/profile/views/screens/profile_screen.dart';
 import 'package:hazard_app/features/report/providers/create_report_provider.dart';
@@ -63,6 +64,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfHazards.select((value) => null));
     ref.watch(providerOfCreateReport.select((value) => null));
     ref.watch(providerOfProfile.select((value) => null));
+    ref.watch(providerOfMyHazards.select((value) => null));
     ref.watch(providerOfMapSearchTextEditingController.select((value) => null));
     ref.watch(providerOfPlacesForMap.select((value) => null));
     ref.watch(providerOfPlacesForSearch.select((value) => null));

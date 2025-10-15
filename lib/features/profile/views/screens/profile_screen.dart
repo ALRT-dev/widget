@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
+import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
 import 'package:hazard_app/features/profile/providers/states/profile_provider_state.dart';
-import 'package:hazard_app/features/profile/views/widgets/needs_update_reports_widgets/needs_update_reports_list.dart';
-import 'package:hazard_app/features/profile/views/widgets/recent_reports_widgets/recent_reports_list.dart';
+import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
+import 'package:hazard_app/features/profile/views/widgets/accepted_hazards_widgets/my_accepted_hazards_list.dart';
+import 'package:hazard_app/features/profile/views/widgets/rejected_hazards_widgets/my_rejected_hazards_list.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
@@ -184,20 +187,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             (value) => value?.name ?? 'User',
           ),
         );
-        return Hero(
-          tag: 'profile_avatar',
-          child: Avatar.initials(
-            initials: _getInitials(userName),
-            size: size,
-            backgroundColor:
-                backgroundColor ??
-                AppColors.white.withValues(
-                  alpha: 0.2,
-                ),
-            foregroundColor: foregroundColor,
-            borderWidth: borderWidth,
-            borderColor: borderColor,
-          ),
+        return Avatar.initials(
+          initials: _getInitials(userName),
+          size: size,
+          backgroundColor:
+              backgroundColor ??
+              AppColors.white.withValues(
+                alpha: 0.2,
+              ),
+          foregroundColor: foregroundColor,
+          borderWidth: borderWidth,
+          borderColor: borderColor,
         );
       },
     );
@@ -373,21 +373,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Consumer(
       builder: (context, ref, child) {
         final isEmpty = ref.watch(
-          providerOfProfile.select(
+          providerOfMyHazards.select(
             (value) => value.myAcceptedHazards.isEmpty,
           ),
         );
         if (isEmpty) return const SizedBox();
 
         return _buildSection(
-          title: 'Recent Reports',
+          title: 'Your Recent Alrts',
           icon: Icons.list_alt_outlined,
           child: Column(
             spacing: 12.spMin,
             children: [
-              RecentReportsList(),
+              MyAcceptedHazardsList(
+                limit: 3,
+                shinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+              ),
               _buildViewAllButton(
-                'View All Reports',
+                text: 'View All Alrts',
+                onPressed: _gotoMyAcceptedReportsScreen,
               ),
             ],
           ),
@@ -400,7 +405,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Consumer(
       builder: (context, ref, child) {
         final isEmpty = ref.watch(
-          providerOfProfile.select(
+          providerOfMyHazards.select(
             (value) => value.myRejectedHazards.isEmpty,
           ),
         );
@@ -412,8 +417,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: Column(
             spacing: 12.spMin,
             children: [
-              NeedsUpdateReportsList(),
-              _buildViewAllButton('View All Pending'),
+              MyRejectedHazardsList(
+                limit: 3,
+                shinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+              ),
+              _buildViewAllButton(
+                text: 'View All Pending',
+                onPressed: _gotoMyRejectedReportsScreen,
+              ),
             ],
           ),
         ).pB(24.0);
@@ -726,11 +738,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildViewAllButton(String text) {
+  Widget _buildViewAllButton({
+    required final String text,
+    final Function()? onPressed,
+  }) {
     return InkWell(
-      onTap: () {
-        // Navigate to full list
-      },
+      onTap: onPressed,
       borderRadius: BorderRadius.circular(8.spMin),
       child: Container(
         padding: EdgeInsets.all(12.spMin),
@@ -764,6 +777,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  String _getInitials(String name) {
+    final words = name.split(' ');
+    if (words.length >= 2) {
+      return '${words[0][0]}${words[1][0]}'.toUpperCase();
+    } else if (words.isNotEmpty) {
+      return words[0][0].toUpperCase();
+    }
+    return 'U';
+  }
+
   /// Listens to the logout state changes and navigates to the AppWrapper on success.
   void _listenToLogoutState() {
     ref.listen<LogoutState>(
@@ -788,13 +811,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  String _getInitials(String name) {
-    final words = name.split(' ');
-    if (words.length >= 2) {
-      return '${words[0][0]}${words[1][0]}'.toUpperCase();
-    } else if (words.isNotEmpty) {
-      return words[0][0].toUpperCase();
-    }
-    return 'U';
+  /// Navigates to the My Accepted Reports screen.
+  void _gotoMyAcceptedReportsScreen() {
+    context.push(
+      MyHazardsScreen.route,
+      extra: const MyHazardsScreenArgs(
+        initialTab: MyHazardsTab.accepted,
+      ),
+    );
+  }
+
+  /// Navigates to the My Rejected Reports screen.
+  void _gotoMyRejectedReportsScreen() {
+    context.push(
+      MyHazardsScreen.route,
+      extra: const MyHazardsScreenArgs(
+        initialTab: MyHazardsTab.rejected,
+      ),
+    );
   }
 }

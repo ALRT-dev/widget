@@ -11,8 +11,8 @@ import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-class NeedsUpdateReportsListItem extends ConsumerStatefulWidget {
-  const NeedsUpdateReportsListItem({
+class MyRejectedHazardsListItem extends ConsumerStatefulWidget {
+  const MyRejectedHazardsListItem({
     super.key,
     required this.report,
   });
@@ -22,11 +22,11 @@ class NeedsUpdateReportsListItem extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _NeedsUpdateReportsListItemState();
+      _MyRejectedHazardsListItemState();
 }
 
-class _NeedsUpdateReportsListItemState
-    extends ConsumerState<NeedsUpdateReportsListItem> {
+class _MyRejectedHazardsListItemState
+    extends ConsumerState<MyRejectedHazardsListItem> {
   late final provider = providerOfHazardItem(widget.report);
 
   @override

@@ -7,6 +7,7 @@ import 'package:hazard_app/features/map/providers/states/map_provider_state.dart
 import 'package:hazard_app/features/map/views/screens/navigation_screen.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_on_map_screen.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/splash_screen.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
@@ -82,6 +83,16 @@ class AppRouter {
           builder: (context, state) {
             return ViewHazardScreen(
               args: state.extra as ViewHazardScreenArgs,
+            );
+          },
+        ),
+        GoRoute(
+          path: MyHazardsScreen.route,
+          builder: (context, state) {
+            return MyHazardsScreen(
+              args:
+                  (state.extra as MyHazardsScreenArgs?) ??
+                  const MyHazardsScreenArgs(),
             );
           },
         ),
