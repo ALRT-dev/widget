@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
 import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
@@ -41,6 +42,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildManageNotificationsSection(),
+                  24.spMin.hSizedBox,
                   _buildUserInfoSection(),
                   24.spMin.hSizedBox,
                   _buildScoresSection(),
@@ -69,6 +72,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       backgroundColor: AppColors.white,
       foregroundColor: AppColors.black,
       elevation: 0,
+
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
           // Calculate the collapse ratio
@@ -89,6 +93,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             title: isCollapsed
                 ? Row(
                     spacing: 10.spMin,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       _buildUserAvatar(
                         size: 40.0,
@@ -109,8 +114,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.black.withValues(alpha: 0.85),
-                    AppColors.black,
+                    AppColors.yellow.withValues(alpha: 0.85),
+                    AppColors.yellow,
                   ],
                 ),
               ),
@@ -135,7 +140,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             userEmail,
                             style: TextStyle(
                               fontSize: 14.spMin,
-                              color: AppColors.white.withValues(alpha: 0.8),
+                              color: AppColors.black.withValues(alpha: 0.8),
                             ),
                           ),
                       ],
@@ -152,7 +157,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildUserName({
     final double fontSize = 24.0,
-    final Color color = AppColors.white,
+    final Color color = AppColors.black,
   }) {
     return Consumer(
       builder: (context, ref, child) {
@@ -177,7 +182,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final double size = 80.0,
     final Color? backgroundColor,
     final Color foregroundColor = AppColors.white,
-    final Color borderColor = AppColors.white,
+    final Color borderColor = AppColors.black,
     final double borderWidth = 3,
   }) {
     return Consumer(
@@ -192,7 +197,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           size: size,
           backgroundColor:
               backgroundColor ??
-              AppColors.white.withValues(
+              AppColors.black.withValues(
                 alpha: 0.2,
               ),
           foregroundColor: foregroundColor,
@@ -497,6 +502,83 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildManageNotificationsSection() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12.spMin),
+        border: Border.all(
+          color: AppColors.extraLightGrey,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColor,
+            blurRadius: 8.spMin,
+            offset: Offset(0, 2.0),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.spMin),
+          onTap: _gotoManageNotificationsScreen,
+          child: Padding(
+            padding: EdgeInsets.all(20.spMin),
+            child: Row(
+              children: [
+                Container(
+                  width: 48.spMin,
+                  height: 48.spMin,
+                  decoration: BoxDecoration(
+                    color: AppColors.blue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12.spMin),
+                  ),
+                  child: Icon(
+                    Icons.notifications_active_outlined,
+                    color: AppColors.blue,
+                    size: 24.spMin,
+                  ),
+                ),
+                16.spMin.wSizedBox,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Manage Notifications',
+                        style: TextStyle(
+                          fontSize: 16.spMin,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.black,
+                        ),
+                      ),
+                      4.spMin.hSizedBox,
+                      Text(
+                        'Control your notification preferences and stay updated',
+                        style: TextStyle(
+                          fontSize: 13.spMin,
+                          color: AppColors.grey,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.grey,
+                  size: 20.spMin,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -829,5 +911,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         initialTab: MyHazardsTab.rejected,
       ),
     );
+  }
+
+  /// Navigates to the Manage Notifications screen.
+  void _gotoManageNotificationsScreen() {
+    context.push(ManageNotificationsScreen.route);
   }
 }
