@@ -7,6 +7,7 @@ import 'package:hazard_app/features/notification/providers/service_providers.dar
 import 'package:hazard_app/features/notification/providers/states/notifications_feed_provider_state.dart';
 import 'package:hazard_app/features/notification/services/notification_service.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
@@ -72,6 +73,21 @@ class NotificationsFeedProvider
           }
         });
 
+    final updateHazardSubscription = _ref
+        .read(providerOfHazardSocketManager)
+        .updateHazardStream
+        .listen((updatedHazard) {
+          if (updatedHazard.id != null) {
+            if (updatedHazard.reviewStatus != HazardReviewStatus.accepted) {
+              // If the updated hazard is not accepted, remove it from the list
+              removeFromHazards(updatedHazard.id!);
+              if (updatedHazard.category != null) {
+                removeCategoryFromSocket(updatedHazard.category!.id);
+              }
+            }
+          }
+        });
+
     final deleteHazardSubscription = _ref
         .read(providerOfHazardSocketManager)
         .deleteHazardStream
@@ -88,6 +104,7 @@ class NotificationsFeedProvider
     // Clean up subscription when provider is disposed
     _ref.onDispose(() {
       newHazardSubscription.cancel();
+      updateHazardSubscription.cancel();
       deleteHazardSubscription.cancel();
     });
   }

@@ -39,7 +39,7 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
   void _listenToHazardUpdates() {
     final updateHazardSubscription = _ref
         .read(providerOfHazardSocketManager)
-        .hazardUpdateStream
+        .updateHazardStream
         .listen((updatedHazard) {
           if (updatedHazard.id == state.hazard.id) {
             updateHazard(updatedHazard);

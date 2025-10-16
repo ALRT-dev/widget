@@ -46,7 +46,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
   void _listenToSocketForHazards() {
     final updateHazardSubscription = _ref
         .read(providerOfHazardSocketManager)
-        .hazardUpdateStream
+        .updateHazardStream
         .listen(updateHazard);
 
     final deleteHazardSubscription = _ref

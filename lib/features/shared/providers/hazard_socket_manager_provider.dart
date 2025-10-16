@@ -19,7 +19,7 @@ class HazardSocketManager {
 
   final Ref _ref;
 
-  final StreamController<Hazard> _hazardUpdateStreamController =
+  final StreamController<Hazard> _updateHazardStreamController =
       StreamController<Hazard>.broadcast();
   final StreamController<Hazard> _newHazardStreamController =
       StreamController<Hazard>.broadcast();
@@ -29,7 +29,7 @@ class HazardSocketManager {
   SocketService get _socketService => _ref.read(providerOfSocketService);
 
   /// Stream that broadcasts hazard updates to all listeners
-  Stream<Hazard> get hazardUpdateStream => _hazardUpdateStreamController.stream;
+  Stream<Hazard> get updateHazardStream => _updateHazardStreamController.stream;
 
   /// Stream that broadcasts new hazards to all listeners
   Stream<Hazard> get newHazardStream => _newHazardStreamController.stream;
@@ -55,7 +55,7 @@ class HazardSocketManager {
       (data) {
         if (data is Map<String, dynamic>) {
           final updatedHazard = Hazard.fromJson(data);
-          _hazardUpdateStreamController.add(updatedHazard);
+          _updateHazardStreamController.add(updatedHazard);
         }
       },
     );
@@ -75,7 +75,7 @@ class HazardSocketManager {
 
   /// Disposes of all stream controllers when no longer needed
   void dispose() {
-    _hazardUpdateStreamController.close();
+    _updateHazardStreamController.close();
     _newHazardStreamController.close();
     _deleteHazardStreamController.close();
   }
