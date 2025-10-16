@@ -12,6 +12,7 @@ import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
+import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_expiry_timer.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -43,109 +44,25 @@ class _HazardNotificationsListItemState
     return InkWell(
       onTap: _gotoViewHazard,
       borderRadius: BorderRadius.circular(10.r),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 10.spMin,
         children: [
-          _iconBuilder(),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Consumer(
-                  builder: (context, ref, child) {
-                    final title = ref.watch(
-                      provider.select(
-                        (value) => value.hazard.title ?? 'Unknown Hazard',
-                      ),
-                    );
-                    final createdAt = ref.watch(
-                      provider.select(
-                        (value) => value.hazard.createdAt,
-                      ),
-                    );
-                    return RichText(
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      text: TextSpan(
-                        style: DefaultTextStyle.of(context).style,
-                        children: [
-                          TextSpan(
-                            text: title,
-                            style: TextStyle(
-                              fontSize: 15.spMin,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black,
-                            ),
-                          ),
-                          if (createdAt != null) ...[
-                            TextSpan(
-                              text: ' • ',
-                              style: TextStyle(
-                                fontSize: 12.spMin,
-                                color: AppColors.grey,
-                              ),
-                            ),
-                            TextSpan(
-                              text: timeago
-                                  .format(
-                                    createdAt,
-                                    locale: 'en_short',
-                                  )
-                                  .replaceAll('~', ''),
-                              style: TextStyle(
-                                fontSize: 10.spMin,
-                                color: AppColors.grey,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    );
-                  },
-                ),
-                Consumer(
-                  builder: (context, ref, child) {
-                    final shortDescription = ref.watch(
-                      provider.select(
-                        (value) => value.hazard.shortDescription,
-                      ),
-                    );
-                    if (shortDescription?.isEmpty ?? true) {
-                      return const SizedBox.shrink();
-                    }
-
-                    return Text(
-                      shortDescription!,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                      ),
-                    );
-                  },
-                ),
-                8.hSizedBox,
-                Consumer(
-                  builder: (context, ref, child) {
-                    final voteType = ref.watch(
-                      provider.select((value) => value.hazard.userVoteType),
-                    );
-                    final voteCount = ref.watch(
-                      provider.select((value) => value.hazard.voteCount),
-                    );
-
-                    return TrustMeter(
-                      initialVoteType: voteType,
-                      initialVoteCount: voteCount,
-                      onVotePressed: _voteOnHazard,
-                    );
-                  },
-                ),
-              ],
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _iconBuilder(),
+              10.wSizedBox,
+              Expanded(
+                child: _headerBuilder(),
+              ),
+            ],
           ),
+          6.hSizedBox,
+          _shortDescriptionBuilder(),
+          8.hSizedBox,
+          _footerBuilder(),
+          10.hSizedBox,
+          _trustMeterBuilder(),
         ],
       ).pad(10.0),
     ).pX(10.0);
@@ -165,8 +82,8 @@ class _HazardNotificationsListItemState
           ),
         );
         return Container(
-          width: 45.spMin,
-          height: 45.spMin,
+          width: 40.spMin,
+          height: 40.spMin,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: severity?.color,
@@ -193,6 +110,157 @@ class _HazardNotificationsListItemState
               ).pL(3.0).pB(2.0),
             ),
           ),
+        );
+      },
+    );
+  }
+
+  Widget _headerBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final title = ref.watch(
+          provider.select(
+            (value) => value.hazard.title ?? 'Unknown Hazard',
+          ),
+        );
+        final createdAt = ref.watch(
+          provider.select(
+            (value) => value.hazard.createdAt,
+          ),
+        );
+        return RichText(
+          overflow: TextOverflow.ellipsis,
+          maxLines: 2,
+          text: TextSpan(
+            style: DefaultTextStyle.of(context).style,
+            children: [
+              TextSpan(
+                text: title,
+                style: TextStyle(
+                  fontSize: 15.spMin,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+              if (createdAt != null) ...[
+                TextSpan(
+                  text: ' • ',
+                  style: TextStyle(
+                    fontSize: 12.spMin,
+                    color: AppColors.grey,
+                  ),
+                ),
+                TextSpan(
+                  text: timeago
+                      .format(
+                        createdAt,
+                        locale: 'en_short',
+                      )
+                      .replaceAll('~', ''),
+                  style: TextStyle(
+                    fontSize: 10.spMin,
+                    color: AppColors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _shortDescriptionBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final shortDescription = ref.watch(
+          provider.select(
+            (value) => value.hazard.shortDescription,
+          ),
+        );
+        if (shortDescription?.isEmpty ?? true) {
+          return const SizedBox.shrink();
+        }
+
+        return Text(
+          shortDescription!,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 2,
+          style: TextStyle(
+            color: Colors.grey[600],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _footerBuilder() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.location_on_outlined,
+              size: 14.spMin,
+              color: AppColors.grey,
+            ),
+            4.wSizedBox,
+            Text(
+              '1.2 km away',
+              style: TextStyle(
+                fontSize: 11.spMin,
+                fontWeight: FontWeight.w500,
+                color: AppColors.grey,
+              ),
+            ),
+          ],
+        ),
+        Consumer(
+          builder: (context, ref, child) {
+            final expiresAt = ref.watch(
+              provider.select(
+                (value) => value.hazard.expiresAt,
+              ),
+            );
+
+            // Only show expiry timer if the hazard has an expiry date
+            if (expiresAt == null) {
+              return const SizedBox.shrink();
+            }
+
+            return HazardExpiryTimer(
+              expiryDateTime: expiresAt,
+              activeColor: AppColors.grey,
+              style: TextStyle(
+                fontSize: 11.spMin,
+                fontWeight: FontWeight.w500,
+              ),
+              iconData: Icons.timer_outlined,
+              iconSize: 12.0,
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _trustMeterBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final voteType = ref.watch(
+          provider.select((value) => value.hazard.userVoteType),
+        );
+        final voteCount = ref.watch(
+          provider.select((value) => value.hazard.voteCount),
+        );
+
+        return TrustMeter(
+          initialVoteType: voteType,
+          initialVoteCount: voteCount,
+          onVotePressed: _voteOnHazard,
         );
       },
     );

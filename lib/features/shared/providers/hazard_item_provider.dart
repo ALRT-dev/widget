@@ -42,7 +42,12 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
         .updateHazardStream
         .listen((updatedHazard) {
           if (updatedHazard.id == state.hazard.id) {
-            updateHazard(updatedHazard);
+            updateHazard(
+              updatedHazard.copyWith(
+                // No need to update userVoteType as it's not sent in the update
+                userVoteType: state.hazard.userVoteType,
+              ),
+            );
           }
         });
 

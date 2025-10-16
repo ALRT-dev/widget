@@ -14,6 +14,7 @@ import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dar
 import 'package:hazard_app/features/shared/providers/states/view_hazard_provider_state.dart';
 import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
+import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_expiry_timer.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'dart:math' as math;
@@ -584,16 +585,16 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         children: [
           if (widget.args.hazard.occurredAt != null)
             _buildTimestampRow(
-              'Occurred',
-              widget.args.hazard.occurredAt!,
-              Icons.event_outlined,
+              label: 'Occurred',
+              dateTime: widget.args.hazard.occurredAt!,
+              icon: Icons.event_outlined,
             ),
           if (widget.args.hazard.createdAt != null) ...[
             if (widget.args.hazard.occurredAt != null) 12.spMin.hSizedBox,
             _buildTimestampRow(
-              'Reported',
-              widget.args.hazard.createdAt!,
-              Icons.report_outlined,
+              label: 'Reported',
+              dateTime: widget.args.hazard.createdAt!,
+              icon: Icons.report_outlined,
             ),
           ],
           if (widget.args.hazard.expiresAt != null) ...[
@@ -601,9 +602,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 widget.args.hazard.createdAt != null)
               12.spMin.hSizedBox,
             _buildTimestampRow(
-              'Expires',
-              widget.args.hazard.expiresAt!,
-              Icons.schedule_outlined,
+              label: 'Expires',
+              dateTime: widget.args.hazard.expiresAt!,
+              dateTimeWidget: HazardExpiryTimer(
+                expiryDateTime: widget.args.hazard.expiresAt!,
+              ),
+              icon: Icons.schedule_outlined,
             ),
           ],
         ],
@@ -611,7 +615,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
-  Widget _buildTimestampRow(String label, DateTime dateTime, IconData icon) {
+  Widget _buildTimestampRow({
+    required final String label,
+    required final IconData icon,
+    required final DateTime dateTime,
+    final Widget? dateTimeWidget,
+  }) {
     return Container(
       padding: EdgeInsets.all(12.spMin),
       decoration: BoxDecoration(
@@ -639,13 +648,14 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   ),
                 ),
                 2.spMin.hSizedBox,
-                Text(
-                  timeago.format(dateTime),
-                  style: TextStyle(
-                    fontSize: 14.spMin,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                dateTimeWidget ??
+                    Text(
+                      timeago.format(dateTime),
+                      style: TextStyle(
+                        fontSize: 14.spMin,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
               ],
             ),
           ),
