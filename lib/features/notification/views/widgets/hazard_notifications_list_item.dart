@@ -50,7 +50,6 @@ class _HazardNotificationsListItemState
           _headerBuilder(),
           12.hSizedBox,
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _iconBuilder(),
               10.wSizedBox,

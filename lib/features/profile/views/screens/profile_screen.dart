@@ -72,7 +72,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       backgroundColor: AppColors.white,
       foregroundColor: AppColors.black,
       elevation: 0,
-
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
           // Calculate the collapse ratio
@@ -93,7 +92,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             title: isCollapsed
                 ? Row(
                     spacing: 10.spMin,
-                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       _buildUserAvatar(
                         size: 40.0,
@@ -235,14 +233,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     Icons.calendar_today_outlined,
                   ),
                 _buildInfoRow(
-                  'Last Active',
-                  'now',
-                  Icons.access_time_outlined,
-                  valueColor: AppColors.green,
-                ),
-                _buildInfoRow(
-                  'Member Status',
-                  'Normal',
+                  'Membership',
+                  'Pilot Participant',
                   Icons.verified_outlined,
                   valueColor: AppColors.black,
                 ),
@@ -273,7 +265,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   xpPoints.toString(),
                   Icons.star_outline,
                   AppColors.orange,
-                  '',
+                  'Level 1 - Watcher',
                 );
               },
             ),
@@ -293,7 +285,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   '${reliabilityScore.toStringAsFixed(0)}%',
                   Icons.shield_outlined,
                   AppColors.green,
-                  '',
+                  _reliabilityDescription(reliabilityScore / 100),
                 );
               },
             ),
@@ -529,7 +521,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           borderRadius: BorderRadius.circular(12.spMin),
           onTap: _gotoManageNotificationsScreen,
           child: Padding(
-            padding: EdgeInsets.all(20.spMin),
+            padding: EdgeInsets.all(16.spMin),
+
             child: Row(
               children: [
                 Container(
@@ -867,6 +860,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       return words[0][0].toUpperCase();
     }
     return 'U';
+  }
+
+  String _reliabilityDescription(double score) {
+    if (score >= 0.8) {
+      return 'Excellent';
+    } else if (score >= 0.6) {
+      return 'Good';
+    } else if (score >= 0.4) {
+      return 'Average';
+    } else if (score >= 0.2) {
+      return 'Below Average';
+    } else {
+      return 'Poor';
+    }
   }
 
   /// Listens to the logout state changes and navigates to the AppWrapper on success.

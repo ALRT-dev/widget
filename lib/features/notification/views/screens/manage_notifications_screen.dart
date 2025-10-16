@@ -249,12 +249,13 @@ class _ManageNotificationsScreenState
     return Card(
       margin: EdgeInsets.only(bottom: 8.spMin),
       elevation: 0,
+      color: AppColors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.spMin),
         side: BorderSide(
           color: notificationSettings[key]!
               ? color.withValues(alpha: 0.5)
-              : AppColors.lightGrey.withValues(alpha: 0.3),
+              : AppColors.lightGrey.withValues(alpha: 0.6),
           width: 1,
         ),
       ),
@@ -322,10 +323,11 @@ class _ManageNotificationsScreenState
     return Card(
       margin: EdgeInsets.only(bottom: 8.spMin),
       elevation: 0,
+      color: AppColors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12.spMin),
         side: BorderSide(
-          color: AppColors.lightGrey.withValues(alpha: 0.3),
+          color: AppColors.lightGrey.withValues(alpha: 0.6),
           width: 1,
         ),
       ),
