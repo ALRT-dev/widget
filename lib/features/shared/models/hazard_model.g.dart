@@ -14,6 +14,7 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   severity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['severity']),
   latitude: (json['latitude'] as num?)?.toDouble(),
   longitude: (json['longitude'] as num?)?.toDouble(),
+  locationName: json['locationName'] as String?,
   categoryId: json['categoryId'] as String?,
   category: json['category'] == null
       ? null
@@ -72,6 +73,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'severity': ?_$HazardSeverityEnumMap[instance.severity],
   'latitude': ?instance.latitude,
   'longitude': ?instance.longitude,
+  'locationName': ?instance.locationName,
   'categoryId': ?instance.categoryId,
   'category': ?instance.category?.toJson(),
   'source': ?instance.source?.toJson(),

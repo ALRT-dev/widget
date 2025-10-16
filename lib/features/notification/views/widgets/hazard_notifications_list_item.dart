@@ -52,54 +52,80 @@ class _HazardNotificationsListItemState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                RichText(
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                  text: TextSpan(
-                    style: DefaultTextStyle.of(context).style,
-                    children: [
-                      TextSpan(
-                        text: widget.hazard.title ?? 'No Title',
-                        style: TextStyle(
-                          fontSize: 15.spMin,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final title = ref.watch(
+                      provider.select(
+                        (value) => value.hazard.title ?? 'Unknown Hazard',
                       ),
-                      if (widget.hazard.createdAt != null) ...[
-                        TextSpan(
-                          text: ' • ',
-                          style: TextStyle(
-                            fontSize: 12.spMin,
-                            color: AppColors.grey,
+                    );
+                    final createdAt = ref.watch(
+                      provider.select(
+                        (value) => value.hazard.createdAt,
+                      ),
+                    );
+                    return RichText(
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      text: TextSpan(
+                        style: DefaultTextStyle.of(context).style,
+                        children: [
+                          TextSpan(
+                            text: title,
+                            style: TextStyle(
+                              fontSize: 15.spMin,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
                           ),
-                        ),
-                        TextSpan(
-                          text: timeago
-                              .format(
-                                widget.hazard.createdAt!,
-                                locale: 'en_short',
-                              )
-                              .replaceAll('~', ''),
-                          style: TextStyle(
-                            fontSize: 10.spMin,
-                            color: AppColors.grey,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
+                          if (createdAt != null) ...[
+                            TextSpan(
+                              text: ' • ',
+                              style: TextStyle(
+                                fontSize: 12.spMin,
+                                color: AppColors.grey,
+                              ),
+                            ),
+                            TextSpan(
+                              text: timeago
+                                  .format(
+                                    createdAt,
+                                    locale: 'en_short',
+                                  )
+                                  .replaceAll('~', ''),
+                              style: TextStyle(
+                                fontSize: 10.spMin,
+                                color: AppColors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
                 ),
-                if (widget.hazard.shortDescription != null)
-                  Text(
-                    widget.hazard.shortDescription!,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                    ),
-                  ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final shortDescription = ref.watch(
+                      provider.select(
+                        (value) => value.hazard.shortDescription,
+                      ),
+                    );
+                    if (shortDescription?.isEmpty ?? true) {
+                      return const SizedBox.shrink();
+                    }
+
+                    return Text(
+                      shortDescription!,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                      ),
+                    );
+                  },
+                ),
                 8.hSizedBox,
                 Consumer(
                   builder: (context, ref, child) {
@@ -126,35 +152,49 @@ class _HazardNotificationsListItemState
   }
 
   Widget _iconBuilder() {
-    return Container(
-      width: 45.spMin,
-      height: 45.spMin,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: widget.hazard.severity?.color,
-      ),
-      padding: EdgeInsets.all(8.spMin),
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppColors.black26,
-        ),
-        child: Center(
-          child: Text(
-            widget.hazard.category?.emoji ?? '❗',
-            style: TextStyle(
-              fontSize: 16.spMin,
-              shadows: [
-                Shadow(
-                  offset: Offset(0.0, 0.0),
-                  blurRadius: 10.0,
-                  color: AppColors.black.withValues(alpha: 0.4),
-                ),
-              ],
+    return Consumer(
+      builder: (context, ref, child) {
+        final severity = ref.watch(
+          provider.select(
+            (value) => value.hazard.severity,
+          ),
+        );
+        final category = ref.watch(
+          provider.select(
+            (value) => value.hazard.category,
+          ),
+        );
+        return Container(
+          width: 45.spMin,
+          height: 45.spMin,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: severity?.color,
+          ),
+          padding: EdgeInsets.all(8.spMin),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.black26,
             ),
-          ).pL(3.0).pB(2.0),
-        ),
-      ),
+            child: Center(
+              child: Text(
+                category?.emoji ?? '❗',
+                style: TextStyle(
+                  fontSize: 16.spMin,
+                  shadows: [
+                    Shadow(
+                      offset: Offset(0.0, 0.0),
+                      blurRadius: 10.0,
+                      color: AppColors.black.withValues(alpha: 0.4),
+                    ),
+                  ],
+                ),
+              ).pL(3.0).pB(2.0),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -184,10 +224,13 @@ class _HazardNotificationsListItemState
 
   /// Navigate to the View Hazard screen with the current hazard as an argument.
   void _gotoViewHazard() {
+    final hazard = ref.read(provider).hazard;
     context.unfocusInputs();
     context.push(
       ViewHazardScreen.route,
-      extra: ViewHazardScreenArgs(hazard: widget.hazard),
+      extra: ViewHazardScreenArgs(
+        hazard: hazard,
+      ),
     );
   }
 

@@ -37,6 +37,9 @@ abstract class Hazard with _$Hazard {
     /// The longitude of the hazard location.
     final double? longitude,
 
+    /// The human-readable name of the hazard location.
+    final String? locationName,
+
     /// The id of the category the hazard belongs to.
     final String? categoryId,
 

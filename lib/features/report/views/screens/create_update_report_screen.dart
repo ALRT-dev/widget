@@ -5,50 +5,79 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
-import 'package:hazard_app/features/report/providers/create_report_provider.dart';
+import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/categories_dropdown.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
-class CreateReportScreen extends ConsumerStatefulWidget {
-  /// Displays the screen for creating a new hazard report.
-  const CreateReportScreen({super.key});
+class CreateUpdateReportScreenArgs {
+  CreateUpdateReportScreenArgs({this.hazardToUpdate});
+
+  /// The hazard to update, if any.
+  /// If null, a new hazard report will be created.
+  final Hazard? hazardToUpdate;
+}
+
+class CreateUpdateReportScreen extends ConsumerStatefulWidget {
+  /// Displays the screen for creating or updating a hazard report.
+  const CreateUpdateReportScreen({
+    super.key,
+    this.args,
+  });
+
+  /// The arguments for the screen.
+  final CreateUpdateReportScreenArgs? args;
+
+  static const createRoute = '/report/create';
+  static const updateRoute = '/report/update';
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
-      _CreateReportScreenState();
+      _CreateUpdateReportScreenState();
 }
 
-class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
+class _CreateUpdateReportScreenState
+    extends ConsumerState<CreateUpdateReportScreen> {
   final _descriptionController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _descriptionController.text =
-        ref.read(providerOfCreateReport).description ?? '';
+        widget.args?.hazardToUpdate?.description ??
+        ref.read(providerOfCreateReport).hazardToCreateOrUpdate.description ??
+        '';
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(providerOfCreateReport.notifier).updateReportSubmitted(false);
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Report an ALRT',
-          style: TextStyle(
-            color: AppColors.black,
-          ),
+        title: Consumer(
+          builder: (context, ref, child) {
+            final isUpdating = ref.watch(
+              providerOfCreateReport.select(
+                (value) => value.hazardToCreateOrUpdate.id?.isNotEmpty ?? false,
+              ),
+            );
+
+            return Text(
+              isUpdating ? 'Update an ALRT' : 'Report an ALRT',
+              style: TextStyle(
+                color: AppColors.black,
+              ),
+            );
+          },
         ),
         backgroundColor: context.theme.scaffoldBackgroundColor,
         foregroundColor: AppColors.black,
@@ -184,7 +213,7 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
           builder: (context, ref, child) {
             final dateTime = ref.watch(
               providerOfCreateReport.select(
-                (value) => value.dateTime,
+                (value) => value.hazardToCreateOrUpdate.occurredAt,
               ),
             );
 
@@ -210,7 +239,7 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
           builder: (context, ref, child) {
             final selectedCategory = ref.watch(
               providerOfCreateReport.select(
-                (value) => value.category,
+                (value) => value.hazardToCreateOrUpdate.category,
               ),
             );
             return CategoriesDropdown(
@@ -241,14 +270,14 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
         _titleBuilder('Location'),
         Consumer(
           builder: (context, ref, child) {
-            final selectedLocation = ref.watch(
+            final locationName = ref.watch(
               providerOfCreateReport.select(
-                (value) => value.location,
+                (value) => value.hazardToCreateOrUpdate.locationName,
               ),
             );
             return _inputBuilder(
               hintText: 'Select a location',
-              value: selectedLocation?.name ?? selectedLocation?.address,
+              value: locationName,
               enabled: false,
               onPressed: _gotoSelectLocationScreen,
             );
@@ -314,10 +343,12 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
             ],
           ),
           padding: EdgeInsets.all(10.spMin),
-          child: Button.filled(
-            value: 'Submit Report',
-            icon: Icon(Icons.check_rounded),
-            onPressed: _handleSubmitReport,
+          child: SafeArea(
+            child: Button.filled(
+              value: 'Submit Report',
+              icon: Icon(Icons.check_rounded),
+              onPressed: _handleSubmitReport,
+            ),
           ),
         );
       },
@@ -325,11 +356,22 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
   }
 
   Widget _submitAnotherButtonBuilder() {
-    return Button.filled(
-      width: 300.0,
-      value: 'Submit Another Report',
-      icon: Icon(Icons.add_rounded),
-      onPressed: _handleAnotherReport,
+    return Consumer(
+      builder: (context, ref, child) {
+        final isUpdating = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.hazardToCreateOrUpdate.id?.isNotEmpty ?? false,
+          ),
+        );
+        if (isUpdating) return const SizedBox.shrink();
+
+        return Button.filled(
+          width: 300.0,
+          value: 'Submit Another Report',
+          icon: Icon(Icons.add_rounded),
+          onPressed: _handleAnotherReport,
+        );
+      },
     );
   }
 
@@ -359,10 +401,11 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
     return ref.watch(
       providerOfCreateReport.select(
         (value) =>
-            value.dateTime != null ||
-            value.category != null ||
-            value.location != null ||
-            (value.description != null && value.description!.isNotEmpty) ||
+            value.hazardToCreateOrUpdate.occurredAt != null ||
+            value.hazardToCreateOrUpdate.locationName != null ||
+            value.hazardToCreateOrUpdate.category != null ||
+            (value.hazardToCreateOrUpdate.description != null &&
+                value.hazardToCreateOrUpdate.description!.isNotEmpty) ||
             (value.medias.isNotEmpty),
       ),
     );
@@ -373,12 +416,21 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
     return ref.watch(
       providerOfCreateReport.select(
         (value) =>
-            value.dateTime != null &&
-            value.category != null &&
-            value.location != null &&
-            (value.description != null && value.description!.isNotEmpty),
+            value.hazardToCreateOrUpdate.occurredAt != null &&
+            value.hazardToCreateOrUpdate.category != null &&
+            value.hazardToCreateOrUpdate.locationName != null &&
+            (value.hazardToCreateOrUpdate.description != null &&
+                value.hazardToCreateOrUpdate.description!.isNotEmpty),
       ),
     );
+  }
+
+  void _onInit() {
+    ref.read(providerOfCreateReport.notifier).updateReportSubmitted(false);
+
+    ref
+        .read(providerOfCreateReport.notifier)
+        .updateHazardToCreateOrUpdate(widget.args?.hazardToUpdate ?? Hazard());
   }
 
   /// Opens a date and time picker dialog.
@@ -386,7 +438,7 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
     context.unfocusInputs();
 
     final initialDate =
-        ref.read(providerOfCreateReport).dateTime ??
+        ref.read(providerOfCreateReport).hazardToCreateOrUpdate.occurredAt ??
         // DateTime.now() is not working here somehow so using this workaround
         DateTime(
           DateTime.now().year,
@@ -429,7 +481,15 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
 
     final selectedLocation = ref.read(
       providerOfCreateReport.select(
-        (value) => value.location,
+        (value) =>
+            value.hazardToCreateOrUpdate.latitude == null ||
+                value.hazardToCreateOrUpdate.longitude == null
+            ? null
+            : AlrtLocation(
+                latitude: value.hazardToCreateOrUpdate.latitude!,
+                longitude: value.hazardToCreateOrUpdate.longitude!,
+                name: value.hazardToCreateOrUpdate.locationName,
+              ),
       ),
     );
 
@@ -475,7 +535,7 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
 
   /// Handles the submission of the report.
   void _handleSubmitReport() {
-    ref.read(providerOfCreateReport.notifier).createReport();
+    ref.read(providerOfCreateReport.notifier).createOrUpdateReport();
     _clearAll();
   }
 

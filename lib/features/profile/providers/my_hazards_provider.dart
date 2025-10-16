@@ -111,11 +111,34 @@ class MyHazardsProvider extends StateNotifier<MyHazardsProviderState> {
     );
   }
 
+  /// Updates a hazard in [MyHazardsProviderState.myAcceptedHazards] with the given [hazard].
+  void updateMyAcceptedHazard(final Hazard hazard) {
+    final updatedHazards = state.myAcceptedHazards.map((h) {
+      if (h.id == hazard.id) {
+        return hazard;
+      }
+      return h;
+    }).toList();
+    updateMyAcceptedHazards(updatedHazards);
+  }
+
   /// Adds a hazard to [MyHazardsProviderState.myAcceptedHazards].
   void addToMyAcceptedHazards(final Hazard hazard) {
     final updatedHazards = List<Hazard>.from(state.myAcceptedHazards)
       ..insert(0, hazard);
     updateMyAcceptedHazards(updatedHazards);
+  }
+
+  /// Adds or updates a hazard in [MyHazardsProviderState.myAcceptedHazards].
+  void addOrUpdateAcceptedHazard(final Hazard hazard) {
+    final index = state.myAcceptedHazards.indexWhere((h) => h.id == hazard.id);
+    if (index != -1) {
+      // Update existing hazard
+      updateMyAcceptedHazard(hazard);
+    } else {
+      // Add new hazard
+      addToMyAcceptedHazards(hazard);
+    }
   }
 
   /// Removes a hazard from [MyHazardsProviderState.myAcceptedHazards] by its [hazardId].
@@ -133,11 +156,34 @@ class MyHazardsProvider extends StateNotifier<MyHazardsProviderState> {
     );
   }
 
+  /// Updates a hazard in [MyHazardsProviderState.myRejectedHazards] with the given [hazard].
+  void updateMyRejectedHazard(final Hazard hazard) {
+    final updatedHazards = state.myRejectedHazards.map((h) {
+      if (h.id == hazard.id) {
+        return hazard;
+      }
+      return h;
+    }).toList();
+    updateMyRejectedHazards(updatedHazards);
+  }
+
   /// Adds a hazard to [MyHazardsProviderState.myRejectedHazards].
   void addToMyRejectedHazards(final Hazard hazard) {
     final updatedHazards = List<Hazard>.from(state.myRejectedHazards)
       ..insert(0, hazard);
     updateMyRejectedHazards(updatedHazards);
+  }
+
+  /// Adds or updates a hazard in [MyHazardsProviderState.myRejectedHazards].
+  void addOrUpdateRejectedHazard(final Hazard hazard) {
+    final index = state.myRejectedHazards.indexWhere((h) => h.id == hazard.id);
+    if (index != -1) {
+      // Update existing hazard
+      updateMyRejectedHazard(hazard);
+    } else {
+      // Add new hazard
+      addToMyRejectedHazards(hazard);
+    }
   }
 
   /// Removes a hazard from [MyHazardsProviderState.myRejectedHazards] by its [hazardId].

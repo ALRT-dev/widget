@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
@@ -185,7 +186,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           icon: Icon(
             Icons.edit_rounded,
           ),
-          onPressed: () {},
+          onPressed: _handleEditPressed,
         );
       },
     );
@@ -339,7 +340,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Coordinates',
+                    widget.args.hazard.locationName != null
+                        ? 'Address'
+                        : 'Coordinates',
                     style: TextStyle(
                       fontSize: 12.spMin,
                       color: AppColors.grey,
@@ -348,7 +351,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   ),
                   4.spMin.hSizedBox,
                   Text(
-                    '${widget.args.hazard.latitude!.toStringAsFixed(6)}, ${widget.args.hazard.longitude!.toStringAsFixed(6)}',
+                    widget.args.hazard.locationName ??
+                        '${widget.args.hazard.latitude!.toStringAsFixed(6)}, ${widget.args.hazard.longitude!.toStringAsFixed(6)}',
                     style: TextStyle(
                       fontSize: 14.spMin,
                       fontWeight: FontWeight.w600,
@@ -1032,6 +1036,16 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       onPressedConfirmAsync: (context, ref) => ref
           .read(providerOfViewHazard(widget.args.hazard.id!).notifier)
           .deleteHazard(),
+    );
+  }
+
+  /// Handle edit button pressed.
+  void _handleEditPressed() {
+    context.push(
+      CreateUpdateReportScreen.updateRoute,
+      extra: CreateUpdateReportScreenArgs(
+        hazardToUpdate: widget.args.hazard,
+      ),
     );
   }
 }

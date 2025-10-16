@@ -18,9 +18,9 @@ import 'package:hazard_app/features/notification/views/screens/notifications_scr
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
 import 'package:hazard_app/features/profile/views/screens/profile_screen.dart';
-import 'package:hazard_app/features/report/providers/create_report_provider.dart';
-import 'package:hazard_app/features/report/providers/states/create_report_provider_state.dart';
-import 'package:hazard_app/features/report/views/screens/create_report_screen.dart';
+import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
+import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
+import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/views/screens/hazard_search_screen.dart';
@@ -89,7 +89,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         children: [
           const MapScreen(),
           const HazardSearchScreen(),
-          const CreateReportScreen(),
+          const CreateUpdateReportScreen(),
           const NotificationsScreen(),
           const ProfileScreen(),
         ],
@@ -118,7 +118,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void _listenToCreateReportState() {
     ref.listen(
       providerOfCreateReport.select(
-        (value) => value.creatingHazardReports,
+        (value) => value.creatingUpdatingHazardReports,
       ),
       (prev, next) {
         if (prev != next) {
