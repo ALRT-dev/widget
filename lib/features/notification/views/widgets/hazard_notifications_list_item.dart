@@ -47,13 +47,15 @@ class _HazardNotificationsListItemState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _headerBuilder(),
+          12.hSizedBox,
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _iconBuilder(),
               10.wSizedBox,
               Expanded(
-                child: _headerBuilder(),
+                child: _titleBuilder(),
               ),
             ],
           ),
@@ -61,11 +63,58 @@ class _HazardNotificationsListItemState
           _shortDescriptionBuilder(),
           8.hSizedBox,
           _footerBuilder(),
-          10.hSizedBox,
+          12.hSizedBox,
           _trustMeterBuilder(),
         ],
       ).pad(10.0),
     ).pX(10.0);
+  }
+
+  Widget _headerBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final source = ref.watch(
+          provider.select(
+            (value) => value.hazard.source,
+          ),
+        );
+        return Row(
+          children: [
+            Text(
+              source?.name ?? 'Crowd Sourced',
+              style: TextStyle(
+                fontSize: 12.spMin,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+            ),
+            6.wSizedBox,
+            const Icon(
+              Icons.circle,
+              size: 4,
+              color: AppColors.grey,
+            ),
+            6.wSizedBox,
+            Text(
+              source != null ? 'Verified' : 'Unverified',
+              style: TextStyle(
+                fontSize: 12.spMin,
+                fontWeight: FontWeight.w500,
+                color: AppColors.grey,
+              ),
+            ),
+            4.wSizedBox,
+            Icon(
+              Icons.verified_rounded,
+              size: 16.spMin,
+              color: source != null
+                  ? AppColors.blue
+                  : AppColors.grey.withValues(alpha: 0.3),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _iconBuilder() {
@@ -115,7 +164,7 @@ class _HazardNotificationsListItemState
     );
   }
 
-  Widget _headerBuilder() {
+  Widget _titleBuilder() {
     return Consumer(
       builder: (context, ref, child) {
         final title = ref.watch(
