@@ -35,6 +35,11 @@ abstract class RestClient {
   @GET(kUrlUser)
   Future<AppUser> getCurrentUser();
 
+  @PUT(kUrlUser)
+  Future<AppUser> updateCurrentUser({
+    @Body() required AppUser user,
+  });
+
   @POST(kUrlSubscribeLocation)
   Future<LocationSubscription> subscribeToLocation({
     @Field() required final double northeastLat,

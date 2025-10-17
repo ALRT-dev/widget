@@ -10,17 +10,21 @@ import 'package:hazard_app/features/shared/utils/either.dart';
 abstract class UserRepository {
   Future<Either<AppUser, AppError>> getCurrentUser();
 
+  Future<Either<AppUser, AppError>> updateCurrentUser({
+    required final AppUser user,
+  });
+
   Future<Either<LocationSubscription, AppError>> subscribeToLocation({
-    required double northeastLat,
-    required double northeastLng,
-    required double southwestLat,
-    required double southwestLng,
-    String? name,
-    String? address,
+    required final double northeastLat,
+    required final double northeastLng,
+    required final double southwestLat,
+    required final double southwestLng,
+    final String? name,
+    final String? address,
   });
 
   Future<Either<void, AppError>> unsubscribeFromLocation({
-    required String subscriptionId,
+    required final String subscriptionId,
   });
 
   Future<Either<List<LocationSubscription>, AppError>>
@@ -132,6 +136,22 @@ class UserRepositoryImpl implements UserRepository {
           updates: updates,
         );
         return Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<AppUser, AppError>> updateCurrentUser({
+    required AppUser user,
+  }) {
+    return runAsyncCall(
+      name: 'updateCurrentUser',
+      future: () async {
+        final result = await _restClient.updateCurrentUser(
+          user: user,
+        );
+        return Success(result);
       },
       onError: Failure.new,
     );

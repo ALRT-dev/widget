@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 mixin _$HomeProviderState {
 
 /// The state of sending push notification token to the server
- SendPushNotificationTokenState get sendPushNotificationTokenState;
+ SendPushNotificationTokenState get sendPushNotificationTokenState;/// The state of updating user location
+ UpdateUserLocationState get updateUserLocationState;
 /// Create a copy of HomeProviderState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -26,16 +27,16 @@ $HomeProviderStateCopyWith<HomeProviderState> get copyWith => _$HomeProviderStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeProviderState&&(identical(other.sendPushNotificationTokenState, sendPushNotificationTokenState) || other.sendPushNotificationTokenState == sendPushNotificationTokenState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeProviderState&&(identical(other.sendPushNotificationTokenState, sendPushNotificationTokenState) || other.sendPushNotificationTokenState == sendPushNotificationTokenState)&&(identical(other.updateUserLocationState, updateUserLocationState) || other.updateUserLocationState == updateUserLocationState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,sendPushNotificationTokenState);
+int get hashCode => Object.hash(runtimeType,sendPushNotificationTokenState,updateUserLocationState);
 
 @override
 String toString() {
-  return 'HomeProviderState(sendPushNotificationTokenState: $sendPushNotificationTokenState)';
+  return 'HomeProviderState(sendPushNotificationTokenState: $sendPushNotificationTokenState, updateUserLocationState: $updateUserLocationState)';
 }
 
 
@@ -46,11 +47,11 @@ abstract mixin class $HomeProviderStateCopyWith<$Res>  {
   factory $HomeProviderStateCopyWith(HomeProviderState value, $Res Function(HomeProviderState) _then) = _$HomeProviderStateCopyWithImpl;
 @useResult
 $Res call({
- SendPushNotificationTokenState sendPushNotificationTokenState
+ SendPushNotificationTokenState sendPushNotificationTokenState, UpdateUserLocationState updateUserLocationState
 });
 
 
-$SendPushNotificationTokenStateCopyWith<$Res> get sendPushNotificationTokenState;
+$SendPushNotificationTokenStateCopyWith<$Res> get sendPushNotificationTokenState;$UpdateUserLocationStateCopyWith<$Res> get updateUserLocationState;
 
 }
 /// @nodoc
@@ -63,10 +64,11 @@ class _$HomeProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? sendPushNotificationTokenState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? sendPushNotificationTokenState = null,Object? updateUserLocationState = null,}) {
   return _then(_self.copyWith(
 sendPushNotificationTokenState: null == sendPushNotificationTokenState ? _self.sendPushNotificationTokenState : sendPushNotificationTokenState // ignore: cast_nullable_to_non_nullable
-as SendPushNotificationTokenState,
+as SendPushNotificationTokenState,updateUserLocationState: null == updateUserLocationState ? _self.updateUserLocationState : updateUserLocationState // ignore: cast_nullable_to_non_nullable
+as UpdateUserLocationState,
   ));
 }
 /// Create a copy of HomeProviderState
@@ -77,6 +79,15 @@ $SendPushNotificationTokenStateCopyWith<$Res> get sendPushNotificationTokenState
   
   return $SendPushNotificationTokenStateCopyWith<$Res>(_self.sendPushNotificationTokenState, (value) {
     return _then(_self.copyWith(sendPushNotificationTokenState: value));
+  });
+}/// Create a copy of HomeProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateUserLocationStateCopyWith<$Res> get updateUserLocationState {
+  
+  return $UpdateUserLocationStateCopyWith<$Res>(_self.updateUserLocationState, (value) {
+    return _then(_self.copyWith(updateUserLocationState: value));
   });
 }
 }
@@ -160,10 +171,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SendPushNotificationTokenState sendPushNotificationTokenState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SendPushNotificationTokenState sendPushNotificationTokenState,  UpdateUserLocationState updateUserLocationState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HomeProviderState() when $default != null:
-return $default(_that.sendPushNotificationTokenState);case _:
+return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationState);case _:
   return orElse();
 
 }
@@ -181,10 +192,10 @@ return $default(_that.sendPushNotificationTokenState);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SendPushNotificationTokenState sendPushNotificationTokenState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SendPushNotificationTokenState sendPushNotificationTokenState,  UpdateUserLocationState updateUserLocationState)  $default,) {final _that = this;
 switch (_that) {
 case _HomeProviderState():
-return $default(_that.sendPushNotificationTokenState);case _:
+return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +212,10 @@ return $default(_that.sendPushNotificationTokenState);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SendPushNotificationTokenState sendPushNotificationTokenState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SendPushNotificationTokenState sendPushNotificationTokenState,  UpdateUserLocationState updateUserLocationState)?  $default,) {final _that = this;
 switch (_that) {
 case _HomeProviderState() when $default != null:
-return $default(_that.sendPushNotificationTokenState);case _:
+return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationState);case _:
   return null;
 
 }
@@ -216,11 +227,13 @@ return $default(_that.sendPushNotificationTokenState);case _:
 
 
 class _HomeProviderState implements HomeProviderState {
-  const _HomeProviderState({this.sendPushNotificationTokenState = const SendPushNotificationTokenState.initial()});
+  const _HomeProviderState({this.sendPushNotificationTokenState = const SendPushNotificationTokenState.initial(), this.updateUserLocationState = const UpdateUserLocationState.initial()});
   
 
 /// The state of sending push notification token to the server
 @override@JsonKey() final  SendPushNotificationTokenState sendPushNotificationTokenState;
+/// The state of updating user location
+@override@JsonKey() final  UpdateUserLocationState updateUserLocationState;
 
 /// Create a copy of HomeProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -232,16 +245,16 @@ _$HomeProviderStateCopyWith<_HomeProviderState> get copyWith => __$HomeProviderS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeProviderState&&(identical(other.sendPushNotificationTokenState, sendPushNotificationTokenState) || other.sendPushNotificationTokenState == sendPushNotificationTokenState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeProviderState&&(identical(other.sendPushNotificationTokenState, sendPushNotificationTokenState) || other.sendPushNotificationTokenState == sendPushNotificationTokenState)&&(identical(other.updateUserLocationState, updateUserLocationState) || other.updateUserLocationState == updateUserLocationState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,sendPushNotificationTokenState);
+int get hashCode => Object.hash(runtimeType,sendPushNotificationTokenState,updateUserLocationState);
 
 @override
 String toString() {
-  return 'HomeProviderState(sendPushNotificationTokenState: $sendPushNotificationTokenState)';
+  return 'HomeProviderState(sendPushNotificationTokenState: $sendPushNotificationTokenState, updateUserLocationState: $updateUserLocationState)';
 }
 
 
@@ -252,11 +265,11 @@ abstract mixin class _$HomeProviderStateCopyWith<$Res> implements $HomeProviderS
   factory _$HomeProviderStateCopyWith(_HomeProviderState value, $Res Function(_HomeProviderState) _then) = __$HomeProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- SendPushNotificationTokenState sendPushNotificationTokenState
+ SendPushNotificationTokenState sendPushNotificationTokenState, UpdateUserLocationState updateUserLocationState
 });
 
 
-@override $SendPushNotificationTokenStateCopyWith<$Res> get sendPushNotificationTokenState;
+@override $SendPushNotificationTokenStateCopyWith<$Res> get sendPushNotificationTokenState;@override $UpdateUserLocationStateCopyWith<$Res> get updateUserLocationState;
 
 }
 /// @nodoc
@@ -269,10 +282,11 @@ class __$HomeProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? sendPushNotificationTokenState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? sendPushNotificationTokenState = null,Object? updateUserLocationState = null,}) {
   return _then(_HomeProviderState(
 sendPushNotificationTokenState: null == sendPushNotificationTokenState ? _self.sendPushNotificationTokenState : sendPushNotificationTokenState // ignore: cast_nullable_to_non_nullable
-as SendPushNotificationTokenState,
+as SendPushNotificationTokenState,updateUserLocationState: null == updateUserLocationState ? _self.updateUserLocationState : updateUserLocationState // ignore: cast_nullable_to_non_nullable
+as UpdateUserLocationState,
   ));
 }
 
@@ -284,6 +298,15 @@ $SendPushNotificationTokenStateCopyWith<$Res> get sendPushNotificationTokenState
   
   return $SendPushNotificationTokenStateCopyWith<$Res>(_self.sendPushNotificationTokenState, (value) {
     return _then(_self.copyWith(sendPushNotificationTokenState: value));
+  });
+}/// Create a copy of HomeProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateUserLocationStateCopyWith<$Res> get updateUserLocationState {
+  
+  return $UpdateUserLocationStateCopyWith<$Res>(_self.updateUserLocationState, (value) {
+    return _then(_self.copyWith(updateUserLocationState: value));
   });
 }
 }
@@ -660,6 +683,398 @@ as AppError,
 }
 
 /// Create a copy of SendPushNotificationTokenState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppErrorCopyWith<$Res> get error {
+  
+  return $AppErrorCopyWith<$Res>(_self.error, (value) {
+    return _then(_self.copyWith(error: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$UpdateUserLocationState {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateUserLocationState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationState()';
+}
+
+
+}
+
+/// @nodoc
+class $UpdateUserLocationStateCopyWith<$Res>  {
+$UpdateUserLocationStateCopyWith(UpdateUserLocationState _, $Res Function(UpdateUserLocationState) __);
+}
+
+
+/// Adds pattern-matching-related methods to [UpdateUserLocationState].
+extension UpdateUserLocationStatePatterns on UpdateUserLocationState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( UpdateUserLocationStateInitial value)?  initial,TResult Function( UpdateUserLocationStateLoading value)?  loading,TResult Function( UpdateUserLocationStateSuccess value)?  success,TResult Function( UpdateUserLocationStateError value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case UpdateUserLocationStateInitial() when initial != null:
+return initial(_that);case UpdateUserLocationStateLoading() when loading != null:
+return loading(_that);case UpdateUserLocationStateSuccess() when success != null:
+return success(_that);case UpdateUserLocationStateError() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( UpdateUserLocationStateInitial value)  initial,required TResult Function( UpdateUserLocationStateLoading value)  loading,required TResult Function( UpdateUserLocationStateSuccess value)  success,required TResult Function( UpdateUserLocationStateError value)  error,}){
+final _that = this;
+switch (_that) {
+case UpdateUserLocationStateInitial():
+return initial(_that);case UpdateUserLocationStateLoading():
+return loading(_that);case UpdateUserLocationStateSuccess():
+return success(_that);case UpdateUserLocationStateError():
+return error(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( UpdateUserLocationStateInitial value)?  initial,TResult? Function( UpdateUserLocationStateLoading value)?  loading,TResult? Function( UpdateUserLocationStateSuccess value)?  success,TResult? Function( UpdateUserLocationStateError value)?  error,}){
+final _that = this;
+switch (_that) {
+case UpdateUserLocationStateInitial() when initial != null:
+return initial(_that);case UpdateUserLocationStateLoading() when loading != null:
+return loading(_that);case UpdateUserLocationStateSuccess() when success != null:
+return success(_that);case UpdateUserLocationStateError() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( AppUser newAppUser)?  success,TResult Function( AppError error)?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case UpdateUserLocationStateInitial() when initial != null:
+return initial();case UpdateUserLocationStateLoading() when loading != null:
+return loading();case UpdateUserLocationStateSuccess() when success != null:
+return success(_that.newAppUser);case UpdateUserLocationStateError() when error != null:
+return error(_that.error);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( AppUser newAppUser)  success,required TResult Function( AppError error)  error,}) {final _that = this;
+switch (_that) {
+case UpdateUserLocationStateInitial():
+return initial();case UpdateUserLocationStateLoading():
+return loading();case UpdateUserLocationStateSuccess():
+return success(_that.newAppUser);case UpdateUserLocationStateError():
+return error(_that.error);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( AppUser newAppUser)?  success,TResult? Function( AppError error)?  error,}) {final _that = this;
+switch (_that) {
+case UpdateUserLocationStateInitial() when initial != null:
+return initial();case UpdateUserLocationStateLoading() when loading != null:
+return loading();case UpdateUserLocationStateSuccess() when success != null:
+return success(_that.newAppUser);case UpdateUserLocationStateError() when error != null:
+return error(_that.error);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class UpdateUserLocationStateInitial implements UpdateUserLocationState {
+  const UpdateUserLocationStateInitial();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateUserLocationStateInitial);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationState.initial()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class UpdateUserLocationStateLoading implements UpdateUserLocationState {
+  const UpdateUserLocationStateLoading();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateUserLocationStateLoading);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationState.loading()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class UpdateUserLocationStateSuccess implements UpdateUserLocationState {
+  const UpdateUserLocationStateSuccess(this.newAppUser);
+  
+
+ final  AppUser newAppUser;
+
+/// Create a copy of UpdateUserLocationState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UpdateUserLocationStateSuccessCopyWith<UpdateUserLocationStateSuccess> get copyWith => _$UpdateUserLocationStateSuccessCopyWithImpl<UpdateUserLocationStateSuccess>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateUserLocationStateSuccess&&(identical(other.newAppUser, newAppUser) || other.newAppUser == newAppUser));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,newAppUser);
+
+@override
+String toString() {
+  return 'UpdateUserLocationState.success(newAppUser: $newAppUser)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $UpdateUserLocationStateSuccessCopyWith<$Res> implements $UpdateUserLocationStateCopyWith<$Res> {
+  factory $UpdateUserLocationStateSuccessCopyWith(UpdateUserLocationStateSuccess value, $Res Function(UpdateUserLocationStateSuccess) _then) = _$UpdateUserLocationStateSuccessCopyWithImpl;
+@useResult
+$Res call({
+ AppUser newAppUser
+});
+
+
+$AppUserCopyWith<$Res> get newAppUser;
+
+}
+/// @nodoc
+class _$UpdateUserLocationStateSuccessCopyWithImpl<$Res>
+    implements $UpdateUserLocationStateSuccessCopyWith<$Res> {
+  _$UpdateUserLocationStateSuccessCopyWithImpl(this._self, this._then);
+
+  final UpdateUserLocationStateSuccess _self;
+  final $Res Function(UpdateUserLocationStateSuccess) _then;
+
+/// Create a copy of UpdateUserLocationState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? newAppUser = null,}) {
+  return _then(UpdateUserLocationStateSuccess(
+null == newAppUser ? _self.newAppUser : newAppUser // ignore: cast_nullable_to_non_nullable
+as AppUser,
+  ));
+}
+
+/// Create a copy of UpdateUserLocationState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppUserCopyWith<$Res> get newAppUser {
+  
+  return $AppUserCopyWith<$Res>(_self.newAppUser, (value) {
+    return _then(_self.copyWith(newAppUser: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class UpdateUserLocationStateError implements UpdateUserLocationState {
+  const UpdateUserLocationStateError(this.error);
+  
+
+ final  AppError error;
+
+/// Create a copy of UpdateUserLocationState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$UpdateUserLocationStateErrorCopyWith<UpdateUserLocationStateError> get copyWith => _$UpdateUserLocationStateErrorCopyWithImpl<UpdateUserLocationStateError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateUserLocationStateError&&(identical(other.error, error) || other.error == error));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,error);
+
+@override
+String toString() {
+  return 'UpdateUserLocationState.error(error: $error)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $UpdateUserLocationStateErrorCopyWith<$Res> implements $UpdateUserLocationStateCopyWith<$Res> {
+  factory $UpdateUserLocationStateErrorCopyWith(UpdateUserLocationStateError value, $Res Function(UpdateUserLocationStateError) _then) = _$UpdateUserLocationStateErrorCopyWithImpl;
+@useResult
+$Res call({
+ AppError error
+});
+
+
+$AppErrorCopyWith<$Res> get error;
+
+}
+/// @nodoc
+class _$UpdateUserLocationStateErrorCopyWithImpl<$Res>
+    implements $UpdateUserLocationStateErrorCopyWith<$Res> {
+  _$UpdateUserLocationStateErrorCopyWithImpl(this._self, this._then);
+
+  final UpdateUserLocationStateError _self;
+  final $Res Function(UpdateUserLocationStateError) _then;
+
+/// Create a copy of UpdateUserLocationState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
+  return _then(UpdateUserLocationStateError(
+null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as AppError,
+  ));
+}
+
+/// Create a copy of UpdateUserLocationState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')

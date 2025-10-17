@@ -40,6 +40,15 @@ class UserService {
     return _userRepository.getCurrentUser();
   }
 
+  /// Updates the current logged-in user.
+  Future<Either<AppUser, AppError>> updateCurrentUser({
+    required AppUser user,
+  }) {
+    return _userRepository.updateCurrentUser(
+      user: user,
+    );
+  }
+
   /// Subscribes the current user to location.
   Future<Either<LocationSubscription, AppError>> subscribeToLocation({
     required double northeastLat,

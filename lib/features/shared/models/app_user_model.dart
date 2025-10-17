@@ -15,6 +15,15 @@ abstract class AppUser with _$AppUser {
     /// The user's email address.
     final String? email,
 
+    /// The user's latitude.
+    final double? latitude,
+
+    /// The user's longitude.
+    final double? longitude,
+
+    /// The name of the location associated with the user.
+    final String? locationName,
+
     /// The experience points the user has accumulated.
     @Default(0) final int xpPoints,
 

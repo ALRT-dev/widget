@@ -125,21 +125,47 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         (value) => value?.email,
                       ),
                     );
+                    final userLocation = ref.watch(
+                      providerOfLoggedInUser.select(
+                        (value) => value?.locationName,
+                      ),
+                    );
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        40.spMin.hSizedBox,
+                        40.hSizedBox,
                         _buildUserAvatar(),
-                        12.spMin.hSizedBox,
+                        12.hSizedBox,
                         _buildUserName(),
-                        if (userEmail != null) 4.spMin.hSizedBox,
+                        if (userEmail != null) 2.hSizedBox,
                         if (userEmail != null)
                           Text(
                             userEmail,
                             style: TextStyle(
-                              fontSize: 14.spMin,
+                              fontSize: 16.spMin,
                               color: AppColors.black.withValues(alpha: 0.8),
+                              fontWeight: FontWeight.w500,
                             ),
+                          ),
+                        if (userLocation != null) 6.hSizedBox,
+                        if (userLocation != null)
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.location_on_outlined,
+                                size: 13.spMin,
+                                color: AppColors.black.withValues(alpha: 0.8),
+                              ),
+                              3.wSizedBox,
+                              Text(
+                                userLocation,
+                                style: TextStyle(
+                                  fontSize: 12.spMin,
+                                  color: AppColors.black,
+                                ),
+                              ),
+                            ],
                           ),
                       ],
                     );
