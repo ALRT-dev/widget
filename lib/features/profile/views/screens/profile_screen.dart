@@ -605,6 +605,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget _buildLogoutSection() {
     return Button.filled(
       value: 'Logout',
+      color: AppColors.red,
       icon: Icon(Icons.logout),
       onPressed: () {
         _showLogoutDialog();

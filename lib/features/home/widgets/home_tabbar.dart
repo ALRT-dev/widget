@@ -6,6 +6,7 @@ import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/avatar.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -42,8 +43,9 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
           dividerColor: Colors.transparent,
           dividerHeight: 0.0,
           onTap: (index) => _onTabChanged(HomeTab.values[index]),
-          tabs:
-              HomeTab.values.map((tab) => Tab(icon: _tabBuilder(tab))).toList(),
+          tabs: HomeTab.values
+              .map((tab) => Tab(icon: _tabBuilder(tab)))
+              .toList(),
         ).pT(5.0),
       ),
     );
@@ -88,12 +90,30 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
             (value) => value == HomeTab.profile,
           ),
         );
-        return Avatar.network(
-          imgUrl:
-              'https://goldenglobes.com/wp-content/uploads/2023/10/ryan_reynolds_gettyimages-630281680.jpg?w=1968',
+        final initials = ref.watch(
+          providerOfLoggedInUser.select(
+            (user) => user?.initials ?? 'U',
+          ),
+        );
+
+        return Avatar.initials(
+          initials: initials,
           size: 30.0,
-          borderWidth: isSelected ? 2.0 : 0.0,
-          borderColor: isSelected ? AppColors.black : Colors.transparent,
+          foregroundColor: AppColors.black,
+          backgroundColor: AppColors.yellow,
+          borderColor: isSelected ? AppColors.black : AppColors.transparent,
+          borderWidth: isSelected ? 1.5 : 0.0,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    blurRadius: 4.0,
+                    color: AppColors.shadowColor,
+                    offset: Offset(0, 0),
+                  ),
+                ]
+              : [],
+          // borderWidth: isSelected ? 2.0 : 0.0,
+          // borderColor: isSelected ? AppColors.black : Colors.transparent,
         ).onPressed(
           () => _onTabChanged(HomeTab.profile),
         );

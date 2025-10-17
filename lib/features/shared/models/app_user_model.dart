@@ -60,6 +60,20 @@ abstract class AppUser with _$AppUser {
     );
   }
 
+  /// Generates the initials from the user's name.
+  String get initials {
+    if (name?.isEmpty ?? true) {
+      return 'U';
+    }
+
+    final nameParts = name!.trim().split(' ');
+    if (nameParts.length == 1) {
+      return nameParts[0][0].toUpperCase();
+    } else {
+      return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+    }
+  }
+
   factory AppUser.fromJson(Map<String, dynamic> json) =>
       _$AppUserFromJson(json);
 }
