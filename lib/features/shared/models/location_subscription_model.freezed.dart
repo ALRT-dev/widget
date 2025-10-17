@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LocationSubscription {
 
- String get id; double get northeastLat; double get northeastLng; double get southwestLat; double get southwestLng; String? get name; String? get address; DateTime? get createdAt; DateTime? get updatedAt;
+ String? get id; double get northeastLat; double get northeastLng; double get southwestLat; double get southwestLng; String? get name; String? get address; DateTime? get createdAt; DateTime? get updatedAt;
 /// Create a copy of LocationSubscription
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $LocationSubscriptionCopyWith<$Res>  {
   factory $LocationSubscriptionCopyWith(LocationSubscription value, $Res Function(LocationSubscription) _then) = _$LocationSubscriptionCopyWithImpl;
 @useResult
 $Res call({
- String id, double northeastLat, double northeastLng, double southwestLat, double southwestLng, String? name, String? address, DateTime? createdAt, DateTime? updatedAt
+ String? id, double northeastLat, double northeastLng, double southwestLat, double southwestLng, String? name, String? address, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -65,10 +65,10 @@ class _$LocationSubscriptionCopyWithImpl<$Res>
 
 /// Create a copy of LocationSubscription
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? northeastLat = null,Object? northeastLng = null,Object? southwestLat = null,Object? southwestLng = null,Object? name = freezed,Object? address = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? northeastLat = null,Object? northeastLng = null,Object? southwestLat = null,Object? southwestLng = null,Object? name = freezed,Object? address = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,northeastLat: null == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,northeastLat: null == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
 as double,northeastLng: null == northeastLng ? _self.northeastLng : northeastLng // ignore: cast_nullable_to_non_nullable
 as double,southwestLat: null == southwestLat ? _self.southwestLat : southwestLat // ignore: cast_nullable_to_non_nullable
 as double,southwestLng: null == southwestLng ? _self.southwestLng : southwestLng // ignore: cast_nullable_to_non_nullable
@@ -161,7 +161,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LocationSubscription() when $default != null:
 return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.name,_that.address,_that.createdAt,_that.updatedAt);case _:
@@ -182,7 +182,7 @@ return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLa
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _LocationSubscription():
 return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.name,_that.address,_that.createdAt,_that.updatedAt);case _:
@@ -202,7 +202,7 @@ return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLa
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _LocationSubscription() when $default != null:
 return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.name,_that.address,_that.createdAt,_that.updatedAt);case _:
@@ -217,10 +217,10 @@ return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLa
 @JsonSerializable()
 
 class _LocationSubscription implements LocationSubscription {
-  const _LocationSubscription({required this.id, required this.northeastLat, required this.northeastLng, required this.southwestLat, required this.southwestLng, this.name, this.address, this.createdAt, this.updatedAt});
+  const _LocationSubscription({this.id, required this.northeastLat, required this.northeastLng, required this.southwestLat, required this.southwestLng, this.name, this.address, this.createdAt, this.updatedAt});
   factory _LocationSubscription.fromJson(Map<String, dynamic> json) => _$LocationSubscriptionFromJson(json);
 
-@override final  String id;
+@override final  String? id;
 @override final  double northeastLat;
 @override final  double northeastLng;
 @override final  double southwestLat;
@@ -263,7 +263,7 @@ abstract mixin class _$LocationSubscriptionCopyWith<$Res> implements $LocationSu
   factory _$LocationSubscriptionCopyWith(_LocationSubscription value, $Res Function(_LocationSubscription) _then) = __$LocationSubscriptionCopyWithImpl;
 @override @useResult
 $Res call({
- String id, double northeastLat, double northeastLng, double southwestLat, double southwestLng, String? name, String? address, DateTime? createdAt, DateTime? updatedAt
+ String? id, double northeastLat, double northeastLng, double southwestLat, double southwestLng, String? name, String? address, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -280,10 +280,10 @@ class __$LocationSubscriptionCopyWithImpl<$Res>
 
 /// Create a copy of LocationSubscription
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? northeastLat = null,Object? northeastLng = null,Object? southwestLat = null,Object? southwestLng = null,Object? name = freezed,Object? address = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? northeastLat = null,Object? northeastLng = null,Object? southwestLat = null,Object? southwestLng = null,Object? name = freezed,Object? address = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_LocationSubscription(
-id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as String,northeastLat: null == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
+id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String?,northeastLat: null == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
 as double,northeastLng: null == northeastLng ? _self.northeastLng : northeastLng // ignore: cast_nullable_to_non_nullable
 as double,southwestLat: null == southwestLat ? _self.southwestLat : southwestLat // ignore: cast_nullable_to_non_nullable
 as double,southwestLng: null == southwestLng ? _self.southwestLng : southwestLng // ignore: cast_nullable_to_non_nullable

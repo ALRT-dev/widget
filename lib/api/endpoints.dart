@@ -10,8 +10,12 @@ const kUrlRefreshToken = '/auth/refresh-token';
 // ---------------------------- USER ----------------------------
 
 const kUrlUser = '/user';
+
 const kUrlSubscribeLocation = '$kUrlUser/subscribe-location';
 const kUrlUnsubscribeLocation = '$kUrlUser/unsubscribe-location';
+const kUrlUserLocationSubscriptions = '$kUrlUser/location-subscriptions';
+
+const kUrlPushNotificationSettings = '$kUrlUser/push-notification-settings';
 
 // ---------------------------- HAZARD ----------------------------
 

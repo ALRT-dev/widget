@@ -1,4 +1,6 @@
 import 'package:hazard_app/api/rest_client.dart';
+import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
+import 'package:hazard_app/features/notification/models/push_notification_update_input_model.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
@@ -19,6 +21,16 @@ abstract class UserRepository {
 
   Future<Either<void, AppError>> unsubscribeFromLocation({
     required String subscriptionId,
+  });
+
+  Future<Either<List<LocationSubscription>, AppError>>
+  getLocationSubscriptions();
+
+  Future<Either<PushNotificationSettings, AppError>>
+  getPushNotificationSettings();
+
+  Future<Either<void, AppError>> updatePushNotificationSettings({
+    required final List<PushNotificationUpdateInput> updates,
   });
 }
 
@@ -76,6 +88,48 @@ class UserRepositoryImpl implements UserRepository {
       future: () async {
         await _restClient.unsubscribeFromLocation(
           subscriptionId: subscriptionId,
+        );
+        return Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<List<LocationSubscription>, AppError>>
+  getLocationSubscriptions() {
+    return runAsyncCall(
+      name: 'getLocationSubscriptions',
+      future: () async {
+        final result = await _restClient.getLocationSubscriptions();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<PushNotificationSettings, AppError>>
+  getPushNotificationSettings() {
+    return runAsyncCall(
+      name: 'getPushNotificationSettings',
+      future: () async {
+        final result = await _restClient.getPushNotificationSettings();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> updatePushNotificationSettings({
+    required List<PushNotificationUpdateInput> updates,
+  }) {
+    return runAsyncCall(
+      name: 'updatePushNotificationSettings',
+      future: () async {
+        await _restClient.updatePushNotificationSettings(
+          updates: updates,
         );
         return Success(null);
       },

@@ -4,14 +4,16 @@ extension DateTimeExt on DateTime {
   /// Returns a formatted string representation of the DateTime object.
   ///
   /// Eg. 5th June 2023, 14:30
-  String get formatted {
+  String get formattedWithTime {
     final dayWithSuffix = _getDayWithOrdinalSuffix(day);
 
-    final isToday = DateTime.now().year == year &&
+    final isToday =
+        DateTime.now().year == year &&
         DateTime.now().month == month &&
         DateTime.now().day == day;
 
-    final isYesterday = DateTime.now().year == year &&
+    final isYesterday =
+        DateTime.now().year == year &&
         DateTime.now().month == month &&
         DateTime.now().day - 1 == day;
 
@@ -23,7 +25,23 @@ extension DateTimeExt on DateTime {
       return 'Yesterday, ${DateFormat('HH:mm').format(this)}';
     }
 
-    return DateFormat('MMMM yyyy, HH:mm').format(this).replaceFirst(
+    return DateFormat('MMMM yyyy, HH:mm')
+        .format(this)
+        .replaceFirst(
+          DateFormat('MMMM').format(this),
+          '$dayWithSuffix ${DateFormat('MMMM').format(this)}',
+        );
+  }
+
+  /// Returns a formatted string representation of the DateTime object.
+  ///
+  /// Eg. 5th June 2023
+  String get formattedDateOnly {
+    final dayWithSuffix = _getDayWithOrdinalSuffix(day);
+
+    return DateFormat('MMMM yyyy')
+        .format(this)
+        .replaceFirst(
           DateFormat('MMMM').format(this),
           '$dayWithSuffix ${DateFormat('MMMM').format(this)}',
         );

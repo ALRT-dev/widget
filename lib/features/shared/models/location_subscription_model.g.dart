@@ -9,7 +9,7 @@ part of 'location_subscription_model.dart';
 _LocationSubscription _$LocationSubscriptionFromJson(
   Map<String, dynamic> json,
 ) => _LocationSubscription(
-  id: json['id'] as String,
+  id: json['id'] as String?,
   northeastLat: (json['northeastLat'] as num).toDouble(),
   northeastLng: (json['northeastLng'] as num).toDouble(),
   southwestLat: (json['southwestLat'] as num).toDouble(),
@@ -27,7 +27,7 @@ _LocationSubscription _$LocationSubscriptionFromJson(
 Map<String, dynamic> _$LocationSubscriptionToJson(
   _LocationSubscription instance,
 ) => <String, dynamic>{
-  'id': instance.id,
+  'id': ?instance.id,
   'northeastLat': instance.northeastLat,
   'northeastLng': instance.northeastLng,
   'southwestLat': instance.southwestLat,

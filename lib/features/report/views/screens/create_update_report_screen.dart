@@ -219,7 +219,7 @@ class _CreateUpdateReportScreenState
 
             return _inputBuilder(
               hintText: 'Select a date & time',
-              value: dateTime?.formatted,
+              value: dateTime?.formattedWithTime,
               enabled: false,
               onPressed: _openDateTimePicker,
             );

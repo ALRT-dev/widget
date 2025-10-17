@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
+import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
@@ -41,6 +42,8 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
       _ref.read(providerOfHazardCategoriesForSearch.notifier);
   NotificationsFeedProvider get _notificationsFeedProvider =>
       _ref.read(providerOfNotificationsFeed.notifier);
+  MyLocationSubscriptionsProvider get _myLocationSubscriptionsProvider =>
+      _ref.read(providerOfMyLocationSubscriptions.notifier);
 
   /// Listens to the global hazard streams for updates and deletions.
   void _listenToSocketForHazards() {
@@ -134,6 +137,9 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
           ),
         );
 
+        // add the new subscription to MyLocationSubscriptionsProvider
+        _myLocationSubscriptionsProvider.addLocationSubscription(subscription);
+
         // after subscribing to a location, refresh the notifications feed
         _notificationsFeedProvider.getNotificationsFeed();
       },
@@ -167,6 +173,11 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         updateSubscriptionId(null);
         state = state.copyWith(
           unsubscribeFromLocationState: UnsubscribeFromLocationState.success(),
+        );
+
+        // remove the subscription from MyLocationSubscriptionsProvider
+        _myLocationSubscriptionsProvider.removeLocationSubscription(
+          subscriptionId,
         );
 
         // after unsubscribing from a location, refresh the notifications feed

@@ -12,10 +12,12 @@ import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/views/screens/map_screen.dart';
 import 'package:hazard_app/features/notification/enums/push_notification_types.dart';
 import 'package:hazard_app/features/notification/extensions/remote_message_extension.dart';
+import 'package:hazard_app/features/notification/providers/manage_notifications_provider.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/providers/push_notification_message_provider.dart';
 import 'package:hazard_app/features/notification/views/screens/notifications_screen.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
+import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
 import 'package:hazard_app/features/profile/views/screens/profile_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
@@ -65,6 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfCreateReport.select((value) => null));
     ref.watch(providerOfProfile.select((value) => null));
     ref.watch(providerOfMyHazards.select((value) => null));
+    ref.watch(providerOfMyLocationSubscriptions.select((value) => null));
     ref.watch(providerOfMapSearchTextEditingController.select((value) => null));
     ref.watch(providerOfPlacesForMap.select((value) => null));
     ref.watch(providerOfPlacesForSearch.select((value) => null));
@@ -77,6 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfPushNotificationMessage.select((value) => null));
     ref.watch(providerOfHazardSocketManager.select((value) => null));
     ref.watch(providerOfUserSocketManager.select((value) => null));
+    ref.watch(providerOfManageNotifications.select((value) => null));
 
     _listenToHazardsState();
     _listenToCreateReportState();

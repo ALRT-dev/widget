@@ -1,0 +1,152 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
+import 'package:hazard_app/features/profile/providers/states/my_location_subscriptions_provider_state.dart';
+import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
+import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
+import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
+import 'package:hazard_app/features/shared/utils/dialogs.dart';
+import 'package:hazard_app/features/shared/views/widgets/button.dart';
+import 'package:hazard_app/others/app_colors.dart';
+
+class AllLocationSubscriptionsListItem extends ConsumerStatefulWidget {
+  const AllLocationSubscriptionsListItem({
+    super.key,
+    required this.subscription,
+  });
+
+  final LocationSubscription subscription;
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _AllLocationSubscriptionsListItemState();
+}
+
+class _AllLocationSubscriptionsListItemState
+    extends ConsumerState<AllLocationSubscriptionsListItem> {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.only(bottom: 8.spMin),
+      elevation: 0,
+      color: AppColors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.spMin),
+        side: BorderSide(
+          color: AppColors.lightGrey.withValues(alpha: 0.6),
+          width: 1,
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16.spMin),
+        child: Row(
+          children: [
+            Container(
+              width: 40.spMin,
+              height: 40.spMin,
+              decoration: BoxDecoration(
+                color: AppColors.blue.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8.spMin),
+              ),
+              child: Icon(
+                Icons.place,
+                color: AppColors.blue,
+                size: 20.spMin,
+              ),
+            ),
+            12.spMin.wSizedBox,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.subscription.name ?? 'Unknown Location',
+                    style: TextStyle(
+                      fontSize: 15.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  2.spMin.hSizedBox,
+                  Text(
+                    widget.subscription.address ?? 'No address available',
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      color: AppColors.grey,
+                      height: 1.3,
+                    ),
+                  ),
+                  2.spMin.hSizedBox,
+                  Text(
+                    'Subscribed ${widget.subscription.createdAt?.formattedDateOnly}',
+                    style: TextStyle(
+                      fontSize: 11.spMin,
+                      color: AppColors.grey,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Consumer(
+              builder: (context, ref, child) {
+                final isLoading = ref.watch(
+                  providerOfMyLocationSubscriptions.select(
+                    (value) => value.unsubscribeFromLocationStateWrappers.any(
+                      (wrapper) =>
+                          wrapper.subscriptionId == widget.subscription.id &&
+                          wrapper.unsubscribeFromLocationState.maybeWhen(
+                            orElse: () => false,
+                            loading: () => true,
+                          ),
+                    ),
+                  ),
+                );
+
+                return SizedBox(
+                  height: 30.spMin,
+                  child: Button.filled(
+                    width: 120.spMin,
+                    onPressed: _handleUnsubscribe,
+                    isLoading: isLoading,
+                    padding: EdgeInsets.zero,
+                    color: AppColors.red,
+                    icon: isLoading
+                        ? null
+                        : Icon(
+                            Icons.notifications_off_rounded,
+                            color: AppColors.white,
+                            size: 16.spMin,
+                          ),
+                    borderRadius: 8.0,
+                    value: isLoading ? null : 'Unsubscribe',
+                    valueStyle: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.white,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Handles the unsubscribe action when the "Unsubscribe" button is pressed.
+  void _handleUnsubscribe() {
+    if (widget.subscription.id == null) return;
+
+    showConfirmationSheet(
+      context: context,
+      title: 'Unsubscribe from Location',
+      description:
+          'Are you sure you want to unsubscribe from notifications for "${widget.subscription.name ?? 'this location'}"?',
+      onPressedConfirmAsync: (context, ref) => ref
+          .read(providerOfMyLocationSubscriptions.notifier)
+          .unsubscribeFromLocation(subscriptionId: widget.subscription.id!),
+    );
+  }
+}

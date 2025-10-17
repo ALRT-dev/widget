@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/api/interceptors/auth_interceptor.dart';
+import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
@@ -64,6 +65,27 @@ class UserService {
   }) {
     return _userRepository.unsubscribeFromLocation(
       subscriptionId: subscriptionId,
+    );
+  }
+
+  /// Fetches the location subscriptions of the current user.
+  Future<Either<List<LocationSubscription>, AppError>>
+  getLocationSubscriptions() {
+    return _userRepository.getLocationSubscriptions();
+  }
+
+  /// Fetches the push notification settings of the current user.
+  Future<Either<PushNotificationSettings, AppError>>
+  getPushNotificationSettings() {
+    return _userRepository.getPushNotificationSettings();
+  }
+
+  /// Updates the push notification settings of the current user.
+  Future<Either<void, AppError>> updatePushNotificationSettings({
+    required final PushNotificationSettings settings,
+  }) {
+    return _userRepository.updatePushNotificationSettings(
+      updates: settings.toUpdates(),
     );
   }
 }

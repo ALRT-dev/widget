@@ -6,7 +6,7 @@ part 'location_subscription_model.g.dart';
 @freezed
 abstract class LocationSubscription with _$LocationSubscription {
   const factory LocationSubscription({
-    required final String id,
+    final String? id,
     required final double northeastLat,
     required final double northeastLng,
     required final double southwestLat,
