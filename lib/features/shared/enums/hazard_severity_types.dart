@@ -7,6 +7,16 @@ enum HazardSeverity {
   watchAndAct,
   emergency;
 
+  /// Returns the title string corresponding to the hazard severity.
+  String get title {
+    return switch (this) {
+      HazardSeverity.info => 'Info',
+      HazardSeverity.advice => 'Advice',
+      HazardSeverity.watchAndAct => 'Watch and Act',
+      HazardSeverity.emergency => 'Emergency',
+    };
+  }
+
   /// Returns the asset path for the marker icon corresponding to the hazard severity.
   String get markerPath {
     return switch (this) {
@@ -24,6 +34,15 @@ enum HazardSeverity {
       HazardSeverity.advice => AppColors.advice,
       HazardSeverity.watchAndAct => AppColors.watchAndAct,
       HazardSeverity.emergency => AppColors.emergency,
+    };
+  }
+
+  String get emoji {
+    return switch (this) {
+      HazardSeverity.info => '🔵',
+      HazardSeverity.advice => '🟡',
+      HazardSeverity.watchAndAct => '🟠',
+      HazardSeverity.emergency => '🔴',
     };
   }
 }

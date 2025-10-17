@@ -7,6 +7,7 @@ import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
@@ -16,6 +17,7 @@ import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/categories_dropdown.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
+import 'package:hazard_app/features/shared/views/widgets/severities_dropdown.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class CreateUpdateReportScreenArgs {
@@ -109,6 +111,7 @@ class _CreateUpdateReportScreenState
         children: [
           _dateTimeBuilder(),
           _categoryBuilder(),
+          _severityBuilder(),
           _locationBuilder(),
           _descriptionBuilder(),
           _mediaBuilder(),
@@ -254,6 +257,37 @@ class _CreateUpdateReportScreenState
               ),
               onCategorySelected: (category) => _updateCategory(
                 category,
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _severityBuilder() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8.h,
+      children: [
+        _titleBuilder('Severity'),
+        Consumer(
+          builder: (context, ref, child) {
+            final selectedSeverity = ref.watch(
+              providerOfCreateReport.select(
+                (value) => value.hazardToCreateOrUpdate.severity,
+              ),
+            );
+            return SeveritiesDropdown(
+              button: _inputBuilder(
+                hintText: 'Select severity',
+                value: selectedSeverity == null
+                    ? null
+                    : '${selectedSeverity.emoji} ${selectedSeverity.title}',
+                enabled: false,
+              ),
+              onSeveritySelected: (severity) => _updateSeverity(
+                severity,
               ),
             );
           },
@@ -514,6 +548,11 @@ class _CreateUpdateReportScreenState
   /// Updates the category in the state.
   void _updateCategory(final HazardCategory category) {
     ref.read(providerOfCreateReport.notifier).updateCategory(category);
+  }
+
+  /// Updates the severity in the state.
+  void _updateSeverity(final HazardSeverity severity) {
+    ref.read(providerOfCreateReport.notifier).updateSeverity(severity);
   }
 
   /// Updates the location in the state.

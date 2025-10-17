@@ -148,7 +148,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             shape: BoxShape.circle,
             color: severity?.color,
           ),
-          padding: EdgeInsets.all(8.spMin),
+          padding: EdgeInsets.all(7.spMin),
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,

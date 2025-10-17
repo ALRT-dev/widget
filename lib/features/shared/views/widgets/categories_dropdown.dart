@@ -31,6 +31,7 @@ class _CategoriesDropdownState extends ConsumerState<CategoriesDropdown> {
   Widget build(BuildContext context) {
     return AlrtDropdown(
       button: widget.button,
+      dropdownHeight: 290.0,
       menuContent: (context, close) => _categoriesListBuilder(close),
     );
   }
@@ -79,13 +80,13 @@ class _CategoriesDropdownState extends ConsumerState<CategoriesDropdown> {
               leading: Text(
                 category.emoji ?? '!',
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 18.spMin,
                 ),
               ),
               title: Text(
                 category.name ?? 'N/A',
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 16.spMin,
                 ),
               ),
               onTap: () {

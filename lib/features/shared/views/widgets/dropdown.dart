@@ -46,6 +46,7 @@ class AlrtDropdown extends ConsumerStatefulWidget {
     required this.button,
     required this.menuContent,
     this.controller,
+    this.dropdownHeight = 300,
   });
 
   final Widget button;
@@ -53,6 +54,8 @@ class AlrtDropdown extends ConsumerStatefulWidget {
   final Widget Function(BuildContext, Function()) menuContent;
 
   final AlrtDropdownController? controller;
+
+  final double dropdownHeight;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _AlrtDropdownState();
@@ -147,7 +150,7 @@ class _AlrtDropdownState extends ConsumerState<AlrtDropdown> {
                     color: AppColors.transparent,
                     child: Container(
                       width: buttonSize.width,
-                      height: 300,
+                      height: widget.dropdownHeight,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20.r),

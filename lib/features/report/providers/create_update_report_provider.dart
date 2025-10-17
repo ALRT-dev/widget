@@ -5,6 +5,7 @@ import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/states/my_hazards_provider_state.dart';
 import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
@@ -168,11 +169,20 @@ class CreateReportProvider
     );
   }
 
-  /// Updates [CreateUpdateReportProviderState.category] with the given [category].
+  /// Updates [CreateUpdateReportProviderState.hazardToCreateOrUpdate.category] with the given [category].
   void updateCategory(final HazardCategory category) {
     updateHazardToCreateOrUpdate(
       state.hazardToCreateOrUpdate.copyWith(
         category: category,
+      ),
+    );
+  }
+
+  /// Updates [CreateUpdateReportProviderState.hazardToCreateOrUpdate.severity] with the given [severity].
+  void updateSeverity(final HazardSeverity severity) {
+    updateHazardToCreateOrUpdate(
+      state.hazardToCreateOrUpdate.copyWith(
+        severity: severity,
       ),
     );
   }
