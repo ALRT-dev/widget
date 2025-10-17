@@ -124,7 +124,7 @@ class _ManageNotificationsScreenState
           ),
           8.spMin.hSizedBox,
           Text(
-            'Manage your subscribed locations for targeted hazard alrts.',
+            'Manage your subscribed locations for targeted hazard alrts. Your own location is always subscribed.',
             style: TextStyle(
               fontSize: 14.spMin,
               color: AppColors.grey,

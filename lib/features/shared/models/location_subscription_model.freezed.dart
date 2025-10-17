@@ -15,7 +15,17 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LocationSubscription {
 
- String? get id; double get northeastLat; double get northeastLng; double get southwestLat; double get southwestLng; String? get name; String? get address; DateTime? get createdAt; DateTime? get updatedAt;
+/// The subscription's unique identifier.
+ String? get id;/// The northeast latitude of the subscription area.
+ double get northeastLat;/// The northeast longitude of the subscription area.
+ double get northeastLng;/// The southwest latitude of the subscription area.
+ double get southwestLat;/// The southwest longitude of the subscription area.
+ double get southwestLng;/// Indicates if this subscription is for the user's own location.
+ bool get isOwnLocation;/// The name of the location.
+ String? get name;/// The human-readable address of the location.
+ String? get address;/// The timestamp when the subscription was created.
+ DateTime? get createdAt;/// The timestamp when the subscription was last updated.
+ DateTime? get updatedAt;
 /// Create a copy of LocationSubscription
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +38,16 @@ $LocationSubscriptionCopyWith<LocationSubscription> get copyWith => _$LocationSu
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocationSubscription&&(identical(other.id, id) || other.id == id)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.name, name) || other.name == name)&&(identical(other.address, address) || other.address == address)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LocationSubscription&&(identical(other.id, id) || other.id == id)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.isOwnLocation, isOwnLocation) || other.isOwnLocation == isOwnLocation)&&(identical(other.name, name) || other.name == name)&&(identical(other.address, address) || other.address == address)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,northeastLat,northeastLng,southwestLat,southwestLng,name,address,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,northeastLat,northeastLng,southwestLat,southwestLng,isOwnLocation,name,address,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'LocationSubscription(id: $id, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, name: $name, address: $address, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'LocationSubscription(id: $id, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, isOwnLocation: $isOwnLocation, name: $name, address: $address, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +58,7 @@ abstract mixin class $LocationSubscriptionCopyWith<$Res>  {
   factory $LocationSubscriptionCopyWith(LocationSubscription value, $Res Function(LocationSubscription) _then) = _$LocationSubscriptionCopyWithImpl;
 @useResult
 $Res call({
- String? id, double northeastLat, double northeastLng, double southwestLat, double southwestLng, String? name, String? address, DateTime? createdAt, DateTime? updatedAt
+ String? id, double northeastLat, double northeastLng, double southwestLat, double southwestLng, bool isOwnLocation, String? name, String? address, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -65,14 +75,15 @@ class _$LocationSubscriptionCopyWithImpl<$Res>
 
 /// Create a copy of LocationSubscription
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? northeastLat = null,Object? northeastLng = null,Object? southwestLat = null,Object? southwestLng = null,Object? name = freezed,Object? address = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? northeastLat = null,Object? northeastLng = null,Object? southwestLat = null,Object? southwestLng = null,Object? isOwnLocation = null,Object? name = freezed,Object? address = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,northeastLat: null == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
 as double,northeastLng: null == northeastLng ? _self.northeastLng : northeastLng // ignore: cast_nullable_to_non_nullable
 as double,southwestLat: null == southwestLat ? _self.southwestLat : southwestLat // ignore: cast_nullable_to_non_nullable
 as double,southwestLng: null == southwestLng ? _self.southwestLng : southwestLng // ignore: cast_nullable_to_non_nullable
-as double,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as double,isOwnLocation: null == isOwnLocation ? _self.isOwnLocation : isOwnLocation // ignore: cast_nullable_to_non_nullable
+as bool,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,address: freezed == address ? _self.address : address // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -161,10 +172,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  bool isOwnLocation,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LocationSubscription() when $default != null:
-return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.name,_that.address,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.isOwnLocation,_that.name,_that.address,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -182,10 +193,10 @@ return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLa
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  bool isOwnLocation,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _LocationSubscription():
-return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.name,_that.address,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.isOwnLocation,_that.name,_that.address,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +213,10 @@ return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLa
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  double northeastLat,  double northeastLng,  double southwestLat,  double southwestLng,  bool isOwnLocation,  String? name,  String? address,  DateTime? createdAt,  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _LocationSubscription() when $default != null:
-return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.name,_that.address,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.isOwnLocation,_that.name,_that.address,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -217,17 +228,28 @@ return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLa
 @JsonSerializable()
 
 class _LocationSubscription implements LocationSubscription {
-  const _LocationSubscription({this.id, required this.northeastLat, required this.northeastLng, required this.southwestLat, required this.southwestLng, this.name, this.address, this.createdAt, this.updatedAt});
+  const _LocationSubscription({this.id, required this.northeastLat, required this.northeastLng, required this.southwestLat, required this.southwestLng, this.isOwnLocation = false, this.name, this.address, this.createdAt, this.updatedAt});
   factory _LocationSubscription.fromJson(Map<String, dynamic> json) => _$LocationSubscriptionFromJson(json);
 
+/// The subscription's unique identifier.
 @override final  String? id;
+/// The northeast latitude of the subscription area.
 @override final  double northeastLat;
+/// The northeast longitude of the subscription area.
 @override final  double northeastLng;
+/// The southwest latitude of the subscription area.
 @override final  double southwestLat;
+/// The southwest longitude of the subscription area.
 @override final  double southwestLng;
+/// Indicates if this subscription is for the user's own location.
+@override@JsonKey() final  bool isOwnLocation;
+/// The name of the location.
 @override final  String? name;
+/// The human-readable address of the location.
 @override final  String? address;
+/// The timestamp when the subscription was created.
 @override final  DateTime? createdAt;
+/// The timestamp when the subscription was last updated.
 @override final  DateTime? updatedAt;
 
 /// Create a copy of LocationSubscription
@@ -243,16 +265,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocationSubscription&&(identical(other.id, id) || other.id == id)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.name, name) || other.name == name)&&(identical(other.address, address) || other.address == address)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LocationSubscription&&(identical(other.id, id) || other.id == id)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.isOwnLocation, isOwnLocation) || other.isOwnLocation == isOwnLocation)&&(identical(other.name, name) || other.name == name)&&(identical(other.address, address) || other.address == address)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,northeastLat,northeastLng,southwestLat,southwestLng,name,address,createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,northeastLat,northeastLng,southwestLat,southwestLng,isOwnLocation,name,address,createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'LocationSubscription(id: $id, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, name: $name, address: $address, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'LocationSubscription(id: $id, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, isOwnLocation: $isOwnLocation, name: $name, address: $address, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -263,7 +285,7 @@ abstract mixin class _$LocationSubscriptionCopyWith<$Res> implements $LocationSu
   factory _$LocationSubscriptionCopyWith(_LocationSubscription value, $Res Function(_LocationSubscription) _then) = __$LocationSubscriptionCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, double northeastLat, double northeastLng, double southwestLat, double southwestLng, String? name, String? address, DateTime? createdAt, DateTime? updatedAt
+ String? id, double northeastLat, double northeastLng, double southwestLat, double southwestLng, bool isOwnLocation, String? name, String? address, DateTime? createdAt, DateTime? updatedAt
 });
 
 
@@ -280,14 +302,15 @@ class __$LocationSubscriptionCopyWithImpl<$Res>
 
 /// Create a copy of LocationSubscription
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? northeastLat = null,Object? northeastLng = null,Object? southwestLat = null,Object? southwestLng = null,Object? name = freezed,Object? address = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? northeastLat = null,Object? northeastLng = null,Object? southwestLat = null,Object? southwestLng = null,Object? isOwnLocation = null,Object? name = freezed,Object? address = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_LocationSubscription(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,northeastLat: null == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
 as double,northeastLng: null == northeastLng ? _self.northeastLng : northeastLng // ignore: cast_nullable_to_non_nullable
 as double,southwestLat: null == southwestLat ? _self.southwestLat : southwestLat // ignore: cast_nullable_to_non_nullable
 as double,southwestLng: null == southwestLng ? _self.southwestLng : southwestLng // ignore: cast_nullable_to_non_nullable
-as double,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as double,isOwnLocation: null == isOwnLocation ? _self.isOwnLocation : isOwnLocation // ignore: cast_nullable_to_non_nullable
+as bool,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,address: freezed == address ? _self.address : address // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable

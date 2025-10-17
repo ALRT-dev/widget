@@ -14,6 +14,7 @@ _LocationSubscription _$LocationSubscriptionFromJson(
   northeastLng: (json['northeastLng'] as num).toDouble(),
   southwestLat: (json['southwestLat'] as num).toDouble(),
   southwestLng: (json['southwestLng'] as num).toDouble(),
+  isOwnLocation: json['isOwnLocation'] as bool? ?? false,
   name: json['name'] as String?,
   address: json['address'] as String?,
   createdAt: json['createdAt'] == null
@@ -32,6 +33,7 @@ Map<String, dynamic> _$LocationSubscriptionToJson(
   'northeastLng': instance.northeastLng,
   'southwestLat': instance.southwestLat,
   'southwestLng': instance.southwestLng,
+  'isOwnLocation': instance.isOwnLocation,
   'name': ?instance.name,
   'address': ?instance.address,
   'createdAt': ?instance.createdAt?.toIso8601String(),

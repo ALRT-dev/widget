@@ -41,34 +41,43 @@ class _AllLocationSubscriptionsListItemState
       child: Padding(
         padding: EdgeInsets.all(16.spMin),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               width: 40.spMin,
               height: 40.spMin,
               decoration: BoxDecoration(
-                color: AppColors.blue.withValues(alpha: 0.1),
+                color: widget.subscription.isOwnLocation
+                    ? AppColors.green.withValues(alpha: 0.1)
+                    : AppColors.blue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8.spMin),
               ),
               child: Icon(
                 Icons.place,
-                color: AppColors.blue,
+                color: widget.subscription.isOwnLocation
+                    ? AppColors.green
+                    : AppColors.blue,
                 size: 20.spMin,
               ),
             ),
-            12.spMin.wSizedBox,
+            12.wSizedBox,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.subscription.name ?? 'Unknown Location',
+                    widget.subscription.isOwnLocation
+                        ? 'My Location'
+                        : widget.subscription.name ?? 'Unknown Location',
                     style: TextStyle(
                       fontSize: 15.spMin,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.black,
+                      color: widget.subscription.isOwnLocation
+                          ? AppColors.green
+                          : AppColors.black,
                     ),
                   ),
-                  2.spMin.hSizedBox,
+                  2.hSizedBox,
                   Text(
                     widget.subscription.address ?? 'No address available',
                     style: TextStyle(
@@ -77,7 +86,7 @@ class _AllLocationSubscriptionsListItemState
                       height: 1.3,
                     ),
                   ),
-                  2.spMin.hSizedBox,
+                  2.hSizedBox,
                   Text(
                     'Subscribed ${widget.subscription.createdAt?.formattedDateOnly}',
                     style: TextStyle(
@@ -86,48 +95,53 @@ class _AllLocationSubscriptionsListItemState
                       fontStyle: FontStyle.italic,
                     ),
                   ),
+                  if (!widget.subscription.isOwnLocation) 8.hSizedBox,
+                  if (!widget.subscription.isOwnLocation)
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final isLoading = ref.watch(
+                          providerOfMyLocationSubscriptions.select(
+                            (value) =>
+                                value.unsubscribeFromLocationStateWrappers.any(
+                                  (wrapper) =>
+                                      wrapper.subscriptionId ==
+                                          widget.subscription.id &&
+                                      wrapper.unsubscribeFromLocationState
+                                          .maybeWhen(
+                                            orElse: () => false,
+                                            loading: () => true,
+                                          ),
+                                ),
+                          ),
+                        );
+
+                        return SizedBox(
+                          height: 30.spMin,
+                          child: Button.filled(
+                            width: 120.spMin,
+                            onPressed: _handleUnsubscribe,
+                            isLoading: isLoading,
+                            padding: EdgeInsets.zero,
+                            color: AppColors.red,
+                            icon: isLoading
+                                ? null
+                                : Icon(
+                                    Icons.notifications_off_rounded,
+                                    color: AppColors.white,
+                                    size: 16.spMin,
+                                  ),
+                            borderRadius: 8.0,
+                            value: isLoading ? null : 'Unsubscribe',
+                            valueStyle: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.white,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                 ],
               ),
-            ),
-            Consumer(
-              builder: (context, ref, child) {
-                final isLoading = ref.watch(
-                  providerOfMyLocationSubscriptions.select(
-                    (value) => value.unsubscribeFromLocationStateWrappers.any(
-                      (wrapper) =>
-                          wrapper.subscriptionId == widget.subscription.id &&
-                          wrapper.unsubscribeFromLocationState.maybeWhen(
-                            orElse: () => false,
-                            loading: () => true,
-                          ),
-                    ),
-                  ),
-                );
-
-                return SizedBox(
-                  height: 30.spMin,
-                  child: Button.filled(
-                    width: 120.spMin,
-                    onPressed: _handleUnsubscribe,
-                    isLoading: isLoading,
-                    padding: EdgeInsets.zero,
-                    color: AppColors.red,
-                    icon: isLoading
-                        ? null
-                        : Icon(
-                            Icons.notifications_off_rounded,
-                            color: AppColors.white,
-                            size: 16.spMin,
-                          ),
-                    borderRadius: 8.0,
-                    value: isLoading ? null : 'Unsubscribe',
-                    valueStyle: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.white,
-                    ),
-                  ),
-                );
-              },
             ),
           ],
         ),

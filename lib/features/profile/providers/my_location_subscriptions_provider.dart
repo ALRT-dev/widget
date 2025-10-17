@@ -218,11 +218,26 @@ class MyLocationSubscriptionsProvider
   void addLocationSubscription(
     final LocationSubscription locationSubscription,
   ) {
+    final updatedLocationSubscriptions = [
+      locationSubscription,
+      ...state.locationSubscriptions,
+    ];
+
+    // sort isOwnLocation subscriptions first
+    updatedLocationSubscriptions.sort(
+      (a, b) {
+        if (a.isOwnLocation && !b.isOwnLocation) {
+          return -1;
+        } else if (!a.isOwnLocation && b.isOwnLocation) {
+          return 1;
+        } else {
+          return 0;
+        }
+      },
+    );
+
     updateLocationSubscriptions(
-      locationSubscriptions: [
-        locationSubscription,
-        ...state.locationSubscriptions,
-      ],
+      locationSubscriptions: updatedLocationSubscriptions,
     );
   }
 
