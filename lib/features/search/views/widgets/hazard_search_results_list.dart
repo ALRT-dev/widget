@@ -5,10 +5,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
-import 'package:hazard_app/features/search/views/widgets/hazard_search_results_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
+import 'package:hazard_app/features/shared/views/widgets/common_hazards_list_item.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -200,8 +200,9 @@ class _HazardSearchResultsListState
           itemCount: hazards.length,
           itemBuilder: (context, index) {
             final hazard = hazards[index];
-            return HazardSearchResultsListItem(
+            return CommonHazardsListItem(
               hazard: hazard,
+              showTrustMeter: false,
             );
           },
           separatorBuilder: (context, index) => 10.hSizedBox,

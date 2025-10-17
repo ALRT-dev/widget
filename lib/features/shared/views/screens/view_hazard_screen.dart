@@ -179,6 +179,16 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             (value) => value.hazard?.reportedBy?.id == loggedInUserId,
           ),
         );
+        final isExpired = ref.watch(
+          providerOfViewHazard(widget.args.hazard.id!).select(
+            (value) => value.hazard?.isExpired == true,
+          ),
+        );
+
+        if (isExpired) {
+          return const SizedBox.shrink();
+        }
+
         if (!isOwner) {
           return const SizedBox.shrink();
         }
@@ -1051,6 +1061,18 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
   /// Handle edit button pressed.
   void _handleEditPressed() {
+    final isExpired = ref.read(
+      providerOfViewHazard(widget.args.hazard.id!).select(
+        (value) => value.hazard?.isExpired == true,
+      ),
+    );
+    if (isExpired) {
+      context.showErrorToast(
+        message: 'Cannot edit an expired hazard report.',
+      );
+      return;
+    }
+
     context.push(
       CreateUpdateReportScreen.updateRoute,
       extra: CreateUpdateReportScreenArgs(

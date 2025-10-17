@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/states/my_hazards_provider_state.dart';
-import 'package:hazard_app/features/profile/views/widgets/accepted_hazards_widgets/my_accepted_hazards_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/views/widgets/common_hazards_list_item.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 
 class MyAcceptedHazardsList extends ConsumerStatefulWidget {
@@ -63,7 +63,7 @@ class _MyAcceptedHazardsListState extends ConsumerState<MyAcceptedHazardsList> {
   Widget _dataBuilder() {
     return Consumer(
       builder: (context, ref, child) {
-        final recentReports = ref.watch(
+        final myAcceptedHazards = ref.watch(
           providerOfMyHazards.select(
             (value) => value.myAcceptedHazards,
           ),
@@ -75,15 +75,17 @@ class _MyAcceptedHazardsListState extends ConsumerState<MyAcceptedHazardsList> {
           removeBottom: true,
           child: ListView.separated(
             itemCount: widget.limit == null
-                ? recentReports.length
-                : min(recentReports.length, widget.limit!),
+                ? myAcceptedHazards.length
+                : min(myAcceptedHazards.length, widget.limit!),
             shrinkWrap: widget.shinkWrap,
             physics: widget.physics,
             itemBuilder: (context, index) {
-              final report = recentReports[index];
-              return MyAcceptedHazardsListItem(
-                key: ValueKey(report.id),
-                report: report,
+              final hazard = myAcceptedHazards[index];
+              return CommonHazardsListItem(
+                key: ValueKey(hazard.id),
+                showSourceHeader: false,
+                hazard: hazard,
+                horizontalPadding: 0.0,
               );
             },
             separatorBuilder: (context, index) => 10.hSizedBox,

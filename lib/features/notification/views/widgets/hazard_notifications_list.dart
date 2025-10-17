@@ -4,9 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/providers/states/notifications_feed_provider_state.dart';
-import 'package:hazard_app/features/notification/views/widgets/hazard_notifications_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/views/widgets/common_hazards_list_item.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 
 class HazardNotificationsList extends ConsumerStatefulWidget {
@@ -124,7 +124,7 @@ class _HazardNotificationsListState
           itemCount: hazards.length,
           itemBuilder: (context, index) {
             final hazard = hazards[index];
-            return HazardNotificationsListItem(
+            return CommonHazardsListItem(
               key: ValueKey(hazard.id),
               hazard: hazard,
             );
