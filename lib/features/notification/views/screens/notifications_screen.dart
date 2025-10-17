@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/views/widgets/hazard_notifications_list.dart';
 import 'package:hazard_app/features/notification/views/widgets/notifications_appbar.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
@@ -15,6 +16,12 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
@@ -26,5 +33,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         ],
       ),
     ).keyboardDismisser(context);
+  }
+
+  void _onInit() {
+    // Removes expired hazards from the notifications feed upon initialization.
+    ref.read(providerOfNotificationsFeed.notifier).removeExpiredHazards();
   }
 }

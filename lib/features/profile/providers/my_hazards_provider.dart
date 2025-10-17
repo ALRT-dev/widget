@@ -149,6 +149,14 @@ class MyHazardsProvider extends StateNotifier<MyHazardsProviderState> {
     updateMyAcceptedHazards(updatedHazards);
   }
 
+  /// Removes the expired hazards from [MyHazardsProviderState.myAcceptedHazards].
+  void removeExpiredAcceptedHazards() {
+    final updatedHazards = state.myAcceptedHazards
+        .where((hazard) => !hazard.isExpired)
+        .toList();
+    updateMyAcceptedHazards(updatedHazards);
+  }
+
   /// Updates [MyHazardsProviderState.myRejectedHazards] with the given [hazards].
   void updateMyRejectedHazards(final List<Hazard> hazards) {
     state = state.copyWith(

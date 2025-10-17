@@ -102,5 +102,13 @@ abstract class Hazard with _$Hazard {
   /// The net vote count (upvotes - downvotes) for the hazard.
   int get voteCount => upvoteCount - downvoteCount;
 
+  /// Indicates whether the hazard has expired based on the current date and time.
+  bool get isExpired {
+    if (expiresAt == null) {
+      return false;
+    }
+    return DateTime.now().isAfter(expiresAt!);
+  }
+
   factory Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);
 }

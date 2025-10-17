@@ -335,8 +335,12 @@ class _HazardNotificationsListItemState
         final voteCount = ref.watch(
           provider.select((value) => value.hazard.voteCount),
         );
+        final isExpired = ref.watch(
+          provider.select((value) => value.hazard.isExpired),
+        );
 
         return TrustMeter(
+          updateOnPressed: !isExpired,
           initialVoteType: voteType,
           initialVoteCount: voteCount,
           onVotePressed: _voteOnHazard,
@@ -383,6 +387,14 @@ class _HazardNotificationsListItemState
 
   /// Handle voting on the hazard by updating the provider and calling the vote function.
   void _voteOnHazard(final HazardVoteType type) {
+    final isExpired = ref.read(provider).hazard.isExpired;
+    if (isExpired) {
+      context.showErrorToast(
+        message: 'Cannot vote on an expired hazard.',
+      );
+      return;
+    }
+
     ref.read(provider.notifier).voteHazard(voteType: type);
   }
 }

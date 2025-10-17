@@ -193,6 +193,14 @@ class NotificationsFeedProvider
     );
   }
 
+  /// Removes hazards that have expired from the existing list of hazards in the state.
+  void removeExpiredHazards() {
+    final updatedHazards = state.hazards
+        .where((hazard) => !hazard.isExpired)
+        .toList();
+    updateHazards(updatedHazards);
+  }
+
   /// Processes a [HazardCategory] received from the socket by adding or updating it in the hazard categories provider.
   void processCategoryFromSocket(final HazardCategory category) {
     final existingCategories = _ref

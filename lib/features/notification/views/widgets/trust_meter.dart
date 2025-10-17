@@ -8,12 +8,16 @@ class TrustMeter extends ConsumerStatefulWidget {
   const TrustMeter({
     super.key,
     required this.initialVoteCount,
+    this.updateOnPressed = true,
     this.initialVoteType,
     this.onVotePressed,
   });
 
   /// The total number of votes for the hazard.
   final int initialVoteCount;
+
+  /// Whether the trust meter should update its state when pressed.
+  final bool updateOnPressed;
 
   /// The type of vote (upvote or downvote) that the user has made.
   final HazardVoteType? initialVoteType;
@@ -184,49 +188,53 @@ class _TrustMeterState extends ConsumerState<TrustMeter> {
   }
 
   void _handleUpvote() {
-    setState(() {
-      if (_voteType == HazardVoteType.upvote) {
-        // Remove upvote
-        _voteType = null;
-        _voteCount--;
-      } else {
-        // Add upvote
-        _voteType = HazardVoteType.upvote;
-        _voteCount++;
-
-        // Remove downvote if it was active
-        if (_voteType == HazardVoteType.downvote) {
+    if (widget.updateOnPressed) {
+      setState(() {
+        if (_voteType == HazardVoteType.upvote) {
+          // Remove upvote
+          _voteType = null;
+          _voteCount--;
+        } else {
+          // Add upvote
           _voteType = HazardVoteType.upvote;
+          _voteCount++;
 
-          // Add two because we're removing a downvote and adding an upvote
-          _voteCount += 2;
+          // Remove downvote if it was active
+          if (_voteType == HazardVoteType.downvote) {
+            _voteType = HazardVoteType.upvote;
+
+            // Add two because we're removing a downvote and adding an upvote
+            _voteCount += 2;
+          }
         }
-      }
-    });
+      });
+    }
 
     widget.onVotePressed?.call(HazardVoteType.upvote);
   }
 
   void _handleDownvote() {
-    setState(() {
-      if (_voteType == HazardVoteType.downvote) {
-        // Remove downvote
-        _voteType = null;
-        _voteCount++;
-      } else {
-        // Add downvote
-        _voteType = HazardVoteType.downvote;
-        _voteCount--;
-
-        // Remove upvote if it was active
-        if (_voteType == HazardVoteType.upvote) {
+    if (widget.updateOnPressed) {
+      setState(() {
+        if (_voteType == HazardVoteType.downvote) {
+          // Remove downvote
+          _voteType = null;
+          _voteCount++;
+        } else {
+          // Add downvote
           _voteType = HazardVoteType.downvote;
+          _voteCount--;
 
-          // Subtract two because we're removing an upvote and adding a downvote
-          _voteCount -= 2;
+          // Remove upvote if it was active
+          if (_voteType == HazardVoteType.upvote) {
+            _voteType = HazardVoteType.downvote;
+
+            // Subtract two because we're removing an upvote and adding a downvote
+            _voteCount -= 2;
+          }
         }
-      }
-    });
+      });
+    }
 
     widget.onVotePressed?.call(HazardVoteType.downvote);
   }
