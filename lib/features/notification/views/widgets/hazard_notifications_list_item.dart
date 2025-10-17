@@ -10,6 +10,7 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_expiry_timer.dart';
@@ -247,24 +248,54 @@ class _HazardNotificationsListItemState
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.location_on_outlined,
-              size: 14.spMin,
-              color: AppColors.grey,
-            ),
-            4.wSizedBox,
-            Text(
-              '1.2 km away',
-              style: TextStyle(
-                fontSize: 11.spMin,
-                fontWeight: FontWeight.w500,
-                color: AppColors.grey,
+        Consumer(
+          builder: (context, ref, child) {
+            final otherLatitude = ref.watch(
+              provider.select(
+                (value) => value.hazard.latitude,
               ),
-            ),
-          ],
+            );
+            final otherLongitude = ref.watch(
+              provider.select(
+                (value) => value.hazard.longitude,
+              ),
+            );
+            if (otherLatitude == null || otherLongitude == null) {
+              return const SizedBox.shrink();
+            }
+
+            final distance = ref.watch(
+              providerOfLoggedInUser.select(
+                (value) => value?.distanceTo(
+                  otherLatitude,
+                  otherLongitude,
+                ),
+              ),
+            );
+            if (distance == null) {
+              return const SizedBox.shrink();
+            }
+
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.location_on_outlined,
+                  size: 14.spMin,
+                  color: AppColors.grey,
+                ),
+                4.wSizedBox,
+                Text(
+                  '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} away',
+                  style: TextStyle(
+                    fontSize: 11.spMin,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.grey,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         Consumer(
           builder: (context, ref, child) {

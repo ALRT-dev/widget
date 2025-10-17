@@ -231,8 +231,8 @@ return $default(_that.id,_that.name,_that.email,_that.latitude,_that.longitude,_
 /// @nodoc
 @JsonSerializable()
 
-class _AppUser implements AppUser {
-  const _AppUser({this.id, this.name, this.email, this.latitude, this.longitude, this.locationName, this.xpPoints = 0, this.reliabilityScore = 0.0, this.hazardsViewedCount = 0, this.hazardsReportedCount = 0, this.upvotesReceivedCount = 0, this.createdAt});
+class _AppUser extends AppUser {
+  const _AppUser({this.id, this.name, this.email, this.latitude, this.longitude, this.locationName, this.xpPoints = 0, this.reliabilityScore = 0.0, this.hazardsViewedCount = 0, this.hazardsReportedCount = 0, this.upvotesReceivedCount = 0, this.createdAt}): super._();
   factory _AppUser.fromJson(Map<String, dynamic> json) => _$AppUserFromJson(json);
 
 /// The user's unique identifier.

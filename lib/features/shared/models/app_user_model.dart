@@ -1,10 +1,13 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hazard_app/features/shared/utils/location_helper.dart';
 
 part 'app_user_model.freezed.dart';
 part 'app_user_model.g.dart';
 
 @freezed
 abstract class AppUser with _$AppUser {
+  const AppUser._();
+
   const factory AppUser({
     /// The user's unique identifier.
     final String? id,
@@ -42,6 +45,20 @@ abstract class AppUser with _$AppUser {
     /// The timestamp when the user account was created.
     final DateTime? createdAt,
   }) = _AppUser;
+
+  /// Calculates the distance in meters from the user's location to another geographical point.
+  double? distanceTo(double otherLatitude, double otherLongitude) {
+    if (latitude == null || longitude == null) {
+      return null;
+    }
+
+    return calculateDistanceInMeters(
+      latitude!,
+      longitude!,
+      otherLatitude,
+      otherLongitude,
+    );
+  }
 
   factory AppUser.fromJson(Map<String, dynamic> json) =>
       _$AppUserFromJson(json);
