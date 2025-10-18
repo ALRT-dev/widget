@@ -1,0 +1,125 @@
+default_platform(:ios)
+
+platform :ios do
+  require 'date'
+
+  my_release_note = <<~NOTE
+    * First release of Alrt App
+  NOTE
+
+  desc "Automatically increment the version name and version code. Also prepare the changelogs and release note from git commits."
+  lane :auto_versioning do
+    # Increment the version code and version name in pubspec.yaml
+    pubspec_path = '../../pubspec.yaml'
+    # version_name = increment_version_name(pubspec_path) # Eg. 1.0.0
+    version_name = "1.0.0"
+    # version_code = increment_version_code(pubspec_path) # Eg. 23
+    version_code = '1'
+
+    # Generate 2 files: CHANGELOG.md and release_notes.txt from git commits
+    generateChangeLogAndReleaseNote(version_name, version_code, my_release_note)
+
+    # Add a new git tag with the updated version name nad code
+    add_git_tag(
+      tag: "v#{version_name}+#{version_code}"
+    )
+  end
+
+  desc 'Deploy the DEV application to Firebase App Distribution (iOS)'
+  lane :firebase_dev do
+    sh 'fvm flutter build ipa --flavor dev -t lib/main_dev.dart'
+    firebase_app_distribution(
+      app: "1:841565771679:ios:9b500f20dcdaa31dde0faa",
+      release_notes_file: '../release_note.txt',
+      ipa_path: "../build/ios/ipa/[Dev] Alrt.ipa",
+      groups: 'alrt',
+    )
+  end
+
+  desc 'Deploy the PROD application to Firebase App Distribution (iOS)'
+  lane :firebase_prod do
+    # sh 'fvm flutter build ipa --flavor prod -t lib/main_prod.dart'
+    firebase_app_distribution(
+      app: "1:841565771679:ios:45b8377b1d906f78de0faa",
+      release_notes_file: '../release_note.txt',
+      ipa_path: "../build/ios/ipa/Alrt.ipa",
+      groups: 'alrt',
+    )
+  end
+
+  desc "Deploy the PROD application to TestFlight"
+  lane :beta_release do
+    # sh 'fvm flutter build ipa --flavor prod -t lib/main_prod.dart'
+    
+    upload_to_testflight(
+      ipa: "../build/ios/ipa/hazard_app.ipa",
+      changelog: my_release_note
+    )
+  end
+
+  desc "Uploads the dSYM files to Crashlytics"
+  lane :upload_dsym do
+    upload_symbols_to_crashlytics(
+      gsp_path: "./config/prod/GoogleService-Info.plist"
+    )
+  end
+
+  # -------------------------------------- HELPERS --------------------------------------
+  
+  def increment_version_code(pubspec_path)
+    content = File.read(pubspec_path)
+    version_line = content.lines.find { |line| line.start_with?("version:") }
+    current_version = version_line.split("version:").last.strip
+    version_name, version_code = current_version.split('+')
+    new_version_code = version_code.to_i + 1
+    new_version = "#{version_name}+#{new_version_code}"
+    new_content = content.gsub(/version: .*/, "version: #{new_version}")
+    File.write(pubspec_path, new_content)
+    return new_version_code
+  end
+
+  def increment_version_name(pubspec_path)
+    content = File.read(pubspec_path)
+    version_line = content.lines.find { |line| line.start_with?("version:") }
+    current_version = version_line.split("version:").last.strip
+    version_name, version_code = current_version.split('+')
+    version_parts = version_name.split('.').map(&:to_i)
+    version_parts[-1] += 1
+    new_version_name = version_parts.join('.')
+    new_version = "#{new_version_name}+#{version_code}"
+    new_content = content.gsub(/version: .*/, "version: #{new_version}")
+    File.write(pubspec_path, new_content)
+    return new_version_name
+  end
+
+  def generateChangeLogAndReleaseNote(version_name, version_code, release_note = nil)
+    current_date = Date.today.strftime("%Y/%m/%d")
+  
+    if release_note.nil? || release_note.strip.empty?
+      last_tag = last_git_tag
+      if last_tag.nil? || last_tag.empty?
+        last_tag = "HEAD~1"
+      end
+  
+      changelog = changelog_from_git_commits(
+        between: [last_tag, 'Head'],
+        pretty: "* %s"
+      )
+    else
+      changelog = release_note
+    end
+  
+    changelog_file_path = "../../CHANGELOG.md"
+    release_notes_file_path = "../../release_note.txt"
+  
+    existing_content = File.exist?(changelog_file_path) ? File.read(changelog_file_path) : ""
+    new_entry = "## v#{version_name}+#{version_code} - #{current_date}\n#{changelog}\n\n"
+    updated_content = new_entry + existing_content
+  
+    # Write CHANGELOG.md
+    File.write(changelog_file_path, updated_content)
+  
+    # Write release_note.txt
+    File.write(release_notes_file_path, changelog)
+  end
+end
