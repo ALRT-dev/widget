@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -94,6 +95,12 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard.reportedBy,
           ),
         );
+        final confidenceScore = ref.watch(
+          provider.select(
+            (value) => value.hazard.confidenceScore,
+          ),
+        );
+
         return Row(
           children: [
             Text(
@@ -129,6 +136,23 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   ? AppColors.blue
                   : reportedBy?.reportsStatus.color ?? AppColors.lightGrey,
             ),
+            if (confidenceScore != null && kDebugMode) ...[
+              4.wSizedBox,
+              const Icon(
+                Icons.circle,
+                size: 4,
+                color: AppColors.grey,
+              ),
+              6.wSizedBox,
+              Text(
+                'ACS: $confidenceScore',
+                style: TextStyle(
+                  fontSize: 12.spMin,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.grey,
+                ),
+              ),
+            ],
           ],
         );
       },

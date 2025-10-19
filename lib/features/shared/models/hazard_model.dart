@@ -86,6 +86,9 @@ abstract class Hazard with _$Hazard {
     /// The total number of downvotes for the hazard.
     @Default(0) final int downvoteCount,
 
+    /// The confidence score of the hazard (from 0 to 100) to be used in the sorting order.
+    final int? confidenceScore,
+
     /// The date and time when the hazard occurred.
     @DateTimeConverter() final DateTime? occurredAt,
 

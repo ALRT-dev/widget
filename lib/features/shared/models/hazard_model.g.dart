@@ -47,6 +47,7 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   ),
   upvoteCount: (json['upvoteCount'] as num?)?.toInt() ?? 0,
   downvoteCount: (json['downvoteCount'] as num?)?.toInt() ?? 0,
+  confidenceScore: (json['confidenceScore'] as num?)?.toInt(),
   occurredAt: _$JsonConverterFromJson<String, DateTime>(
     json['occurredAt'],
     const DateTimeConverter().fromJson,
@@ -91,6 +92,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'userVoteType': ?_$HazardVoteTypeEnumMap[instance.userVoteType],
   'upvoteCount': instance.upvoteCount,
   'downvoteCount': instance.downvoteCount,
+  'confidenceScore': ?instance.confidenceScore,
   'occurredAt': ?_$JsonConverterToJson<String, DateTime>(
     instance.occurredAt,
     const DateTimeConverter().toJson,
