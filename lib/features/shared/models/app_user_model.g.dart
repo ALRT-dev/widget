@@ -18,6 +18,9 @@ _AppUser _$AppUserFromJson(Map<String, dynamic> json) => _AppUser(
   hazardsViewedCount: (json['hazardsViewedCount'] as num?)?.toInt() ?? 0,
   hazardsReportedCount: (json['hazardsReportedCount'] as num?)?.toInt() ?? 0,
   upvotesReceivedCount: (json['upvotesReceivedCount'] as num?)?.toInt() ?? 0,
+  reportsStatus:
+      $enumDecodeNullable(_$UserReportsStatusEnumMap, json['reportsStatus']) ??
+      UserReportsStatus.unverified,
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
@@ -35,5 +38,12 @@ Map<String, dynamic> _$AppUserToJson(_AppUser instance) => <String, dynamic>{
   'hazardsViewedCount': instance.hazardsViewedCount,
   'hazardsReportedCount': instance.hazardsReportedCount,
   'upvotesReceivedCount': instance.upvotesReceivedCount,
+  'reportsStatus': _$UserReportsStatusEnumMap[instance.reportsStatus]!,
   'createdAt': ?instance.createdAt?.toIso8601String(),
+};
+
+const _$UserReportsStatusEnumMap = {
+  UserReportsStatus.unverified: 'unverified',
+  UserReportsStatus.emerging: 'emerging',
+  UserReportsStatus.verified: 'verified',
 };

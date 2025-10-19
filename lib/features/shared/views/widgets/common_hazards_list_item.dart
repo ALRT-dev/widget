@@ -89,6 +89,11 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard.source,
           ),
         );
+        final reportedBy = ref.watch(
+          provider.select(
+            (value) => value.hazard.reportedBy,
+          ),
+        );
         return Row(
           children: [
             Text(
@@ -107,7 +112,9 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             ),
             6.wSizedBox,
             Text(
-              source != null ? 'Verified' : 'Unverified',
+              source != null
+                  ? 'Verified'
+                  : reportedBy?.reportsStatus.title ?? 'Unverified',
               style: TextStyle(
                 fontSize: 12.spMin,
                 fontWeight: FontWeight.w500,
@@ -120,7 +127,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               size: 16.spMin,
               color: source != null
                   ? AppColors.blue
-                  : AppColors.grey.withValues(alpha: 0.3),
+                  : reportedBy?.reportsStatus.color ?? AppColors.lightGrey,
             ),
           ],
         );

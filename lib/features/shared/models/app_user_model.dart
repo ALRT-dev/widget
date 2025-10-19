@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hazard_app/features/shared/enums/user_reports_status_types.dart';
 import 'package:hazard_app/features/shared/utils/location_helper.dart';
 
 part 'app_user_model.freezed.dart';
@@ -41,6 +42,10 @@ abstract class AppUser with _$AppUser {
 
     /// The number of upvotes the user has received on their reports.
     @Default(0) final int upvotesReceivedCount,
+
+    /// The user's report verification status.
+    @Default(UserReportsStatus.unverified)
+    final UserReportsStatus reportsStatus,
 
     /// The timestamp when the user account was created.
     final DateTime? createdAt,
