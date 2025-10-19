@@ -88,7 +88,7 @@ class _MyAcceptedHazardsListState extends ConsumerState<MyAcceptedHazardsList> {
                 horizontalPadding: 0.0,
               );
             },
-            separatorBuilder: (context, index) => 10.hSizedBox,
+            separatorBuilder: (context, index) => 20.hSizedBox,
           ),
         );
       },
