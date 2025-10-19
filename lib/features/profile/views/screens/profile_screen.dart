@@ -29,12 +29,6 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
-  }
-
-  @override
   Widget build(BuildContext context) {
     _listenToLogoutState();
 
@@ -907,11 +901,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     } else {
       return 'Poor';
     }
-  }
-
-  void _onInit() {
-    // Removes expired hazards from My Accepted Reports upon initialization.
-    ref.read(providerOfMyHazards.notifier).removeExpiredAcceptedHazards();
   }
 
   /// Listens to the logout state changes and navigates to the AppWrapper on success.

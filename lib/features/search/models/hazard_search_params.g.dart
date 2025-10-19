@@ -25,6 +25,7 @@ _HazardSearchParams _$HazardSearchParamsFromJson(Map<String, dynamic> json) =>
       northeastLng: (json['northeastLng'] as num?)?.toDouble(),
       southwestLat: (json['southwestLat'] as num?)?.toDouble(),
       southwestLng: (json['southwestLng'] as num?)?.toDouble(),
+      showExpired: json['showExpired'] as bool? ?? false,
       page: (json['page'] as num?)?.toInt() ?? 1,
       pageSize: (json['pageSize'] as num?)?.toInt() ?? 20,
     );
@@ -39,6 +40,7 @@ Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
       'northeastLng': ?instance.northeastLng,
       'southwestLat': ?instance.southwestLat,
       'southwestLng': ?instance.southwestLng,
+      'showExpired': instance.showExpired,
       'page': instance.page,
       'pageSize': instance.pageSize,
     };

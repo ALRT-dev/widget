@@ -205,7 +205,7 @@ class _HazardSearchResultsListState
               showTrustMeter: false,
             );
           },
-          separatorBuilder: (context, index) => 20.hSizedBox,
+          separatorBuilder: (context, index) => 15.hSizedBox,
         );
       },
     );

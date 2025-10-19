@@ -129,7 +129,7 @@ class _HazardNotificationsListState
               hazard: hazard,
             );
           },
-          separatorBuilder: (context, index) => 20.hSizedBox,
+          separatorBuilder: (context, index) => 15.hSizedBox,
         );
       },
     );

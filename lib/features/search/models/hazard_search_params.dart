@@ -33,6 +33,9 @@ abstract class HazardSearchParams with _$HazardSearchParams {
     /// The bounds for location-based filtering.
     final double? southwestLng,
 
+    /// Whether to show expired hazards or not.
+    @Default(false) final bool showExpired,
+
     /// The page number for pagination.
     @Default(1) final int page,
 
