@@ -4,6 +4,7 @@ import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
+import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_source_model.dart';
@@ -92,6 +93,13 @@ abstract class Hazard with _$Hazard {
 
     /// The list of media files associated with the hazard.
     @Default(<S3Media>[]) final List<S3Media> medias,
+
+    /// The list of medias that have been processed and are ready for displaying to the UI.
+    ///
+    /// This field is not included in JSON serialization/deserialization and is generated using [medias].
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    @Default(<AlrtMedia>[])
+    final List<AlrtMedia> processedMedias,
 
     /// The date and time when the hazard occurred.
     @DateTimeConverter() final DateTime? occurredAt,

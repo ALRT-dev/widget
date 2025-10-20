@@ -8,13 +8,16 @@ import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
+import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/view_hazard_provider_state.dart';
 import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
+import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_expiry_timer.dart';
+import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'dart:math' as math;
@@ -43,6 +46,8 @@ class ViewHazardScreen extends ConsumerStatefulWidget {
 }
 
 class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
+  late final provider = providerOfViewHazard(widget.args.hazard.id!);
+
   @override
   void initState() {
     super.initState();
@@ -56,11 +61,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     }
 
     // register this provider to the lifecycle of this widget
-    ref.watch(
-      providerOfViewHazard(widget.args.hazard.id!).select(
-        (value) => null,
-      ),
-    );
+    ref.watch(provider.select((value) => null));
 
     _listenToTheDeleteHazardState();
 
@@ -125,22 +126,22 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
   Widget _buildAppBar() {
     return SliverAppBar(
-      expandedHeight: 200.spMin,
+      expandedHeight: 400.spMin,
       floating: false,
       pinned: true,
       backgroundColor: AppColors.white,
       foregroundColor: AppColors.black,
       elevation: 0,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          size: 20.spMin,
+      leading: Center(
+        child: RoundButton(
+          icon: Icon(
+            Icons.arrow_back_ios_rounded,
+          ),
+          onPressed: () => context.pop(),
         ),
-        onPressed: () => context.pop(),
-      ),
+      ).pL(5.0),
       actions: [
         _buildDeleteButton(),
-        5.wSizedBox,
         _buildEditButton(),
         10.wSizedBox,
       ],
@@ -157,14 +158,52 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               ],
             ),
           ),
-          child: Center(
-            child: Padding(
-              padding: EdgeInsets.only(top: 80.spMin),
-              child: _buildSeverityIcon(),
-            ),
+          child: Consumer(
+            builder: (context, ref, child) {
+              final hazard = ref.watch(
+                provider.select((value) => value.hazard),
+              );
+              if (hazard?.processedMedias.isNotEmpty ?? false) {
+                return HazardMediasCarousel(
+                  medias: hazard!.processedMedias,
+                );
+              }
+
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 80.spMin),
+                  child: _buildSeverityIcon(),
+                ),
+              );
+            },
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDeleteButton() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final loggedInUserId = ref.watch(
+          providerOfLoggedInUser.select((value) => value?.id),
+        );
+        final isOwner = ref.watch(
+          provider.select(
+            (value) => value.hazard?.reportedBy?.id == loggedInUserId,
+          ),
+        );
+        if (!isOwner) {
+          return const SizedBox.shrink();
+        }
+
+        return RoundButton(
+          icon: Icon(
+            Icons.delete_outline_rounded,
+          ),
+          onPressed: _handleDeletePressed,
+        );
+      },
     );
   }
 
@@ -175,12 +214,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           providerOfLoggedInUser.select((value) => value?.id),
         );
         final isOwner = ref.watch(
-          providerOfViewHazard(widget.args.hazard.id!).select(
+          provider.select(
             (value) => value.hazard?.reportedBy?.id == loggedInUserId,
           ),
         );
         final isExpired = ref.watch(
-          providerOfViewHazard(widget.args.hazard.id!).select(
+          provider.select(
             (value) => value.hazard?.isExpired == true,
           ),
         );
@@ -193,37 +232,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           return const SizedBox.shrink();
         }
 
-        return IconButton(
+        return RoundButton(
           icon: Icon(
             Icons.edit_rounded,
           ),
           onPressed: _handleEditPressed,
-        );
-      },
-    );
-  }
-
-  Widget _buildDeleteButton() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final loggedInUserId = ref.watch(
-          providerOfLoggedInUser.select((value) => value?.id),
-        );
-        final isOwner = ref.watch(
-          providerOfViewHazard(widget.args.hazard.id!).select(
-            (value) => value.hazard?.reportedBy?.id == loggedInUserId,
-          ),
-        );
-        if (!isOwner) {
-          return const SizedBox.shrink();
-        }
-
-        return IconButton(
-          icon: Icon(
-            Icons.delete_outline_rounded,
-          ),
-          onPressed: _handleDeletePressed,
-        );
+        ).pL(10.0);
       },
     );
   }
@@ -300,12 +314,16 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             ),
             decoration: BoxDecoration(
               color:
-                  widget.args.hazard.severity?.color.withValues(alpha: 0.1) ??
+                  widget.args.hazard.severity?.color.withValues(
+                    alpha: 0.1,
+                  ) ??
                   AppColors.extraLightGrey,
               borderRadius: BorderRadius.circular(20.spMin),
               border: Border.all(
                 color:
-                    widget.args.hazard.severity?.color.withValues(alpha: 0.3) ??
+                    widget.args.hazard.severity?.color.withValues(
+                      alpha: 0.3,
+                    ) ??
                     AppColors.lightGrey,
               ),
             ),
@@ -1015,15 +1033,13 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   }
 
   void _onInit() {
-    ref
-        .read(providerOfViewHazard(widget.args.hazard.id!).notifier)
-        .updateHazard(widget.args.hazard);
+    ref.read(provider.notifier).updateHazard(widget.args.hazard);
   }
 
   /// Listen to the delete hazard state and handle success or error.
   void _listenToTheDeleteHazardState() {
     ref.listen(
-      providerOfViewHazard(widget.args.hazard.id!).select(
+      provider.select(
         (value) => value.deleteHazardState,
       ),
       (previous, next) {
@@ -1053,16 +1069,15 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       description:
           'Are you sure you want to delete this alrt report? This action cannot be undone.',
       confirmButtonText: 'Delete',
-      onPressedConfirmAsync: (context, ref) => ref
-          .read(providerOfViewHazard(widget.args.hazard.id!).notifier)
-          .deleteHazard(),
+      onPressedConfirmAsync: (context, ref) =>
+          ref.read(provider.notifier).deleteHazard(),
     );
   }
 
   /// Handle edit button pressed.
   void _handleEditPressed() {
     final isExpired = ref.read(
-      providerOfViewHazard(widget.args.hazard.id!).select(
+      provider.select(
         (value) => value.hazard?.isExpired == true,
       ),
     );

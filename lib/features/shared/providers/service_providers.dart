@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
+import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/services/socket_service.dart';
 import 'package:hazard_app/features/shared/services/user_service.dart';
 
@@ -11,3 +12,6 @@ final providerOfHazardService = Provider<HazardService>(HazardService.new);
 
 /// Provides [SocketService].
 final providerOfSocketService = Provider<SocketService>(SocketService.new);
+
+/// Provides [MediaService].
+final providerOfMediaService = Provider<MediaService>(MediaService.new);

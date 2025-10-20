@@ -11,10 +11,9 @@ import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
-import 'package:hazard_app/features/shared/providers/repository_providers.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
-import 'package:hazard_app/features/shared/repositories/media_repository.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
+import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 import 'package:uuid/uuid.dart';
 
@@ -38,7 +37,7 @@ class CreateReportProvider
        super(state);
 
   final Ref _ref;
-  MediaRepository get _mediaRepository => _ref.read(providerOfMediaRepository);
+  MediaService get _mediaService => _ref.read(providerOfMediaService);
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   MyHazardsProvider get _myHazardsProvider =>
       _ref.read(providerOfMyHazards.notifier);
@@ -144,7 +143,7 @@ class CreateReportProvider
 
   /// Picks multiple images from the gallery and adds them to [CreateUpdateReportProviderState.medias].
   Future<void> pickMedias() async {
-    final result = await _mediaRepository.pickMedias();
+    final result = await _mediaService.pickMedias();
     if (!mounted) return;
 
     result.whenSuccess(

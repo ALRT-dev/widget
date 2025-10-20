@@ -7,6 +7,8 @@ import 'package:hazard_app/features/notification/repositories/notification_repos
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/providers/service_providers.dart';
+import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 
 class NotificationService {
@@ -15,6 +17,7 @@ class NotificationService {
   final Ref _ref;
   NotificationRepository get _notificationRepository =>
       _ref.read(providerOfNotificationRepository);
+  HazardService get _hazardService => _ref.read(providerOfHazardService);
 
   StreamSubscription<RemoteMessage>? _remoteMessageStreamSub;
 
@@ -22,9 +25,22 @@ class NotificationService {
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
   getNotificationsFeed({
     final HazardSearchParams? searchParams,
-  }) {
-    return _notificationRepository.getNotificationsFeed(
+  }) async {
+    final result = await _notificationRepository.getNotificationsFeed(
       searchParams: searchParams,
+    );
+
+    final success = result.whenSuccess((response) {
+      final populatedHazards = response.hazards
+          .map(_hazardService.populateHazardWithRequiredData)
+          .toList();
+      return response.copyWith(
+        hazards: populatedHazards,
+      );
+    });
+
+    return result.copyWith(
+      success: (_) => success,
     );
   }
 

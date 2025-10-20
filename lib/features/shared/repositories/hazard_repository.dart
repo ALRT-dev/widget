@@ -10,7 +10,6 @@ import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
-import 'package:hazard_app/features/shared/utils/dummy_data.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 
 abstract class HazardRepository {
@@ -186,17 +185,5 @@ class HazardRepositoryImpl extends HazardRepository {
       },
       onError: Failure.new,
     );
-  }
-}
-
-class MockHazardRepositoryImpl extends HazardRepositoryImpl {
-  MockHazardRepositoryImpl({required super.restClient});
-
-  @override
-  Future<Either<List<Hazard>, AppError>> getHazards({
-    required HazardSearchParams searchParams,
-  }) async {
-    await Future.delayed(const Duration(seconds: 1));
-    return Success(kDummyHazards as List<Hazard>);
   }
 }

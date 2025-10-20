@@ -219,8 +219,8 @@ return $default(_that.id,_that.url,_that.s3Key,_that.type,_that.fileSize,_that.t
 /// @nodoc
 @JsonSerializable()
 
-class _S3Media implements S3Media {
-  const _S3Media({required this.id, @JsonKey(name: 'presignedUrl') required this.url, required this.s3Key, required this.type, this.fileSize, this.thumbnailUrl});
+class _S3Media extends S3Media {
+  const _S3Media({required this.id, @JsonKey(name: 'presignedUrl') required this.url, required this.s3Key, required this.type, this.fileSize, this.thumbnailUrl}): super._();
   factory _S3Media.fromJson(Map<String, dynamic> json) => _$S3MediaFromJson(json);
 
 /// The unique identifier for the media.

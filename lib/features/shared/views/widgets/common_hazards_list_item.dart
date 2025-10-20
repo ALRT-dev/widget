@@ -15,6 +15,7 @@ import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dar
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_expiry_timer.dart';
+import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -60,8 +61,17 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (widget.showSourceHeader) _headerBuilder(),
-          if (widget.showSourceHeader) 12.hSizedBox,
+          if (widget.showSourceHeader) ...[
+            _headerBuilder(),
+            12.hSizedBox,
+          ],
+          if (widget.hazard.processedMedias.isNotEmpty) ...[
+            3.hSizedBox,
+            HazardMediasCarousel(
+              medias: widget.hazard.processedMedias,
+            ),
+            15.hSizedBox,
+          ],
           Row(
             children: [
               _iconBuilder(),
@@ -75,8 +85,10 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           _shortDescriptionBuilder(),
           8.hSizedBox,
           _footerBuilder(),
-          if (widget.showTrustMeter) 12.hSizedBox,
-          if (widget.showTrustMeter) _trustMeterBuilder(),
+          if (widget.showTrustMeter) ...[
+            12.hSizedBox,
+            _trustMeterBuilder(),
+          ],
         ],
       ).pad(10.0),
     ).pX(widget.horizontalPadding);

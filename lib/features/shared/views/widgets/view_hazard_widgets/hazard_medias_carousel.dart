@@ -1,0 +1,233 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/shared/enums/alrt_media_source_types.dart';
+import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
+import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
+import 'package:hazard_app/others/app_colors.dart';
+
+class HazardMediasCarousel extends ConsumerStatefulWidget {
+  const HazardMediasCarousel({
+    super.key,
+    required this.medias,
+    this.initialIndex = 0,
+  });
+
+  /// The list of media items to display in the carousel.
+  final List<AlrtMedia> medias;
+
+  /// The initial index to display in the carousel.
+  final int initialIndex;
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _HazardMediasCarouselState();
+}
+
+class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
+    with TickerProviderStateMixin {
+  final CarouselSliderController _carouselController =
+      CarouselSliderController();
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final imageMedias = _filterImageMedias(widget.medias);
+    return SizedBox(
+      height: 300.spMin,
+      width: double.infinity,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16.spMin),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: _buildCarousel(imageMedias),
+            ),
+            _buildIndicators(imageMedias),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Filters media to only include images
+  List<AlrtMedia> _filterImageMedias(List<AlrtMedia> medias) {
+    return medias.where((media) => media.type == AlrtMediaType.image).toList();
+  }
+
+  /// Builds the main carousel widget
+  Widget _buildCarousel(List<AlrtMedia> imageMedias) {
+    return CarouselSlider.builder(
+      carouselController: _carouselController,
+      itemCount: imageMedias.length,
+      itemBuilder: (context, index, realIndex) {
+        return Hero(
+          tag: imageMedias[index].id,
+          child: Stack(
+            children: [
+              _buildImageWidget(imageMedias[index]),
+              _buildGradientOverlay(),
+            ],
+          ),
+          flightShuttleBuilder:
+              (
+                flightContext,
+                animation,
+                flightDirection,
+                fromHeroContext,
+                toHeroContext,
+              ) => ClipRRect(
+                borderRadius: BorderRadius.circular(16.spMin),
+                child: toHeroContext.widget,
+              ),
+        );
+      },
+      options: CarouselOptions(
+        height: double.infinity,
+        viewportFraction: 1.0,
+        enableInfiniteScroll: false,
+        scrollDirection: Axis.horizontal,
+        pageSnapping: true,
+        scrollPhysics: ClampingScrollPhysics(),
+        initialPage: widget.initialIndex,
+        onPageChanged: (index, reason) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
+    );
+  }
+
+  /// Builds the appropriate image widget based on source type
+  Widget _buildImageWidget(AlrtMedia media) {
+    Widget imageWidget;
+
+    switch (media.source) {
+      case AlrtMediaSource.networkUrl:
+        imageWidget = CachedNetworkImage(
+          imageUrl: media.value,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorWidget: (context, url, error) => _buildImageError(),
+        );
+        break;
+      case AlrtMediaSource.file:
+        imageWidget = Image.file(
+          File(media.value),
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (context, error, stackTrace) => _buildImageError(),
+        );
+        break;
+      case AlrtMediaSource.asset:
+        imageWidget = Image.asset(
+          media.value,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (context, error, stackTrace) => _buildImageError(),
+        );
+        break;
+    }
+
+    return imageWidget;
+  }
+
+  /// Builds error widget for failed image loads
+  Widget _buildImageError() {
+    return Container(
+      color: AppColors.extraLightGrey,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.broken_image_outlined,
+              size: 48.spMin,
+              color: Colors.grey.shade500,
+            ),
+            SizedBox(height: 8.spMin),
+            Text(
+              'Failed to load image',
+              style: TextStyle(
+                fontSize: 12.spMin,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Builds gradient overlay for better text readability
+  Widget _buildGradientOverlay() {
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                AppColors.transparent,
+                AppColors.black.withValues(alpha: 0.3),
+              ],
+              stops: const [0.6, 1.0],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Builds page indicators
+  Widget _buildIndicators(List<AlrtMedia> imageMedias) {
+    if (imageMedias.length <= 1) return const SizedBox.shrink();
+
+    return Positioned(
+      bottom: 16.spMin,
+      left: 0,
+      right: 0,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: imageMedias.asMap().entries.map((entry) {
+          int index = entry.key;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: _currentIndex == index ? 24.spMin : 8.spMin,
+            height: 8.spMin,
+            margin: EdgeInsets.symmetric(horizontal: 2.spMin),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4.spMin),
+              color: _currentIndex == index
+                  ? AppColors.white
+                  : AppColors.white.withValues(alpha: 0.5),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.2),
+                  blurRadius: 4.spMin,
+                  offset: Offset(0, 2.spMin),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}

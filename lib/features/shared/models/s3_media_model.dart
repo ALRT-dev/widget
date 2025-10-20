@@ -1,11 +1,15 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hazard_app/features/shared/enums/alrt_media_source_types.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
+import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 
 part 's3_media_model.freezed.dart';
 part 's3_media_model.g.dart';
 
 @freezed
 abstract class S3Media with _$S3Media {
+  const S3Media._();
+
   const factory S3Media({
     /// The unique identifier for the media.
     required final String id,
@@ -25,6 +29,16 @@ abstract class S3Media with _$S3Media {
     /// The URL of the thumbnail for the media, if applicable.
     final String? thumbnailUrl,
   }) = _S3Media;
+
+  /// Converts this [S3Media] instance to an [AlrtMedia] instance.
+  AlrtMedia toAlrtMedia() {
+    return AlrtMedia(
+      id: id,
+      value: url,
+      type: type,
+      source: AlrtMediaSource.networkUrl,
+    );
+  }
 
   factory S3Media.fromJson(Map<String, dynamic> json) =>
       _$S3MediaFromJson(json);

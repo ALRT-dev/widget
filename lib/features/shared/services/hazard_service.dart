@@ -21,9 +21,17 @@ class HazardService {
   /// Fetches the list of hazards from the server.
   Future<Either<List<Hazard>, AppError>> getHazards({
     required final HazardSearchParams searchParams,
-  }) {
-    return _hazardRepository.getHazards(
+  }) async {
+    final result = await _hazardRepository.getHazards(
       searchParams: searchParams,
+    );
+
+    final success = result.whenSuccess((hazards) {
+      return hazards.map(populateHazardWithRequiredData).toList();
+    });
+
+    return result.copyWith(
+      success: (_) => success,
     );
   }
 
@@ -31,9 +39,22 @@ class HazardService {
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
   getGetHazardsWithCategories({
     required final HazardSearchParams searchParams,
-  }) {
-    return _hazardRepository.getGetHazardsWithCategories(
+  }) async {
+    final result = await _hazardRepository.getGetHazardsWithCategories(
       searchParams: searchParams,
+    );
+
+    final success = result.whenSuccess((response) {
+      final populatedHazards = response.hazards
+          .map(populateHazardWithRequiredData)
+          .toList();
+      return response.copyWith(
+        hazards: populatedHazards,
+      );
+    });
+
+    return result.copyWith(
+      success: (_) => success,
     );
   }
 
@@ -96,6 +117,13 @@ class HazardService {
   }) {
     return _hazardRepository.viewHazard(
       hazardId: hazardId,
+    );
+  }
+
+  /// Populates a hazard with any required data before processing.
+  Hazard populateHazardWithRequiredData(final Hazard hazard) {
+    return hazard.copyWith(
+      processedMedias: hazard.medias.map((e) => e.toAlrtMedia()).toList(),
     );
   }
 }
