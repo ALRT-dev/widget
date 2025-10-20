@@ -73,6 +73,7 @@ class CreateReportProvider
     } else {
       result = await _hazardService.createHazardReport(
         hazard: hazard,
+        mediaFiles: state.medias,
       );
     }
     if (!mounted) return;
@@ -262,6 +263,7 @@ class CreateReportProvider
       hazardToCreateOrUpdate: state.hazardToCreateOrUpdate.copyWith(
         occurredAt: null,
         category: null,
+        severity: null,
         latitude: null,
         longitude: null,
         locationName: null,

@@ -7,6 +7,7 @@ import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_source_model.dart';
+import 'package:hazard_app/features/shared/models/s3_media_model.dart';
 
 part 'hazard_model.freezed.dart';
 part 'hazard_model.g.dart';
@@ -88,6 +89,9 @@ abstract class Hazard with _$Hazard {
 
     /// The confidence score of the hazard (from 0 to 100) to be used in the sorting order.
     final int? confidenceScore,
+
+    /// The list of media files associated with the hazard.
+    @Default(<S3Media>[]) final List<S3Media> medias,
 
     /// The date and time when the hazard occurred.
     @DateTimeConverter() final DateTime? occurredAt,

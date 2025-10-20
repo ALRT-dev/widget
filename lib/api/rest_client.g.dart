@@ -366,13 +366,36 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<Hazard> createHazardReport({required Hazard hazard}) async {
+  Future<Hazard> createHazardReport({
+    required Map<String, dynamic> hazard,
+    List<File>? mediaFiles,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = hazard;
+    final _data = FormData();
+    _data.fields.add(MapEntry('hazard', jsonEncode(hazard)));
+    if (mediaFiles != null) {
+      _data.files.addAll(
+        mediaFiles.map(
+          (i) => MapEntry(
+            'mediaFiles',
+            MultipartFile.fromFileSync(
+              i.path,
+              filename: i.path.split(Platform.pathSeparator).last,
+            ),
+          ),
+        ),
+      );
+    }
     final _options = _setStreamType<Hazard>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
+      Options(
+            method: 'POST',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
           .compose(
             _dio.options,
             '/hazards',

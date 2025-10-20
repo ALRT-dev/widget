@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:hazard_app/api/endpoints.dart';
 import 'package:hazard_app/features/auth/models/auth_success_model.dart';
@@ -82,8 +85,10 @@ abstract class RestClient {
   Future<List<HazardCategory>> getHazardCategories();
 
   @POST(kUrlHazards)
+  @MultiPart()
   Future<Hazard> createHazardReport({
-    @Body() required final Hazard hazard,
+    @Part() required final Map<String, dynamic> hazard,
+    @Part() final List<File>? mediaFiles,
   });
 
   @PUT('$kUrlHazards/{hazardId}')

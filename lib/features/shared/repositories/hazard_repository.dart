@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
+import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
@@ -24,6 +27,7 @@ abstract class HazardRepository {
 
   Future<Either<Hazard, AppError>> createHazardReport({
     required final Hazard hazard,
+    final List<AlrtMedia>? mediaFiles,
   });
 
   Future<Either<Hazard, AppError>> updateHazardReport({
@@ -99,11 +103,20 @@ class HazardRepositoryImpl extends HazardRepository {
   @override
   Future<Either<Hazard, AppError>> createHazardReport({
     required Hazard hazard,
+    List<AlrtMedia>? mediaFiles,
   }) {
     return runAsyncCall(
       name: 'createHazardReport',
       future: () async {
-        final result = await _restClient.createHazardReport(hazard: hazard);
+        List<File>? files;
+        if (mediaFiles != null && mediaFiles.isNotEmpty) {
+          files = mediaFiles.map((media) => File(media.value)).toList();
+        }
+
+        final result = await _restClient.createHazardReport(
+          hazard: hazard.toJson(),
+          mediaFiles: files,
+        );
         return Success(result);
       },
       onError: Failure.new,
