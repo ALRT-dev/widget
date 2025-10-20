@@ -26,6 +26,23 @@ _HazardSearchParams _$HazardSearchParamsFromJson(Map<String, dynamic> json) =>
       southwestLat: (json['southwestLat'] as num?)?.toDouble(),
       southwestLng: (json['southwestLng'] as num?)?.toDouble(),
       showExpired: json['showExpired'] as bool? ?? false,
+      sortSettings:
+          (json['sortSettings'] as List<dynamic>?)
+              ?.map(
+                (e) => (e as Map<String, dynamic>).map(
+                  (k, e) => MapEntry(
+                    $enumDecode(_$SortCategoryEnumMap, k),
+                    $enumDecode(_$SortOrderEnumMap, e),
+                  ),
+                ),
+              )
+              .toList() ??
+          const <Map<SortCategory, SortOrder>>[
+            {SortCategory.severity: SortOrder.desc},
+            {SortCategory.distance: SortOrder.asc},
+            {SortCategory.createdAt: SortOrder.desc},
+            {SortCategory.confidenceScore: SortOrder.desc},
+          ],
       page: (json['page'] as num?)?.toInt() ?? 1,
       pageSize: (json['pageSize'] as num?)?.toInt() ?? 20,
     );
@@ -41,6 +58,14 @@ Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
       'southwestLat': ?instance.southwestLat,
       'southwestLng': ?instance.southwestLng,
       'showExpired': instance.showExpired,
+      'sortSettings': instance.sortSettings
+          .map(
+            (e) => e.map(
+              (k, e) =>
+                  MapEntry(_$SortCategoryEnumMap[k]!, _$SortOrderEnumMap[e]!),
+            ),
+          )
+          .toList(),
       'page': instance.page,
       'pageSize': instance.pageSize,
     };
@@ -49,4 +74,13 @@ const _$HazardReviewStatusEnumMap = {
   HazardReviewStatus.pending: 'pending',
   HazardReviewStatus.accepted: 'accepted',
   HazardReviewStatus.rejected: 'rejected',
+};
+
+const _$SortOrderEnumMap = {SortOrder.asc: 'asc', SortOrder.desc: 'desc'};
+
+const _$SortCategoryEnumMap = {
+  SortCategory.severity: 'severity',
+  SortCategory.distance: 'distance',
+  SortCategory.createdAt: 'createdAt',
+  SortCategory.confidenceScore: 'confidenceScore',
 };

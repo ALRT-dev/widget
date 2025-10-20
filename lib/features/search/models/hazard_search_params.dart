@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
+import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
+import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 
 part 'hazard_search_params.freezed.dart';
 part 'hazard_search_params.g.dart';
@@ -35,6 +37,24 @@ abstract class HazardSearchParams with _$HazardSearchParams {
 
     /// Whether to show expired hazards or not.
     @Default(false) final bool showExpired,
+
+    /// The list of sorting types to sort hazards.
+    @Default(
+      <Map<SortCategory, SortOrder>>[
+        // More severe hazards first
+        {SortCategory.severity: SortOrder.desc},
+
+        // Then, closer hazards first
+        {SortCategory.distance: SortOrder.asc},
+
+        // Then, most recent hazards first
+        {SortCategory.createdAt: SortOrder.desc},
+
+        // Finally, highest confidence score first
+        {SortCategory.confidenceScore: SortOrder.desc},
+      ],
+    )
+    final List<Map<SortCategory, SortOrder>> sortSettings,
 
     /// The page number for pagination.
     @Default(1) final int page,

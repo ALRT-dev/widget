@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/profile/providers/states/my_hazards_provider_state.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
+import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
+import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
@@ -47,6 +49,9 @@ class MyHazardsProvider extends StateNotifier<MyHazardsProviderState> {
         reportedById: _loggedInUser!.id,
         showExpired: true,
         reviewStatus: HazardReviewStatus.accepted,
+        sortSettings: [
+          {SortCategory.createdAt: SortOrder.desc},
+        ],
       ),
     );
     if (!mounted) return;
@@ -82,6 +87,9 @@ class MyHazardsProvider extends StateNotifier<MyHazardsProviderState> {
       searchParams: HazardSearchParams(
         reportedById: _loggedInUser!.id,
         reviewStatus: HazardReviewStatus.rejected,
+        sortSettings: [
+          {SortCategory.createdAt: SortOrder.desc},
+        ],
       ),
     );
     if (!mounted) return;
