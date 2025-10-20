@@ -8,20 +8,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_source_types.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
+import 'package:hazard_app/features/shared/providers/hazard_medias_carousel_index_provider.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class HazardMediasCarousel extends ConsumerStatefulWidget {
   const HazardMediasCarousel({
     super.key,
+    required this.id,
     required this.medias,
-    this.initialIndex = 0,
   });
+
+  /// Unique identifier for the carousel instance.
+  final String id;
 
   /// The list of media items to display in the carousel.
   final List<AlrtMedia> medias;
-
-  /// The initial index to display in the carousel.
-  final int initialIndex;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -32,13 +33,10 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
     with TickerProviderStateMixin {
   final CarouselSliderController _carouselController =
       CarouselSliderController();
-  int _currentIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.initialIndex;
-  }
+  late final currentIndexProvider = providerOfHazardMediasCarouselIndex(
+    widget.id,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -99,11 +97,9 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
         scrollDirection: Axis.horizontal,
         pageSnapping: true,
         scrollPhysics: ClampingScrollPhysics(),
-        initialPage: widget.initialIndex,
+        initialPage: ref.read(currentIndexProvider),
         onPageChanged: (index, reason) {
-          setState(() {
-            _currentIndex = index;
-          });
+          ref.read(currentIndexProvider.notifier).state = index;
         },
       ),
     );
@@ -207,24 +203,30 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
         mainAxisAlignment: MainAxisAlignment.center,
         children: imageMedias.asMap().entries.map((entry) {
           int index = entry.key;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: _currentIndex == index ? 24.spMin : 8.spMin,
-            height: 8.spMin,
-            margin: EdgeInsets.symmetric(horizontal: 2.spMin),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(4.spMin),
-              color: _currentIndex == index
-                  ? AppColors.white
-                  : AppColors.white.withValues(alpha: 0.5),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.2),
-                  blurRadius: 4.spMin,
-                  offset: Offset(0, 2.spMin),
+          return Consumer(
+            builder: (context, ref, child) {
+              final currentIndex = ref.watch(currentIndexProvider);
+
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: currentIndex == index ? 24.spMin : 8.spMin,
+                height: 8.spMin,
+                margin: EdgeInsets.symmetric(horizontal: 2.spMin),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4.spMin),
+                  color: currentIndex == index
+                      ? AppColors.white
+                      : AppColors.white.withValues(alpha: 0.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.black.withValues(alpha: 0.2),
+                      blurRadius: 4.spMin,
+                      offset: Offset(0, 2.spMin),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           );
         }).toList(),
       ),

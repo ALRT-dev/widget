@@ -165,7 +165,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               );
               if (hazard?.processedMedias.isNotEmpty ?? false) {
                 return HazardMediasCarousel(
-                  medias: hazard!.processedMedias,
+                  id: hazard!.id!,
+                  medias: hazard.processedMedias,
                 );
               }
 
@@ -295,11 +296,14 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               12.spMin.wSizedBox,
             ],
             Expanded(
-              child: Text(
-                widget.args.hazard.title ?? 'Hazard Report',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24.spMin,
+              child: Hero(
+                tag: 'hazard_title_${widget.args.hazard.id}',
+                child: Text(
+                  widget.args.hazard.title ?? 'Hazard Report',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24.spMin,
+                  ),
                 ),
               ),
             ),

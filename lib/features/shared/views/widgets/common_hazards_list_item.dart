@@ -68,6 +68,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           if (widget.hazard.processedMedias.isNotEmpty) ...[
             3.hSizedBox,
             HazardMediasCarousel(
+              id: widget.hazard.id!,
               medias: widget.hazard.processedMedias,
             ),
             15.hSizedBox,
