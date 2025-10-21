@@ -15,10 +15,12 @@ final providerOfVideoPreviewLifecycle = Provider.autoDispose
               .addPriority(videoIdPriority.priority);
         });
 
+        final provider = ref.read(
+          providerOfCurrentlyPlayingVideoPriorities.notifier,
+        );
+
         ref.onDispose(() {
-          ref
-              .read(providerOfCurrentlyPlayingVideoPriorities.notifier)
-              .removePriority(videoIdPriority.priority);
+          provider.removePriority(videoIdPriority.priority);
         });
       },
     );

@@ -9,6 +9,7 @@ import 'package:hazard_app/features/shared/providers/base_url_provider.dart';
 import 'package:hazard_app/firebase_options.dart';
 import 'package:hazard_app/others/app.dart';
 import 'package:hazard_app/others/app_flavor_types.dart';
+import 'package:media_kit/media_kit.dart';
 
 class AppBootstrap {
   /// Initializes the app with the given [flavor].
@@ -20,6 +21,7 @@ class AppBootstrap {
 
   void _onInit() async {
     WidgetsFlutterBinding.ensureInitialized();
+    MediaKit.ensureInitialized();
 
     await Future.wait([
       EasyLocalization.ensureInitialized(),
