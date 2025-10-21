@@ -19,6 +19,7 @@ class HazardMediasCarousel extends ConsumerStatefulWidget {
     required this.id,
     required this.medias,
     this.videoPriority = VideoPriority.level1,
+    this.registerVideoLifecycle = true,
   });
 
   /// Unique identifier for the carousel instance.
@@ -29,6 +30,9 @@ class HazardMediasCarousel extends ConsumerStatefulWidget {
 
   /// The priority assigned to video media within the carousel.
   final VideoPriority videoPriority;
+
+  /// Whether to register the video lifecycle for video previews.
+  final bool registerVideoLifecycle;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -75,11 +79,12 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
       carouselController: _carouselController,
       itemCount: imageMedias.length,
       itemBuilder: (context, index, realIndex) {
+        final media = imageMedias[index];
         return Hero(
-          tag: imageMedias[index].id,
+          tag: media.id,
           child: Stack(
             children: [
-              _buildItemWidget(imageMedias[index]),
+              _buildItemWidget(media),
               _buildGradientOverlay(),
             ],
           ),
@@ -159,6 +164,7 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
     return VideoAlrtMediaPreview(
       videoMedia: media,
       priority: widget.videoPriority,
+      registerLifecycle: widget.registerVideoLifecycle,
       muteButtonPositionedWidget: (muteButton) {
         return Positioned(
           bottom: 15.spMin,

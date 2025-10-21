@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
+import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/video_priority_types.dart';
@@ -12,8 +13,10 @@ import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.da
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/models/video_id_priority_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/view_hazard_provider_state.dart';
+import 'package:hazard_app/features/shared/providers/video_preview_lifecycle_provider.dart';
 import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
@@ -63,6 +66,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
     // register this provider to the lifecycle of this widget
     ref.watch(provider.select((value) => null));
+    _registerVideoPriorityProviders();
 
     _listenToTheDeleteHazardState();
 
@@ -168,6 +172,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 return HazardMediasCarousel(
                   id: hazard!.id!,
                   medias: hazard.processedMedias,
+                  registerVideoLifecycle: false,
                   videoPriority: VideoPriority.level2,
                 );
               }
@@ -1040,6 +1045,30 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
   void _onInit() {
     ref.read(provider.notifier).updateHazard(widget.args.hazard);
+  }
+
+  /// Register video priority providers for all video medias.
+  void _registerVideoPriorityProviders() {
+    final videoMedias = ref.read(
+      provider.select(
+        (value) =>
+            value.hazard?.processedMedias
+                .where((media) => media.type == AlrtMediaType.video)
+                .toList() ??
+            [],
+      ),
+    );
+
+    for (final videoMedia in videoMedias) {
+      ref.watch(
+        providerOfVideoPreviewLifecycle(
+          VideoIdPriority(
+            id: videoMedia.id,
+            priority: VideoPriority.level2,
+          ),
+        ).select((value) => null),
+      );
+    }
   }
 
   /// Listen to the delete hazard state and handle success or error.

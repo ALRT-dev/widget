@@ -11,6 +11,7 @@ import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:native_video_player/native_video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class NativeVideoPlayer extends ConsumerStatefulWidget {
   /// Displays the video media using the native player.
@@ -92,35 +93,47 @@ class NativeVideoPlayerState extends ConsumerState<NativeVideoPlayer> {
     _listenToMuteVideoState();
     _listenToCurrentlyPlayingVideoPriorities();
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          IgnorePointer(
-            child: NativeVideoPlayerView(
-              onViewReady: _onControllerReady,
-              fit: BoxFit.cover,
-            ),
-          ),
-          if (_initializedVideoInfo == null)
-            Center(
-              child: Spinner(
-                color: AppColors.white,
+    return VisibilityDetector(
+      key: Key('NativeVideoPlayer_${widget.videoMedia.id}'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction == 1.0) {
+          if (mounted) {
+            _playVideoIfHighestPriority();
+          }
+        } else {
+          _controller?.pause();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          children: [
+            IgnorePointer(
+              child: NativeVideoPlayerView(
+                onViewReady: _onControllerReady,
+                fit: BoxFit.cover,
               ),
             ),
-          if (widget.withPlayIcon && _initializedVideoInfo != null)
-            widget.playButtonPositionedWidget?.call(_playIconBuilder()) ??
-                Center(
-                  child: _playIconBuilder(),
+            if (_initializedVideoInfo == null)
+              Center(
+                child: Spinner(
+                  color: AppColors.white,
                 ),
-          if (widget.withMuteButton && _initializedVideoInfo != null)
-            widget.muteButtonPositionedWidget?.call(_volumeButtonBuilder()) ??
-                Positioned(
-                  right: 20,
-                  bottom: 40,
-                  child: _volumeButtonBuilder(),
-                ),
-        ],
+              ),
+            if (widget.withPlayIcon && _initializedVideoInfo != null)
+              widget.playButtonPositionedWidget?.call(_playIconBuilder()) ??
+                  Center(
+                    child: _playIconBuilder(),
+                  ),
+            if (widget.withMuteButton && _initializedVideoInfo != null)
+              widget.muteButtonPositionedWidget?.call(_volumeButtonBuilder()) ??
+                  Positioned(
+                    right: 20,
+                    bottom: 40,
+                    child: _volumeButtonBuilder(),
+                  ),
+          ],
+        ),
       ),
     );
   }

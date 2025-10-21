@@ -18,6 +18,7 @@ class VideoAlrtMediaPreview extends ConsumerWidget {
     this.withPlayIcon = false,
     this.playIconSize = 50.0,
     this.autoPlay = true,
+    this.registerLifecycle = true,
     this.playButtonPositionedWidget,
   });
 
@@ -49,19 +50,24 @@ class VideoAlrtMediaPreview extends ConsumerWidget {
   /// Whether to autoplay the video or not.
   final bool autoPlay;
 
+  /// Whether to register the lifecycle of this video preview.
+  final bool registerLifecycle;
+
   /// The Positioned widget to cover the play button.
   final Positioned Function(Widget)? playButtonPositionedWidget;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(
-      providerOfVideoPreviewLifecycle(
-        VideoIdPriority(
-          id: videoMedia.id,
-          priority: priority,
-        ),
-      ).select((value) => null),
-    );
+    if (registerLifecycle) {
+      ref.watch(
+        providerOfVideoPreviewLifecycle(
+          VideoIdPriority(
+            id: videoMedia.id,
+            priority: priority,
+          ),
+        ).select((value) => null),
+      );
+    }
 
     return NativeVideoPlayer(
       videoMedia: videoMedia,
