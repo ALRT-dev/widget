@@ -96,24 +96,24 @@ class _ManagePushNotificationsListState
                   .read(providerOfManageNotifications.notifier)
                   .updateIsInfoEnabled,
             ),
-            ManagePushNotificationsListItem(
-              title: 'Crowd Alert (Unconfirmed)',
-              subtitle: 'User-reported incidents awaiting verification',
-              color: AppColors.grey,
-              emoji: '⚪',
-            ),
-            ManagePushNotificationsListItem(
-              title: 'Crowd Alert (Emerging)',
-              subtitle: 'Reports under investigation',
-              color: Colors.brown,
-              emoji: '🟤',
-            ),
-            ManagePushNotificationsListItem(
-              title: 'Crowd Alert (Verified)',
-              subtitle: 'Confirmed community-reported incidents',
-              color: AppColors.green,
-              emoji: '🟢',
-            ),
+            // ManagePushNotificationsListItem(
+            //   title: 'Crowd Alert (Unconfirmed)',
+            //   subtitle: 'User-reported incidents awaiting verification',
+            //   color: AppColors.grey,
+            //   emoji: '⚪',
+            // ),
+            // ManagePushNotificationsListItem(
+            //   title: 'Crowd Alert (Emerging)',
+            //   subtitle: 'Reports under investigation',
+            //   color: Colors.brown,
+            //   emoji: '🟤',
+            // ),
+            // ManagePushNotificationsListItem(
+            //   title: 'Crowd Alert (Verified)',
+            //   subtitle: 'Confirmed community-reported incidents',
+            //   color: AppColors.green,
+            //   emoji: '🟢',
+            // ),
           ],
         );
       },
