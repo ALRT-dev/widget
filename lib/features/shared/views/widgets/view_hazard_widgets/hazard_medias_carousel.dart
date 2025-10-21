@@ -1,14 +1,16 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_source_types.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
+import 'package:hazard_app/features/shared/enums/video_priority_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_medias_carousel_index_provider.dart';
+import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
+import 'package:hazard_app/features/shared/views/widgets/video_preview.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class HazardMediasCarousel extends ConsumerStatefulWidget {
@@ -60,7 +62,7 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
 
   /// Filters media to only include images
   List<AlrtMedia> _filterImageMedias(List<AlrtMedia> medias) {
-    return medias.where((media) => media.type == AlrtMediaType.image).toList();
+    return medias;
   }
 
   /// Builds the main carousel widget
@@ -73,7 +75,7 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
           tag: imageMedias[index].id,
           child: Stack(
             children: [
-              _buildImageWidget(imageMedias[index]),
+              _buildItemWidget(imageMedias[index]),
               _buildGradientOverlay(),
             ],
           ),
@@ -105,14 +107,21 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
     );
   }
 
+  Widget _buildItemWidget(AlrtMedia media) {
+    return media.type == AlrtMediaType.image
+        ? _buildImageWidget(media)
+        : _buildVideoWidget(media);
+  }
+
   /// Builds the appropriate image widget based on source type
-  Widget _buildImageWidget(AlrtMedia media) {
+  Widget _buildImageWidget(final AlrtMedia media) {
     Widget imageWidget;
 
     switch (media.source) {
       case AlrtMediaSource.networkUrl:
-        imageWidget = CachedNetworkImage(
+        imageWidget = AppCachedNetworkImage(
           imageUrl: media.value,
+          cacheKey: media.id,
           fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
@@ -140,6 +149,21 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
     }
 
     return imageWidget;
+  }
+
+  Widget _buildVideoWidget(final AlrtMedia media) {
+    return VideoAlrtMediaPreview(
+      videoMedia: media,
+      priority: VideoPriority.level1,
+      autoPlay: true,
+      muteButtonPositionedWidget: (muteButton) {
+        return Positioned(
+          bottom: 15.spMin,
+          right: 15.spMin,
+          child: muteButton,
+        );
+      },
+    );
   }
 
   /// Builds error widget for failed image loads

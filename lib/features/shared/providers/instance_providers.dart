@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -39,4 +40,19 @@ final providerOfPolylinePointsInstance = Provider<PolylinePoints>(
 /// Provider of [FirebaseMessaging] instance.
 final providerOfFirebaseMessagingInstance = Provider<FirebaseMessaging>(
   (ref) => FirebaseMessaging.instance,
+);
+
+/// Provider of [DefaultCacheManager] instance.
+final providerOfCacheManagerInstance = Provider<CacheManager>(
+  (ref) {
+    final cacheKey = 'libCachedImageData';
+    return CacheManager(
+      Config(
+        cacheKey,
+        stalePeriod: const Duration(days: 30),
+        maxNrOfCacheObjects: 5000,
+        fileSystem: IOFileSystem(cacheKey),
+      ),
+    );
+  },
 );

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hazard_app/features/shared/services/cache_manager_service.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/services/socket_service.dart';
@@ -15,3 +16,8 @@ final providerOfSocketService = Provider<SocketService>(SocketService.new);
 
 /// Provides [MediaService].
 final providerOfMediaService = Provider<MediaService>(MediaService.new);
+
+/// Provider of [CacheManagerService].
+final providerOfCacheManagerService = Provider<CacheManagerService>(
+  CacheManagerService.new,
+);
