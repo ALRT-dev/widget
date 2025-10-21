@@ -30,10 +30,9 @@ class NotificationService {
       searchParams: searchParams,
     );
 
-    final success = result.whenSuccess((response) {
-      final populatedHazards = response.hazards
-          .map(_hazardService.populateHazardWithRequiredData)
-          .toList();
+    final success = await result.whenSuccess((response) async {
+      final populatedHazards = await _hazardService
+          .populateHazardsWithRequiredData(response.hazards);
       return response.copyWith(
         hazards: populatedHazards,
       );

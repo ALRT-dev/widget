@@ -8,7 +8,9 @@ import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:hazard_app/features/shared/providers/repository_providers.dart';
+import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
+import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 
 class HazardService {
@@ -17,6 +19,7 @@ class HazardService {
   final Ref _ref;
   HazardRepository get _hazardRepository =>
       _ref.read(providerOfHazardRepository);
+  MediaService get _mediaService => _ref.read(providerOfMediaService);
 
   /// Fetches the list of hazards from the server.
   Future<Either<List<Hazard>, AppError>> getHazards({
@@ -26,9 +29,9 @@ class HazardService {
       searchParams: searchParams,
     );
 
-    final success = result.whenSuccess((hazards) {
-      return hazards.map(populateHazardWithRequiredData).toList();
-    });
+    final success = await result.whenSuccess(
+      populateHazardsWithRequiredData,
+    );
 
     return result.copyWith(
       success: (_) => success,
@@ -44,10 +47,10 @@ class HazardService {
       searchParams: searchParams,
     );
 
-    final success = result.whenSuccess((response) {
-      final populatedHazards = response.hazards
-          .map(populateHazardWithRequiredData)
-          .toList();
+    final success = await result.whenSuccess((response) async {
+      final populatedHazards = await populateHazardsWithRequiredData(
+        response.hazards,
+      );
       return response.copyWith(
         hazards: populatedHazards,
       );
@@ -121,9 +124,19 @@ class HazardService {
   }
 
   /// Populates a hazard with any required data before processing.
-  Hazard populateHazardWithRequiredData(final Hazard hazard) {
+  Future<Hazard> populateHazardWithRequiredData(final Hazard hazard) async {
     return hazard.copyWith(
-      processedMedias: hazard.medias.map((e) => e.toAlrtMedia()).toList(),
+      processedMedias: await _mediaService.convertS3MediaToAlrtMedia(
+        s3Medias: hazard.medias,
+      ),
     );
+  }
+
+  /// Populates a list of hazards with any required data before processing.
+  Future<List<Hazard>> populateHazardsWithRequiredData(
+    final List<Hazard> hazards,
+  ) async {
+    final futures = hazards.map(populateHazardWithRequiredData).toList();
+    return Future.wait(futures);
   }
 }
