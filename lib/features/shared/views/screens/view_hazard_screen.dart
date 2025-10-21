@@ -6,6 +6,7 @@ import 'package:hazard_app/features/report/views/screens/create_update_report_sc
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/enums/video_priority_types.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -167,6 +168,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 return HazardMediasCarousel(
                   id: hazard!.id!,
                   medias: hazard.processedMedias,
+                  videoPriority: VideoPriority.level2,
                 );
               }
 

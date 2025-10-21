@@ -18,6 +18,7 @@ class HazardMediasCarousel extends ConsumerStatefulWidget {
     super.key,
     required this.id,
     required this.medias,
+    this.videoPriority = VideoPriority.level1,
   });
 
   /// Unique identifier for the carousel instance.
@@ -25,6 +26,9 @@ class HazardMediasCarousel extends ConsumerStatefulWidget {
 
   /// The list of media items to display in the carousel.
   final List<AlrtMedia> medias;
+
+  /// The priority assigned to video media within the carousel.
+  final VideoPriority videoPriority;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -154,8 +158,7 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
   Widget _buildVideoWidget(final AlrtMedia media) {
     return VideoAlrtMediaPreview(
       videoMedia: media,
-      priority: VideoPriority.level1,
-      autoPlay: true,
+      priority: widget.videoPriority,
       muteButtonPositionedWidget: (muteButton) {
         return Positioned(
           bottom: 15.spMin,
