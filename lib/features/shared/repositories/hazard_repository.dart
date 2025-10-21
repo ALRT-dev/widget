@@ -31,6 +31,8 @@ abstract class HazardRepository {
 
   Future<Either<Hazard, AppError>> updateHazardReport({
     required final Hazard hazard,
+    final List<AlrtMedia>? mediaFiles,
+    final List<String>? removedMediaIds,
   });
 
   Future<Either<void, AppError>> deleteHazard({
@@ -107,14 +109,9 @@ class HazardRepositoryImpl extends HazardRepository {
     return runAsyncCall(
       name: 'createHazardReport',
       future: () async {
-        List<File>? files;
-        if (mediaFiles != null && mediaFiles.isNotEmpty) {
-          files = mediaFiles.map((media) => File(media.value)).toList();
-        }
-
         final result = await _restClient.createHazardReport(
           hazard: hazard.toJson(),
-          mediaFiles: files,
+          mediaFiles: mediaFiles?.map((media) => File(media.value)).toList(),
         );
         return Success(result);
       },
@@ -173,13 +170,17 @@ class HazardRepositoryImpl extends HazardRepository {
   @override
   Future<Either<Hazard, AppError>> updateHazardReport({
     required Hazard hazard,
+    List<AlrtMedia>? mediaFiles,
+    List<String>? removedMediaIds,
   }) {
     return runAsyncCall(
       name: 'updateHazardReport',
       future: () async {
         final result = await _restClient.updateHazardReport(
           hazardId: hazard.id!,
-          hazard: hazard,
+          hazard: hazard.toJson(),
+          mediaFiles: mediaFiles?.map((media) => File(media.value)).toList(),
+          removedMediaIds: removedMediaIds,
         );
         return Success(result);
       },

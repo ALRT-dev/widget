@@ -99,9 +99,12 @@ abstract class RestClient {
   });
 
   @PUT('$kUrlHazards/{hazardId}')
+  @MultiPart()
   Future<Hazard> updateHazardReport({
     @Path() required final String hazardId,
-    @Body() required final Hazard hazard,
+    @Part() required final Map<String, dynamic> hazard,
+    @Part() final List<File>? mediaFiles,
+    @Part() final List<String>? removedMediaIds,
   });
 
   @DELETE('$kUrlHazards/{hazardId}')

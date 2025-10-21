@@ -37,6 +37,7 @@ abstract class S3Media with _$S3Media {
       value: url,
       type: type,
       source: AlrtMediaSource.networkUrl,
+      s3Key: s3Key,
     );
   }
 

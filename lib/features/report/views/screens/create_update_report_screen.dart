@@ -462,9 +462,9 @@ class _CreateUpdateReportScreenState
   void _onInit() {
     ref.read(providerOfCreateReport.notifier).updateReportSubmitted(false);
 
-    ref
-        .read(providerOfCreateReport.notifier)
-        .updateHazardToCreateOrUpdate(widget.args?.hazardToUpdate ?? Hazard());
+    ref.read(providerOfCreateReport.notifier)
+      ..updateHazardToCreateOrUpdate(widget.args?.hazardToUpdate ?? Hazard())
+      ..updateMedias(widget.args?.hazardToUpdate?.processedMedias ?? []);
   }
 
   /// Opens a date and time picker dialog.

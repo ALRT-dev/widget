@@ -23,7 +23,8 @@ mixin _$AlrtMedia {
  AlrtMediaType get type;/// The source of the media.
 ///
 /// E.g: file, networkUrl, or asset.
- AlrtMediaSource get source;
+ AlrtMediaSource get source;/// The S3 key of the media file if it's stored in S3.
+ String? get s3Key;
 /// Create a copy of AlrtMedia
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -36,16 +37,16 @@ $AlrtMediaCopyWith<AlrtMedia> get copyWith => _$AlrtMediaCopyWithImpl<AlrtMedia>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AlrtMedia&&(identical(other.id, id) || other.id == id)&&(identical(other.value, value) || other.value == value)&&(identical(other.type, type) || other.type == type)&&(identical(other.source, source) || other.source == source));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AlrtMedia&&(identical(other.id, id) || other.id == id)&&(identical(other.value, value) || other.value == value)&&(identical(other.type, type) || other.type == type)&&(identical(other.source, source) || other.source == source)&&(identical(other.s3Key, s3Key) || other.s3Key == s3Key));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,value,type,source);
+int get hashCode => Object.hash(runtimeType,id,value,type,source,s3Key);
 
 @override
 String toString() {
-  return 'AlrtMedia(id: $id, value: $value, type: $type, source: $source)';
+  return 'AlrtMedia(id: $id, value: $value, type: $type, source: $source, s3Key: $s3Key)';
 }
 
 
@@ -56,7 +57,7 @@ abstract mixin class $AlrtMediaCopyWith<$Res>  {
   factory $AlrtMediaCopyWith(AlrtMedia value, $Res Function(AlrtMedia) _then) = _$AlrtMediaCopyWithImpl;
 @useResult
 $Res call({
- String id, String value, AlrtMediaType type, AlrtMediaSource source
+ String id, String value, AlrtMediaType type, AlrtMediaSource source, String? s3Key
 });
 
 
@@ -73,13 +74,14 @@ class _$AlrtMediaCopyWithImpl<$Res>
 
 /// Create a copy of AlrtMedia
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? value = null,Object? type = null,Object? source = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? value = null,Object? type = null,Object? source = null,Object? s3Key = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as AlrtMediaType,source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
-as AlrtMediaSource,
+as AlrtMediaSource,s3Key: freezed == s3Key ? _self.s3Key : s3Key // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -164,10 +166,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String value,  AlrtMediaType type,  AlrtMediaSource source)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String value,  AlrtMediaType type,  AlrtMediaSource source,  String? s3Key)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AlrtMedia() when $default != null:
-return $default(_that.id,_that.value,_that.type,_that.source);case _:
+return $default(_that.id,_that.value,_that.type,_that.source,_that.s3Key);case _:
   return orElse();
 
 }
@@ -185,10 +187,10 @@ return $default(_that.id,_that.value,_that.type,_that.source);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String value,  AlrtMediaType type,  AlrtMediaSource source)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String value,  AlrtMediaType type,  AlrtMediaSource source,  String? s3Key)  $default,) {final _that = this;
 switch (_that) {
 case _AlrtMedia():
-return $default(_that.id,_that.value,_that.type,_that.source);case _:
+return $default(_that.id,_that.value,_that.type,_that.source,_that.s3Key);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +207,10 @@ return $default(_that.id,_that.value,_that.type,_that.source);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String value,  AlrtMediaType type,  AlrtMediaSource source)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String value,  AlrtMediaType type,  AlrtMediaSource source,  String? s3Key)?  $default,) {final _that = this;
 switch (_that) {
 case _AlrtMedia() when $default != null:
-return $default(_that.id,_that.value,_that.type,_that.source);case _:
+return $default(_that.id,_that.value,_that.type,_that.source,_that.s3Key);case _:
   return null;
 
 }
@@ -220,7 +222,7 @@ return $default(_that.id,_that.value,_that.type,_that.source);case _:
 @JsonSerializable()
 
 class _AlrtMedia implements AlrtMedia {
-  const _AlrtMedia({required this.id, required this.value, required this.type, required this.source});
+  const _AlrtMedia({required this.id, required this.value, required this.type, required this.source, this.s3Key});
   factory _AlrtMedia.fromJson(Map<String, dynamic> json) => _$AlrtMediaFromJson(json);
 
 /// The unique identifier for the media.
@@ -235,6 +237,8 @@ class _AlrtMedia implements AlrtMedia {
 ///
 /// E.g: file, networkUrl, or asset.
 @override final  AlrtMediaSource source;
+/// The S3 key of the media file if it's stored in S3.
+@override final  String? s3Key;
 
 /// Create a copy of AlrtMedia
 /// with the given fields replaced by the non-null parameter values.
@@ -249,16 +253,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AlrtMedia&&(identical(other.id, id) || other.id == id)&&(identical(other.value, value) || other.value == value)&&(identical(other.type, type) || other.type == type)&&(identical(other.source, source) || other.source == source));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AlrtMedia&&(identical(other.id, id) || other.id == id)&&(identical(other.value, value) || other.value == value)&&(identical(other.type, type) || other.type == type)&&(identical(other.source, source) || other.source == source)&&(identical(other.s3Key, s3Key) || other.s3Key == s3Key));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,value,type,source);
+int get hashCode => Object.hash(runtimeType,id,value,type,source,s3Key);
 
 @override
 String toString() {
-  return 'AlrtMedia(id: $id, value: $value, type: $type, source: $source)';
+  return 'AlrtMedia(id: $id, value: $value, type: $type, source: $source, s3Key: $s3Key)';
 }
 
 
@@ -269,7 +273,7 @@ abstract mixin class _$AlrtMediaCopyWith<$Res> implements $AlrtMediaCopyWith<$Re
   factory _$AlrtMediaCopyWith(_AlrtMedia value, $Res Function(_AlrtMedia) _then) = __$AlrtMediaCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String value, AlrtMediaType type, AlrtMediaSource source
+ String id, String value, AlrtMediaType type, AlrtMediaSource source, String? s3Key
 });
 
 
@@ -286,13 +290,14 @@ class __$AlrtMediaCopyWithImpl<$Res>
 
 /// Create a copy of AlrtMedia
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? value = null,Object? type = null,Object? source = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? value = null,Object? type = null,Object? source = null,Object? s3Key = freezed,}) {
   return _then(_AlrtMedia(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,value: null == value ? _self.value : value // ignore: cast_nullable_to_non_nullable
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as AlrtMediaType,source: null == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
-as AlrtMediaSource,
+as AlrtMediaSource,s3Key: freezed == s3Key ? _self.s3Key : s3Key // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

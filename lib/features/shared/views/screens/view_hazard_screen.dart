@@ -226,15 +226,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             (value) => value.hazard?.reportedBy?.id == loggedInUserId,
           ),
         );
-        final isExpired = ref.watch(
-          provider.select(
-            (value) => value.hazard?.isExpired == true,
-          ),
-        );
-
-        if (isExpired) {
-          return const SizedBox.shrink();
-        }
 
         if (!isOwner) {
           return const SizedBox.shrink();

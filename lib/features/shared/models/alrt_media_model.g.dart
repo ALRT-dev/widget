@@ -11,6 +11,7 @@ _AlrtMedia _$AlrtMediaFromJson(Map<String, dynamic> json) => _AlrtMedia(
   value: json['value'] as String,
   type: $enumDecode(_$AlrtMediaTypeEnumMap, json['type']),
   source: $enumDecode(_$AlrtMediaSourceEnumMap, json['source']),
+  s3Key: json['s3Key'] as String?,
 );
 
 Map<String, dynamic> _$AlrtMediaToJson(_AlrtMedia instance) =>
@@ -19,6 +20,7 @@ Map<String, dynamic> _$AlrtMediaToJson(_AlrtMedia instance) =>
       'value': instance.value,
       'type': _$AlrtMediaTypeEnumMap[instance.type]!,
       'source': _$AlrtMediaSourceEnumMap[instance.source]!,
+      's3Key': ?instance.s3Key,
     };
 
 const _$AlrtMediaTypeEnumMap = {

@@ -86,8 +86,14 @@ class HazardService {
   }
 
   /// Updates an existing hazard report on the server.
+  ///
+  /// The [hazard] must have a valid [id] to identify which report to update.
+  ///
+  /// The [removedMediaIds] is a list of media IDs that should be removed from the hazard report.
   Future<Either<Hazard, AppError>> updateHazardReport({
     required final Hazard hazard,
+    final List<AlrtMedia>? mediaFiles,
+    final List<String>? removedMediaIds,
   }) async {
     if (hazard.id == null) {
       return Failure(
@@ -99,6 +105,8 @@ class HazardService {
 
     final result = await _hazardRepository.updateHazardReport(
       hazard: hazard,
+      mediaFiles: mediaFiles,
+      removedMediaIds: removedMediaIds,
     );
 
     final success = await result.whenSuccess(

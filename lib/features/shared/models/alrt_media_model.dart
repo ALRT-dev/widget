@@ -23,6 +23,9 @@ abstract class AlrtMedia with _$AlrtMedia {
     ///
     /// E.g: file, networkUrl, or asset.
     required final AlrtMediaSource source,
+
+    /// The S3 key of the media file if it's stored in S3.
+    final String? s3Key,
   }) = _AlrtMedia;
 
   factory AlrtMedia.fromJson(Map<String, dynamic> json) =>

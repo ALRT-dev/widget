@@ -68,6 +68,13 @@ class CreateReportProvider
     if (isUpdating) {
       result = await _hazardService.updateHazardReport(
         hazard: hazard,
+        mediaFiles: state.medias
+            .where((element) => element.s3Key == null)
+            .toList(),
+        removedMediaIds: state.hazardToCreateOrUpdate.processedMedias
+            .where((media) => !state.medias.any((m) => m.id == media.id))
+            .map((media) => media.id)
+            .toList(),
       );
     } else {
       result = await _hazardService.createHazardReport(
