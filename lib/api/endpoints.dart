@@ -11,6 +11,8 @@ const kUrlRefreshToken = '/auth/refresh-token';
 
 const kUrlUser = '/user';
 
+const kUrlUserProfilePicture = '$kUrlUser/profile-picture';
+
 const kUrlSubscribeLocation = '$kUrlUser/subscribe-location';
 const kUrlUnsubscribeLocation = '$kUrlUser/unsubscribe-location';
 const kUrlUserLocationSubscriptions = '$kUrlUser/location-subscriptions';

@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
 import 'package:hazard_app/features/notification/models/push_notification_update_input_model.dart';
+import 'package:hazard_app/features/shared/enums/alrt_media_source_types.dart';
+import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
@@ -12,6 +16,11 @@ abstract class UserRepository {
 
   Future<Either<AppUser, AppError>> updateCurrentUser({
     required final AppUser user,
+  });
+
+  Future<Either<AppUser, AppError>> updateUserProfilePicture({
+    required final AlrtMedia profilePicture,
+    void Function(int, int)? onSendProgress,
   });
 
   Future<Either<LocationSubscription, AppError>> subscribeToLocation({
@@ -51,6 +60,46 @@ class UserRepositoryImpl implements UserRepository {
       name: 'getCurrentUser',
       future: () async {
         final result = await _restClient.getCurrentUser();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<AppUser, AppError>> updateCurrentUser({
+    required AppUser user,
+  }) {
+    return runAsyncCall(
+      name: 'updateCurrentUser',
+      future: () async {
+        final result = await _restClient.updateCurrentUser(
+          user: user,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<AppUser, AppError>> updateUserProfilePicture({
+    required AlrtMedia profilePicture,
+    void Function(int, int)? onSendProgress,
+  }) {
+    return runAsyncCall(
+      name: 'updateUserProfilePicture',
+      future: () async {
+        if (profilePicture.source != AlrtMediaSource.file) {
+          throw AppError(
+            message: 'Profile picture must be a file.',
+          );
+        }
+
+        final result = await _restClient.updateUserProfilePicture(
+          profilePictureFile: File(profilePicture.value),
+          onSendProgress: onSendProgress,
+        );
         return Success(result);
       },
       onError: Failure.new,
@@ -136,22 +185,6 @@ class UserRepositoryImpl implements UserRepository {
           updates: updates,
         );
         return Success(null);
-      },
-      onError: Failure.new,
-    );
-  }
-
-  @override
-  Future<Either<AppUser, AppError>> updateCurrentUser({
-    required AppUser user,
-  }) {
-    return runAsyncCall(
-      name: 'updateCurrentUser',
-      future: () async {
-        final result = await _restClient.updateCurrentUser(
-          user: user,
-        );
-        return Success(result);
       },
       onError: Failure.new,
     );

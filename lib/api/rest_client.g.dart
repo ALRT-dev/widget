@@ -128,6 +128,52 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<AppUser> updateUserProfilePicture({
+    required File profilePictureFile,
+    void Function(int, int)? onSendProgress,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    _data.files.add(
+      MapEntry(
+        'profilePictureFile',
+        MultipartFile.fromFileSync(
+          profilePictureFile.path,
+          filename: profilePictureFile.path.split(Platform.pathSeparator).last,
+        ),
+      ),
+    );
+    final _options = _setStreamType<AppUser>(
+      Options(
+            method: 'PUT',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
+          .compose(
+            _dio.options,
+            '/user/profile-picture',
+            queryParameters: queryParameters,
+            data: _data,
+            onSendProgress: onSendProgress,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late AppUser _value;
+    try {
+      _value = AppUser.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<LocationSubscription> subscribeToLocation({
     required double northeastLat,
     required double northeastLng,

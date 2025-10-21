@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/shared/enums/user_reports_status_types.dart';
+import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/utils/location_helper.dart';
 
 part 'app_user_model.freezed.dart';
@@ -18,6 +19,16 @@ abstract class AppUser with _$AppUser {
 
     /// The user's email address.
     final String? email,
+
+    /// The URL of the user's profile picture.
+    @JsonKey(name: 'profilePicturePresignedUrl')
+    final String? profilePictureUrl,
+
+    /// The processed profile picture media.
+    ///
+    /// This field is not included in JSON serialization/deserialization and is generated using [profilePictureUrl].
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    final AlrtMedia? processedProfilePicture,
 
     /// The user's latitude.
     final double? latitude,

@@ -14,7 +14,10 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ProfileProviderState {
 
-/// The state of logging out the user.
+/// The profile picture of the user.
+ AlrtMedia? get profilePicture;/// Whether to show the update profile picture button.
+ bool get showUpdateProfilePictureButton;/// The state of updating the profile picture.
+ ProfilePictureUpdateState get profilePictureUpdateState;/// The state of logging out the user.
  LogoutState get logoutState;
 /// Create a copy of ProfileProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -26,16 +29,16 @@ $ProfileProviderStateCopyWith<ProfileProviderState> get copyWith => _$ProfilePro
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileProviderState&&(identical(other.logoutState, logoutState) || other.logoutState == logoutState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfileProviderState&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.showUpdateProfilePictureButton, showUpdateProfilePictureButton) || other.showUpdateProfilePictureButton == showUpdateProfilePictureButton)&&(identical(other.profilePictureUpdateState, profilePictureUpdateState) || other.profilePictureUpdateState == profilePictureUpdateState)&&(identical(other.logoutState, logoutState) || other.logoutState == logoutState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,logoutState);
+int get hashCode => Object.hash(runtimeType,profilePicture,showUpdateProfilePictureButton,profilePictureUpdateState,logoutState);
 
 @override
 String toString() {
-  return 'ProfileProviderState(logoutState: $logoutState)';
+  return 'ProfileProviderState(profilePicture: $profilePicture, showUpdateProfilePictureButton: $showUpdateProfilePictureButton, profilePictureUpdateState: $profilePictureUpdateState, logoutState: $logoutState)';
 }
 
 
@@ -46,11 +49,11 @@ abstract mixin class $ProfileProviderStateCopyWith<$Res>  {
   factory $ProfileProviderStateCopyWith(ProfileProviderState value, $Res Function(ProfileProviderState) _then) = _$ProfileProviderStateCopyWithImpl;
 @useResult
 $Res call({
- LogoutState logoutState
+ AlrtMedia? profilePicture, bool showUpdateProfilePictureButton, ProfilePictureUpdateState profilePictureUpdateState, LogoutState logoutState
 });
 
 
-$LogoutStateCopyWith<$Res> get logoutState;
+$AlrtMediaCopyWith<$Res>? get profilePicture;$ProfilePictureUpdateStateCopyWith<$Res> get profilePictureUpdateState;$LogoutStateCopyWith<$Res> get logoutState;
 
 }
 /// @nodoc
@@ -63,13 +66,37 @@ class _$ProfileProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of ProfileProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? logoutState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? profilePicture = freezed,Object? showUpdateProfilePictureButton = null,Object? profilePictureUpdateState = null,Object? logoutState = null,}) {
   return _then(_self.copyWith(
-logoutState: null == logoutState ? _self.logoutState : logoutState // ignore: cast_nullable_to_non_nullable
+profilePicture: freezed == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
+as AlrtMedia?,showUpdateProfilePictureButton: null == showUpdateProfilePictureButton ? _self.showUpdateProfilePictureButton : showUpdateProfilePictureButton // ignore: cast_nullable_to_non_nullable
+as bool,profilePictureUpdateState: null == profilePictureUpdateState ? _self.profilePictureUpdateState : profilePictureUpdateState // ignore: cast_nullable_to_non_nullable
+as ProfilePictureUpdateState,logoutState: null == logoutState ? _self.logoutState : logoutState // ignore: cast_nullable_to_non_nullable
 as LogoutState,
   ));
 }
 /// Create a copy of ProfileProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AlrtMediaCopyWith<$Res>? get profilePicture {
+    if (_self.profilePicture == null) {
+    return null;
+  }
+
+  return $AlrtMediaCopyWith<$Res>(_self.profilePicture!, (value) {
+    return _then(_self.copyWith(profilePicture: value));
+  });
+}/// Create a copy of ProfileProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ProfilePictureUpdateStateCopyWith<$Res> get profilePictureUpdateState {
+  
+  return $ProfilePictureUpdateStateCopyWith<$Res>(_self.profilePictureUpdateState, (value) {
+    return _then(_self.copyWith(profilePictureUpdateState: value));
+  });
+}/// Create a copy of ProfileProviderState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -160,10 +187,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( LogoutState logoutState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AlrtMedia? profilePicture,  bool showUpdateProfilePictureButton,  ProfilePictureUpdateState profilePictureUpdateState,  LogoutState logoutState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProfileProviderState() when $default != null:
-return $default(_that.logoutState);case _:
+return $default(_that.profilePicture,_that.showUpdateProfilePictureButton,_that.profilePictureUpdateState,_that.logoutState);case _:
   return orElse();
 
 }
@@ -181,10 +208,10 @@ return $default(_that.logoutState);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( LogoutState logoutState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AlrtMedia? profilePicture,  bool showUpdateProfilePictureButton,  ProfilePictureUpdateState profilePictureUpdateState,  LogoutState logoutState)  $default,) {final _that = this;
 switch (_that) {
 case _ProfileProviderState():
-return $default(_that.logoutState);case _:
+return $default(_that.profilePicture,_that.showUpdateProfilePictureButton,_that.profilePictureUpdateState,_that.logoutState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +228,10 @@ return $default(_that.logoutState);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( LogoutState logoutState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AlrtMedia? profilePicture,  bool showUpdateProfilePictureButton,  ProfilePictureUpdateState profilePictureUpdateState,  LogoutState logoutState)?  $default,) {final _that = this;
 switch (_that) {
 case _ProfileProviderState() when $default != null:
-return $default(_that.logoutState);case _:
+return $default(_that.profilePicture,_that.showUpdateProfilePictureButton,_that.profilePictureUpdateState,_that.logoutState);case _:
   return null;
 
 }
@@ -216,9 +243,15 @@ return $default(_that.logoutState);case _:
 
 
 class _ProfileProviderState implements ProfileProviderState {
-  const _ProfileProviderState({this.logoutState = const LogoutState.initial()});
+  const _ProfileProviderState({this.profilePicture, this.showUpdateProfilePictureButton = false, this.profilePictureUpdateState = const ProfilePictureUpdateState.initial(), this.logoutState = const LogoutState.initial()});
   
 
+/// The profile picture of the user.
+@override final  AlrtMedia? profilePicture;
+/// Whether to show the update profile picture button.
+@override@JsonKey() final  bool showUpdateProfilePictureButton;
+/// The state of updating the profile picture.
+@override@JsonKey() final  ProfilePictureUpdateState profilePictureUpdateState;
 /// The state of logging out the user.
 @override@JsonKey() final  LogoutState logoutState;
 
@@ -232,16 +265,16 @@ _$ProfileProviderStateCopyWith<_ProfileProviderState> get copyWith => __$Profile
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileProviderState&&(identical(other.logoutState, logoutState) || other.logoutState == logoutState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfileProviderState&&(identical(other.profilePicture, profilePicture) || other.profilePicture == profilePicture)&&(identical(other.showUpdateProfilePictureButton, showUpdateProfilePictureButton) || other.showUpdateProfilePictureButton == showUpdateProfilePictureButton)&&(identical(other.profilePictureUpdateState, profilePictureUpdateState) || other.profilePictureUpdateState == profilePictureUpdateState)&&(identical(other.logoutState, logoutState) || other.logoutState == logoutState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,logoutState);
+int get hashCode => Object.hash(runtimeType,profilePicture,showUpdateProfilePictureButton,profilePictureUpdateState,logoutState);
 
 @override
 String toString() {
-  return 'ProfileProviderState(logoutState: $logoutState)';
+  return 'ProfileProviderState(profilePicture: $profilePicture, showUpdateProfilePictureButton: $showUpdateProfilePictureButton, profilePictureUpdateState: $profilePictureUpdateState, logoutState: $logoutState)';
 }
 
 
@@ -252,11 +285,11 @@ abstract mixin class _$ProfileProviderStateCopyWith<$Res> implements $ProfilePro
   factory _$ProfileProviderStateCopyWith(_ProfileProviderState value, $Res Function(_ProfileProviderState) _then) = __$ProfileProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- LogoutState logoutState
+ AlrtMedia? profilePicture, bool showUpdateProfilePictureButton, ProfilePictureUpdateState profilePictureUpdateState, LogoutState logoutState
 });
 
 
-@override $LogoutStateCopyWith<$Res> get logoutState;
+@override $AlrtMediaCopyWith<$Res>? get profilePicture;@override $ProfilePictureUpdateStateCopyWith<$Res> get profilePictureUpdateState;@override $LogoutStateCopyWith<$Res> get logoutState;
 
 }
 /// @nodoc
@@ -269,14 +302,38 @@ class __$ProfileProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of ProfileProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? logoutState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? profilePicture = freezed,Object? showUpdateProfilePictureButton = null,Object? profilePictureUpdateState = null,Object? logoutState = null,}) {
   return _then(_ProfileProviderState(
-logoutState: null == logoutState ? _self.logoutState : logoutState // ignore: cast_nullable_to_non_nullable
+profilePicture: freezed == profilePicture ? _self.profilePicture : profilePicture // ignore: cast_nullable_to_non_nullable
+as AlrtMedia?,showUpdateProfilePictureButton: null == showUpdateProfilePictureButton ? _self.showUpdateProfilePictureButton : showUpdateProfilePictureButton // ignore: cast_nullable_to_non_nullable
+as bool,profilePictureUpdateState: null == profilePictureUpdateState ? _self.profilePictureUpdateState : profilePictureUpdateState // ignore: cast_nullable_to_non_nullable
+as ProfilePictureUpdateState,logoutState: null == logoutState ? _self.logoutState : logoutState // ignore: cast_nullable_to_non_nullable
 as LogoutState,
   ));
 }
 
 /// Create a copy of ProfileProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AlrtMediaCopyWith<$Res>? get profilePicture {
+    if (_self.profilePicture == null) {
+    return null;
+  }
+
+  return $AlrtMediaCopyWith<$Res>(_self.profilePicture!, (value) {
+    return _then(_self.copyWith(profilePicture: value));
+  });
+}/// Create a copy of ProfileProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$ProfilePictureUpdateStateCopyWith<$Res> get profilePictureUpdateState {
+  
+  return $ProfilePictureUpdateStateCopyWith<$Res>(_self.profilePictureUpdateState, (value) {
+    return _then(_self.copyWith(profilePictureUpdateState: value));
+  });
+}/// Create a copy of ProfileProviderState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -626,6 +683,432 @@ as AppError,
 }
 
 /// Create a copy of LogoutState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppErrorCopyWith<$Res> get error {
+  
+  return $AppErrorCopyWith<$Res>(_self.error, (value) {
+    return _then(_self.copyWith(error: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$ProfilePictureUpdateState {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProfilePictureUpdateState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ProfilePictureUpdateState()';
+}
+
+
+}
+
+/// @nodoc
+class $ProfilePictureUpdateStateCopyWith<$Res>  {
+$ProfilePictureUpdateStateCopyWith(ProfilePictureUpdateState _, $Res Function(ProfilePictureUpdateState) __);
+}
+
+
+/// Adds pattern-matching-related methods to [ProfilePictureUpdateState].
+extension ProfilePictureUpdateStatePatterns on ProfilePictureUpdateState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _ProfilePictureUpdateStateInitial value)?  initial,TResult Function( _ProfilePictureUpdateStateLoading value)?  loading,TResult Function( _ProfilePictureUpdateStateSuccess value)?  success,TResult Function( _ProfilePictureUpdateStateError value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ProfilePictureUpdateStateInitial() when initial != null:
+return initial(_that);case _ProfilePictureUpdateStateLoading() when loading != null:
+return loading(_that);case _ProfilePictureUpdateStateSuccess() when success != null:
+return success(_that);case _ProfilePictureUpdateStateError() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _ProfilePictureUpdateStateInitial value)  initial,required TResult Function( _ProfilePictureUpdateStateLoading value)  loading,required TResult Function( _ProfilePictureUpdateStateSuccess value)  success,required TResult Function( _ProfilePictureUpdateStateError value)  error,}){
+final _that = this;
+switch (_that) {
+case _ProfilePictureUpdateStateInitial():
+return initial(_that);case _ProfilePictureUpdateStateLoading():
+return loading(_that);case _ProfilePictureUpdateStateSuccess():
+return success(_that);case _ProfilePictureUpdateStateError():
+return error(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _ProfilePictureUpdateStateInitial value)?  initial,TResult? Function( _ProfilePictureUpdateStateLoading value)?  loading,TResult? Function( _ProfilePictureUpdateStateSuccess value)?  success,TResult? Function( _ProfilePictureUpdateStateError value)?  error,}){
+final _that = this;
+switch (_that) {
+case _ProfilePictureUpdateStateInitial() when initial != null:
+return initial(_that);case _ProfilePictureUpdateStateLoading() when loading != null:
+return loading(_that);case _ProfilePictureUpdateStateSuccess() when success != null:
+return success(_that);case _ProfilePictureUpdateStateError() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function( double progress)?  loading,TResult Function( AppUser updatedUser)?  success,TResult Function( AppError error)?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ProfilePictureUpdateStateInitial() when initial != null:
+return initial();case _ProfilePictureUpdateStateLoading() when loading != null:
+return loading(_that.progress);case _ProfilePictureUpdateStateSuccess() when success != null:
+return success(_that.updatedUser);case _ProfilePictureUpdateStateError() when error != null:
+return error(_that.error);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function( double progress)  loading,required TResult Function( AppUser updatedUser)  success,required TResult Function( AppError error)  error,}) {final _that = this;
+switch (_that) {
+case _ProfilePictureUpdateStateInitial():
+return initial();case _ProfilePictureUpdateStateLoading():
+return loading(_that.progress);case _ProfilePictureUpdateStateSuccess():
+return success(_that.updatedUser);case _ProfilePictureUpdateStateError():
+return error(_that.error);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function( double progress)?  loading,TResult? Function( AppUser updatedUser)?  success,TResult? Function( AppError error)?  error,}) {final _that = this;
+switch (_that) {
+case _ProfilePictureUpdateStateInitial() when initial != null:
+return initial();case _ProfilePictureUpdateStateLoading() when loading != null:
+return loading(_that.progress);case _ProfilePictureUpdateStateSuccess() when success != null:
+return success(_that.updatedUser);case _ProfilePictureUpdateStateError() when error != null:
+return error(_that.error);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _ProfilePictureUpdateStateInitial implements ProfilePictureUpdateState {
+  const _ProfilePictureUpdateStateInitial();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfilePictureUpdateStateInitial);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'ProfilePictureUpdateState.initial()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _ProfilePictureUpdateStateLoading implements ProfilePictureUpdateState {
+  const _ProfilePictureUpdateStateLoading({this.progress = 0.0});
+  
+
+@JsonKey() final  double progress;
+
+/// Create a copy of ProfilePictureUpdateState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ProfilePictureUpdateStateLoadingCopyWith<_ProfilePictureUpdateStateLoading> get copyWith => __$ProfilePictureUpdateStateLoadingCopyWithImpl<_ProfilePictureUpdateStateLoading>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfilePictureUpdateStateLoading&&(identical(other.progress, progress) || other.progress == progress));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,progress);
+
+@override
+String toString() {
+  return 'ProfilePictureUpdateState.loading(progress: $progress)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ProfilePictureUpdateStateLoadingCopyWith<$Res> implements $ProfilePictureUpdateStateCopyWith<$Res> {
+  factory _$ProfilePictureUpdateStateLoadingCopyWith(_ProfilePictureUpdateStateLoading value, $Res Function(_ProfilePictureUpdateStateLoading) _then) = __$ProfilePictureUpdateStateLoadingCopyWithImpl;
+@useResult
+$Res call({
+ double progress
+});
+
+
+
+
+}
+/// @nodoc
+class __$ProfilePictureUpdateStateLoadingCopyWithImpl<$Res>
+    implements _$ProfilePictureUpdateStateLoadingCopyWith<$Res> {
+  __$ProfilePictureUpdateStateLoadingCopyWithImpl(this._self, this._then);
+
+  final _ProfilePictureUpdateStateLoading _self;
+  final $Res Function(_ProfilePictureUpdateStateLoading) _then;
+
+/// Create a copy of ProfilePictureUpdateState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? progress = null,}) {
+  return _then(_ProfilePictureUpdateStateLoading(
+progress: null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class _ProfilePictureUpdateStateSuccess implements ProfilePictureUpdateState {
+  const _ProfilePictureUpdateStateSuccess(this.updatedUser);
+  
+
+ final  AppUser updatedUser;
+
+/// Create a copy of ProfilePictureUpdateState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ProfilePictureUpdateStateSuccessCopyWith<_ProfilePictureUpdateStateSuccess> get copyWith => __$ProfilePictureUpdateStateSuccessCopyWithImpl<_ProfilePictureUpdateStateSuccess>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfilePictureUpdateStateSuccess&&(identical(other.updatedUser, updatedUser) || other.updatedUser == updatedUser));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,updatedUser);
+
+@override
+String toString() {
+  return 'ProfilePictureUpdateState.success(updatedUser: $updatedUser)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ProfilePictureUpdateStateSuccessCopyWith<$Res> implements $ProfilePictureUpdateStateCopyWith<$Res> {
+  factory _$ProfilePictureUpdateStateSuccessCopyWith(_ProfilePictureUpdateStateSuccess value, $Res Function(_ProfilePictureUpdateStateSuccess) _then) = __$ProfilePictureUpdateStateSuccessCopyWithImpl;
+@useResult
+$Res call({
+ AppUser updatedUser
+});
+
+
+$AppUserCopyWith<$Res> get updatedUser;
+
+}
+/// @nodoc
+class __$ProfilePictureUpdateStateSuccessCopyWithImpl<$Res>
+    implements _$ProfilePictureUpdateStateSuccessCopyWith<$Res> {
+  __$ProfilePictureUpdateStateSuccessCopyWithImpl(this._self, this._then);
+
+  final _ProfilePictureUpdateStateSuccess _self;
+  final $Res Function(_ProfilePictureUpdateStateSuccess) _then;
+
+/// Create a copy of ProfilePictureUpdateState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? updatedUser = null,}) {
+  return _then(_ProfilePictureUpdateStateSuccess(
+null == updatedUser ? _self.updatedUser : updatedUser // ignore: cast_nullable_to_non_nullable
+as AppUser,
+  ));
+}
+
+/// Create a copy of ProfilePictureUpdateState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppUserCopyWith<$Res> get updatedUser {
+  
+  return $AppUserCopyWith<$Res>(_self.updatedUser, (value) {
+    return _then(_self.copyWith(updatedUser: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class _ProfilePictureUpdateStateError implements ProfilePictureUpdateState {
+  const _ProfilePictureUpdateStateError(this.error);
+  
+
+ final  AppError error;
+
+/// Create a copy of ProfilePictureUpdateState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ProfilePictureUpdateStateErrorCopyWith<_ProfilePictureUpdateStateError> get copyWith => __$ProfilePictureUpdateStateErrorCopyWithImpl<_ProfilePictureUpdateStateError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProfilePictureUpdateStateError&&(identical(other.error, error) || other.error == error));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,error);
+
+@override
+String toString() {
+  return 'ProfilePictureUpdateState.error(error: $error)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ProfilePictureUpdateStateErrorCopyWith<$Res> implements $ProfilePictureUpdateStateCopyWith<$Res> {
+  factory _$ProfilePictureUpdateStateErrorCopyWith(_ProfilePictureUpdateStateError value, $Res Function(_ProfilePictureUpdateStateError) _then) = __$ProfilePictureUpdateStateErrorCopyWithImpl;
+@useResult
+$Res call({
+ AppError error
+});
+
+
+$AppErrorCopyWith<$Res> get error;
+
+}
+/// @nodoc
+class __$ProfilePictureUpdateStateErrorCopyWithImpl<$Res>
+    implements _$ProfilePictureUpdateStateErrorCopyWith<$Res> {
+  __$ProfilePictureUpdateStateErrorCopyWithImpl(this._self, this._then);
+
+  final _ProfilePictureUpdateStateError _self;
+  final $Res Function(_ProfilePictureUpdateStateError) _then;
+
+/// Create a copy of ProfilePictureUpdateState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
+  return _then(_ProfilePictureUpdateStateError(
+null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as AppError,
+  ));
+}
+
+/// Create a copy of ProfilePictureUpdateState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')

@@ -96,6 +96,32 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
           ),
         );
 
+        final processedProfilePicture = ref.watch(
+          providerOfLoggedInUser.select(
+            (user) => user?.processedProfilePicture,
+          ),
+        );
+
+        if (processedProfilePicture != null) {
+          return Avatar.profileMedia(
+            profileMedia: processedProfilePicture,
+            size: 30.0,
+            foregroundColor: AppColors.black,
+            backgroundColor: AppColors.yellow,
+            borderColor: isSelected ? AppColors.black : AppColors.transparent,
+            borderWidth: isSelected ? 1.5 : 0.0,
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      blurRadius: 4.0,
+                      color: AppColors.shadowColor,
+                      offset: Offset(0, 0),
+                    ),
+                  ]
+                : [],
+          );
+        }
+
         return Avatar.initials(
           initials: initials,
           size: 30.0,
@@ -112,12 +138,10 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
                   ),
                 ]
               : [],
-          // borderWidth: isSelected ? 2.0 : 0.0,
-          // borderColor: isSelected ? AppColors.black : Colors.transparent,
-        ).onPressed(
-          () => _onTabChanged(HomeTab.profile),
         );
       },
+    ).onPressed(
+      () => _onTabChanged(HomeTab.profile),
     );
   }
 

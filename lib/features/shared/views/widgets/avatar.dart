@@ -1,9 +1,11 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/shared/enums/alrt_media_source_types.dart';
+import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
+import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 enum _Type {
@@ -11,6 +13,7 @@ enum _Type {
   file,
   asset,
   initials,
+  profileMedia,
 }
 
 class Avatar extends ConsumerStatefulWidget {
@@ -29,10 +32,11 @@ class Avatar extends ConsumerStatefulWidget {
     this.boxShadow,
     this.backgroundColor = Colors.transparent,
     this.foregroundColor = Colors.transparent,
-  })  : type = _Type.network,
-        filePath = null,
-        assetPath = null,
-        initials = null;
+  }) : type = _Type.network,
+       filePath = null,
+       assetPath = null,
+       initials = null,
+       profileMedia = null;
 
   const Avatar.file({
     super.key,
@@ -48,11 +52,12 @@ class Avatar extends ConsumerStatefulWidget {
     this.boxShadow,
     this.backgroundColor = Colors.transparent,
     this.foregroundColor = Colors.transparent,
-  })  : type = _Type.file,
-        cache = false,
-        imgUrl = null,
-        assetPath = null,
-        initials = null;
+  }) : type = _Type.file,
+       cache = false,
+       imgUrl = null,
+       assetPath = null,
+       initials = null,
+       profileMedia = null;
 
   const Avatar.asset({
     super.key,
@@ -68,11 +73,12 @@ class Avatar extends ConsumerStatefulWidget {
     this.boxShadow,
     this.backgroundColor = Colors.transparent,
     this.foregroundColor = Colors.transparent,
-  })  : type = _Type.asset,
-        cache = false,
-        imgUrl = null,
-        filePath = null,
-        initials = null;
+  }) : type = _Type.asset,
+       cache = false,
+       imgUrl = null,
+       filePath = null,
+       initials = null,
+       profileMedia = null;
 
   const Avatar.initials({
     super.key,
@@ -88,11 +94,34 @@ class Avatar extends ConsumerStatefulWidget {
     this.boxShadow,
     this.backgroundColor = Colors.transparent,
     this.foregroundColor = Colors.transparent,
-  })  : type = _Type.initials,
-        cache = false,
-        imgUrl = null,
-        filePath = null,
-        assetPath = null;
+  }) : type = _Type.initials,
+       cache = false,
+       imgUrl = null,
+       filePath = null,
+       assetPath = null,
+       profileMedia = null;
+
+  /// The profile media to display as the avatar if the type is [_Type.profileMedia].
+  const Avatar.profileMedia({
+    super.key,
+    required this.profileMedia,
+    this.size = 40.0,
+    this.width,
+    this.height,
+    this.fit = BoxFit.cover,
+    this.shape = BoxShape.circle,
+    this.borderRadius = BorderRadius.zero,
+    this.borderWidth = 0.0,
+    this.borderColor = Colors.transparent,
+    this.boxShadow,
+    this.backgroundColor = Colors.transparent,
+    this.foregroundColor = Colors.transparent,
+  }) : type = _Type.profileMedia,
+       cache = true,
+       imgUrl = null,
+       filePath = null,
+       assetPath = null,
+       initials = null;
 
   /// The type of the avatar.
   final _Type type;
@@ -113,6 +142,9 @@ class Avatar extends ConsumerStatefulWidget {
 
   /// The name of the image to display as the avatar if the type is [_Type.initials].
   final String? initials;
+
+  /// The profile media to display as the avatar if the type is [_Type.profileMedia].
+  final AlrtMedia? profileMedia;
 
   /// The size of the avatar.
   ///
@@ -169,6 +201,8 @@ class _AvatarState extends ConsumerState<Avatar> {
         return _assetImageBuilder();
       case _Type.initials:
         return _initialsBuilder();
+      case _Type.profileMedia:
+        return _profileMediaBuilder();
     }
   }
 
@@ -177,7 +211,11 @@ class _AvatarState extends ConsumerState<Avatar> {
     return _containerBuilder(
       image: DecorationImage(
         image: widget.cache
-            ? CachedNetworkImageProvider(widget.imgUrl!)
+            ? AppCachedNetworkImageProvider.fromRef(
+                ref: ref,
+                cacheKey: widget.imgUrl!,
+                widget.imgUrl!,
+              )
             : NetworkImage(widget.imgUrl!),
         fit: widget.fit,
       ),
@@ -220,6 +258,38 @@ class _AvatarState extends ConsumerState<Avatar> {
     );
   }
 
+  Widget _profileMediaBuilder() {
+    if (widget.profileMedia == null) return _placeholderBuilder();
+
+    if (widget.profileMedia?.source == AlrtMediaSource.file) {
+      return _containerBuilder(
+        image: DecorationImage(
+          image: FileImage(File(widget.profileMedia!.value)),
+          fit: widget.fit,
+        ),
+      );
+    } else if (widget.profileMedia?.source == AlrtMediaSource.asset) {
+      return _containerBuilder(
+        image: DecorationImage(
+          image: AssetImage(widget.profileMedia!.value),
+          fit: widget.fit,
+        ),
+      );
+    }
+
+    return _containerBuilder(
+      image: DecorationImage(
+        image: widget.cache
+            ? AppCachedNetworkImageProvider.fromRef(
+                ref: ref,
+                widget.profileMedia!.value,
+              )
+            : NetworkImage(widget.profileMedia!.value),
+        fit: widget.fit,
+      ),
+    );
+  }
+
   Widget _placeholderBuilder() {
     return _containerBuilder(
       image: DecorationImage(
@@ -244,15 +314,17 @@ class _AvatarState extends ConsumerState<Avatar> {
           width: widget.borderWidth,
           color: widget.borderColor,
         ),
-        boxShadow: widget.boxShadow ??
+        boxShadow:
+            widget.boxShadow ??
             [
               BoxShadow(
                 color: AppColors.shadowColorDark,
                 blurRadius: 5.0,
               ),
             ],
-        borderRadius:
-            widget.shape == BoxShape.circle ? null : widget.borderRadius,
+        borderRadius: widget.shape == BoxShape.circle
+            ? null
+            : widget.borderRadius,
         color: widget.backgroundColor,
         image: image,
       ),

@@ -4,6 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/api/interceptors/auth_interceptor.dart';
 import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
+import 'package:hazard_app/features/shared/enums/alrt_media_source_types.dart';
+import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
+import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
@@ -12,6 +15,7 @@ import 'package:hazard_app/features/shared/providers/repository_providers.dart';
 import 'package:hazard_app/features/shared/repositories/shared_prefs_repository.dart';
 import 'package:hazard_app/features/shared/repositories/user_repository.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
+import 'package:uuid/uuid.dart';
 
 class UserService {
   const UserService(final Ref ref) : _ref = ref;
@@ -37,15 +41,44 @@ class UserService {
 
     log('Access Token :: $accessToken');
 
-    return _userRepository.getCurrentUser();
+    final result = await _userRepository.getCurrentUser();
+
+    final success = await result.whenSuccess(populateUserWithRequiredData);
+
+    return result.copyWith(
+      success: (_) => success,
+    );
   }
 
   /// Updates the current logged-in user.
   Future<Either<AppUser, AppError>> updateCurrentUser({
     required AppUser user,
-  }) {
-    return _userRepository.updateCurrentUser(
+  }) async {
+    final result = await _userRepository.updateCurrentUser(
       user: user,
+    );
+
+    final success = await result.whenSuccess(populateUserWithRequiredData);
+
+    return result.copyWith(
+      success: (_) => success,
+    );
+  }
+
+  /// Updates the profile picture of the current logged-in user.
+  Future<Either<AppUser, AppError>> updateUserProfilePicture({
+    required AlrtMedia profilePicture,
+    final void Function(int, int)? onSendProgress,
+  }) async {
+    final result = await _userRepository.updateUserProfilePicture(
+      profilePicture: profilePicture,
+      onSendProgress: onSendProgress,
+    );
+
+    final success = await result.whenSuccess(populateUserWithRequiredData);
+
+    return result.copyWith(
+      success: (_) => success,
     );
   }
 
@@ -95,6 +128,20 @@ class UserService {
   }) {
     return _userRepository.updatePushNotificationSettings(
       updates: settings.toUpdates(),
+    );
+  }
+
+  /// Populates the given [appUser] with required data such as processed profile picture.
+  Future<AppUser> populateUserWithRequiredData(final AppUser appUser) async {
+    return appUser.copyWith(
+      processedProfilePicture: appUser.profilePictureUrl == null
+          ? null
+          : AlrtMedia(
+              id: appUser.id ?? const Uuid().v4(),
+              value: appUser.profilePictureUrl!,
+              type: AlrtMediaType.image,
+              source: AlrtMediaSource.networkUrl,
+            ),
     );
   }
 }

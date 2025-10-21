@@ -10,6 +10,7 @@ import 'package:hazard_app/features/profile/providers/states/profile_provider_st
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/profile/views/widgets/accepted_hazards_widgets/my_accepted_hazards_list.dart';
 import 'package:hazard_app/features/profile/views/widgets/rejected_hazards_widgets/my_rejected_hazards_list.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
@@ -30,6 +31,7 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+    _listenToUpdateProfilePictureState();
     _listenToLogoutState();
 
     return Scaffold(
@@ -96,8 +98,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       _buildUserAvatar(
                         size: 40.0,
                         backgroundColor: AppColors.black,
-                        borderColor: AppColors.white,
                         borderWidth: 2.0,
+                        uploadProgressPadding: 8.0,
                       ),
                       _buildUserName(
                         color: AppColors.black,
@@ -208,6 +210,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final Color foregroundColor = AppColors.white,
     final Color borderColor = AppColors.black,
     final double borderWidth = 3,
+    final double uploadProgressPadding = 20.0,
   }) {
     return Consumer(
       builder: (context, ref, child) {
@@ -216,17 +219,68 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             (value) => value?.name ?? 'User',
           ),
         );
-        return Avatar.initials(
-          initials: _getInitials(userName),
-          size: size,
-          backgroundColor:
-              backgroundColor ??
-              AppColors.black.withValues(
-                alpha: 0.2,
+        final profilePicture = ref.watch(
+          providerOfProfile.select(
+            (value) => value.profilePicture,
+          ),
+        );
+        final showUpdateButton = ref.watch(
+          providerOfProfile.select(
+            (value) => value.showUpdateProfilePictureButton,
+          ),
+        );
+
+        return Stack(
+          children: [
+            Builder(
+              builder: (context) {
+                if (profilePicture == null) {
+                  return Avatar.initials(
+                    initials: _getInitials(userName),
+                    size: size,
+                    backgroundColor:
+                        backgroundColor ??
+                        AppColors.black.withValues(
+                          alpha: 0.2,
+                        ),
+                    foregroundColor: foregroundColor,
+                    borderWidth: borderWidth,
+                    borderColor: borderColor,
+                  );
+                } else {
+                  return Stack(
+                    children: [
+                      Avatar.profileMedia(
+                        profileMedia: profilePicture,
+                        size: size,
+                        backgroundColor:
+                            backgroundColor ??
+                            AppColors.black.withValues(
+                              alpha: 0.2,
+                            ),
+                        foregroundColor: foregroundColor,
+                        borderWidth: borderWidth,
+                        borderColor: borderColor,
+                      ),
+                      Positioned.fill(
+                        child: Center(
+                          child: _profilePictureUploadProgress(
+                            padding: uploadProgressPadding,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              },
+            ).onPressed(_showUpdateProfilePictureButton),
+            if (showUpdateButton)
+              Positioned.fill(
+                child: _changeProfilePictureButton().onPressed(
+                  _uploadNewProfilePicture,
+                ),
               ),
-          foregroundColor: foregroundColor,
-          borderWidth: borderWidth,
-          borderColor: borderColor,
+          ],
         );
       },
     );
@@ -879,6 +933,63 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  Widget _profilePictureUploadProgress({
+    final double padding = 20.0,
+  }) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final progress = ref
+            .watch(
+              providerOfProfile.select(
+                (value) => value.profilePictureUpdateState,
+              ),
+            )
+            .maybeWhen(
+              loading: (progress) => progress,
+              orElse: () => 0.0,
+            );
+
+        if (progress == 0.0) {
+          return const SizedBox();
+        }
+
+        return Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.black.withValues(alpha: 0.5),
+          ),
+          padding: EdgeInsets.all(padding.spMin),
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
+            strokeCap: StrokeCap.round,
+            value: progress,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _changeProfilePictureButton({
+    final double padding = 8.0,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.black.withValues(alpha: 0.5),
+      ),
+      padding: EdgeInsets.all(padding.spMin),
+      child: Icon(
+        Icons.edit_rounded,
+        color: AppColors.white,
+        size: 24.spMin,
+      ),
+    );
+  }
+
   String _getInitials(String name) {
     final words = name.split(' ');
     if (words.length >= 2) {
@@ -903,6 +1014,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
+  /// Listens to the profile picture update state changes and shows appropriate toasts.
+  void _listenToUpdateProfilePictureState() {
+    ref.listen<ProfilePictureUpdateState>(
+      providerOfProfile.select(
+        (value) => value.profilePictureUpdateState,
+      ),
+      (previous, next) {
+        next.maybeWhen(
+          error: (_) => context.showErrorToast(
+            message: 'Failed to update profile picture. Please try again.',
+          ),
+          orElse: () {},
+        );
+      },
+    );
+  }
+
   /// Listens to the logout state changes and navigates to the AppWrapper on success.
   void _listenToLogoutState() {
     ref.listen<LogoutState>(
@@ -910,6 +1038,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       (previous, next) {
         next.maybeWhen(
           success: () => context.go(AppWrapper.route),
+          error: (_) => context.showErrorToast(
+            message: 'Failed to logout. Please try again.',
+          ),
           orElse: () {},
         );
       },
@@ -950,5 +1081,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   /// Navigates to the Manage Notifications screen.
   void _gotoManageNotificationsScreen() {
     context.push(ManageNotificationsScreen.route);
+  }
+
+  /// Shows the update profile picture button.
+  void _showUpdateProfilePictureButton() {
+    ref
+        .read(providerOfProfile.notifier)
+        .updateShowUpdateProfilePictureButton(true);
+  }
+
+  /// Uploads a new profile picture.
+  void _uploadNewProfilePicture() async {
+    await ref.read(providerOfProfile.notifier).updateProfilePicture();
   }
 }

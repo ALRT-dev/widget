@@ -43,6 +43,13 @@ abstract class RestClient {
     @Body() required AppUser user,
   });
 
+  @PUT(kUrlUserProfilePicture)
+  @MultiPart()
+  Future<AppUser> updateUserProfilePicture({
+    @Part() required final File profilePictureFile,
+    @SendProgress() final void Function(int, int)? onSendProgress,
+  });
+
   @POST(kUrlSubscribeLocation)
   Future<LocationSubscription> subscribeToLocation({
     @Field() required final double northeastLat,
