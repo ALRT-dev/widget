@@ -70,10 +70,18 @@ class HazardService {
   Future<Either<Hazard, AppError>> createHazardReport({
     required final Hazard hazard,
     final List<AlrtMedia>? mediaFiles,
-  }) {
-    return _hazardRepository.createHazardReport(
+  }) async {
+    final result = await _hazardRepository.createHazardReport(
       hazard: hazard,
       mediaFiles: mediaFiles,
+    );
+
+    final success = await result.whenSuccess(
+      populateHazardWithRequiredData,
+    );
+
+    return result.copyWith(
+      success: (_) => success,
     );
   }
 
@@ -89,8 +97,16 @@ class HazardService {
       );
     }
 
-    return _hazardRepository.updateHazardReport(
+    final result = await _hazardRepository.updateHazardReport(
       hazard: hazard,
+    );
+
+    final success = await result.whenSuccess(
+      populateHazardWithRequiredData,
+    );
+
+    return result.copyWith(
+      success: (_) => success,
     );
   }
 

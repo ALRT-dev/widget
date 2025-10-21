@@ -4,6 +4,8 @@ import 'package:hazard_app/features/shared/enums/socket_event_types.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/socket_service.dart';
+import 'package:hazard_app/features/shared/services/user_service.dart';
+import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 
 final providerOfUserSocketManager = Provider<UserSocketManager>(
   (ref) => UserSocketManager(ref: ref),
@@ -29,6 +31,7 @@ class UserSocketManager {
       StreamController<int>.broadcast();
 
   SocketService get _socketService => _ref.read(providerOfSocketService);
+  UserService get _userService => _ref.read(providerOfUserService);
 
   /// Stream that broadcasts user updates to all listeners
   Stream<AppUser> get userUpdateStream => _userUpdateStreamController.stream;
@@ -49,42 +52,63 @@ class UserSocketManager {
   void _setupSocketListeners() {
     _socketService.listenToEvent(
       SocketEvent.updateUser,
-      (data) {
+      (data) async {
         if (data is Map<String, dynamic>) {
-          final updatedUser = AppUser.fromJson(data);
-          _userUpdateStreamController.add(updatedUser);
+          return runAsyncCall(
+            name: 'Listen to updateUser socket event',
+            future: () async {
+              final updatedUser = AppUser.fromJson(data);
+              final result = await _userService.populateUserWithRequiredData(
+                updatedUser,
+              );
+              _userUpdateStreamController.add(result);
+            },
+            onError: (_) {},
+          );
         }
       },
     );
 
     _socketService.listenToEvent(
       SocketEvent.updateUserXp,
-      (data) {
+      (data) async {
         if (data is Map<String, dynamic>) {
-          final xpPoints = data['xpPoints'] as int?;
-          final reliabilityScore = data['reliabilityScore'] as double?;
+          return runAsyncCall(
+            name: 'Listen to updateUserXp socket event',
+            future: () async {
+              final xpPoints = data['xpPoints'] as int?;
+              final reliabilityScore = data['reliabilityScore'] as double?;
 
-          if (xpPoints != null) {
-            _userXpUpdateStreamController.add(xpPoints);
-          }
-          if (reliabilityScore != null) {
-            _userReliabilityUpdateStreamController.add(reliabilityScore);
-          }
+              if (xpPoints != null) {
+                _userXpUpdateStreamController.add(xpPoints);
+              }
+              if (reliabilityScore != null) {
+                _userReliabilityUpdateStreamController.add(reliabilityScore);
+              }
+            },
+            onError: (_) {},
+          );
         }
       },
     );
 
     _socketService.listenToEvent(
       SocketEvent.updateUserUpvotesReceivedCount,
-      (data) {
+      (data) async {
         if (data is Map<String, dynamic>) {
-          final upvotesReceivedCount = data['upvotesReceivedCount'] as int?;
+          return runAsyncCall(
+            name: 'Listen to updateUserUpvotesReceivedCount socket event',
+            future: () async {
+              final upvotesReceivedCount = data['upvotesReceivedCount'] as int?;
 
-          if (upvotesReceivedCount != null) {
-            _userUpvotesReceivedCountUpdateStreamController.add(
-              upvotesReceivedCount,
-            );
-          }
+              if (upvotesReceivedCount != null) {
+                _userUpvotesReceivedCountUpdateStreamController.add(
+                  upvotesReceivedCount,
+                );
+              }
+            },
+            onError: (_) {},
+          );
         }
       },
     );
