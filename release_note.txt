@@ -1,1 +1,4 @@
-* First release of Alrt App
+* Feed credibility and ordering improvements
+* Hazard media upload
+* Profile picture upload
+* Push notification settings issues fixed
