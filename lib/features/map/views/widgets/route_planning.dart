@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
-import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
@@ -78,14 +77,22 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
               builder: (context, ref, child) {
                 final distanceInKm = ref.watch(
                   providerOfMap.select(
-                    (value) => value.currentRoutePlan?.currentRoute?.routes
-                        .firstOrNull?.distanceKm,
+                    (value) => value
+                        .currentRoutePlan
+                        ?.currentRoute
+                        ?.routes
+                        .firstOrNull
+                        ?.distanceKm,
                   ),
                 );
                 final distanceInMeters = ref.watch(
                   providerOfMap.select(
-                    (value) => value.currentRoutePlan?.currentRoute?.routes
-                        .firstOrNull?.distanceMeters,
+                    (value) => value
+                        .currentRoutePlan
+                        ?.currentRoute
+                        ?.routes
+                        .firstOrNull
+                        ?.distanceMeters,
                   ),
                 );
 
@@ -93,8 +100,8 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
                   distanceInKm != null && distanceInKm >= 1
                       ? '${distanceInKm.toStringAsFixed(2)} km'
                       : distanceInMeters != null
-                          ? '$distanceInMeters m'
-                          : '',
+                      ? '$distanceInMeters m'
+                      : '',
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: AppColors.grey,
@@ -256,8 +263,8 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
                     TravelMode.bicycling => Icons.directions_bike_rounded,
                     _ => Icons.directions,
                   },
-                  duration: route.value.routes.firstOrNull?.durationMinutes !=
-                          null
+                  duration:
+                      route.value.routes.firstOrNull?.durationMinutes != null
                       ? '${route.value.routes.first.durationMinutes?.toStringAsFixed(0)}m'
                       : null,
                   isSelected: selectedTravelMode == route.key,
@@ -342,14 +349,18 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
   /// Returns the route hazard summary from the provider.
   RouteHazardSummary get _routeHazardSummary {
     final hazards = ref.watch(
-      providerOfHazards.select(
-        (value) => value.mapHazards,
+      providerOfMap.select(
+        (value) => value.hazards,
       ),
     );
     final routePoints = ref.watch(
       providerOfMap.select(
         (value) =>
-            value.currentRoutePlan?.currentRoute?.routes.firstOrNull
+            value
+                .currentRoutePlan
+                ?.currentRoute
+                ?.routes
+                .firstOrNull
                 ?.polylinePoints
                 ?.map((e) => LatLng(e.latitude, e.longitude))
                 .toList() ??

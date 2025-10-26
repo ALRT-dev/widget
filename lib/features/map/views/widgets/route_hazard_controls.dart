@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
-import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -46,7 +46,7 @@ class _RouteHazardControlsState extends ConsumerState<RouteHazardControls> {
   }
 
   void _analyzeRoute() {
-    final hazards = ref.read(providerOfHazards).mapHazards;
+    final hazards = ref.read(providerOfMap).hazards;
     _routeHazardSummary = HazardAvoidanceHelper.analyzeRouteHazards(
       hazards: hazards,
       routePoints: widget.routePoints,
@@ -147,8 +147,9 @@ class _RouteHazardControlsState extends ConsumerState<RouteHazardControls> {
                 icon: const Icon(Icons.directions),
                 label: Text(_avoidHazards ? 'Get Safe Route' : 'Get Route'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      _avoidHazards ? AppColors.advice : AppColors.primary,
+                  backgroundColor: _avoidHazards
+                      ? AppColors.advice
+                      : AppColors.primary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),

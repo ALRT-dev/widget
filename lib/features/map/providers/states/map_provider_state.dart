@@ -4,12 +4,16 @@ import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/utils/constants.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
 
 part 'map_provider_state.freezed.dart';
 
 @freezed
 abstract class MapProviderState with _$MapProviderState {
   const factory MapProviderState({
+    /// The list of hazards displayed on the map.
+    @Default(<Hazard>[]) final List<Hazard> hazards,
+
     /// The current camera position of the map.
     @Default(kDefaultCameraPosition) final CameraPosition cameraPosition,
 
@@ -31,6 +35,10 @@ abstract class MapProviderState with _$MapProviderState {
     /// The state of fetching address from coordinates.
     @Default(GetAddressFromCoordinatesState.initial())
     final GetAddressFromCoordinatesState getAddressFromCoordinatesState,
+
+    /// The state of fetching hazards for the map.
+    @Default(GetMapHazardsState.initial())
+    final GetMapHazardsState getMapHazardsState,
   }) = _MapProviderState;
 }
 
@@ -59,4 +67,16 @@ abstract class GetAddressFromCoordinatesState
   const factory GetAddressFromCoordinatesState.error(
     final AppError error,
   ) = _GetAddressFromCoordinatesStateError;
+}
+
+@freezed
+abstract class GetMapHazardsState with _$GetMapHazardsState {
+  const factory GetMapHazardsState.initial() = _GetMapHazardsStateInitial;
+  const factory GetMapHazardsState.loading() = _GetMapHazardsStateLoading;
+  const factory GetMapHazardsState.success(
+    final List<Hazard> hazards,
+  ) = _GetMapHazardsStateSuccess;
+  const factory GetMapHazardsState.error(
+    final AppError error,
+  ) = _GetMapHazardsStateError;
 }

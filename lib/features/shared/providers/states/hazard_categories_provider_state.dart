@@ -15,21 +15,21 @@ abstract class HazardCategoriesProviderState
     @Default(<HazardCategory>[]) final List<HazardCategory> selectedCategories,
 
     /// The state of fetching hazard categories.
-    @Default(GetHazardCategoriesState.initial())
-    GetHazardCategoriesState getHazardCategoriesState,
+    @Default(GetAllHazardCategoriesState.initial())
+    GetAllHazardCategoriesState getAllHazardCategoriesState,
   }) = _HazardCategoriesProviderState;
 }
 
 @freezed
-class GetHazardCategoriesState with _$GetHazardCategoriesState {
-  const factory GetHazardCategoriesState.initial() =
-      GetHazardCategoriesStateInitial;
-  const factory GetHazardCategoriesState.loading() =
-      GetHazardCategoriesStateLoading;
-  const factory GetHazardCategoriesState.success(
+class GetAllHazardCategoriesState with _$GetAllHazardCategoriesState {
+  const factory GetAllHazardCategoriesState.initial() =
+      _GetAllHazardCategoriesStateInitial;
+  const factory GetAllHazardCategoriesState.loading() =
+      _GetAllHazardCategoriesStateLoading;
+  const factory GetAllHazardCategoriesState.success(
     final List<HazardCategory> hazardCategories,
-  ) = GetHazardCategoriesStateSuccess;
-  const factory GetHazardCategoriesState.error(
+  ) = _GetAllHazardCategoriesStateSuccess;
+  const factory GetAllHazardCategoriesState.error(
     final AppError error,
-  ) = GetHazardCategoriesStateError;
+  ) = _GetAllHazardCategoriesStateError;
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hazard_app/features/search/providers/hazards_provider.dart';
-import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/states/hazard_categories_provider_state.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -20,6 +20,8 @@ class CategoriesDropdown extends ConsumerStatefulWidget {
 
   /// Callback when a category is selected.
   final void Function(HazardCategory)? onCategorySelected;
+
+  static const String categoriesKey = 'CategoriesDropdown';
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -38,8 +40,8 @@ class _CategoriesDropdownState extends ConsumerState<CategoriesDropdown> {
 
   Widget _categoriesListBuilder(final Function() close) {
     final getCategoriesState = ref.watch(
-      providerOfHazards.select(
-        (value) => value.getHazardCategoriesState,
+      providerOfHazardCategoriesForDropdown.select(
+        (value) => value.getAllHazardCategoriesState,
       ),
     );
 
@@ -68,7 +70,7 @@ class _CategoriesDropdownState extends ConsumerState<CategoriesDropdown> {
     return Consumer(
       builder: (context, ref, child) {
         final categories = ref.watch(
-          providerOfHazards.select(
+          providerOfHazardCategoriesForDropdown.select(
             (value) => value.hazardCategories,
           ),
         );

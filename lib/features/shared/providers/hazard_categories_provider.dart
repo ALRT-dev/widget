@@ -1,11 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:hazard_app/features/map/views/screens/map_screen.dart';
 import 'package:hazard_app/features/notification/views/widgets/notifications_appbar.dart';
 import 'package:hazard_app/features/search/views/widgets/hazard_search_appbar.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_categories_provider_state.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
+import 'package:hazard_app/features/shared/views/widgets/categories_dropdown.dart';
+
+final providerOfHazardCategoriesForMap = providerOfHazardCategories(
+  MapScreen.categoriesKey,
+);
 
 final providerOfHazardCategoriesForSearch = providerOfHazardCategories(
   HazardSearchAppBar.categoriesKey,
@@ -13,6 +19,10 @@ final providerOfHazardCategoriesForSearch = providerOfHazardCategories(
 
 final providerOfHazardCategoriesForNotifications = providerOfHazardCategories(
   NotificationsAppBar.categoriesKey,
+);
+
+final providerOfHazardCategoriesForDropdown = providerOfHazardCategories(
+  CategoriesDropdown.categoriesKey,
 );
 
 final providerOfHazardCategories = StateNotifierProvider.autoDispose
@@ -35,9 +45,9 @@ class HazardCategoriesProvider
   HazardService get _hazardService => _ref.read(providerOfHazardService);
 
   /// Fetches the list of hazard categories.
-  Future<void> getHazardCategories() async {
+  Future<void> getAllHazardCategories() async {
     state = state.copyWith(
-      getHazardCategoriesState: const GetHazardCategoriesState.loading(),
+      getAllHazardCategoriesState: const GetAllHazardCategoriesState.loading(),
     );
 
     final result = await _hazardService.getHazardCategories();
@@ -46,7 +56,7 @@ class HazardCategoriesProvider
     result.when(
       (hazardCategories) {
         state = state.copyWith(
-          getHazardCategoriesState: GetHazardCategoriesState.success(
+          getAllHazardCategoriesState: GetAllHazardCategoriesState.success(
             hazardCategories,
           ),
         );
@@ -54,7 +64,7 @@ class HazardCategoriesProvider
       },
       (error) {
         state = state.copyWith(
-          getHazardCategoriesState: GetHazardCategoriesState.error(error),
+          getAllHazardCategoriesState: GetAllHazardCategoriesState.error(error),
         );
       },
     );
@@ -137,10 +147,10 @@ class HazardCategoriesProvider
     }
   }
 
-  /// Resets the [GetHazardCategoriesState] to its initial state.
-  void updateGetHazardCategoriesStateToInitial() {
+  /// Resets the [GetAllHazardCategoriesState] to its initial state.
+  void updateGetAllHazardCategoriesStateToInitial() {
     state = state.copyWith(
-      getHazardCategoriesState: const GetHazardCategoriesState.initial(),
+      getAllHazardCategoriesState: const GetAllHazardCategoriesState.initial(),
     );
     updateHazardCategories([]);
   }

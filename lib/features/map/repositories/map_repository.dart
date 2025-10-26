@@ -14,6 +14,8 @@ abstract class MapRepository {
     final Duration? duration,
   });
 
+  Future<Either<LatLngBounds, AppError>> getVisibleRegion();
+
   Future<Either<List<GooglePlace>, AppError>> getPlaces({
     required final String searchString,
     required final AlrtLocation currentUserLocation,
@@ -61,6 +63,18 @@ class MapRepositoryImpl implements MapRepository {
           duration: duration,
         );
         return Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<LatLngBounds, AppError>> getVisibleRegion() {
+    return runAsyncCall(
+      name: 'getVisibleRegion',
+      future: () async {
+        final bounds = await _googleMapController.getVisibleRegion();
+        return Success(bounds);
       },
       onError: Failure.new,
     );

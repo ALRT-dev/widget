@@ -10,7 +10,9 @@ import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_severity_with_count_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_severity_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 
 final providerOfNotificationsFeed =
@@ -41,6 +43,8 @@ class NotificationsFeedProvider
       _ref.read(providerOfNotificationService);
   HazardCategoriesProvider get _hazardCategoriesProvider =>
       _ref.read(providerOfHazardCategoriesForNotifications.notifier);
+  HazardSeverityFiltersProvider get _hazardSeverityFiltersProvider =>
+      _ref.read(providerOfHazardSeverityFiltersForNotifications.notifier);
 
   /// Listens to the socket for hazard updates, new hazards, and deletions.
   void _listenToSocketForHazards() {
@@ -119,6 +123,7 @@ class NotificationsFeedProvider
       searchParams: HazardSearchParams(
         searchString: state.searchString,
         categoryIds: state.selectedCategories.map((e) => e.id).toList(),
+        severities: state.selectedSeverities.map((e) => e.severity).toList(),
       ),
     );
     if (!mounted) return;
@@ -134,7 +139,12 @@ class NotificationsFeedProvider
 
         // add categories to the hazard categories provider
         _hazardCategoriesProvider.updateHazardCategories(
-          hazardsWithCategories.categories,
+          hazardsWithCategories.categoryFilters,
+        );
+
+        // add severities to the hazard severity filters provider
+        _hazardSeverityFiltersProvider.updateHazardSeverities(
+          hazardsWithCategories.severityFilters,
         );
       },
       (error) {
@@ -156,6 +166,15 @@ class NotificationsFeedProvider
   void updateSelectedCategories(final List<HazardCategory> selectedCategories) {
     state = state.copyWith(
       selectedCategories: selectedCategories,
+    );
+  }
+
+  /// Updates [NotificationsFeedProviderState.selectedSeverities] with the provided [selectedSeverities].
+  void updateSelectedSeverities(
+    final List<HazardSeverityWithCount> selectedSeverities,
+  ) {
+    state = state.copyWith(
+      selectedSeverities: selectedSeverities,
     );
   }
 

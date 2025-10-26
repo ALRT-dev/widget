@@ -31,7 +31,7 @@ class _HazardCategoriesListState extends ConsumerState<HazardCategoriesList> {
   Widget build(BuildContext context) {
     final getCategoriesState = ref.watch(
       providerOfHazardCategories(widget.categoriesKey).select(
-        (value) => value.getHazardCategoriesState,
+        (value) => value.getAllHazardCategoriesState,
       ),
     );
     return getCategoriesState.maybeWhen(
@@ -59,10 +59,10 @@ class _HazardCategoriesListState extends ConsumerState<HazardCategoriesList> {
             itemBuilder: (context, index) {
               final hazardCategory = hazardCategories[index];
               return HazardCategoriesListItem(
-                categoriesKey: widget.categoriesKey,
-                hazardCategory: hazardCategory,
-                onSelected: (_) => _handleCategoriesSelectionUpdated(),
-              )
+                    categoriesKey: widget.categoriesKey,
+                    hazardCategory: hazardCategory,
+                    onSelected: (_) => _handleCategoriesSelectionUpdated(),
+                  )
                   .pL(index == 0 ? 20.0 : 0.0)
                   .pR(index == (hazardCategories.length - 1) ? 20.0 : 0.0);
             },

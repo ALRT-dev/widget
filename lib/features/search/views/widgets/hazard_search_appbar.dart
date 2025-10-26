@@ -187,11 +187,6 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
     ref.read(providerOfMainSearch.notifier)
       ..updateSearchedLocation(null)
       ..updateGetHazardsByLocationStateToInitial();
-
-    // clear hazard categories as well
-    ref
-        .read(providerOfHazardCategoriesForSearch.notifier)
-        .updateGetHazardCategoriesStateToInitial();
   }
 
   /// Handles the selection of a search result place.

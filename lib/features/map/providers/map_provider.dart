@@ -14,10 +14,14 @@ import 'package:hazard_app/features/map/providers/states/map_provider_state.dart
 import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_marker.dart';
-import 'package:hazard_app/features/search/providers/hazards_provider.dart';
-import 'package:hazard_app/features/search/providers/states/hazards_provider_state.dart';
+import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_severity_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/service_providers.dart';
+import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
 
@@ -40,7 +44,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
   final Ref _ref;
   MapService get _mapService => _ref.read(providerOfMapService);
+  HazardService get _hazardService => _ref.read(providerOfHazardService);
   LocationService get _locationService => _ref.read(providerOfLocationService);
+  HazardCategoriesProvider get _hazardCategoriesProvider =>
+      _ref.read(providerOfHazardCategoriesForMap.notifier);
+  HazardSeverityFiltersProvider get _hazardSeverityFiltersProvider =>
+      _ref.read(providerOfHazardSeverityFiltersForMap.notifier);
+
   StreamSubscription<double>? _headingStreamSubscription;
 
   void _onInit() {
@@ -69,6 +79,76 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
+  /// Fetches hazards for the map and updates the state accordingly.
+  Future<void> getMapHazards() async {
+    state = state.copyWith(
+      getMapHazardsState: const GetMapHazardsState.loading(),
+    );
+
+    final visibleBoundsResult = await _mapService.getVisibleRegion();
+    if (!mounted) return;
+
+    final visibleBounds = visibleBoundsResult.whenSuccess(
+      (success) => success,
+    );
+    if (visibleBounds == null) {
+      state = state.copyWith(
+        getMapHazardsState: GetMapHazardsState.error(
+          AppError(
+            message: 'Failed to get visible region bounds.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final selectedCategories = _ref
+        .read(providerOfHazardCategoriesForMap)
+        .selectedCategories;
+    final selectedSeverities = _ref
+        .read(providerOfHazardSeverityFiltersForMap)
+        .selectedSeverities;
+
+    final result = await _hazardService.getGetHazardsWithCategories(
+      searchParams: HazardSearchParams(
+        categoryIds: selectedCategories.map((e) => e.id).toList(),
+        severities: selectedSeverities.map((e) => e.severity).toList(),
+        northeastLat: visibleBounds.northeast.latitude,
+        northeastLng: visibleBounds.northeast.longitude,
+        southwestLat: visibleBounds.southwest.latitude,
+        southwestLng: visibleBounds.southwest.longitude,
+        pageSize: 100,
+      ),
+    );
+    if (!mounted) return;
+
+    result.when(
+      (response) {
+        state = state.copyWith(
+          getMapHazardsState: GetMapHazardsState.success(response.hazards),
+          hazards: response.hazards,
+        );
+
+        generateMarkers();
+
+        // Also update hazard categories in the hazard categories provider
+        _hazardCategoriesProvider.updateHazardCategories(
+          response.categoryFilters,
+        );
+
+        // Also update hazard severity filters in the hazard severity filters provider
+        _hazardSeverityFiltersProvider.updateHazardSeverities(
+          response.severityFilters,
+        );
+      },
+      (l) {
+        state = state.copyWith(
+          getMapHazardsState: GetMapHazardsState.error(l),
+        );
+      },
+    );
+  }
+
   /// Fetches route from the map service and updates the state accordingly.
   /// Optionally avoids specified hazards.
   Future<void> getRoute({
@@ -83,8 +163,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
     // Get relevant hazards to avoid if enabled
     List<Hazard>? hazardsToAvoid;
     if (avoidHazards) {
-      final hazardsProvider = _ref.read(providerOfHazards);
-      hazardsToAvoid = hazardsProvider.mapHazards;
+      hazardsToAvoid = state.hazards;
     }
 
     final result = await _mapService.getRoutePlan(
@@ -253,11 +332,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
     }
   }
 
-  /// Generates markers for all hazards in [HazardsProviderState.hazards].
-  ///
-  /// Uses [providerOfHazards] to get the list of hazards and creates a marker for each hazard with a valid location.
+  /// Generates markers for all hazards in the state.
   void generateMarkers() async {
-    final hazards = _ref.read(providerOfHazards).mapHazards;
+    final hazards = state.hazards;
     final markerFutures = <Future<Marker>>[];
 
     for (final hazard in hazards) {

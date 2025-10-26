@@ -43,6 +43,11 @@ class MapService {
     return result;
   }
 
+  /// Gets the visible region of the map.
+  Future<Either<LatLngBounds, AppError>> getVisibleRegion() {
+    return _mapRepository.getVisibleRegion();
+  }
+
   /// Fetches places based on the given [searchString].
   Future<Either<List<GooglePlace>, AppError>> getPlaces({
     required final String searchString,

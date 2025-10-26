@@ -23,7 +23,6 @@ import 'package:hazard_app/features/profile/views/screens/profile_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
 import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
-import 'package:hazard_app/features/search/providers/hazards_provider.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/views/screens/hazard_search_screen.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
@@ -31,6 +30,7 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_severity_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/providers/user_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
@@ -63,7 +63,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // register this provider to the lifecycle of this screen
     ref.watch(providerOfHome.select((value) => null));
     ref.watch(providerOfMap.select((value) => null));
-    ref.watch(providerOfHazards.select((value) => null));
     ref.watch(providerOfCreateReport.select((value) => null));
     ref.watch(providerOfProfile.select((value) => null));
     ref.watch(providerOfMyHazards.select((value) => null));
@@ -77,12 +76,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(
       providerOfHazardCategoriesForNotifications.select((value) => null),
     );
+    ref.watch(providerOfHazardSeverityFiltersForSearch.select((value) => null));
+    ref.watch(
+      providerOfHazardSeverityFiltersForNotifications.select((value) => null),
+    );
     ref.watch(providerOfPushNotificationMessage.select((value) => null));
     ref.watch(providerOfHazardSocketManager.select((value) => null));
     ref.watch(providerOfUserSocketManager.select((value) => null));
     ref.watch(providerOfManageNotifications.select((value) => null));
 
-    _listenToHazardsState();
     _listenToCreateReportState();
     _listenToTheMessageRecievedFromThePushNotification();
 
@@ -101,20 +103,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       bottomNavigationBar: HomeTabbar(
         tabController: _tabController,
       ),
-    );
-  }
-
-  /// Listens to changes in the hazards state and updates the map markers accordingly.
-  void _listenToHazardsState() {
-    ref.listen(
-      providerOfHazards.select(
-        (value) => value.mapHazards,
-      ),
-      (prev, next) {
-        if (prev != next) {
-          ref.read(providerOfMap.notifier).generateMarkers();
-        }
-      },
     );
   }
 

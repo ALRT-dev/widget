@@ -95,7 +95,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
 
         // add categories to the hazard categories provider
         _hazardCategoriesProvider.updateHazardCategories(
-          hazardsWithCategories.categories,
+          hazardsWithCategories.categoryFilters,
         );
 
         // update subscriptionId if there's an active subscription for this location

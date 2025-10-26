@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 
@@ -14,6 +15,9 @@ abstract class HazardSearchParams with _$HazardSearchParams {
 
     /// The list of category IDs to filter hazards.
     @Default(<String>[]) final List<String> categoryIds,
+
+    /// The severity levels to filter hazards.
+    final List<HazardSeverity>? severities,
 
     /// The id of the user who reported the hazard to filter hazards.
     final String? reportedById,
