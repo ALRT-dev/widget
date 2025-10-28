@@ -67,87 +67,74 @@ class HazardService {
     final int numberOfParallelRequests = 10,
     required final HazardSearchParams searchParams,
   }) async {
-    // First request to get the initial batch and categories
-    final initialResult = await getHazardsWithCategories(
-      searchParams: searchParams,
-    );
+    final allHazards = <Hazard>[];
+    final pageSize = searchParams.pageSize;
+    int currentPage = searchParams.page;
+    bool hasMoreData = true;
+    GetHazardsWithCategoriesResponse? firstResponse;
 
-    return initialResult.when(
-      (initialResponse) async {
-        final allHazards = <Hazard>[...initialResponse.hazards];
-        final pageSize = searchParams.pageSize;
+    while (hasMoreData) {
+      final batchFutures =
+          <Future<Either<GetHazardsWithCategoriesResponse, AppError>>>[];
 
-        // If the initial response has fewer items than page size, we have all data
-        if (initialResponse.hazards.length < pageSize) {
-          return Success(initialResponse);
-        }
+      // Create parallel requests for the current batch of pages
+      for (int i = 0; i < numberOfParallelRequests; i++) {
+        final pageSearchParams = searchParams.copyWith(
+          page: currentPage + i,
+        );
 
-        // Keep fetching until we get all hazards
-        int currentPage = searchParams.page + 1;
-        bool hasMoreData = true;
-
-        while (hasMoreData) {
-          final batchFutures =
-              <Future<Either<GetHazardsWithCategoriesResponse, AppError>>>[];
-
-          // Create parallel requests for the next batch of pages
-          for (int i = 0; i < numberOfParallelRequests; i++) {
-            final pageSearchParams = searchParams.copyWith(
-              page: currentPage + i,
-            );
-
-            batchFutures.add(
-              getHazardsWithCategories(
-                searchParams: pageSearchParams,
-              ),
-            );
-          }
-
-          // Wait for this batch to complete
-          final batchResults = await Future.wait(batchFutures);
-
-          // Process batch results
-          bool hasDataInThisBatch = false;
-          for (final result in batchResults) {
-            final error = result.when(
-              (response) {
-                if (response.hazards.isNotEmpty) {
-                  allHazards.addAll(response.hazards);
-                  hasDataInThisBatch = true;
-
-                  // If this page has fewer items than page size, it's the last page
-                  if (response.hazards.length < pageSize) {
-                    hasMoreData = false;
-                  }
-                }
-                return null; // Success case
-              },
-              (error) => error, // Return error
-            );
-
-            // If any request fails, return the error
-            if (error != null) {
-              return Failure(error);
-            }
-          }
-
-          // If no data was found in any of the parallel requests, we're done
-          if (!hasDataInThisBatch) {
-            hasMoreData = false;
-          }
-
-          // Move to the next batch of pages
-          currentPage += numberOfParallelRequests;
-        }
-
-        // Return the combined response with all hazards
-        return Success(
-          initialResponse.copyWith(
-            hazards: allHazards,
+        batchFutures.add(
+          getHazardsWithCategories(
+            searchParams: pageSearchParams,
           ),
         );
-      },
-      (error) async => Failure(error),
+      }
+
+      // Wait for this batch to complete
+      final batchResults = await Future.wait(batchFutures);
+
+      // Process batch results
+      bool hasDataInThisBatch = false;
+      for (final result in batchResults) {
+        final error = result.when(
+          (response) {
+            // Store the first response to preserve categories and metadata
+            firstResponse ??= response;
+
+            if (response.hazards.isNotEmpty) {
+              allHazards.addAll(response.hazards);
+              hasDataInThisBatch = true;
+
+              // If this page has fewer items than page size, it's the last page
+              if (response.hazards.length < pageSize) {
+                hasMoreData = false;
+              }
+            }
+            return null; // Success case
+          },
+          (error) => error, // Return error
+        );
+
+        // If any request fails, return the error
+        if (error != null) {
+          return Failure(error);
+        }
+      }
+
+      // If no data was found in any of the parallel requests, we're done
+      if (!hasDataInThisBatch) {
+        hasMoreData = false;
+      }
+
+      // Move to the next batch of pages
+      currentPage += numberOfParallelRequests;
+    }
+
+    // Return the combined response with all hazards
+    return Success(
+      (firstResponse ?? const GetHazardsWithCategoriesResponse()).copyWith(
+        hazards: allHazards,
+      ),
     );
   }
 
