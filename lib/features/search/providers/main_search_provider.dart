@@ -73,7 +73,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
       getHazardsByLocationState: const GetHazardsByLocationState.loading(),
     );
 
-    final result = await _hazardService.getGetHazardsWithCategories(
+    final result = await _hazardService.getHazardsWithCategories(
       searchParams: HazardSearchParams(
         northeastLat: location!.bounds?.northeastLat,
         northeastLng: location.bounds?.northeastLng,

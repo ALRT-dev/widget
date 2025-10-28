@@ -40,7 +40,7 @@ class HazardService {
 
   /// Fetches hazards along with categories from the server.
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
-  getGetHazardsWithCategories({
+  getHazardsWithCategories({
     required final HazardSearchParams searchParams,
   }) async {
     final result = await _hazardRepository.getGetHazardsWithCategories(
@@ -58,6 +58,96 @@ class HazardService {
 
     return result.copyWith(
       success: (_) => success,
+    );
+  }
+
+  /// Fetches all hazards along with categories from the server.
+  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
+  getAllHazardsWithCategories({
+    final int numberOfParallelRequests = 10,
+    required final HazardSearchParams searchParams,
+  }) async {
+    // First request to get the initial batch and categories
+    final initialResult = await getHazardsWithCategories(
+      searchParams: searchParams,
+    );
+
+    return initialResult.when(
+      (initialResponse) async {
+        final allHazards = <Hazard>[...initialResponse.hazards];
+        final pageSize = searchParams.pageSize;
+
+        // If the initial response has fewer items than page size, we have all data
+        if (initialResponse.hazards.length < pageSize) {
+          return Success(initialResponse);
+        }
+
+        // Keep fetching until we get all hazards
+        int currentPage = searchParams.page + 1;
+        bool hasMoreData = true;
+
+        while (hasMoreData) {
+          final batchFutures =
+              <Future<Either<GetHazardsWithCategoriesResponse, AppError>>>[];
+
+          // Create parallel requests for the next batch of pages
+          for (int i = 0; i < numberOfParallelRequests; i++) {
+            final pageSearchParams = searchParams.copyWith(
+              page: currentPage + i,
+            );
+
+            batchFutures.add(
+              getHazardsWithCategories(
+                searchParams: pageSearchParams,
+              ),
+            );
+          }
+
+          // Wait for this batch to complete
+          final batchResults = await Future.wait(batchFutures);
+
+          // Process batch results
+          bool hasDataInThisBatch = false;
+          for (final result in batchResults) {
+            final error = result.when(
+              (response) {
+                if (response.hazards.isNotEmpty) {
+                  allHazards.addAll(response.hazards);
+                  hasDataInThisBatch = true;
+
+                  // If this page has fewer items than page size, it's the last page
+                  if (response.hazards.length < pageSize) {
+                    hasMoreData = false;
+                  }
+                }
+                return null; // Success case
+              },
+              (error) => error, // Return error
+            );
+
+            // If any request fails, return the error
+            if (error != null) {
+              return Failure(error);
+            }
+          }
+
+          // If no data was found in any of the parallel requests, we're done
+          if (!hasDataInThisBatch) {
+            hasMoreData = false;
+          }
+
+          // Move to the next batch of pages
+          currentPage += numberOfParallelRequests;
+        }
+
+        // Return the combined response with all hazards
+        return Success(
+          initialResponse.copyWith(
+            hazards: allHazards,
+          ),
+        );
+      },
+      (error) async => Failure(error),
     );
   }
 

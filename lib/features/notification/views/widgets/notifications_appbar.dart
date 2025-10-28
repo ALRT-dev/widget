@@ -94,7 +94,7 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
                 )
               : PreferredSize(
                   preferredSize: Size.fromHeight(
-                    (63 +
+                    (61 +
                             (isCategoriesPresent ? 57.spMin : 0) +
                             (isSeveritiesPresent && isFiltersVisible
                                 ? 40.spMin

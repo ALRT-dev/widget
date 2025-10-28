@@ -109,7 +109,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
         .read(providerOfHazardSeverityFiltersForMap)
         .selectedSeverities;
 
-    final result = await _hazardService.getGetHazardsWithCategories(
+    final result = await _hazardService.getAllHazardsWithCategories(
       searchParams: HazardSearchParams(
         categoryIds: selectedCategories.map((e) => e.id).toList(),
         severities: selectedSeverities.map((e) => e.severity).toList(),
