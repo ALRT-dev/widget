@@ -25,13 +25,13 @@ class _CustomMarkerState extends ConsumerState<CustomMarker> {
       children: [
         Image.asset(
           widget.markerImagePath,
-          width: 38.w,
+          width: 38.spMin,
         ),
         Positioned.fill(
-          bottom: 17.w,
+          bottom: 17.spMin,
           child: Center(
             child: Container(
-              padding: EdgeInsets.all(3.w),
+              padding: EdgeInsets.all(3.spMin),
               decoration: BoxDecoration(
                 color: AppColors.black26,
                 shape: BoxShape.circle,
@@ -44,7 +44,7 @@ class _CustomMarkerState extends ConsumerState<CustomMarker> {
                       offset: Offset(0.0, 0.0),
                       blurRadius: 10.0,
                       color: AppColors.black.withValues(alpha: 0.4),
-                    )
+                    ),
                   ],
                 ),
               ).pL(3.0).pB(3.0),
