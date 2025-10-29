@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
+import 'package:hazard_app/features/map/models/safest_fastest_routes_model.dart';
 import 'package:hazard_app/features/map/providers/repository_providers.dart';
 import 'package:hazard_app/features/map/repositories/map_repository.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
@@ -113,16 +114,16 @@ class MapService {
     ]);
 
     final travelModeDriving = result[0].whenSuccess(
-      (response) => response.hasRoutes ? response : null,
+      (response) => response,
     );
     final travelModeTransit = result[1].whenSuccess(
-      (response) => response.hasRoutes ? response : null,
+      (response) => response,
     );
     final travelModeWalking = result[2].whenSuccess(
-      (response) => response.hasRoutes ? response : null,
+      (response) => response,
     );
     final travelModeBicycling = result[3].whenSuccess(
-      (response) => response.hasRoutes ? response : null,
+      (response) => response,
     );
 
     return Success(
@@ -140,44 +141,14 @@ class MapService {
     );
   }
 
-  /// Fetches route from the given [origin] to the [destination].
-  /// Optionally avoids specified hazards.
-  Future<Either<RoutesApiResponse, AppError>> getRoute({
+  /// Fetches a route between [origin] and [destination], optionally avoiding [hazardsToAvoid].
+  ///
+  /// Returns the safest and the fastest routes.
+  Future<Either<SafestFastestRoutes, AppError>> getRoute({
     required final LatLng origin,
     required final LatLng destination,
     final TravelMode travelMode = TravelMode.driving,
     final List<Hazard>? hazardsToAvoid,
-  }) async {
-    try {
-      // If no hazards to avoid, use the simple route
-      if (hazardsToAvoid?.isEmpty ?? true) {
-        final simpleRoute = await _getSimpleRoute(
-          origin: origin,
-          destination: destination,
-          travelMode: travelMode,
-        );
-        return Success(simpleRoute);
-      }
-
-      // Try to get a route that avoids hazards
-      final safestRoute = await _getRouteAvoidingHazards(
-        origin: origin,
-        destination: destination,
-        hazards: hazardsToAvoid!,
-        travelMode: travelMode,
-      );
-
-      return Success(safestRoute);
-    } catch (error) {
-      return Failure(AppError(message: error.toString()));
-    }
-  }
-
-  /// Gets a simple route without hazard avoidance.
-  Future<RoutesApiResponse> _getSimpleRoute({
-    required final LatLng origin,
-    required final LatLng destination,
-    final TravelMode travelMode = TravelMode.driving,
   }) async {
     final result = await _mapRepository.getRoute(
       origin: origin,
@@ -186,77 +157,54 @@ class MapService {
     );
 
     return result.when(
-      (routeResponse) => routeResponse,
-      (error) => throw error,
+      (response) {
+        final routes = response.routes;
+        if (routes.isEmpty) {
+          return Failure(
+            AppError(
+              message: 'No routes found between the specified locations.',
+            ),
+          );
+        }
+
+        // Determine the safest route if hazards are provided
+        Route? safestRoute;
+        if (hazardsToAvoid != null && hazardsToAvoid.isNotEmpty) {
+          safestRoute = _chooseSafestRoute(routes, hazardsToAvoid);
+        }
+
+        // The fastest route based on duration
+        Route? fastestRoute;
+        for (final route in routes) {
+          if (route.duration != null) {
+            if (fastestRoute == null ||
+                (route.duration! < fastestRoute.duration!)) {
+              fastestRoute = route;
+            }
+          }
+        }
+        fastestRoute ??= routes.first;
+
+        return Success(
+          SafestFastestRoutes(
+            safestRoute: safestRoute ?? fastestRoute,
+            fastestRoute: fastestRoute,
+            allRoutes: routes,
+          ),
+        );
+      },
+      Failure.new,
     );
   }
 
-  /// Gets a route that tries to avoid hazard areas using alternative routing preferences.
-  Future<RoutesApiResponse> _getRouteAvoidingHazards({
-    required final LatLng origin,
-    required final LatLng destination,
-    required final List<Hazard> hazards,
-    final TravelMode travelMode = TravelMode.driving,
-  }) async {
-    // Filter hazards that have valid coordinates
-    final validHazards = hazards
-        .where((h) => h.latitude != null && h.longitude != null)
-        .toList();
-
-    if (validHazards.isEmpty) {
-      return await _getSimpleRoute(
-        origin: origin,
-        destination: destination,
-        travelMode: travelMode,
-      );
-    }
-
-    // Try different routing approaches and select the safest
-    final routes = <RoutesApiResponse>[];
-
-    // 1. Try direct route first to compare
-    try {
-      final directRoute = await _getSimpleRoute(
-        origin: origin,
-        destination: destination,
-        travelMode: travelMode,
-      );
-      routes.add(directRoute);
-    } catch (e) {
-      // Continue with other approaches if direct route fails
-    }
-
-    // 2. Try alternative routes using different routing preferences
-    // Note: This is a simplified approach. In a real implementation,
-    // you might want to use different waypoints or routing parameters
-    try {
-      final alternativeRoute = await _getSimpleRoute(
-        origin: origin,
-        destination: destination,
-        travelMode: travelMode,
-      );
-      routes.add(alternativeRoute);
-    } catch (e) {
-      // Continue if this fails
-    }
-
-    // Choose the safest route from available options
-    return _chooseSafestRoute(routes, validHazards) ??
-        await _getSimpleRoute(
-          origin: origin,
-          destination: destination,
-          travelMode: travelMode,
-        );
-  }
-
   /// Chooses the safest route from available options.
-  RoutesApiResponse? _chooseSafestRoute(
-    List<RoutesApiResponse> routes,
+  Route? _chooseSafestRoute(
+    List<Route> routes,
     List<Hazard> hazards,
   ) {
     if (routes.isEmpty) return null;
 
-    RoutesApiResponse? safestRoute;
+    Route? safestRoute;
     double lowestRiskScore = double.infinity;
 
     for (final route in routes) {
@@ -272,21 +220,14 @@ class MapService {
 
   /// Calculates risk score for a route based on hazard proximity using actual route polyline.
   double _calculateRouteRiskScore(
-    RoutesApiResponse route,
+    Route route,
     List<Hazard> hazards,
   ) {
-    if (route.routes.isEmpty) {
-      return double.infinity;
-    }
-
     try {
-      final firstRoute = route.routes.first;
-
       // Check if polylinePoints are available directly on the route
-      if (firstRoute.polylinePoints != null &&
-          firstRoute.polylinePoints!.isNotEmpty) {
+      if (route.polylinePoints != null && route.polylinePoints!.isNotEmpty) {
         // Convert polyline points to LatLng list
-        final routePoints = firstRoute.polylinePoints!
+        final routePoints = route.polylinePoints!
             .map((point) => LatLng(point.latitude, point.longitude))
             .toList();
 

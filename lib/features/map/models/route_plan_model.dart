@@ -1,6 +1,7 @@
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/models/safest_fastest_routes_model.dart';
 
 part 'route_plan_model.freezed.dart';
 
@@ -19,13 +20,13 @@ abstract class RoutePlan with _$RoutePlan {
     @Default(TravelMode.driving) final TravelMode selectedTravelMode,
 
     /// Map of travel modes to their corresponding route responses.
-    @Default(<TravelMode, RoutesApiResponse>{})
-    final Map<TravelMode, RoutesApiResponse> travelModeRoutes,
+    @Default(<TravelMode, SafestFastestRoutes>{})
+    final Map<TravelMode, SafestFastestRoutes> travelModeRoutes,
 
     /// Whether navigation is currently active.
     @Default(false) final bool isNavigating,
   }) = _RoutePlan;
 
   /// Gets the current route based on the selected travel mode.
-  RoutesApiResponse? get currentRoute => travelModeRoutes[selectedTravelMode];
+  SafestFastestRoutes? get currentRoute => travelModeRoutes[selectedTravelMode];
 }

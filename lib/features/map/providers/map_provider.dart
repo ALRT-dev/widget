@@ -420,38 +420,69 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
   /// Adds a polyline for current route plan.
   void addPolylineForRoutePlan() {
-    if (state.currentRoutePlan?.currentRoute?.routes.isEmpty ?? true) return;
-    final routePoints = state
-        .currentRoutePlan
-        ?.currentRoute
-        ?.routes
-        .first
-        .polylinePoints
-        ?.map((e) => LatLng(e.latitude, e.longitude))
-        .toList();
-    if (routePoints == null || routePoints.isEmpty) return;
+    var polylines = <Polyline>{};
 
-    final selectedTravelMode = state.currentRoutePlan?.selectedTravelMode;
-    if (selectedTravelMode == null) return;
+    final allRoutes = (state.currentRoutePlan?.currentRoute?.allRoutes ?? []);
 
+    for (final route in allRoutes) {
+      final routePoints = route.polylinePoints!
+          .map((e) => LatLng(e.latitude, e.longitude))
+          .toList();
+      if (routePoints.isEmpty) continue;
+
+      final selectedTravelMode = state.currentRoutePlan?.selectedTravelMode;
+      if (selectedTravelMode == null) continue;
+
+      final polyLine = Polyline(
+        polylineId: PolylineId('route_${allRoutes.indexOf(route)}'),
+        color: state.currentRoutePlan?.currentRoute?.currentRoute == route
+            ? AppColors.blue
+            : AppColors.blue.withValues(alpha: 0.3),
+        points: routePoints,
+        width: 8,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        jointType: JointType.round,
+        patterns: selectedTravelMode == TravelMode.walking
+            ? [PatternItem.dash(3), PatternItem.gap(1)]
+            : [],
+        consumeTapEvents: true,
+        onTap: () {
+          // Update selected route in the current route plan
+          updateCurrentRoutePlan(
+            state.currentRoutePlan?.copyWith(
+              travelModeRoutes: {
+                ...state.currentRoutePlan!.travelModeRoutes,
+                selectedTravelMode: state
+                    .currentRoutePlan!
+                    .travelModeRoutes[selectedTravelMode]!
+                    .copyWith(selectedRoute: route),
+              },
+            ),
+          );
+        },
+      );
+      polylines = {
+        ...polylines,
+        polyLine,
+      };
+    }
+
+    updatePolylines(polylines);
     final isNavigating = state.currentRoutePlan?.isNavigating ?? false;
 
-    final polyLine = Polyline(
-      polylineId: const PolylineId('route'),
-      color: AppColors.blue,
-      points: routePoints,
-      width: 10,
-      startCap: Cap.roundCap,
-      endCap: Cap.roundCap,
-      jointType: JointType.round,
-      patterns: selectedTravelMode == TravelMode.walking
-          ? [PatternItem.dash(3), PatternItem.gap(1)]
-          : [],
-    );
-
-    updatePolylines({polyLine});
     if (!isNavigating) {
-      animateToBounds(bounds: routePoints.toBounds());
+      final currentRoutePoints =
+          state.currentRoutePlan?.currentRoute?.currentRoute.polylinePoints
+              ?.map((e) => LatLng(e.latitude, e.longitude))
+              .toList() ??
+          [];
+
+      if (currentRoutePoints.isNotEmpty) {
+        animateToBounds(
+          bounds: currentRoutePoints.toBounds(),
+        );
+      }
     }
   }
 

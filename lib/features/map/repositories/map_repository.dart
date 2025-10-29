@@ -204,6 +204,7 @@ class MapRepositoryImpl implements MapRepository {
               ? RoutingPreference.trafficAware
               : RoutingPreference.unspecified,
           polylineQuality: PolylineQuality.overview,
+          computeAlternativeRoutes: true,
         );
 
         final result = await _polylinePoints.getRouteBetweenCoordinatesV2(

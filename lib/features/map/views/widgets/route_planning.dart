@@ -80,9 +80,8 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
                     (value) => value
                         .currentRoutePlan
                         ?.currentRoute
-                        ?.routes
-                        .firstOrNull
-                        ?.distanceKm,
+                        ?.currentRoute
+                        .distanceKm,
                   ),
                 );
                 final distanceInMeters = ref.watch(
@@ -90,9 +89,8 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
                     (value) => value
                         .currentRoutePlan
                         ?.currentRoute
-                        ?.routes
-                        .firstOrNull
-                        ?.distanceMeters,
+                        ?.currentRoute
+                        .distanceMeters,
                   ),
                 );
 
@@ -263,9 +261,8 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
                     TravelMode.bicycling => Icons.directions_bike_rounded,
                     _ => Icons.directions,
                   },
-                  duration:
-                      route.value.routes.firstOrNull?.durationMinutes != null
-                      ? '${route.value.routes.first.durationMinutes?.toStringAsFixed(0)}m'
+                  duration: route.value.currentRoute.durationMinutes != null
+                      ? '${route.value.currentRoute.durationMinutes?.toStringAsFixed(0)}m'
                       : null,
                   isSelected: selectedTravelMode == route.key,
                   onTap: () => _handleTravelModeChange(route.key),
@@ -356,12 +353,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
     final routePoints = ref.watch(
       providerOfMap.select(
         (value) =>
-            value
-                .currentRoutePlan
-                ?.currentRoute
-                ?.routes
-                .firstOrNull
-                ?.polylinePoints
+            value.currentRoutePlan?.currentRoute?.currentRoute.polylinePoints
                 ?.map((e) => LatLng(e.latitude, e.longitude))
                 .toList() ??
             [],

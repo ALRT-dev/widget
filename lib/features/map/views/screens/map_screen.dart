@@ -119,15 +119,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
           Consumer(
             builder: (context, ref, child) {
-              final isRoutePresent = ref.watch(
-                providerOfMap.select(
-                  (value) => value.currentRoutePlan != null,
-                ),
-              );
-              if (isRoutePresent) {
-                return RoutePlanning().pB(20.0);
-              }
-
               final isHazardSelected = ref.watch(
                 providerOfMap.select(
                   (value) => value.selectedHazard != null,
@@ -135,6 +126,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               );
               if (isHazardSelected) {
                 return MapHazardPreview().pB(20.0);
+              }
+
+              final isRoutePresent = ref.watch(
+                providerOfMap.select(
+                  (value) => value.currentRoutePlan != null,
+                ),
+              );
+              if (isRoutePresent) {
+                return RoutePlanning().pB(20.0);
               }
 
               return SelectedLocationPreview().pB(20.0);

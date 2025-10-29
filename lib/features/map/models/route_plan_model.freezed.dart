@@ -18,7 +18,7 @@ mixin _$RoutePlan {
  AlrtLocation get origin;/// The destination location for the route.
  AlrtLocation get destination;/// Currently selected travel mode.
  TravelMode get selectedTravelMode;/// Map of travel modes to their corresponding route responses.
- Map<TravelMode, RoutesApiResponse> get travelModeRoutes;/// Whether navigation is currently active.
+ Map<TravelMode, SafestFastestRoutes> get travelModeRoutes;/// Whether navigation is currently active.
  bool get isNavigating;
 /// Create a copy of RoutePlan
 /// with the given fields replaced by the non-null parameter values.
@@ -50,7 +50,7 @@ abstract mixin class $RoutePlanCopyWith<$Res>  {
   factory $RoutePlanCopyWith(RoutePlan value, $Res Function(RoutePlan) _then) = _$RoutePlanCopyWithImpl;
 @useResult
 $Res call({
- AlrtLocation origin, AlrtLocation destination, TravelMode selectedTravelMode, Map<TravelMode, RoutesApiResponse> travelModeRoutes, bool isNavigating
+ AlrtLocation origin, AlrtLocation destination, TravelMode selectedTravelMode, Map<TravelMode, SafestFastestRoutes> travelModeRoutes, bool isNavigating
 });
 
 
@@ -73,7 +73,7 @@ origin: null == origin ? _self.origin : origin // ignore: cast_nullable_to_non_n
 as AlrtLocation,destination: null == destination ? _self.destination : destination // ignore: cast_nullable_to_non_nullable
 as AlrtLocation,selectedTravelMode: null == selectedTravelMode ? _self.selectedTravelMode : selectedTravelMode // ignore: cast_nullable_to_non_nullable
 as TravelMode,travelModeRoutes: null == travelModeRoutes ? _self.travelModeRoutes : travelModeRoutes // ignore: cast_nullable_to_non_nullable
-as Map<TravelMode, RoutesApiResponse>,isNavigating: null == isNavigating ? _self.isNavigating : isNavigating // ignore: cast_nullable_to_non_nullable
+as Map<TravelMode, SafestFastestRoutes>,isNavigating: null == isNavigating ? _self.isNavigating : isNavigating // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -177,7 +177,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, RoutesApiResponse> travelModeRoutes,  bool isNavigating)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, SafestFastestRoutes> travelModeRoutes,  bool isNavigating)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RoutePlan() when $default != null:
 return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.travelModeRoutes,_that.isNavigating);case _:
@@ -198,7 +198,7 @@ return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.tr
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, RoutesApiResponse> travelModeRoutes,  bool isNavigating)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, SafestFastestRoutes> travelModeRoutes,  bool isNavigating)  $default,) {final _that = this;
 switch (_that) {
 case _RoutePlan():
 return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.travelModeRoutes,_that.isNavigating);case _:
@@ -218,7 +218,7 @@ return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.tr
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, RoutesApiResponse> travelModeRoutes,  bool isNavigating)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, SafestFastestRoutes> travelModeRoutes,  bool isNavigating)?  $default,) {final _that = this;
 switch (_that) {
 case _RoutePlan() when $default != null:
 return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.travelModeRoutes,_that.isNavigating);case _:
@@ -233,7 +233,7 @@ return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.tr
 
 
 class _RoutePlan extends RoutePlan {
-  const _RoutePlan({required this.origin, required this.destination, this.selectedTravelMode = TravelMode.driving, final  Map<TravelMode, RoutesApiResponse> travelModeRoutes = const <TravelMode, RoutesApiResponse>{}, this.isNavigating = false}): _travelModeRoutes = travelModeRoutes,super._();
+  const _RoutePlan({required this.origin, required this.destination, this.selectedTravelMode = TravelMode.driving, final  Map<TravelMode, SafestFastestRoutes> travelModeRoutes = const <TravelMode, SafestFastestRoutes>{}, this.isNavigating = false}): _travelModeRoutes = travelModeRoutes,super._();
   
 
 /// The origin location for the route.
@@ -243,9 +243,9 @@ class _RoutePlan extends RoutePlan {
 /// Currently selected travel mode.
 @override@JsonKey() final  TravelMode selectedTravelMode;
 /// Map of travel modes to their corresponding route responses.
- final  Map<TravelMode, RoutesApiResponse> _travelModeRoutes;
+ final  Map<TravelMode, SafestFastestRoutes> _travelModeRoutes;
 /// Map of travel modes to their corresponding route responses.
-@override@JsonKey() Map<TravelMode, RoutesApiResponse> get travelModeRoutes {
+@override@JsonKey() Map<TravelMode, SafestFastestRoutes> get travelModeRoutes {
   if (_travelModeRoutes is EqualUnmodifiableMapView) return _travelModeRoutes;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_travelModeRoutes);
@@ -284,7 +284,7 @@ abstract mixin class _$RoutePlanCopyWith<$Res> implements $RoutePlanCopyWith<$Re
   factory _$RoutePlanCopyWith(_RoutePlan value, $Res Function(_RoutePlan) _then) = __$RoutePlanCopyWithImpl;
 @override @useResult
 $Res call({
- AlrtLocation origin, AlrtLocation destination, TravelMode selectedTravelMode, Map<TravelMode, RoutesApiResponse> travelModeRoutes, bool isNavigating
+ AlrtLocation origin, AlrtLocation destination, TravelMode selectedTravelMode, Map<TravelMode, SafestFastestRoutes> travelModeRoutes, bool isNavigating
 });
 
 
@@ -307,7 +307,7 @@ origin: null == origin ? _self.origin : origin // ignore: cast_nullable_to_non_n
 as AlrtLocation,destination: null == destination ? _self.destination : destination // ignore: cast_nullable_to_non_nullable
 as AlrtLocation,selectedTravelMode: null == selectedTravelMode ? _self.selectedTravelMode : selectedTravelMode // ignore: cast_nullable_to_non_nullable
 as TravelMode,travelModeRoutes: null == travelModeRoutes ? _self._travelModeRoutes : travelModeRoutes // ignore: cast_nullable_to_non_nullable
-as Map<TravelMode, RoutesApiResponse>,isNavigating: null == isNavigating ? _self.isNavigating : isNavigating // ignore: cast_nullable_to_non_nullable
+as Map<TravelMode, SafestFastestRoutes>,isNavigating: null == isNavigating ? _self.isNavigating : isNavigating // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

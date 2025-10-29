@@ -53,6 +53,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   );
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
+  }
+
+  @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
@@ -72,6 +78,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfPlacesForSearch.select((value) => null));
     ref.watch(providerOfMainSearch.select((value) => null));
     ref.watch(providerOfNotificationsFeed.select((value) => null));
+    ref.watch(providerOfHazardCategoriesForDropdown.select((value) => null));
     ref.watch(providerOfHazardCategoriesForSearch.select((value) => null));
     ref.watch(
       providerOfHazardCategoriesForNotifications.select((value) => null),
@@ -142,6 +149,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         }
       },
     );
+  }
+
+  void _onInit() {
+    // fetch hazard categories for dropdowns
+    ref
+        .read(providerOfHazardCategoriesForDropdown.notifier)
+        .getAllHazardCategories();
   }
 
   /// Listens to the message received from the push notification.

@@ -286,7 +286,9 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
             current.currentLocation != null &&
             previous != current) {
           _updateCameraPosition(
-              current.currentLocation!, current.currentBearing);
+            current.currentLocation!,
+            current.currentBearing,
+          );
         }
       },
     );
@@ -329,16 +331,19 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
     final routePlan = ref.read(providerOfMap).currentRoutePlan;
     final currentRoute = routePlan?.currentRoute;
 
-    if (currentRoute?.routes.isNotEmpty == true) {
-      final route = currentRoute!.routes.first;
-      final routePoints = route.polylinePoints
+    if (currentRoute?.currentRoute != null) {
+      final route = currentRoute!.currentRoute;
+      final routePoints =
+          route.polylinePoints
               ?.map((point) => LatLng(point.latitude, point.longitude))
               .toList() ??
           [];
 
       if (routePoints.isNotEmpty) {
         final destination = routePoints.last;
-        ref.read(providerOfNavigation.notifier).startNavigation(
+        ref
+            .read(providerOfNavigation.notifier)
+            .startNavigation(
               destination: AlrtLocation(
                 latitude: destination.latitude,
                 longitude: destination.longitude,
@@ -380,7 +385,8 @@ class _NavigationScreenState extends ConsumerState<NavigationScreen> {
     final double deltaLatRad = (to.latitude - from.latitude) * pi / 180;
     final double deltaLngRad = (to.longitude - from.longitude) * pi / 180;
 
-    final double a = sin(deltaLatRad / 2) * sin(deltaLatRad / 2) +
+    final double a =
+        sin(deltaLatRad / 2) * sin(deltaLatRad / 2) +
         cos(lat1Rad) *
             cos(lat2Rad) *
             sin(deltaLngRad / 2) *
