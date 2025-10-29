@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
+import 'package:hazard_app/features/map/extensions/polyline_extension.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
@@ -14,6 +16,7 @@ import 'package:hazard_app/features/map/providers/states/map_provider_state.dart
 import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_marker.dart';
+import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -368,9 +371,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final selectedPlaceMarker = state.markers.firstWhereOrNull(
       (marker) => marker.markerId.value == 'selected_location',
     );
+    final routeLabelMarkers = state.markers.where(
+      (marker) => marker.markerId.value.startsWith('route_label_'),
+    );
     updateMarkers({
       ...markers.toSet(),
       if (selectedPlaceMarker != null) selectedPlaceMarker,
+      ...routeLabelMarkers,
     });
   }
 
@@ -443,9 +450,6 @@ class MapProvider extends StateNotifier<MapProviderState> {
         startCap: Cap.roundCap,
         endCap: Cap.roundCap,
         jointType: JointType.round,
-        patterns: selectedTravelMode == TravelMode.walking
-            ? [PatternItem.dash(3), PatternItem.gap(1)]
-            : [],
         consumeTapEvents: true,
         onTap: () {
           // Update selected route in the current route plan
@@ -468,9 +472,14 @@ class MapProvider extends StateNotifier<MapProviderState> {
       };
     }
 
+    // Update polylines in the state
     updatePolylines(polylines);
-    final isNavigating = state.currentRoutePlan?.isNavigating ?? false;
 
+    // Add route label markers
+    addRouteLabelMarkers();
+
+    // If not navigating, animate to fit the route bounds
+    final isNavigating = state.currentRoutePlan?.isNavigating ?? false;
     if (!isNavigating) {
       final currentRoutePoints =
           state.currentRoutePlan?.currentRoute?.currentRoute.polylinePoints
@@ -484,6 +493,91 @@ class MapProvider extends StateNotifier<MapProviderState> {
         );
       }
     }
+  }
+
+  /// Adds route label markers for fastest and safest routes.
+  void addRouteLabelMarkers() async {
+    final currentRoute = state.currentRoutePlan?.currentRoute;
+    if (currentRoute == null) return;
+
+    final routes = currentRoute.allRoutes;
+    if (routes.length < 2) return; // No need to add labels if only one route
+
+    final fastestRoute = currentRoute.fastestRoute;
+    final safestRoute = currentRoute.safestRoute;
+
+    // Remove existing route label markers
+    final updatedMarkers = Set<Marker>.from(state.markers)
+      ..removeWhere(
+        (marker) => marker.markerId.value.startsWith('route_label_'),
+      );
+
+    // Add fastest route marker
+    final fastestRoutePoints = fastestRoute.polylinePoints
+        ?.map((e) => LatLng(e.latitude, e.longitude))
+        .toList();
+    if (fastestRoutePoints != null && fastestRoutePoints.isNotEmpty) {
+      final fastestMidpoint = fastestRoutePoints.findMidpoint();
+      if (fastestMidpoint != null) {
+        final fastestMarkerIcon = await RouteLabelMarker(
+          label: safestRoute == fastestRoute ? 'Fastest & Safest' : 'Fastest',
+          backgroundColor: AppColors.blue,
+        ).toBitmapDescriptor();
+
+        updatedMarkers.add(
+          Marker(
+            markerId: const MarkerId('route_label_fastest'),
+            position: fastestMidpoint,
+            icon: fastestMarkerIcon,
+            zIndexInt: 2,
+            anchor: const Offset(
+              0.0,
+              0.5,
+            ), // Anchor at left center so arrow points to route from the side
+          ),
+        );
+      }
+    }
+
+    // Add safest route marker (only if different from fastest)
+    if (safestRoute != fastestRoute) {
+      final safestRoutePoints = safestRoute.polylinePoints
+          ?.map((e) => LatLng(e.latitude, e.longitude))
+          .toList();
+      if (safestRoutePoints != null && safestRoutePoints.isNotEmpty) {
+        final safestMidpoint = safestRoutePoints.findMidpoint();
+        if (safestMidpoint != null) {
+          final safestMarkerIcon = await const RouteLabelMarker(
+            label: 'Safest',
+            backgroundColor: AppColors.blue,
+          ).toBitmapDescriptor();
+
+          updatedMarkers.add(
+            Marker(
+              markerId: const MarkerId('route_label_safest'),
+              position: safestMidpoint,
+              icon: safestMarkerIcon,
+              zIndexInt: 2,
+              anchor: const Offset(
+                0.0,
+                0.5,
+              ), // Anchor at left center so arrow points to route from the side
+            ),
+          );
+        }
+      }
+    }
+
+    updateMarkers(updatedMarkers);
+  }
+
+  /// Removes route label markers from the map.
+  void removeRouteLabelMarkers() {
+    final updatedMarkers = Set<Marker>.from(state.markers)
+      ..removeWhere(
+        (marker) => marker.markerId.value.startsWith('route_label_'),
+      );
+    updateMarkers(updatedMarkers);
   }
 
   /// Adds a marker for the selected location, replacing any existing selected location marker.
@@ -526,6 +620,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
     if (routePlan == null) {
       updatePolylines({});
+      removeRouteLabelMarkers();
     } else {
       addPolylineForRoutePlan();
     }
