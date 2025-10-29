@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 mixin _$MapProviderState {
 
 /// The list of hazards displayed on the map.
- List<Hazard> get hazards;/// The current camera position of the map.
+ List<Hazard> get hazards;/// The currently selected hazard on the map, if any.
+ Hazard? get selectedHazard;/// The current camera position of the map.
  CameraPosition get cameraPosition;/// The set of markers displayed on the map.
  Set<Marker> get markers;/// The set of polylines displayed on the map.
  Set<Polyline> get polylines;/// The currently selected location on the map, if any.
@@ -34,16 +35,16 @@ $MapProviderStateCopyWith<MapProviderState> get copyWith => _$MapProviderStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MapProviderState&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other.markers, markers)&&const DeepCollectionEquality().equals(other.polylines, polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MapProviderState&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.selectedHazard, selectedHazard) || other.selectedHazard == selectedHazard)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other.markers, markers)&&const DeepCollectionEquality().equals(other.polylines, polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(hazards),cameraPosition,const DeepCollectionEquality().hash(markers),const DeepCollectionEquality().hash(polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(hazards),selectedHazard,cameraPosition,const DeepCollectionEquality().hash(markers),const DeepCollectionEquality().hash(polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState);
 
 @override
 String toString() {
-  return 'MapProviderState(hazards: $hazards, cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState)';
+  return 'MapProviderState(hazards: $hazards, selectedHazard: $selectedHazard, cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState)';
 }
 
 
@@ -54,11 +55,11 @@ abstract mixin class $MapProviderStateCopyWith<$Res>  {
   factory $MapProviderStateCopyWith(MapProviderState value, $Res Function(MapProviderState) _then) = _$MapProviderStateCopyWithImpl;
 @useResult
 $Res call({
- List<Hazard> hazards, CameraPosition cameraPosition, Set<Marker> markers, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState
+ List<Hazard> hazards, Hazard? selectedHazard, CameraPosition cameraPosition, Set<Marker> markers, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState
 });
 
 
-$AlrtLocationCopyWith<$Res>? get selectedLocation;$RoutePlanCopyWith<$Res>? get currentRoutePlan;$GetRouteStateCopyWith<$Res> get getRouteState;$GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;$GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;
+$HazardCopyWith<$Res>? get selectedHazard;$AlrtLocationCopyWith<$Res>? get selectedLocation;$RoutePlanCopyWith<$Res>? get currentRoutePlan;$GetRouteStateCopyWith<$Res> get getRouteState;$GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;$GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;
 
 }
 /// @nodoc
@@ -71,10 +72,11 @@ class _$MapProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? hazards = null,Object? cameraPosition = null,Object? markers = null,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? hazards = null,Object? selectedHazard = freezed,Object? cameraPosition = null,Object? markers = null,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,}) {
   return _then(_self.copyWith(
 hazards: null == hazards ? _self.hazards : hazards // ignore: cast_nullable_to_non_nullable
-as List<Hazard>,cameraPosition: null == cameraPosition ? _self.cameraPosition : cameraPosition // ignore: cast_nullable_to_non_nullable
+as List<Hazard>,selectedHazard: freezed == selectedHazard ? _self.selectedHazard : selectedHazard // ignore: cast_nullable_to_non_nullable
+as Hazard?,cameraPosition: null == cameraPosition ? _self.cameraPosition : cameraPosition // ignore: cast_nullable_to_non_nullable
 as CameraPosition,markers: null == markers ? _self.markers : markers // ignore: cast_nullable_to_non_nullable
 as Set<Marker>,polylines: null == polylines ? _self.polylines : polylines // ignore: cast_nullable_to_non_nullable
 as Set<Polyline>,selectedLocation: freezed == selectedLocation ? _self.selectedLocation : selectedLocation // ignore: cast_nullable_to_non_nullable
@@ -86,6 +88,18 @@ as GetMapHazardsState,
   ));
 }
 /// Create a copy of MapProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HazardCopyWith<$Res>? get selectedHazard {
+    if (_self.selectedHazard == null) {
+    return null;
+  }
+
+  return $HazardCopyWith<$Res>(_self.selectedHazard!, (value) {
+    return _then(_self.copyWith(selectedHazard: value));
+  });
+}/// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -218,10 +232,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Hazard> hazards,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MapProviderState() when $default != null:
-return $default(_that.hazards,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState);case _:
+return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState);case _:
   return orElse();
 
 }
@@ -239,10 +253,10 @@ return $default(_that.hazards,_that.cameraPosition,_that.markers,_that.polylines
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Hazard> hazards,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState)  $default,) {final _that = this;
 switch (_that) {
 case _MapProviderState():
-return $default(_that.hazards,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState);case _:
+return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -259,10 +273,10 @@ return $default(_that.hazards,_that.cameraPosition,_that.markers,_that.polylines
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Hazard> hazards,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState)?  $default,) {final _that = this;
 switch (_that) {
 case _MapProviderState() when $default != null:
-return $default(_that.hazards,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState);case _:
+return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState);case _:
   return null;
 
 }
@@ -274,7 +288,7 @@ return $default(_that.hazards,_that.cameraPosition,_that.markers,_that.polylines
 
 
 class _MapProviderState implements MapProviderState {
-  const _MapProviderState({final  List<Hazard> hazards = const <Hazard>[], this.cameraPosition = kDefaultCameraPosition, final  Set<Marker> markers = const <Marker>{}, final  Set<Polyline> polylines = const <Polyline>{}, this.selectedLocation, this.currentRoutePlan, this.getRouteState = const GetRouteState.initial(), this.getAddressFromCoordinatesState = const GetAddressFromCoordinatesState.initial(), this.getMapHazardsState = const GetMapHazardsState.initial()}): _hazards = hazards,_markers = markers,_polylines = polylines;
+  const _MapProviderState({final  List<Hazard> hazards = const <Hazard>[], this.selectedHazard, this.cameraPosition = kDefaultCameraPosition, final  Set<Marker> markers = const <Marker>{}, final  Set<Polyline> polylines = const <Polyline>{}, this.selectedLocation, this.currentRoutePlan, this.getRouteState = const GetRouteState.initial(), this.getAddressFromCoordinatesState = const GetAddressFromCoordinatesState.initial(), this.getMapHazardsState = const GetMapHazardsState.initial()}): _hazards = hazards,_markers = markers,_polylines = polylines;
   
 
 /// The list of hazards displayed on the map.
@@ -286,6 +300,8 @@ class _MapProviderState implements MapProviderState {
   return EqualUnmodifiableListView(_hazards);
 }
 
+/// The currently selected hazard on the map, if any.
+@override final  Hazard? selectedHazard;
 /// The current camera position of the map.
 @override@JsonKey() final  CameraPosition cameraPosition;
 /// The set of markers displayed on the map.
@@ -327,16 +343,16 @@ _$MapProviderStateCopyWith<_MapProviderState> get copyWith => __$MapProviderStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MapProviderState&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other._markers, _markers)&&const DeepCollectionEquality().equals(other._polylines, _polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MapProviderState&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.selectedHazard, selectedHazard) || other.selectedHazard == selectedHazard)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other._markers, _markers)&&const DeepCollectionEquality().equals(other._polylines, _polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_hazards),cameraPosition,const DeepCollectionEquality().hash(_markers),const DeepCollectionEquality().hash(_polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_hazards),selectedHazard,cameraPosition,const DeepCollectionEquality().hash(_markers),const DeepCollectionEquality().hash(_polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState);
 
 @override
 String toString() {
-  return 'MapProviderState(hazards: $hazards, cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState)';
+  return 'MapProviderState(hazards: $hazards, selectedHazard: $selectedHazard, cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState)';
 }
 
 
@@ -347,11 +363,11 @@ abstract mixin class _$MapProviderStateCopyWith<$Res> implements $MapProviderSta
   factory _$MapProviderStateCopyWith(_MapProviderState value, $Res Function(_MapProviderState) _then) = __$MapProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<Hazard> hazards, CameraPosition cameraPosition, Set<Marker> markers, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState
+ List<Hazard> hazards, Hazard? selectedHazard, CameraPosition cameraPosition, Set<Marker> markers, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState
 });
 
 
-@override $AlrtLocationCopyWith<$Res>? get selectedLocation;@override $RoutePlanCopyWith<$Res>? get currentRoutePlan;@override $GetRouteStateCopyWith<$Res> get getRouteState;@override $GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;@override $GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;
+@override $HazardCopyWith<$Res>? get selectedHazard;@override $AlrtLocationCopyWith<$Res>? get selectedLocation;@override $RoutePlanCopyWith<$Res>? get currentRoutePlan;@override $GetRouteStateCopyWith<$Res> get getRouteState;@override $GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;@override $GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;
 
 }
 /// @nodoc
@@ -364,10 +380,11 @@ class __$MapProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? hazards = null,Object? cameraPosition = null,Object? markers = null,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? hazards = null,Object? selectedHazard = freezed,Object? cameraPosition = null,Object? markers = null,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,}) {
   return _then(_MapProviderState(
 hazards: null == hazards ? _self._hazards : hazards // ignore: cast_nullable_to_non_nullable
-as List<Hazard>,cameraPosition: null == cameraPosition ? _self.cameraPosition : cameraPosition // ignore: cast_nullable_to_non_nullable
+as List<Hazard>,selectedHazard: freezed == selectedHazard ? _self.selectedHazard : selectedHazard // ignore: cast_nullable_to_non_nullable
+as Hazard?,cameraPosition: null == cameraPosition ? _self.cameraPosition : cameraPosition // ignore: cast_nullable_to_non_nullable
 as CameraPosition,markers: null == markers ? _self._markers : markers // ignore: cast_nullable_to_non_nullable
 as Set<Marker>,polylines: null == polylines ? _self._polylines : polylines // ignore: cast_nullable_to_non_nullable
 as Set<Polyline>,selectedLocation: freezed == selectedLocation ? _self.selectedLocation : selectedLocation // ignore: cast_nullable_to_non_nullable
@@ -380,6 +397,18 @@ as GetMapHazardsState,
 }
 
 /// Create a copy of MapProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HazardCopyWith<$Res>? get selectedHazard {
+    if (_self.selectedHazard == null) {
+    return null;
+  }
+
+  return $HazardCopyWith<$Res>(_self.selectedHazard!, (value) {
+    return _then(_self.copyWith(selectedHazard: value));
+  });
+}/// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')

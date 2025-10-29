@@ -354,10 +354,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
                     hazard.latitude!,
                     hazard.longitude!,
                   ),
-                  infoWindow: InfoWindow(
-                    title: hazard.title,
-                    snippet: hazard.shortDescription,
-                  ),
+                  onTap: () => updateSelectedHazard(hazard),
                   icon: bitmapDescriptor,
                 );
               },
@@ -375,6 +372,20 @@ class MapProvider extends StateNotifier<MapProviderState> {
       ...markers.toSet(),
       if (selectedPlaceMarker != null) selectedPlaceMarker,
     });
+  }
+
+  /// Updates the [MapProviderState.hazards] to the given [hazards].
+  void updateHazards(final List<Hazard> hazards) {
+    state = state.copyWith(
+      hazards: hazards,
+    );
+  }
+
+  /// Updates [MapProviderState.selectedHazard] to the given [hazard].
+  void updateSelectedHazard(final Hazard? hazard) {
+    state = state.copyWith(
+      selectedHazard: hazard,
+    );
   }
 
   /// Updates [MapProviderState.cameraPosition] to the given [cameraPosition].

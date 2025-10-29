@@ -34,15 +34,15 @@ class _SelectedLocationPreviewState
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(20.spMin),
         border: Border.all(
           color: AppColors.lightGrey,
         ),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadowColor,
-            blurRadius: 10.r,
-            offset: Offset(0, 4.h),
+            blurRadius: 10.0,
+            offset: Offset(0, 4.0),
           ),
         ],
       ),
@@ -111,7 +111,7 @@ class _SelectedLocationPreviewState
             );
 
             return _buttonBuilder(
-              value: 'Directions',
+              value: 'Get Directions',
               isLoading: isLoading,
               icon: Icon(
                 Icons.directions_rounded,
@@ -121,15 +121,6 @@ class _SelectedLocationPreviewState
               onPressed: _getDirections,
             );
           },
-        ),
-        _buttonBuilder(
-          value: 'Start',
-          icon: Icon(
-            Icons.navigation_rounded,
-            size: 20.spMin,
-            color: AppColors.white,
-          ),
-          onPressed: () {},
         ),
       ],
     );
@@ -177,7 +168,9 @@ class _SelectedLocationPreviewState
 
     final currentUserLocation = ref.read(providerOfLocation).location;
 
-    ref.read(providerOfMap.notifier).getRoute(
+    ref
+        .read(providerOfMap.notifier)
+        .getRoute(
           origin: currentUserLocation,
           destination: selectedLocation,
         );

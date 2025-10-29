@@ -14,6 +14,7 @@ import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
+import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_expiry_timer.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -23,6 +24,8 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
   const CommonHazardsListItem({
     super.key,
     required this.hazard,
+    this.showCloseButton = false,
+    this.onClosePressed,
     this.showTrustMeter = true,
     this.showSourceHeader = true,
     this.horizontalPadding = 10.0,
@@ -30,6 +33,12 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
 
   /// The hazard to display in this list item.
   final Hazard hazard;
+
+  /// Whether to show a close button on the list item.
+  final bool showCloseButton;
+
+  /// Callback when the close button is pressed.
+  final void Function()? onClosePressed;
 
   /// Whether to show the trust meter widget.
   final bool showTrustMeter;
@@ -63,7 +72,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         children: [
           if (widget.showSourceHeader) ...[
             _headerBuilder(),
-            12.hSizedBox,
+            10.hSizedBox,
           ],
           if (widget.hazard.processedMedias.isNotEmpty) ...[
             3.hSizedBox,
@@ -115,57 +124,74 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         );
 
         return Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              source?.name ?? 'Crowd Sourced',
-              style: TextStyle(
-                fontSize: 12.spMin,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    source?.name ?? 'Crowd Sourced',
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  6.wSizedBox,
+                  const Icon(
+                    Icons.circle,
+                    size: 4,
+                    color: AppColors.grey,
+                  ),
+                  6.wSizedBox,
+                  Text(
+                    source != null
+                        ? 'Verified'
+                        : reportedBy?.reportsStatus.title ?? 'Unverified',
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                  4.wSizedBox,
+                  Icon(
+                    Icons.verified_rounded,
+                    size: 16.spMin,
+                    color: source != null
+                        ? AppColors.blue
+                        : reportedBy?.reportsStatus.color ??
+                              AppColors.lightGrey,
+                  ),
+                  if (confidenceScore != null && kDebugMode) ...[
+                    4.wSizedBox,
+                    const Icon(
+                      Icons.circle,
+                      size: 4,
+                      color: AppColors.grey,
+                    ),
+                    6.wSizedBox,
+                    Text(
+                      'ACS: $confidenceScore',
+                      style: TextStyle(
+                        fontSize: 12.spMin,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-            6.wSizedBox,
-            const Icon(
-              Icons.circle,
-              size: 4,
-              color: AppColors.grey,
-            ),
-            6.wSizedBox,
-            Text(
-              source != null
-                  ? 'Verified'
-                  : reportedBy?.reportsStatus.title ?? 'Unverified',
-              style: TextStyle(
-                fontSize: 12.spMin,
-                fontWeight: FontWeight.w500,
-                color: AppColors.grey,
-              ),
-            ),
-            4.wSizedBox,
-            Icon(
-              Icons.verified_rounded,
-              size: 16.spMin,
-              color: source != null
-                  ? AppColors.blue
-                  : reportedBy?.reportsStatus.color ?? AppColors.lightGrey,
-            ),
-            if (confidenceScore != null && kDebugMode) ...[
-              4.wSizedBox,
-              const Icon(
-                Icons.circle,
-                size: 4,
-                color: AppColors.grey,
-              ),
-              6.wSizedBox,
-              Text(
-                'ACS: $confidenceScore',
-                style: TextStyle(
-                  fontSize: 12.spMin,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.grey,
+            if (widget.showCloseButton && widget.onClosePressed != null)
+              RoundButton(
+                icon: Icon(
+                  Icons.close_rounded,
+                  size: 20.spMin,
                 ),
+                size: 30.0,
+                onPressed: widget.onClosePressed,
               ),
-            ],
           ],
         );
       },

@@ -14,6 +14,9 @@ abstract class MapProviderState with _$MapProviderState {
     /// The list of hazards displayed on the map.
     @Default(<Hazard>[]) final List<Hazard> hazards,
 
+    /// The currently selected hazard on the map, if any.
+    final Hazard? selectedHazard,
+
     /// The current camera position of the map.
     @Default(kDefaultCameraPosition) final CameraPosition cameraPosition,
 

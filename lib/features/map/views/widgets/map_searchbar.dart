@@ -166,12 +166,16 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
     _searchController.text = place.name;
 
     ref.read(providerOfPlacesForMap.notifier).updateSearchString(place.name);
-    ref
-        .read(providerOfMap.notifier)
-        .updateSelectedLocation(place.toAlrtLocation);
+    ref.read(providerOfMap.notifier)
+      // update selected location
+      ..updateSelectedLocation(place.toAlrtLocation)
+      // clear any selected hazard when a new place is selected
+      ..updateSelectedHazard(null);
 
     // move camera to the selected place
-    ref.read(providerOfMap.notifier).animateTo(
+    ref
+        .read(providerOfMap.notifier)
+        .animateTo(
           position: LatLng(place.latitude, place.longitude),
           zoom: 20.0,
         );

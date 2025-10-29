@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/views/widgets/map_hazard_preview.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
 import 'package:hazard_app/features/map/views/widgets/route_planning.dart';
 import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
@@ -83,7 +84,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     return RouteSourceAndDestination();
                   }
                   return Row(
-                    spacing: 10.spMin,
                     children: [
                       Expanded(child: MapSearchbar()),
                       _filtersButtonBuilder(),
@@ -102,6 +102,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   if (!isFiltersVisible) {
                     return const SizedBox.shrink();
                   }
+
                   return HazardSeverityFiltersList(
                     severityFiltersKey: MapScreen.severityFiltersKey,
                     onSeveritiesSelectionUpdated: (_) =>
@@ -126,6 +127,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               if (isRoutePresent) {
                 return RoutePlanning().pB(20.0);
               }
+
+              final isHazardSelected = ref.watch(
+                providerOfMap.select(
+                  (value) => value.selectedHazard != null,
+                ),
+              );
+              if (isHazardSelected) {
+                return MapHazardPreview().pB(20.0);
+              }
+
               return SelectedLocationPreview().pB(20.0);
             },
           ).pX(20.0),
@@ -137,6 +148,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Widget _filtersButtonBuilder() {
     return Consumer(
       builder: (context, ref, child) {
+        final isFiltersAvailable = ref.watch(
+          providerOfHazardSeverityFiltersForMap.select(
+            (value) => value.hazardSeverities.isNotEmpty,
+          ),
+        );
+        if (!isFiltersAvailable) {
+          return const SizedBox.shrink();
+        }
+
         final isFiltersVisible = ref.watch(
           providerOfHazardSeverityFiltersForMap.select(
             (value) => value.isFiltersVisible,
@@ -167,7 +187,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             size: 22.spMin,
             color: AppColors.black,
           ),
-        ).onPressed(_handleFiltersButtonPressed);
+        ).pL(10.0).onPressed(_handleFiltersButtonPressed);
       },
     );
   }
