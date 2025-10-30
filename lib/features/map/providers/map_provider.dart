@@ -13,12 +13,13 @@ import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
 import 'package:hazard_app/features/map/extensions/polyline_extension.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
+import 'package:hazard_app/features/map/providers/hazard_markers_bitmaps_provider.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
+import 'package:hazard_app/features/map/providers/states/hazard_markers_bitmaps_provider_state.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
 import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
-import 'package:hazard_app/features/map/views/widgets/custom_marker.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
@@ -57,6 +58,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
       _ref.read(providerOfHazardCategoriesForMap.notifier);
   HazardSeverityFiltersProvider get _hazardSeverityFiltersProvider =>
       _ref.read(providerOfHazardSeverityFiltersForMap.notifier);
+  HazardMarkersBitmapsProviderState get _hazardMarkerBitmapsProviderState =>
+      _ref.read(providerOfHazardMarkerBitmaps);
 
   StreamSubscription<double>? _headingStreamSubscription;
   StreamSubscription? _positionStreamSubscription;
@@ -769,35 +772,32 @@ class MapProvider extends StateNotifier<MapProviderState> {
   /// Generates markers for all hazards in the state.
   void generateMarkers() async {
     final hazards = state.hazards;
-    final markerFutures = <Future<Marker>>[];
+    final markers = <Marker>[];
 
     for (final hazard in hazards) {
-      if (hazard.latitude != null && hazard.longitude != null) {
-        final markerFuture =
-            CustomMarker(
-              markerImagePath:
-                  hazard.severity?.markerPath ?? HazardSeverity.info.markerPath,
-              emoji: hazard.category?.emoji ?? '❗',
-            ).toBitmapDescriptor().then(
-              (bitmapDescriptor) {
-                return Marker(
-                  markerId: MarkerId(
-                    hazard.id ?? '${hazard.latitude},${hazard.longitude}',
-                  ),
-                  position: LatLng(
-                    hazard.latitude!,
-                    hazard.longitude!,
-                  ),
-                  onTap: () => updateSelectedHazard(hazard),
-                  icon: bitmapDescriptor,
-                );
-              },
-            );
-        markerFutures.add(markerFuture);
-      }
-    }
+      if (hazard.latitude == null || hazard.longitude == null) continue;
 
-    final markers = await Future.wait(markerFutures);
+      final severity = hazard.severity ?? HazardSeverity.info;
+      final categoryEmoji = hazard.category?.emoji ?? '❗';
+
+      final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
+      final key = '${severity.name}_$categoryEmoji';
+      final bitmapDescriptor = markerBitmaps[key];
+      if (bitmapDescriptor == null) continue;
+
+      final marker = Marker(
+        markerId: MarkerId(
+          hazard.id ?? '${hazard.latitude},${hazard.longitude}',
+        ),
+        position: LatLng(
+          hazard.latitude!,
+          hazard.longitude!,
+        ),
+        onTap: () => updateSelectedHazard(hazard),
+        icon: bitmapDescriptor,
+      );
+      markers.add(marker);
+    }
 
     final selectedPlaceMarker = state.markers.firstWhereOrNull(
       (marker) => marker.markerId.value == 'selected_location',

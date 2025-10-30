@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/auth/providers/service_providers.dart';
+import 'package:hazard_app/features/map/providers/hazard_markers_bitmaps_provider.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/shared/providers/instance_providers.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
@@ -8,8 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final providerOfAppInitialization =
     NotifierProvider.autoDispose<AppInitializationProvider, bool>(
-  AppInitializationProvider.new,
-);
+      AppInitializationProvider.new,
+    );
 
 class AppInitializationProvider extends Notifier<bool> {
   @override
@@ -34,6 +35,7 @@ class AppInitializationProvider extends Notifier<bool> {
     // initialize these things after logged in user is initialized
     await Future.wait([
       _getCurrentUserLocation(),
+      _generateMarkerBitmaps(),
     ]);
     if (!ref.mounted) return;
 
@@ -55,32 +57,23 @@ class AppInitializationProvider extends Notifier<bool> {
 
   /// Initialize google sign-in.
   Future<void> _initializeGoogleSignIn() {
-    return runAsyncCall(
-      name: '_initializeGoogleSignIn',
-      future: () {
-        return ref.read(providerOfAuthService).initializeGoogleSignIn();
-      },
-      onError: (_) {},
-    );
+    return ref.read(providerOfAuthService).initializeGoogleSignIn();
   }
 
   /// Initializes the current logged in user.
   Future<void> _initializeLoggedInUser() {
-    return runAsyncCall(
-      name: '_initializeLoggedInUser',
-      future: () {
-        return ref.refresh(providerOfLoggedInUserFetcher.future);
-      },
-      onError: (_) {},
-    );
+    return ref.refresh(providerOfLoggedInUserFetcher.future);
   }
 
   /// Gets the location of the current user.
   Future<void> _getCurrentUserLocation() {
-    return runAsyncCall(
-      name: '_getCurrentUserLocation',
-      future: () => ref.read(providerOfLocation.notifier).getLocation(),
-      onError: (_) {},
-    );
+    return ref.read(providerOfLocation.notifier).getLocation();
+  }
+
+  /// Generates hazard marker bitmaps.
+  Future<void> _generateMarkerBitmaps() {
+    return ref
+        .read(providerOfHazardMarkerBitmaps.notifier)
+        .generateMarkerBitmaps();
   }
 }

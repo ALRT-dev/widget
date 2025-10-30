@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hazard_app/features/map/views/widgets/custom_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -12,6 +15,7 @@ import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
+import 'package:widget_to_marker/widget_to_marker.dart';
 
 class HazardService {
   HazardService(final Ref ref) : _ref = ref;
@@ -288,6 +292,40 @@ class HazardService {
   }) {
     return _hazardRepository.viewHazard(
       hazardId: hazardId,
+    );
+  }
+
+  /// Generates marker bitmaps for all hazard categories and severities.
+  Future<Either<Map<String, BitmapDescriptor>, AppError>>
+  generateHazardMarkerBitmaps() async {
+    final categoriesResult = await getHazardCategories();
+    final categories = categoriesResult.whenSuccess((cats) => cats) ?? [];
+    final severities = HazardSeverity.values;
+
+    final futures = <Future<Map<String, BitmapDescriptor>>>[];
+
+    for (final category in categories) {
+      for (final severity in severities) {
+        final key = '${severity.name}_${category.emoji}';
+
+        final future = CustomMarker(
+          markerImagePath: severity.markerPath,
+          emoji: category.emoji ?? '❗',
+        ).toBitmapDescriptor().then((bitmap) => {key: bitmap});
+
+        futures.add(future);
+      }
+    }
+
+    final markerBitmaps = await Future.wait(futures);
+    return Success(
+      markerBitmaps.fold<Map<String, BitmapDescriptor>>(
+        {},
+        (acc, map) {
+          acc.addAll(map);
+          return acc;
+        },
+      ),
     );
   }
 
