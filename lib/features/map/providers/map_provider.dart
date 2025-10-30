@@ -295,10 +295,25 @@ class MapProvider extends StateNotifier<MapProviderState> {
   }
 
   /// Starts navigation by centering the camera on the user's current location.
-  void startNavigation() {
-    updateIsNavigating(true);
+  void startNavigation() async {
+    final currentRoutePlan = state.currentRoutePlan;
+    if (currentRoutePlan == null) return;
 
     final currentUserLocation = _ref.read(providerOfLocation).location;
+    final origin = currentRoutePlan.origin;
+    final destination = currentRoutePlan.destination;
+
+    // If origin is different from current user location, get a new route then start navigation
+    if (origin != currentUserLocation) {
+      await getRoutePlan(
+        origin: currentUserLocation,
+        destination: destination,
+      );
+      if (!mounted) return;
+    }
+
+    updateIsNavigating(true);
+
     final zoom = 18.0;
     final tilt = 20.0;
 
@@ -346,7 +361,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
             final newLocation = AlrtLocation(
               latitude: position.latitude,
               longitude: position.longitude,
-              address: '', // We don't need address during navigation
+              address: 'Your Location',
             );
 
             _handleLocationUpdate(newLocation);

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/providers/map_search_text_editing_controller_provider.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
@@ -125,17 +126,29 @@ class _RouteSourceAndDestinationState
   }
 
   Widget _locationItemBuilder(final AlrtLocation location) {
-    return SizedBox(
-      width: double.infinity,
-      child: Text(
-        location.name ?? location.address ?? 'Unknown location',
-        style: TextStyle(
-          fontSize: 14.spMin,
-          color: AppColors.black,
-          fontWeight: FontWeight.w500,
-        ),
-        overflow: TextOverflow.ellipsis,
-      ),
+    return Consumer(
+      builder: (context, ref, child) {
+        final currentUserLocation = ref.read(
+          providerOfLocation.select(
+            (value) => value.location,
+          ),
+        );
+
+        return SizedBox(
+          width: double.infinity,
+          child: Text(
+            location == currentUserLocation
+                ? 'Your Location'
+                : location.displayName,
+            style: TextStyle(
+              fontSize: 14.spMin,
+              color: AppColors.black,
+              fontWeight: FontWeight.w500,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        );
+      },
     );
   }
 
