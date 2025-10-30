@@ -1,4 +1,1 @@
-* Feed credibility and ordering improvements
-* Hazard media upload
-* Profile picture upload
-* Push notification settings issues fixed
+* Google Maps

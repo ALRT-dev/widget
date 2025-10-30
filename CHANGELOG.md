@@ -1,3 +1,7 @@
+## v1.0.0+3 - 2025/10/30
+* Google Maps
+
+
 ## v1.0.0+2 - 2025/10/21
 * Feed credibility and ordering improvements
 * Hazard media upload
