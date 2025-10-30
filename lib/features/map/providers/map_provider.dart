@@ -610,10 +610,6 @@ class MapProvider extends StateNotifier<MapProviderState> {
       // Medium speed (>36 km/h)
       zoom = 17.0;
       tilt = 50.0;
-    } else if (currentSpeed < 2) {
-      // Very slow or stationary
-      zoom = 19.0;
-      tilt = 65.0;
     }
 
     animateToCameraUpdate(

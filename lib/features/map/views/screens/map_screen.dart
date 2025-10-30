@@ -51,6 +51,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
+            compassEnabled: false,
+            zoomControlsEnabled: false,
+            padding: EdgeInsets.symmetric(
+              vertical: 140.spMin,
+            ),
             buildingsEnabled: ref.watch(
               providerOfMap.select(
                 (value) => !(value.currentRoutePlan?.isNavigating ?? false),
