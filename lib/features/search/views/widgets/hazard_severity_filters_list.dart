@@ -42,22 +42,26 @@ class _HazardSeverityFiltersListState
         );
         if (hazardSeverities.isEmpty) return const SizedBox();
 
-        return SizedBox(
-          height: 30.spMin,
-          child: ListView.separated(
-            itemCount: hazardSeverities.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) {
-              final hazardSeverity = hazardSeverities[index];
-              return HazardSeverityFiltersListItem(
-                    severityFiltersKey: widget.severityFiltersKey,
-                    hazardSeverity: hazardSeverity,
-                    onSelected: (_) => _handleSeveritiesSelectionUpdated(),
-                  )
-                  .pL(index == 0 ? 20.0 : 0.0)
-                  .pR(index == (hazardSeverities.length - 1) ? 20.0 : 0.0);
-            },
-            separatorBuilder: (context, index) => 10.wSizedBox,
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            height: 30.spMin,
+            child: ListView.separated(
+              itemCount: hazardSeverities.length,
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final hazardSeverity = hazardSeverities[index];
+                return HazardSeverityFiltersListItem(
+                      severityFiltersKey: widget.severityFiltersKey,
+                      hazardSeverity: hazardSeverity,
+                      onSelected: (_) => _handleSeveritiesSelectionUpdated(),
+                    )
+                    .pL(index == 0 ? 20.0 : 0.0)
+                    .pR(index == (hazardSeverities.length - 1) ? 20.0 : 0.0);
+              },
+              separatorBuilder: (context, index) => 10.wSizedBox,
+            ),
           ),
         );
       },

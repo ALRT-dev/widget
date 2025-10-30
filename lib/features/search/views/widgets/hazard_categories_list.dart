@@ -51,22 +51,26 @@ class _HazardCategoriesListState extends ConsumerState<HazardCategoriesList> {
         );
         if (hazardCategories.isEmpty) return const SizedBox();
 
-        return SizedBox(
-          height: 40.spMin,
-          child: ListView.separated(
-            itemCount: hazardCategories.length,
-            scrollDirection: Axis.horizontal,
-            itemBuilder: (context, index) {
-              final hazardCategory = hazardCategories[index];
-              return HazardCategoriesListItem(
-                    categoriesKey: widget.categoriesKey,
-                    hazardCategory: hazardCategory,
-                    onSelected: (_) => _handleCategoriesSelectionUpdated(),
-                  )
-                  .pL(index == 0 ? 20.0 : 0.0)
-                  .pR(index == (hazardCategories.length - 1) ? 20.0 : 0.0);
-            },
-            separatorBuilder: (context, index) => 10.wSizedBox,
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: SizedBox(
+            height: 40.spMin,
+            child: ListView.separated(
+              itemCount: hazardCategories.length,
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final hazardCategory = hazardCategories[index];
+                return HazardCategoriesListItem(
+                      categoriesKey: widget.categoriesKey,
+                      hazardCategory: hazardCategory,
+                      onSelected: (_) => _handleCategoriesSelectionUpdated(),
+                    )
+                    .pL(index == 0 ? 20.0 : 0.0)
+                    .pR(index == (hazardCategories.length - 1) ? 20.0 : 0.0);
+              },
+              separatorBuilder: (context, index) => 10.wSizedBox,
+            ),
           ),
         );
       },
