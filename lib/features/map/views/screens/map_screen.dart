@@ -215,7 +215,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       const Duration(milliseconds: 300),
       () {
         if (!mounted) return;
-        ref.read(providerOfMap.notifier).getMapHazards();
+        ref.read(providerOfMap.notifier)
+          // Get the hazards for the new map position
+          ..getMapHazards()
+          // If route planning is active, update the hazards to avoid for the route
+          ..getRoutePlanHazardsToAvoid();
       },
     );
   }

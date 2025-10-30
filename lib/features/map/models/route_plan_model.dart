@@ -2,6 +2,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/safest_fastest_routes_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
 
 part 'route_plan_model.freezed.dart';
 
@@ -22,6 +23,9 @@ abstract class RoutePlan with _$RoutePlan {
     /// Map of travel modes to their corresponding route responses.
     @Default(<TravelMode, SafestFastestRoutes>{})
     final Map<TravelMode, SafestFastestRoutes> travelModeRoutes,
+
+    /// The list of hazards to avoid during route planning.
+    @Default(<Hazard>[]) final List<Hazard> hazardsToAvoid,
 
     /// Whether navigation is currently active.
     @Default(false) final bool isNavigating,

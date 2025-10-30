@@ -99,7 +99,9 @@ class _RouteSourceAndDestinationState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (origin != null)
-          _locationItemBuilder(origin).pB(14.0).onPressed(
+          _locationItemBuilder(origin)
+              .pB(14.0)
+              .onPressed(
                 () => _handleLocationSelection(
                   location: origin,
                   isSelectingOrigin: true,
@@ -110,7 +112,9 @@ class _RouteSourceAndDestinationState
           color: AppColors.lightGrey,
         ),
         if (destination != null)
-          _locationItemBuilder(destination).pT(14.0).onPressed(
+          _locationItemBuilder(destination)
+              .pT(14.0)
+              .onPressed(
                 () => _handleLocationSelection(
                   location: destination,
                   isSelectingOrigin: false,
@@ -165,7 +169,7 @@ class _RouteSourceAndDestinationState
       if (origin == null || destination == null) return;
 
       ref.read(providerOfMap.notifier)
-        ..getRoute(origin: origin, destination: destination)
+        ..getRoutePlan(origin: origin, destination: destination)
         ..updateSelectedLocation(destination)
         ..addSelectedLocationMarker(destination.latLng);
       ref.read(providerOfMapSearchTextEditingController).text =

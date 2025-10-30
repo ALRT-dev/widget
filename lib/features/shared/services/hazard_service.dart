@@ -38,6 +38,73 @@ class HazardService {
     );
   }
 
+  /// Fetches all hazards from the server by making multiple parallel requests.
+  Future<Either<List<Hazard>, AppError>> getAllHazards({
+    final int numberOfParallelRequests = 10,
+    required final HazardSearchParams searchParams,
+  }) async {
+    final allHazards = <Hazard>[];
+    final pageSize = searchParams.pageSize;
+    int currentPage = searchParams.page;
+    bool hasMoreData = true;
+
+    while (hasMoreData) {
+      final batchFutures = <Future<Either<List<Hazard>, AppError>>>[];
+
+      // Create parallel requests for the current batch of pages
+      for (int i = 0; i < numberOfParallelRequests; i++) {
+        final pageSearchParams = searchParams.copyWith(
+          page: currentPage + i,
+        );
+
+        batchFutures.add(
+          getHazards(
+            searchParams: pageSearchParams,
+          ),
+        );
+      }
+
+      // Wait for this batch to complete
+      final batchResults = await Future.wait(batchFutures);
+
+      // Process batch results
+      bool hasDataInThisBatch = false;
+      for (final result in batchResults) {
+        final error = result.when(
+          (hazards) {
+            if (hazards.isNotEmpty) {
+              allHazards.addAll(hazards);
+              hasDataInThisBatch = true;
+
+              // If this page has fewer items than page size, it's the last page
+              if (hazards.length < pageSize) {
+                hasMoreData = false;
+              }
+            }
+            return null; // Success case
+          },
+          (error) => error, // Return error
+        );
+
+        // If any request fails, return the error
+        if (error != null) {
+          return Failure(error);
+        }
+      }
+
+      // If no data was found in any of the parallel requests, we're done
+      if (!hasDataInThisBatch) {
+        hasMoreData = false;
+      }
+
+      // Move to the next batch of pages
+      currentPage += numberOfParallelRequests;
+    }
+
+    // Return the combined list of all hazards
+    return Success(allHazards);
+  }
+
   /// Fetches hazards along with categories from the server.
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
   getHazardsWithCategories({

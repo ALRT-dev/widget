@@ -170,7 +170,7 @@ class _SelectedLocationPreviewState
 
     ref
         .read(providerOfMap.notifier)
-        .getRoute(
+        .getRoutePlan(
           origin: currentUserLocation,
           destination: selectedLocation,
         );

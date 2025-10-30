@@ -347,7 +347,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
   RouteHazardSummary get _routeHazardSummary {
     final hazards = ref.watch(
       providerOfMap.select(
-        (value) => value.hazards,
+        (value) => value.currentRoutePlan?.hazardsToAvoid ?? [],
       ),
     );
     final routePoints = ref.watch(

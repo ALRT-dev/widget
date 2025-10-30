@@ -160,25 +160,17 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
   /// Fetches route from the map service and updates the state accordingly.
   /// Optionally avoids specified hazards.
-  Future<void> getRoute({
+  Future<void> getRoutePlan({
     required final AlrtLocation origin,
     required final AlrtLocation destination,
-    final bool avoidHazards = true,
   }) async {
     state = state.copyWith(
       getRouteState: const GetRouteState.loading(),
     );
 
-    // Get relevant hazards to avoid if enabled
-    List<Hazard>? hazardsToAvoid;
-    if (avoidHazards) {
-      hazardsToAvoid = state.hazards;
-    }
-
     final result = await _mapService.getRoutePlan(
       origin: origin,
       destination: destination,
-      hazardsToAvoid: hazardsToAvoid,
     );
     if (!mounted) return;
 
@@ -195,6 +187,36 @@ class MapProvider extends StateNotifier<MapProviderState> {
         );
       },
     );
+  }
+
+  /// Fetches hazards to avoid for the current route plan and updates the state accordingly.
+  Future<void> getRoutePlanHazardsToAvoid() async {
+    if (state.currentRoutePlan == null) return;
+
+    final allRoutes = state.currentRoutePlan?.currentRoute?.allRoutes ?? [];
+    if (allRoutes.isEmpty) return;
+
+    final bounds = allRoutes
+        .expand(
+          (route) => route.polylinePoints!
+              .map((e) => LatLng(e.latitude, e.longitude))
+              .toList(),
+        )
+        .toList()
+        .toBounds();
+
+    final result = await _hazardService.getAllHazards(
+      numberOfParallelRequests: 5,
+      searchParams: HazardSearchParams(
+        northeastLat: bounds.northeast.latitude,
+        northeastLng: bounds.northeast.longitude,
+        southwestLat: bounds.southwest.latitude,
+        southwestLng: bounds.southwest.longitude,
+        pageSize: 100,
+      ),
+    );
+
+    result.whenSuccess(updateHazardsToAvoid);
   }
 
   /// Fetches address from coordinates using the map service and updates the state accordingly.
@@ -356,7 +378,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
     addPolylineForRoutePlan();
 
     // Update user location marker
-    _updateUserLocationMarker(newLocation);
+    // _updateUserLocationMarker(newLocation);
 
     // Update camera position smoothly
     _updateNavigationCamera(newLocation);
@@ -424,6 +446,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
   }
 
   /// Updates or creates a user location marker during navigation
+  // ignore: unused_element
   void _updateUserLocationMarker(AlrtLocation location) {
     final userLocationMarker = Marker(
       markerId: const MarkerId('user_location'),
@@ -546,10 +569,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
     log('User is off route, recalculating...');
 
     // Get new route from current location to destination
-    await getRoute(
+    await getRoutePlan(
       origin: currentLocation,
       destination: currentRoutePlan!.destination,
-      avoidHazards: true,
     );
   }
 
@@ -733,10 +755,14 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final routeLabelMarkers = state.markers.where(
       (marker) => marker.markerId.value.startsWith('route_label_'),
     );
+    final currentUserLocationMarker = state.markers.firstWhereOrNull(
+      (marker) => marker.markerId.value == 'user_location',
+    );
     updateMarkers({
       ...markers.toSet(),
       if (selectedPlaceMarker != null) selectedPlaceMarker,
       ...routeLabelMarkers,
+      if (currentUserLocationMarker != null) currentUserLocationMarker,
     });
   }
 
@@ -785,7 +811,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
   }
 
   /// Adds a polyline for current route plan.
-  void addPolylineForRoutePlan() {
+  ///
+  /// If [animateToBounds] is true, animates the camera to fit the route bounds.
+  void addPolylineForRoutePlan({
+    final bool animateToBounds = true,
+  }) {
     var polylines = <Polyline>{};
 
     final allRoutes = (state.currentRoutePlan?.currentRoute?.allRoutes ?? []);
@@ -812,10 +842,10 @@ class MapProvider extends StateNotifier<MapProviderState> {
         final polyLine = Polyline(
           polylineId: PolylineId('route_${allRoutes.indexOf(route)}'),
           color: isCurrentRoute
-              ? AppColors.blue
-              : AppColors.blue.withValues(alpha: 0.3),
+              ? AppColors.darkBlue
+              : AppColors.darkBlue.withValues(alpha: 0.3),
           points: routePoints,
-          width: 8,
+          width: isCurrentRoute ? 10 : 8,
           startCap: Cap.roundCap,
           endCap: Cap.roundCap,
           jointType: JointType.round,
@@ -832,6 +862,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
                       .copyWith(selectedRoute: route),
                 },
               ),
+              animateToRouteBounds: false,
             );
           },
         );
@@ -850,7 +881,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
     }
 
     // If not navigating, animate to fit the route bounds
-    if (!isNavigating) {
+    if (!isNavigating && animateToBounds) {
       final currentRoutePoints =
           state.currentRoutePlan?.currentRoute?.currentRoute.polylinePoints
               ?.map((e) => LatLng(e.latitude, e.longitude))
@@ -858,7 +889,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
           [];
 
       if (currentRoutePoints.isNotEmpty) {
-        animateToBounds(
+        this.animateToBounds(
           bounds: currentRoutePoints.toBounds(),
         );
       }
@@ -876,7 +907,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
       polylines.add(
         Polyline(
           polylineId: const PolylineId('active_route'),
-          color: AppColors.blue,
+          color: AppColors.darkBlue,
           points: routePoints,
           width: 8,
           startCap: Cap.roundCap,
@@ -910,7 +941,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     // Choose colors based on whether user is on route
     final isOffRoute = state.isOffRoute;
-    final activeColor = isOffRoute ? AppColors.red : AppColors.blue;
+    final activeColor = isOffRoute ? AppColors.red : AppColors.darkBlue;
     final passedColor = AppColors.grey.withValues(alpha: 0.6);
 
     // Create passed route segment (gray/dimmed)
@@ -929,7 +960,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
       );
     }
 
-    // Create upcoming route segment (active color - blue if on route, red if off route)
+    // Create upcoming route segment (active color - darkBlue if on route, red if off route)
     if (closestSegmentIndex < routePoints.length - 1) {
       final upcomingPoints = routePoints.sublist(closestSegmentIndex);
       polylines.add(
@@ -962,6 +993,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final fastestRoute = currentRoute.fastestRoute;
     final safestRoute = currentRoute.safestRoute;
 
+    log('State markers before adding route labels: ${state.markers.length}');
+
     // Remove existing route label markers
     final updatedMarkers = Set<Marker>.from(state.markers)
       ..removeWhere(
@@ -977,7 +1010,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
       if (fastestMidpoint != null) {
         final fastestMarkerIcon = await RouteLabelMarker(
           label: safestRoute == fastestRoute ? 'Fastest & Safest' : 'Fastest',
-          backgroundColor: AppColors.blue,
+          backgroundColor: AppColors.darkBlue,
         ).toBitmapDescriptor();
 
         updatedMarkers.add(
@@ -1005,7 +1038,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
         if (safestMidpoint != null) {
           final safestMarkerIcon = await const RouteLabelMarker(
             label: 'Safest',
-            backgroundColor: AppColors.blue,
+            backgroundColor: AppColors.darkBlue,
           ).toBitmapDescriptor();
 
           updatedMarkers.add(
@@ -1070,15 +1103,27 @@ class MapProvider extends StateNotifier<MapProviderState> {
   }
 
   /// Updates [MapProviderState.currentRoutePlan] to the given [routePlan].
-  void updateCurrentRoutePlan(final RoutePlan? routePlan) {
+  ///
+  /// If [routePlan] is null, removes existing polylines and route label markers.
+  /// If [animateToRouteBounds] is true, animates the camera to fit the route bounds.
+  void updateCurrentRoutePlan(
+    final RoutePlan? routePlan, {
+    final bool animateToRouteBounds = true,
+    final bool updatePolylines = true,
+  }) {
     state = state.copyWith(
       currentRoutePlan: routePlan,
     );
-    if (routePlan == null) {
-      updatePolylines({});
-      removeRouteLabelMarkers();
-    } else {
-      addPolylineForRoutePlan();
+
+    if (updatePolylines) {
+      if (routePlan == null) {
+        this.updatePolylines({});
+        removeRouteLabelMarkers();
+      } else {
+        addPolylineForRoutePlan(
+          animateToBounds: animateToRouteBounds,
+        );
+      }
     }
   }
 
@@ -1088,6 +1133,18 @@ class MapProvider extends StateNotifier<MapProviderState> {
       state.currentRoutePlan?.copyWith(
         selectedTravelMode: mode,
       ),
+    );
+  }
+
+  /// Updates [MapProviderState.currentRoutePlan]'s hazards to avoid to the given [hazardsToAvoid].
+  void updateHazardsToAvoid(final List<Hazard> hazardsToAvoid) {
+    updateCurrentRoutePlan(
+      state.currentRoutePlan?.copyWith(
+        hazardsToAvoid: hazardsToAvoid,
+      ),
+
+      // No need to update polylines here as the route itself hasn't changed
+      updatePolylines: false,
     );
   }
 
