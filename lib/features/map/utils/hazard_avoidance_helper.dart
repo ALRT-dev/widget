@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:developer' as dev;
 import 'dart:math' as math;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
@@ -7,6 +7,8 @@ import 'package:hazard_app/features/shared/utils/location_helper.dart';
 
 /// Helper class for hazard avoidance functionality
 class HazardAvoidanceHelper {
+  static final bool _enableLogging = false;
+
   /// Filters hazards that are relevant to a specific route using actual route polyline
   static List<Hazard> getRelevantHazardsForPolyline(
     List<Hazard> allHazards,
@@ -142,8 +144,9 @@ class HazardAvoidanceHelper {
         .where((h) => h.severity == HazardSeverity.advice)
         .length;
 
-    final lowRiskCount =
-        relevantHazards.where((h) => h.severity == HazardSeverity.info).length;
+    final lowRiskCount = relevantHazards
+        .where((h) => h.severity == HazardSeverity.info)
+        .length;
 
     // Debug: log the counts
     log(
@@ -240,6 +243,12 @@ class HazardAvoidanceHelper {
       point2.longitude,
     );
   }
+
+  /// Logs a message if logging is enabled
+  static void log(final String message) {
+    if (!_enableLogging) return;
+    dev.log(message);
+  }
 }
 
 /// Summary of hazards affecting a route
@@ -282,19 +291,23 @@ class RouteHazardSummary {
     final messages = <String>[];
     if (emergencyHazards > 0) {
       messages.add(
-          '$emergencyHazards emergency hazard${emergencyHazards == 1 ? '' : 's'}');
+        '$emergencyHazards emergency hazard${emergencyHazards == 1 ? '' : 's'}',
+      );
     }
     if (highRiskHazards > 0) {
       messages.add(
-          '$highRiskHazards high risk hazard${highRiskHazards == 1 ? '' : 's'}');
+        '$highRiskHazards high risk hazard${highRiskHazards == 1 ? '' : 's'}',
+      );
     }
     if (mediumRiskHazards > 0) {
       messages.add(
-          '$mediumRiskHazards medium risk hazard${mediumRiskHazards == 1 ? '' : 's'}');
+        '$mediumRiskHazards medium risk hazard${mediumRiskHazards == 1 ? '' : 's'}',
+      );
     }
     if (lowRiskHazards > 0) {
-      messages
-          .add('$lowRiskHazards info hazard${lowRiskHazards == 1 ? '' : 's'}');
+      messages.add(
+        '$lowRiskHazards info hazard${lowRiskHazards == 1 ? '' : 's'}',
+      );
     }
 
     final hazardText = messages.join(', ');

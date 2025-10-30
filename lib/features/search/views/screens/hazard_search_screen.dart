@@ -120,6 +120,7 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
                     size: 16,
                   ),
             borderRadius: 8.0,
+            iconAndTextSpacing: 5.0,
             value: isLoading
                 ? null
                 : isSubscribed

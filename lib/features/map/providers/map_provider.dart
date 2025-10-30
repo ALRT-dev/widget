@@ -76,6 +76,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
     _ref.onDispose(() {
       _headingStreamSubscription?.cancel();
       _positionStreamSubscription?.cancel();
+      // Reset map ready state when provider is disposed
+      if (mounted) {
+        state = state.copyWith(
+          isMapReady: false,
+          pendingAnimationBounds: null,
+        );
+      }
     });
   }
 
@@ -86,6 +93,15 @@ class MapProvider extends StateNotifier<MapProviderState> {
     _mapService.initializeMapController(
       googleMapController: googleMapController,
     );
+
+    // Mark map as ready
+    updateIsMapReady(true);
+
+    // Execute any pending animation
+    final pendingBounds = state.pendingAnimationBounds;
+    if (pendingBounds != null) {
+      animateToBounds(bounds: pendingBounds);
+    }
   }
 
   /// Fetches hazards for the map and updates the state accordingly.
@@ -274,18 +290,41 @@ class MapProvider extends StateNotifier<MapProviderState> {
   }
 
   /// Animates the camera to fit within the given [bounds] with optional [padding].
+  /// If the map is not ready, stores the bounds to animate to later.
   Future<void> animateToBounds({
     required final LatLngBounds bounds,
     final double padding = 100.0,
   }) async {
-    await _mapService.animateCamera(
-      cameraUpdate: CameraUpdate.newLatLngBounds(
-        bounds,
-        padding,
-      ),
-    );
+    if (!state.isMapReady) {
+      // If map is not ready, store the bounds for later execution
+      state = state.copyWith(
+        pendingAnimationBounds: bounds,
+      );
+    } else {
+      // If map is ready, attempt to animate immediately
+      final result = await _mapService.animateCamera(
+        cameraUpdate: CameraUpdate.newLatLngBounds(bounds, padding),
+      );
+      if (!mounted) return;
+
+      result.when(
+        (success) {
+          // Animation succeeded, reset pending bounds
+          state = state.copyWith(
+            pendingAnimationBounds: null,
+          );
+        },
+        (failure) {
+          // If animation fails, queue it
+          state = state.copyWith(
+            pendingAnimationBounds: bounds,
+          );
+        },
+      );
+    }
   }
 
+  /// Animates the camera using the given [cameraUpdate].
   Future<void> animateToCameraUpdate({
     required final CameraUpdate cameraUpdate,
   }) async {
@@ -775,6 +814,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
       ...routeLabelMarkers,
       if (currentUserLocationMarker != null) currentUserLocationMarker,
     });
+  }
+
+  /// Updates [MapProviderState.isMapReady] to the given [isMapReady].
+  void updateIsMapReady(final bool isMapReady) {
+    state = state.copyWith(
+      isMapReady: isMapReady,
+    );
   }
 
   /// Updates the [MapProviderState.hazards] to the given [hazards].

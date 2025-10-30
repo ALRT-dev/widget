@@ -227,8 +227,8 @@ return $default(_that.id,_that.northeastLat,_that.northeastLng,_that.southwestLa
 /// @nodoc
 @JsonSerializable()
 
-class _LocationSubscription implements LocationSubscription {
-  const _LocationSubscription({this.id, required this.northeastLat, required this.northeastLng, required this.southwestLat, required this.southwestLng, this.isOwnLocation = false, this.name, this.address, this.createdAt, this.updatedAt});
+class _LocationSubscription extends LocationSubscription {
+  const _LocationSubscription({this.id, required this.northeastLat, required this.northeastLng, required this.southwestLat, required this.southwestLng, this.isOwnLocation = false, this.name, this.address, this.createdAt, this.updatedAt}): super._();
   factory _LocationSubscription.fromJson(Map<String, dynamic> json) => _$LocationSubscriptionFromJson(json);
 
 /// The subscription's unique identifier.

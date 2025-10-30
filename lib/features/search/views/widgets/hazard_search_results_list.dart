@@ -154,6 +154,7 @@ class _HazardSearchResultsListState
                 : isSubscribed
                 ? 'Unsubscribe'
                 : 'Subscribe',
+            iconAndTextSpacing: 5.0,
             valueStyle: const TextStyle(
               fontSize: 14,
             ),

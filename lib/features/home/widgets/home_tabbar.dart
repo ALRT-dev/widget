@@ -148,6 +148,5 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
   /// Updates the current selected tab.
   void _onTabChanged(final HomeTab tab) {
     ref.read(providerOfHomeTab.notifier).state = tab;
-    widget.tabController.animateTo(tab.index);
   }
 }

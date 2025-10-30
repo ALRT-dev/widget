@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_provider.dart';
+import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/home/widgets/home_tabbar.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/providers/map_search_text_editing_controller_provider.dart';
@@ -92,6 +93,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfUserSocketManager.select((value) => null));
     ref.watch(providerOfManageNotifications.select((value) => null));
 
+    _listenToHomeTabStateChanges();
     _listenToCreateReportState();
     _listenToTheMessageRecievedFromThePushNotification();
 
@@ -110,6 +112,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       bottomNavigationBar: HomeTabbar(
         tabController: _tabController,
       ),
+    );
+  }
+
+  /// Listens to changes in the selected tab and updates the tab controller.
+  void _listenToHomeTabStateChanges() {
+    ref.listen<HomeTab>(
+      providerOfHomeTab,
+      (previous, next) {
+        if (previous != next) {
+          _tabController.animateTo(next.index);
+        }
+      },
     );
   }
 

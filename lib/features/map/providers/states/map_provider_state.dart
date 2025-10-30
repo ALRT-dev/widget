@@ -61,6 +61,12 @@ abstract class MapProviderState with _$MapProviderState {
 
     /// Navigation state
     @Default(NavigationState.idle) final NavigationState navigationState,
+
+    /// Whether the map controller is ready for operations
+    @Default(false) final bool isMapReady,
+
+    /// Pending bounds to animate to when map becomes ready
+    final LatLngBounds? pendingAnimationBounds,
   }) = _MapProviderState;
 }
 

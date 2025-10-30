@@ -1,10 +1,13 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 part 'location_subscription_model.freezed.dart';
 part 'location_subscription_model.g.dart';
 
 @freezed
 abstract class LocationSubscription with _$LocationSubscription {
+  const LocationSubscription._();
+
   const factory LocationSubscription({
     /// The subscription's unique identifier.
     final String? id,
@@ -36,6 +39,12 @@ abstract class LocationSubscription with _$LocationSubscription {
     /// The timestamp when the subscription was last updated.
     final DateTime? updatedAt,
   }) = _LocationSubscription;
+
+  /// Computes the geographical bounds of the subscription area.
+  LatLngBounds get bounds => LatLngBounds(
+    northeast: LatLng(northeastLat, northeastLng),
+    southwest: LatLng(southwestLat, southwestLng),
+  );
 
   factory LocationSubscription.fromJson(Map<String, dynamic> json) =>
       _$LocationSubscriptionFromJson(json);

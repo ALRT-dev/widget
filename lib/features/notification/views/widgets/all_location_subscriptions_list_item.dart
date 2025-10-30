@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/home/enums/home_tab_types.dart';
+import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
+import 'package:hazard_app/features/home/views/screens/home_screen.dart';
+import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
 import 'package:hazard_app/features/profile/providers/states/my_location_subscriptions_provider_state.dart';
+import 'package:hazard_app/features/shared/extensions/context_navigation_extension.dart';
 import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
@@ -95,51 +100,79 @@ class _AllLocationSubscriptionsListItemState
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-                  if (!widget.subscription.isOwnLocation) 8.hSizedBox,
-                  if (!widget.subscription.isOwnLocation)
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final isLoading = ref.watch(
-                          providerOfMyLocationSubscriptions.select(
-                            (value) =>
-                                value.unsubscribeFromLocationStateWrappers.any(
-                                  (wrapper) =>
-                                      wrapper.subscriptionId ==
-                                          widget.subscription.id &&
-                                      wrapper.unsubscribeFromLocationState
-                                          .maybeWhen(
-                                            orElse: () => false,
-                                            loading: () => true,
-                                          ),
-                                ),
-                          ),
-                        );
+                  8.hSizedBox,
+                  Row(
+                    spacing: 10.spMin,
+                    children: [
+                      if (!widget.subscription.isOwnLocation)
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final isLoading = ref.watch(
+                              providerOfMyLocationSubscriptions.select(
+                                (value) => value
+                                    .unsubscribeFromLocationStateWrappers
+                                    .any(
+                                      (wrapper) =>
+                                          wrapper.subscriptionId ==
+                                              widget.subscription.id &&
+                                          wrapper.unsubscribeFromLocationState
+                                              .maybeWhen(
+                                                orElse: () => false,
+                                                loading: () => true,
+                                              ),
+                                    ),
+                              ),
+                            );
 
-                        return SizedBox(
-                          height: 30.spMin,
-                          child: Button.filled(
-                            width: 120.spMin,
-                            onPressed: _handleUnsubscribe,
-                            isLoading: isLoading,
-                            padding: EdgeInsets.zero,
-                            color: AppColors.red,
-                            icon: isLoading
-                                ? null
-                                : Icon(
-                                    Icons.notifications_off_rounded,
-                                    color: AppColors.white,
-                                    size: 16.spMin,
-                                  ),
-                            borderRadius: 8.0,
-                            value: isLoading ? null : 'Unsubscribe',
-                            valueStyle: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.white,
-                            ),
+                            return SizedBox(
+                              height: 30.spMin,
+                              child: Button.filled(
+                                width: 120.spMin,
+                                onPressed: _handleUnsubscribe,
+                                isLoading: isLoading,
+                                padding: EdgeInsets.zero,
+                                color: AppColors.red,
+                                iconAndTextSpacing: 5.0,
+                                icon: isLoading
+                                    ? null
+                                    : Icon(
+                                        Icons.notifications_off_rounded,
+                                        color: AppColors.white,
+                                        size: 16.spMin,
+                                      ),
+                                borderRadius: 8.0,
+                                value: isLoading ? null : 'Unsubscribe',
+                                valueStyle: TextStyle(
+                                  fontSize: 12.spMin,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      SizedBox(
+                        height: 30.spMin,
+                        child: Button.filled(
+                          width: 120.spMin,
+                          onPressed: _handleViewOnMap,
+                          iconAndTextSpacing: 5.0,
+                          padding: EdgeInsets.zero,
+                          color: AppColors.blue,
+                          icon: Icon(
+                            Icons.map_rounded,
+                            color: AppColors.white,
+                            size: 16.spMin,
                           ),
-                        );
-                      },
-                    ),
+                          borderRadius: 8.0,
+                          value: 'View on Map',
+                          valueStyle: TextStyle(
+                            fontSize: 12.spMin,
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -162,5 +195,14 @@ class _AllLocationSubscriptionsListItemState
           .read(providerOfMyLocationSubscriptions.notifier)
           .unsubscribeFromLocation(subscriptionId: widget.subscription.id!),
     );
+  }
+
+  /// Handles the view on map action when the "View on Map" button is pressed.
+  void _handleViewOnMap() {
+    context.popUntilRoute(HomeScreen.route);
+    ref.read(providerOfHomeTab.notifier).state = HomeTab.map;
+    ref
+        .read(providerOfMap.notifier)
+        .animateToBounds(bounds: widget.subscription.bounds);
   }
 }

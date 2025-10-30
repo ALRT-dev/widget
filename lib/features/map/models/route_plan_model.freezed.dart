@@ -18,9 +18,9 @@ mixin _$RoutePlan {
  AlrtLocation get origin;/// The destination location for the route.
  AlrtLocation get destination;/// Currently selected travel mode.
  TravelMode get selectedTravelMode;/// Map of travel modes to their corresponding route responses.
- Map<TravelMode, SafestFastestRoutes> get travelModeRoutes;/// Whether navigation is currently active.
- bool get isNavigating;/// The list of hazards to avoid during route planning.
- List<Hazard> get hazardsToAvoid;
+ Map<TravelMode, SafestFastestRoutes> get travelModeRoutes;/// The list of hazards to avoid during route planning.
+ List<Hazard> get hazardsToAvoid;/// Whether navigation is currently active.
+ bool get isNavigating;
 /// Create a copy of RoutePlan
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -31,16 +31,16 @@ $RoutePlanCopyWith<RoutePlan> get copyWith => _$RoutePlanCopyWithImpl<RoutePlan>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RoutePlan&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.destination, destination) || other.destination == destination)&&(identical(other.selectedTravelMode, selectedTravelMode) || other.selectedTravelMode == selectedTravelMode)&&const DeepCollectionEquality().equals(other.travelModeRoutes, travelModeRoutes)&&(identical(other.isNavigating, isNavigating) || other.isNavigating == isNavigating)&&const DeepCollectionEquality().equals(other.hazardsToAvoid, hazardsToAvoid));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RoutePlan&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.destination, destination) || other.destination == destination)&&(identical(other.selectedTravelMode, selectedTravelMode) || other.selectedTravelMode == selectedTravelMode)&&const DeepCollectionEquality().equals(other.travelModeRoutes, travelModeRoutes)&&const DeepCollectionEquality().equals(other.hazardsToAvoid, hazardsToAvoid)&&(identical(other.isNavigating, isNavigating) || other.isNavigating == isNavigating));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,origin,destination,selectedTravelMode,const DeepCollectionEquality().hash(travelModeRoutes),isNavigating,const DeepCollectionEquality().hash(hazardsToAvoid));
+int get hashCode => Object.hash(runtimeType,origin,destination,selectedTravelMode,const DeepCollectionEquality().hash(travelModeRoutes),const DeepCollectionEquality().hash(hazardsToAvoid),isNavigating);
 
 @override
 String toString() {
-  return 'RoutePlan(origin: $origin, destination: $destination, selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes, isNavigating: $isNavigating, hazardsToAvoid: $hazardsToAvoid)';
+  return 'RoutePlan(origin: $origin, destination: $destination, selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes, hazardsToAvoid: $hazardsToAvoid, isNavigating: $isNavigating)';
 }
 
 
@@ -51,7 +51,7 @@ abstract mixin class $RoutePlanCopyWith<$Res>  {
   factory $RoutePlanCopyWith(RoutePlan value, $Res Function(RoutePlan) _then) = _$RoutePlanCopyWithImpl;
 @useResult
 $Res call({
- AlrtLocation origin, AlrtLocation destination, TravelMode selectedTravelMode, Map<TravelMode, SafestFastestRoutes> travelModeRoutes, bool isNavigating, List<Hazard> hazardsToAvoid
+ AlrtLocation origin, AlrtLocation destination, TravelMode selectedTravelMode, Map<TravelMode, SafestFastestRoutes> travelModeRoutes, List<Hazard> hazardsToAvoid, bool isNavigating
 });
 
 
@@ -68,15 +68,15 @@ class _$RoutePlanCopyWithImpl<$Res>
 
 /// Create a copy of RoutePlan
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? origin = null,Object? destination = null,Object? selectedTravelMode = null,Object? travelModeRoutes = null,Object? isNavigating = null,Object? hazardsToAvoid = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? origin = null,Object? destination = null,Object? selectedTravelMode = null,Object? travelModeRoutes = null,Object? hazardsToAvoid = null,Object? isNavigating = null,}) {
   return _then(_self.copyWith(
 origin: null == origin ? _self.origin : origin // ignore: cast_nullable_to_non_nullable
 as AlrtLocation,destination: null == destination ? _self.destination : destination // ignore: cast_nullable_to_non_nullable
 as AlrtLocation,selectedTravelMode: null == selectedTravelMode ? _self.selectedTravelMode : selectedTravelMode // ignore: cast_nullable_to_non_nullable
 as TravelMode,travelModeRoutes: null == travelModeRoutes ? _self.travelModeRoutes : travelModeRoutes // ignore: cast_nullable_to_non_nullable
-as Map<TravelMode, SafestFastestRoutes>,isNavigating: null == isNavigating ? _self.isNavigating : isNavigating // ignore: cast_nullable_to_non_nullable
-as bool,hazardsToAvoid: null == hazardsToAvoid ? _self.hazardsToAvoid : hazardsToAvoid // ignore: cast_nullable_to_non_nullable
-as List<Hazard>,
+as Map<TravelMode, SafestFastestRoutes>,hazardsToAvoid: null == hazardsToAvoid ? _self.hazardsToAvoid : hazardsToAvoid // ignore: cast_nullable_to_non_nullable
+as List<Hazard>,isNavigating: null == isNavigating ? _self.isNavigating : isNavigating // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 /// Create a copy of RoutePlan
@@ -179,10 +179,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, SafestFastestRoutes> travelModeRoutes,  bool isNavigating,  List<Hazard> hazardsToAvoid)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, SafestFastestRoutes> travelModeRoutes,  List<Hazard> hazardsToAvoid,  bool isNavigating)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RoutePlan() when $default != null:
-return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.travelModeRoutes,_that.isNavigating,_that.hazardsToAvoid);case _:
+return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.travelModeRoutes,_that.hazardsToAvoid,_that.isNavigating);case _:
   return orElse();
 
 }
@@ -200,10 +200,10 @@ return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.tr
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, SafestFastestRoutes> travelModeRoutes,  bool isNavigating,  List<Hazard> hazardsToAvoid)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, SafestFastestRoutes> travelModeRoutes,  List<Hazard> hazardsToAvoid,  bool isNavigating)  $default,) {final _that = this;
 switch (_that) {
 case _RoutePlan():
-return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.travelModeRoutes,_that.isNavigating,_that.hazardsToAvoid);case _:
+return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.travelModeRoutes,_that.hazardsToAvoid,_that.isNavigating);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -220,10 +220,10 @@ return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.tr
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, SafestFastestRoutes> travelModeRoutes,  bool isNavigating,  List<Hazard> hazardsToAvoid)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AlrtLocation origin,  AlrtLocation destination,  TravelMode selectedTravelMode,  Map<TravelMode, SafestFastestRoutes> travelModeRoutes,  List<Hazard> hazardsToAvoid,  bool isNavigating)?  $default,) {final _that = this;
 switch (_that) {
 case _RoutePlan() when $default != null:
-return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.travelModeRoutes,_that.isNavigating,_that.hazardsToAvoid);case _:
+return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.travelModeRoutes,_that.hazardsToAvoid,_that.isNavigating);case _:
   return null;
 
 }
@@ -235,7 +235,7 @@ return $default(_that.origin,_that.destination,_that.selectedTravelMode,_that.tr
 
 
 class _RoutePlan extends RoutePlan {
-  const _RoutePlan({required this.origin, required this.destination, this.selectedTravelMode = TravelMode.driving, final  Map<TravelMode, SafestFastestRoutes> travelModeRoutes = const <TravelMode, SafestFastestRoutes>{}, this.isNavigating = false, final  List<Hazard> hazardsToAvoid = const <Hazard>[]}): _travelModeRoutes = travelModeRoutes,_hazardsToAvoid = hazardsToAvoid,super._();
+  const _RoutePlan({required this.origin, required this.destination, this.selectedTravelMode = TravelMode.driving, final  Map<TravelMode, SafestFastestRoutes> travelModeRoutes = const <TravelMode, SafestFastestRoutes>{}, final  List<Hazard> hazardsToAvoid = const <Hazard>[], this.isNavigating = false}): _travelModeRoutes = travelModeRoutes,_hazardsToAvoid = hazardsToAvoid,super._();
   
 
 /// The origin location for the route.
@@ -253,8 +253,6 @@ class _RoutePlan extends RoutePlan {
   return EqualUnmodifiableMapView(_travelModeRoutes);
 }
 
-/// Whether navigation is currently active.
-@override@JsonKey() final  bool isNavigating;
 /// The list of hazards to avoid during route planning.
  final  List<Hazard> _hazardsToAvoid;
 /// The list of hazards to avoid during route planning.
@@ -264,6 +262,8 @@ class _RoutePlan extends RoutePlan {
   return EqualUnmodifiableListView(_hazardsToAvoid);
 }
 
+/// Whether navigation is currently active.
+@override@JsonKey() final  bool isNavigating;
 
 /// Create a copy of RoutePlan
 /// with the given fields replaced by the non-null parameter values.
@@ -275,16 +275,16 @@ _$RoutePlanCopyWith<_RoutePlan> get copyWith => __$RoutePlanCopyWithImpl<_RouteP
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RoutePlan&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.destination, destination) || other.destination == destination)&&(identical(other.selectedTravelMode, selectedTravelMode) || other.selectedTravelMode == selectedTravelMode)&&const DeepCollectionEquality().equals(other._travelModeRoutes, _travelModeRoutes)&&(identical(other.isNavigating, isNavigating) || other.isNavigating == isNavigating)&&const DeepCollectionEquality().equals(other._hazardsToAvoid, _hazardsToAvoid));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RoutePlan&&(identical(other.origin, origin) || other.origin == origin)&&(identical(other.destination, destination) || other.destination == destination)&&(identical(other.selectedTravelMode, selectedTravelMode) || other.selectedTravelMode == selectedTravelMode)&&const DeepCollectionEquality().equals(other._travelModeRoutes, _travelModeRoutes)&&const DeepCollectionEquality().equals(other._hazardsToAvoid, _hazardsToAvoid)&&(identical(other.isNavigating, isNavigating) || other.isNavigating == isNavigating));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,origin,destination,selectedTravelMode,const DeepCollectionEquality().hash(_travelModeRoutes),isNavigating,const DeepCollectionEquality().hash(_hazardsToAvoid));
+int get hashCode => Object.hash(runtimeType,origin,destination,selectedTravelMode,const DeepCollectionEquality().hash(_travelModeRoutes),const DeepCollectionEquality().hash(_hazardsToAvoid),isNavigating);
 
 @override
 String toString() {
-  return 'RoutePlan(origin: $origin, destination: $destination, selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes, isNavigating: $isNavigating, hazardsToAvoid: $hazardsToAvoid)';
+  return 'RoutePlan(origin: $origin, destination: $destination, selectedTravelMode: $selectedTravelMode, travelModeRoutes: $travelModeRoutes, hazardsToAvoid: $hazardsToAvoid, isNavigating: $isNavigating)';
 }
 
 
@@ -295,7 +295,7 @@ abstract mixin class _$RoutePlanCopyWith<$Res> implements $RoutePlanCopyWith<$Re
   factory _$RoutePlanCopyWith(_RoutePlan value, $Res Function(_RoutePlan) _then) = __$RoutePlanCopyWithImpl;
 @override @useResult
 $Res call({
- AlrtLocation origin, AlrtLocation destination, TravelMode selectedTravelMode, Map<TravelMode, SafestFastestRoutes> travelModeRoutes, bool isNavigating, List<Hazard> hazardsToAvoid
+ AlrtLocation origin, AlrtLocation destination, TravelMode selectedTravelMode, Map<TravelMode, SafestFastestRoutes> travelModeRoutes, List<Hazard> hazardsToAvoid, bool isNavigating
 });
 
 
@@ -312,15 +312,15 @@ class __$RoutePlanCopyWithImpl<$Res>
 
 /// Create a copy of RoutePlan
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? origin = null,Object? destination = null,Object? selectedTravelMode = null,Object? travelModeRoutes = null,Object? isNavigating = null,Object? hazardsToAvoid = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? origin = null,Object? destination = null,Object? selectedTravelMode = null,Object? travelModeRoutes = null,Object? hazardsToAvoid = null,Object? isNavigating = null,}) {
   return _then(_RoutePlan(
 origin: null == origin ? _self.origin : origin // ignore: cast_nullable_to_non_nullable
 as AlrtLocation,destination: null == destination ? _self.destination : destination // ignore: cast_nullable_to_non_nullable
 as AlrtLocation,selectedTravelMode: null == selectedTravelMode ? _self.selectedTravelMode : selectedTravelMode // ignore: cast_nullable_to_non_nullable
 as TravelMode,travelModeRoutes: null == travelModeRoutes ? _self._travelModeRoutes : travelModeRoutes // ignore: cast_nullable_to_non_nullable
-as Map<TravelMode, SafestFastestRoutes>,isNavigating: null == isNavigating ? _self.isNavigating : isNavigating // ignore: cast_nullable_to_non_nullable
-as bool,hazardsToAvoid: null == hazardsToAvoid ? _self._hazardsToAvoid : hazardsToAvoid // ignore: cast_nullable_to_non_nullable
-as List<Hazard>,
+as Map<TravelMode, SafestFastestRoutes>,hazardsToAvoid: null == hazardsToAvoid ? _self._hazardsToAvoid : hazardsToAvoid // ignore: cast_nullable_to_non_nullable
+as List<Hazard>,isNavigating: null == isNavigating ? _self.isNavigating : isNavigating // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
