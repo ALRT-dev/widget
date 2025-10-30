@@ -51,6 +51,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
+            buildingsEnabled: ref.watch(
+              providerOfMap.select(
+                (value) => !(value.currentRoutePlan?.isNavigating ?? false),
+              ),
+            ),
             onMapCreated: (controller) {
               ref
                   .read(providerOfMap.notifier)

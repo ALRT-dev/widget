@@ -563,7 +563,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     // Adjust zoom and tilt based on speed for better navigation experience
     double zoom = 18.0;
-    double tilt = 60.0;
+    double tilt = 30.0;
 
     if (currentSpeed > 20) {
       // High speed (>72 km/h)

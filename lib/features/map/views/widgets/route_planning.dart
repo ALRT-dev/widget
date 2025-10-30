@@ -383,9 +383,16 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
 
   /// Handles the close button press to clear the current route.
   void _handleClose() {
-    ref.read(providerOfMap.notifier)
-      ..updateCurrentRoutePlan(null)
-      ..stopNavigation();
+    final isNavigating = ref.read(
+      providerOfMap.select(
+        (value) => value.currentRoutePlan?.isNavigating ?? false,
+      ),
+    );
+    if (isNavigating) {
+      ref.read(providerOfMap.notifier).stopNavigation();
+    } else {
+      ref.read(providerOfMap.notifier).updateCurrentRoutePlan(null);
+    }
   }
 
   /// Handles travel mode change.
