@@ -24,7 +24,14 @@ mixin _$MapProviderState {
  RoutePlan? get currentRoutePlan;/// The state of fetching route.
  GetRouteState get getRouteState;/// The state of fetching address from coordinates.
  GetAddressFromCoordinatesState get getAddressFromCoordinatesState;/// The state of fetching hazards for the map.
- GetMapHazardsState get getMapHazardsState;
+ GetMapHazardsState get getMapHazardsState;// Navigation-related fields
+/// Current user location during navigation
+ AlrtLocation? get currentNavigationLocation;/// Current speed (m/s)
+ double get currentSpeed;/// Current bearing/direction in degrees (0-360)
+ double get currentBearing;/// Whether the user is off-route
+ bool get isOffRoute;/// Camera should follow user during navigation
+ bool get followUser;/// Navigation state
+ NavigationState get navigationState;
 /// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -35,16 +42,16 @@ $MapProviderStateCopyWith<MapProviderState> get copyWith => _$MapProviderStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MapProviderState&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.selectedHazard, selectedHazard) || other.selectedHazard == selectedHazard)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other.markers, markers)&&const DeepCollectionEquality().equals(other.polylines, polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MapProviderState&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.selectedHazard, selectedHazard) || other.selectedHazard == selectedHazard)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other.markers, markers)&&const DeepCollectionEquality().equals(other.polylines, polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState)&&(identical(other.currentNavigationLocation, currentNavigationLocation) || other.currentNavigationLocation == currentNavigationLocation)&&(identical(other.currentSpeed, currentSpeed) || other.currentSpeed == currentSpeed)&&(identical(other.currentBearing, currentBearing) || other.currentBearing == currentBearing)&&(identical(other.isOffRoute, isOffRoute) || other.isOffRoute == isOffRoute)&&(identical(other.followUser, followUser) || other.followUser == followUser)&&(identical(other.navigationState, navigationState) || other.navigationState == navigationState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(hazards),selectedHazard,cameraPosition,const DeepCollectionEquality().hash(markers),const DeepCollectionEquality().hash(polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(hazards),selectedHazard,cameraPosition,const DeepCollectionEquality().hash(markers),const DeepCollectionEquality().hash(polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState,currentNavigationLocation,currentSpeed,currentBearing,isOffRoute,followUser,navigationState);
 
 @override
 String toString() {
-  return 'MapProviderState(hazards: $hazards, selectedHazard: $selectedHazard, cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState)';
+  return 'MapProviderState(hazards: $hazards, selectedHazard: $selectedHazard, cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState, currentNavigationLocation: $currentNavigationLocation, currentSpeed: $currentSpeed, currentBearing: $currentBearing, isOffRoute: $isOffRoute, followUser: $followUser, navigationState: $navigationState)';
 }
 
 
@@ -55,11 +62,11 @@ abstract mixin class $MapProviderStateCopyWith<$Res>  {
   factory $MapProviderStateCopyWith(MapProviderState value, $Res Function(MapProviderState) _then) = _$MapProviderStateCopyWithImpl;
 @useResult
 $Res call({
- List<Hazard> hazards, Hazard? selectedHazard, CameraPosition cameraPosition, Set<Marker> markers, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState
+ List<Hazard> hazards, Hazard? selectedHazard, CameraPosition cameraPosition, Set<Marker> markers, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState, AlrtLocation? currentNavigationLocation, double currentSpeed, double currentBearing, bool isOffRoute, bool followUser, NavigationState navigationState
 });
 
 
-$HazardCopyWith<$Res>? get selectedHazard;$AlrtLocationCopyWith<$Res>? get selectedLocation;$RoutePlanCopyWith<$Res>? get currentRoutePlan;$GetRouteStateCopyWith<$Res> get getRouteState;$GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;$GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;
+$HazardCopyWith<$Res>? get selectedHazard;$AlrtLocationCopyWith<$Res>? get selectedLocation;$RoutePlanCopyWith<$Res>? get currentRoutePlan;$GetRouteStateCopyWith<$Res> get getRouteState;$GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;$GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;$AlrtLocationCopyWith<$Res>? get currentNavigationLocation;
 
 }
 /// @nodoc
@@ -72,7 +79,7 @@ class _$MapProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? hazards = null,Object? selectedHazard = freezed,Object? cameraPosition = null,Object? markers = null,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? hazards = null,Object? selectedHazard = freezed,Object? cameraPosition = null,Object? markers = null,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,Object? currentNavigationLocation = freezed,Object? currentSpeed = null,Object? currentBearing = null,Object? isOffRoute = null,Object? followUser = null,Object? navigationState = null,}) {
   return _then(_self.copyWith(
 hazards: null == hazards ? _self.hazards : hazards // ignore: cast_nullable_to_non_nullable
 as List<Hazard>,selectedHazard: freezed == selectedHazard ? _self.selectedHazard : selectedHazard // ignore: cast_nullable_to_non_nullable
@@ -84,7 +91,13 @@ as AlrtLocation?,currentRoutePlan: freezed == currentRoutePlan ? _self.currentRo
 as RoutePlan?,getRouteState: null == getRouteState ? _self.getRouteState : getRouteState // ignore: cast_nullable_to_non_nullable
 as GetRouteState,getAddressFromCoordinatesState: null == getAddressFromCoordinatesState ? _self.getAddressFromCoordinatesState : getAddressFromCoordinatesState // ignore: cast_nullable_to_non_nullable
 as GetAddressFromCoordinatesState,getMapHazardsState: null == getMapHazardsState ? _self.getMapHazardsState : getMapHazardsState // ignore: cast_nullable_to_non_nullable
-as GetMapHazardsState,
+as GetMapHazardsState,currentNavigationLocation: freezed == currentNavigationLocation ? _self.currentNavigationLocation : currentNavigationLocation // ignore: cast_nullable_to_non_nullable
+as AlrtLocation?,currentSpeed: null == currentSpeed ? _self.currentSpeed : currentSpeed // ignore: cast_nullable_to_non_nullable
+as double,currentBearing: null == currentBearing ? _self.currentBearing : currentBearing // ignore: cast_nullable_to_non_nullable
+as double,isOffRoute: null == isOffRoute ? _self.isOffRoute : isOffRoute // ignore: cast_nullable_to_non_nullable
+as bool,followUser: null == followUser ? _self.followUser : followUser // ignore: cast_nullable_to_non_nullable
+as bool,navigationState: null == navigationState ? _self.navigationState : navigationState // ignore: cast_nullable_to_non_nullable
+as NavigationState,
   ));
 }
 /// Create a copy of MapProviderState
@@ -149,6 +162,18 @@ $GetMapHazardsStateCopyWith<$Res> get getMapHazardsState {
   
   return $GetMapHazardsStateCopyWith<$Res>(_self.getMapHazardsState, (value) {
     return _then(_self.copyWith(getMapHazardsState: value));
+  });
+}/// Create a copy of MapProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AlrtLocationCopyWith<$Res>? get currentNavigationLocation {
+    if (_self.currentNavigationLocation == null) {
+    return null;
+  }
+
+  return $AlrtLocationCopyWith<$Res>(_self.currentNavigationLocation!, (value) {
+    return _then(_self.copyWith(currentNavigationLocation: value));
   });
 }
 }
@@ -232,10 +257,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState,  AlrtLocation? currentNavigationLocation,  double currentSpeed,  double currentBearing,  bool isOffRoute,  bool followUser,  NavigationState navigationState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MapProviderState() when $default != null:
-return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState);case _:
+return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState,_that.currentNavigationLocation,_that.currentSpeed,_that.currentBearing,_that.isOffRoute,_that.followUser,_that.navigationState);case _:
   return orElse();
 
 }
@@ -253,10 +278,10 @@ return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.ma
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState,  AlrtLocation? currentNavigationLocation,  double currentSpeed,  double currentBearing,  bool isOffRoute,  bool followUser,  NavigationState navigationState)  $default,) {final _that = this;
 switch (_that) {
 case _MapProviderState():
-return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState);case _:
+return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState,_that.currentNavigationLocation,_that.currentSpeed,_that.currentBearing,_that.isOffRoute,_that.followUser,_that.navigationState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -273,10 +298,10 @@ return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.ma
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState,  AlrtLocation? currentNavigationLocation,  double currentSpeed,  double currentBearing,  bool isOffRoute,  bool followUser,  NavigationState navigationState)?  $default,) {final _that = this;
 switch (_that) {
 case _MapProviderState() when $default != null:
-return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState);case _:
+return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState,_that.currentNavigationLocation,_that.currentSpeed,_that.currentBearing,_that.isOffRoute,_that.followUser,_that.navigationState);case _:
   return null;
 
 }
@@ -288,7 +313,7 @@ return $default(_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.ma
 
 
 class _MapProviderState implements MapProviderState {
-  const _MapProviderState({final  List<Hazard> hazards = const <Hazard>[], this.selectedHazard, this.cameraPosition = kDefaultCameraPosition, final  Set<Marker> markers = const <Marker>{}, final  Set<Polyline> polylines = const <Polyline>{}, this.selectedLocation, this.currentRoutePlan, this.getRouteState = const GetRouteState.initial(), this.getAddressFromCoordinatesState = const GetAddressFromCoordinatesState.initial(), this.getMapHazardsState = const GetMapHazardsState.initial()}): _hazards = hazards,_markers = markers,_polylines = polylines;
+  const _MapProviderState({final  List<Hazard> hazards = const <Hazard>[], this.selectedHazard, this.cameraPosition = kDefaultCameraPosition, final  Set<Marker> markers = const <Marker>{}, final  Set<Polyline> polylines = const <Polyline>{}, this.selectedLocation, this.currentRoutePlan, this.getRouteState = const GetRouteState.initial(), this.getAddressFromCoordinatesState = const GetAddressFromCoordinatesState.initial(), this.getMapHazardsState = const GetMapHazardsState.initial(), this.currentNavigationLocation, this.currentSpeed = 0.0, this.currentBearing = 0.0, this.isOffRoute = false, this.followUser = true, this.navigationState = NavigationState.idle}): _hazards = hazards,_markers = markers,_polylines = polylines;
   
 
 /// The list of hazards displayed on the map.
@@ -332,6 +357,19 @@ class _MapProviderState implements MapProviderState {
 @override@JsonKey() final  GetAddressFromCoordinatesState getAddressFromCoordinatesState;
 /// The state of fetching hazards for the map.
 @override@JsonKey() final  GetMapHazardsState getMapHazardsState;
+// Navigation-related fields
+/// Current user location during navigation
+@override final  AlrtLocation? currentNavigationLocation;
+/// Current speed (m/s)
+@override@JsonKey() final  double currentSpeed;
+/// Current bearing/direction in degrees (0-360)
+@override@JsonKey() final  double currentBearing;
+/// Whether the user is off-route
+@override@JsonKey() final  bool isOffRoute;
+/// Camera should follow user during navigation
+@override@JsonKey() final  bool followUser;
+/// Navigation state
+@override@JsonKey() final  NavigationState navigationState;
 
 /// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -343,16 +381,16 @@ _$MapProviderStateCopyWith<_MapProviderState> get copyWith => __$MapProviderStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MapProviderState&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.selectedHazard, selectedHazard) || other.selectedHazard == selectedHazard)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other._markers, _markers)&&const DeepCollectionEquality().equals(other._polylines, _polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MapProviderState&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.selectedHazard, selectedHazard) || other.selectedHazard == selectedHazard)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other._markers, _markers)&&const DeepCollectionEquality().equals(other._polylines, _polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState)&&(identical(other.currentNavigationLocation, currentNavigationLocation) || other.currentNavigationLocation == currentNavigationLocation)&&(identical(other.currentSpeed, currentSpeed) || other.currentSpeed == currentSpeed)&&(identical(other.currentBearing, currentBearing) || other.currentBearing == currentBearing)&&(identical(other.isOffRoute, isOffRoute) || other.isOffRoute == isOffRoute)&&(identical(other.followUser, followUser) || other.followUser == followUser)&&(identical(other.navigationState, navigationState) || other.navigationState == navigationState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_hazards),selectedHazard,cameraPosition,const DeepCollectionEquality().hash(_markers),const DeepCollectionEquality().hash(_polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_hazards),selectedHazard,cameraPosition,const DeepCollectionEquality().hash(_markers),const DeepCollectionEquality().hash(_polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState,currentNavigationLocation,currentSpeed,currentBearing,isOffRoute,followUser,navigationState);
 
 @override
 String toString() {
-  return 'MapProviderState(hazards: $hazards, selectedHazard: $selectedHazard, cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState)';
+  return 'MapProviderState(hazards: $hazards, selectedHazard: $selectedHazard, cameraPosition: $cameraPosition, markers: $markers, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState, currentNavigationLocation: $currentNavigationLocation, currentSpeed: $currentSpeed, currentBearing: $currentBearing, isOffRoute: $isOffRoute, followUser: $followUser, navigationState: $navigationState)';
 }
 
 
@@ -363,11 +401,11 @@ abstract mixin class _$MapProviderStateCopyWith<$Res> implements $MapProviderSta
   factory _$MapProviderStateCopyWith(_MapProviderState value, $Res Function(_MapProviderState) _then) = __$MapProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<Hazard> hazards, Hazard? selectedHazard, CameraPosition cameraPosition, Set<Marker> markers, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState
+ List<Hazard> hazards, Hazard? selectedHazard, CameraPosition cameraPosition, Set<Marker> markers, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState, AlrtLocation? currentNavigationLocation, double currentSpeed, double currentBearing, bool isOffRoute, bool followUser, NavigationState navigationState
 });
 
 
-@override $HazardCopyWith<$Res>? get selectedHazard;@override $AlrtLocationCopyWith<$Res>? get selectedLocation;@override $RoutePlanCopyWith<$Res>? get currentRoutePlan;@override $GetRouteStateCopyWith<$Res> get getRouteState;@override $GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;@override $GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;
+@override $HazardCopyWith<$Res>? get selectedHazard;@override $AlrtLocationCopyWith<$Res>? get selectedLocation;@override $RoutePlanCopyWith<$Res>? get currentRoutePlan;@override $GetRouteStateCopyWith<$Res> get getRouteState;@override $GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;@override $GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;@override $AlrtLocationCopyWith<$Res>? get currentNavigationLocation;
 
 }
 /// @nodoc
@@ -380,7 +418,7 @@ class __$MapProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? hazards = null,Object? selectedHazard = freezed,Object? cameraPosition = null,Object? markers = null,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? hazards = null,Object? selectedHazard = freezed,Object? cameraPosition = null,Object? markers = null,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,Object? currentNavigationLocation = freezed,Object? currentSpeed = null,Object? currentBearing = null,Object? isOffRoute = null,Object? followUser = null,Object? navigationState = null,}) {
   return _then(_MapProviderState(
 hazards: null == hazards ? _self._hazards : hazards // ignore: cast_nullable_to_non_nullable
 as List<Hazard>,selectedHazard: freezed == selectedHazard ? _self.selectedHazard : selectedHazard // ignore: cast_nullable_to_non_nullable
@@ -392,7 +430,13 @@ as AlrtLocation?,currentRoutePlan: freezed == currentRoutePlan ? _self.currentRo
 as RoutePlan?,getRouteState: null == getRouteState ? _self.getRouteState : getRouteState // ignore: cast_nullable_to_non_nullable
 as GetRouteState,getAddressFromCoordinatesState: null == getAddressFromCoordinatesState ? _self.getAddressFromCoordinatesState : getAddressFromCoordinatesState // ignore: cast_nullable_to_non_nullable
 as GetAddressFromCoordinatesState,getMapHazardsState: null == getMapHazardsState ? _self.getMapHazardsState : getMapHazardsState // ignore: cast_nullable_to_non_nullable
-as GetMapHazardsState,
+as GetMapHazardsState,currentNavigationLocation: freezed == currentNavigationLocation ? _self.currentNavigationLocation : currentNavigationLocation // ignore: cast_nullable_to_non_nullable
+as AlrtLocation?,currentSpeed: null == currentSpeed ? _self.currentSpeed : currentSpeed // ignore: cast_nullable_to_non_nullable
+as double,currentBearing: null == currentBearing ? _self.currentBearing : currentBearing // ignore: cast_nullable_to_non_nullable
+as double,isOffRoute: null == isOffRoute ? _self.isOffRoute : isOffRoute // ignore: cast_nullable_to_non_nullable
+as bool,followUser: null == followUser ? _self.followUser : followUser // ignore: cast_nullable_to_non_nullable
+as bool,navigationState: null == navigationState ? _self.navigationState : navigationState // ignore: cast_nullable_to_non_nullable
+as NavigationState,
   ));
 }
 
@@ -458,6 +502,18 @@ $GetMapHazardsStateCopyWith<$Res> get getMapHazardsState {
   
   return $GetMapHazardsStateCopyWith<$Res>(_self.getMapHazardsState, (value) {
     return _then(_self.copyWith(getMapHazardsState: value));
+  });
+}/// Create a copy of MapProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AlrtLocationCopyWith<$Res>? get currentNavigationLocation {
+    if (_self.currentNavigationLocation == null) {
+    return null;
+  }
+
+  return $AlrtLocationCopyWith<$Res>(_self.currentNavigationLocation!, (value) {
+    return _then(_self.copyWith(currentNavigationLocation: value));
   });
 }
 }

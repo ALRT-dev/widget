@@ -42,7 +42,35 @@ abstract class MapProviderState with _$MapProviderState {
     /// The state of fetching hazards for the map.
     @Default(GetMapHazardsState.initial())
     final GetMapHazardsState getMapHazardsState,
+
+    // Navigation-related fields
+    /// Current user location during navigation
+    final AlrtLocation? currentNavigationLocation,
+
+    /// Current speed (m/s)
+    @Default(0.0) final double currentSpeed,
+
+    /// Current bearing/direction in degrees (0-360)
+    @Default(0.0) final double currentBearing,
+
+    /// Whether the user is off-route
+    @Default(false) final bool isOffRoute,
+
+    /// Camera should follow user during navigation
+    @Default(true) final bool followUser,
+
+    /// Navigation state
+    @Default(NavigationState.idle) final NavigationState navigationState,
   }) = _MapProviderState;
+}
+
+enum NavigationState {
+  idle,
+  starting,
+  active,
+  paused,
+  completed,
+  error,
 }
 
 @freezed
