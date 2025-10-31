@@ -77,6 +77,7 @@ Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
     };
 
 const _$HazardSeverityEnumMap = {
+  HazardSeverity.unknown: 'unknown',
   HazardSeverity.info: 'info',
   HazardSeverity.advice: 'advice',
   HazardSeverity.watchAndAct: 'watchAndAct',

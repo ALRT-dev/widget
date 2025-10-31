@@ -120,6 +120,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
 };
 
 const _$HazardSeverityEnumMap = {
+  HazardSeverity.unknown: 'unknown',
   HazardSeverity.info: 'info',
   HazardSeverity.advice: 'advice',
   HazardSeverity.watchAndAct: 'watchAndAct',

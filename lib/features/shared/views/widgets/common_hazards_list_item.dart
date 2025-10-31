@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/notification/views/widgets/trust_meter.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -168,7 +169,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     child: Row(
                       children: [
                         Flexible(
-                          flex: 2,
+                          flex: 4,
                           child: Text(
                             source?.name ?? 'Crowd Sourced',
                             overflow: TextOverflow.ellipsis,
@@ -181,6 +182,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                         ),
                         6.wSizedBox,
                         Flexible(
+                          flex: 3,
                           child: Row(
                             children: [
                               Icon(
@@ -236,14 +238,15 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                       ],
                     ),
                   ),
-                  Text(
-                    severity?.title ?? 'Unknown',
-                    style: TextStyle(
-                      fontSize: 12.spMin,
-                      fontWeight: FontWeight.w600,
-                      color: foregroundColor,
+                  if (severity != HazardSeverity.unknown)
+                    Text(
+                      severity?.title ?? 'Unknown',
+                      style: TextStyle(
+                        fontSize: 12.spMin,
+                        fontWeight: FontWeight.w600,
+                        color: foregroundColor,
+                      ),
                     ),
-                  ),
                   if (widget.showCloseButton &&
                       widget.onClosePressed != null) ...[
                     30.wSizedBox,

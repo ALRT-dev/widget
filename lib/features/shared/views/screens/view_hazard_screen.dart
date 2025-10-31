@@ -112,7 +112,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     24.spMin.hSizedBox,
                   ],
                   _buildTimestampSection(),
-                  if (widget.args.hazard.aiConfidence != null) ...[
+                  if (widget.args.hazard.aiConfidence != null &&
+                      widget.args.hazard.source == null) ...[
                     24.spMin.hSizedBox,
                     _buildAIAnalysisSection(),
                   ],
@@ -320,6 +321,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
   IconData _getSeverityIcon(HazardSeverity severity) {
     switch (severity) {
+      case HazardSeverity.unknown:
+        return Icons.help_outline;
       case HazardSeverity.info:
         return Icons.info_outline;
       case HazardSeverity.advice:
@@ -364,7 +367,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     final reportedBy = widget.args.hazard.reportedBy;
     final color = source != null
         ? AppColors.blue
-        : reportedBy?.reportsStatus.color ?? AppColors.lightGrey;
+        : (reportedBy?.reportsStatus.color == AppColors.lightGrey
+                  ? AppColors.grey
+                  : reportedBy?.reportsStatus.color) ??
+              AppColors.grey;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 12.spMin,
@@ -520,7 +526,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _getSeverityTitle(severity),
+                    severity.title,
                     style: TextStyle(
                       fontSize: 16.spMin,
                       fontWeight: FontWeight.bold,
@@ -544,21 +550,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
-  String _getSeverityTitle(HazardSeverity severity) {
-    switch (severity) {
-      case HazardSeverity.info:
-        return 'Information';
-      case HazardSeverity.advice:
-        return 'Advice';
-      case HazardSeverity.watchAndAct:
-        return 'Watch and Act';
-      case HazardSeverity.emergency:
-        return 'Emergency';
-    }
-  }
-
   String _getSeverityDescription(HazardSeverity severity) {
     switch (severity) {
+      case HazardSeverity.unknown:
+        return 'Severity level is unknown';
       case HazardSeverity.info:
         return 'General information about potential hazards';
       case HazardSeverity.advice:

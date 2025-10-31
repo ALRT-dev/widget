@@ -111,7 +111,6 @@ class _CreateUpdateReportScreenState
         children: [
           _dateTimeBuilder(),
           _categoryBuilder(),
-          _severityBuilder(),
           _locationBuilder(),
           _descriptionBuilder(),
           _mediaBuilder(),
@@ -261,6 +260,7 @@ class _CreateUpdateReportScreenState
     );
   }
 
+  // ignore: unused_element
   Widget _severityBuilder() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -571,7 +571,7 @@ class _CreateUpdateReportScreenState
   /// Handles the submission of the report.
   void _handleSubmitReport() {
     ref.read(providerOfCreateReport.notifier).createOrUpdateReport();
-    _clearAll();
+    // _clearAll();
   }
 
   /// Handles the action when user wants to submit another report.
