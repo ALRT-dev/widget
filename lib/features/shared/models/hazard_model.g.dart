@@ -28,6 +28,7 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
     _$AIConfidenceEnumMap,
     json['aiConfidence'],
   ),
+  callToAction: json['callToAction'] as String?,
   reportedBy: json['reportedBy'] == null
       ? null
       : AppUser.fromJson(json['reportedBy'] as Map<String, dynamic>),
@@ -86,6 +87,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'aiSummary': ?instance.aiSummary,
   'aiSeverity': ?_$HazardSeverityEnumMap[instance.aiSeverity],
   'aiConfidence': ?_$AIConfidenceEnumMap[instance.aiConfidence],
+  'callToAction': ?instance.callToAction,
   'reportedBy': ?instance.reportedBy?.toJson(),
   'reviewStatus': ?_$HazardReviewStatusEnumMap[instance.reviewStatus],
   'reviewFeedback': ?instance.reviewFeedback,

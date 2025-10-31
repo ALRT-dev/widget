@@ -94,6 +94,14 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   ],
                   24.spMin.hSizedBox,
                   _buildLocationSection(),
+                  if (widget.args.hazard.aiSummary != null) ...[
+                    24.spMin.hSizedBox,
+                    _buildAISummarySection(),
+                  ],
+                  if (widget.args.hazard.callToAction != null) ...[
+                    24.spMin.hSizedBox,
+                    _buildCallToActionSection(),
+                  ],
                   24.spMin.hSizedBox,
                   _buildDescriptionSection(),
                   24.spMin.hSizedBox,
@@ -104,10 +112,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     24.spMin.hSizedBox,
                   ],
                   _buildTimestampSection(),
-                  if (widget.args.hazard.aiSummary != null) ...[
-                    24.spMin.hSizedBox,
-                    _buildAISummarySection(),
-                  ],
                   if (widget.args.hazard.aiConfidence != null) ...[
                     24.spMin.hSizedBox,
                     _buildAIAnalysisSection(),
@@ -130,63 +134,72 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   }
 
   Widget _buildAppBar() {
-    return SliverAppBar(
-      expandedHeight: 400.spMin,
-      floating: false,
-      pinned: true,
-      backgroundColor: AppColors.white,
-      foregroundColor: AppColors.black,
-      elevation: 0,
-      leading: Center(
-        child: RoundButton(
-          icon: Icon(
-            Icons.arrow_back_ios_rounded,
+    return Consumer(
+      builder: (context, ref, child) {
+        final hasMedia = ref.watch(
+          provider.select(
+            (value) => value.hazard?.medias.isNotEmpty ?? false,
           ),
-          onPressed: () => context.pop(),
-        ),
-      ).pL(5.0),
-      actions: [
-        _buildDeleteButton(),
-        _buildEditButton(),
-        10.wSizedBox,
-      ],
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                widget.args.hazard.severity?.color.withValues(alpha: 0.1) ??
-                    AppColors.extraLightGrey,
-                AppColors.white,
-              ],
+        );
+        return SliverAppBar(
+          expandedHeight: hasMedia ? 400.spMin : 200.spMin,
+          floating: false,
+          pinned: true,
+          backgroundColor: AppColors.white,
+          foregroundColor: AppColors.black,
+          elevation: 0,
+          leading: Center(
+            child: RoundButton(
+              icon: Icon(
+                Icons.arrow_back_ios_rounded,
+              ),
+              onPressed: () => context.pop(),
+            ),
+          ).pL(5.0),
+          actions: [
+            _buildDeleteButton(),
+            _buildEditButton(),
+            10.wSizedBox,
+          ],
+          flexibleSpace: FlexibleSpaceBar(
+            background: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    widget.args.hazard.severity?.color.withValues(alpha: 0.1) ??
+                        AppColors.extraLightGrey,
+                    AppColors.white,
+                  ],
+                ),
+              ),
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final hazard = ref.watch(
+                    provider.select((value) => value.hazard),
+                  );
+                  if (hazard?.processedMedias.isNotEmpty ?? false) {
+                    return HazardMediasCarousel(
+                      id: hazard!.id!,
+                      medias: hazard.processedMedias,
+                      registerVideoLifecycle: false,
+                      videoPriority: VideoPriority.level2,
+                    );
+                  }
+
+                  return Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 80.spMin),
+                      child: _iconBuilder(),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
-          child: Consumer(
-            builder: (context, ref, child) {
-              final hazard = ref.watch(
-                provider.select((value) => value.hazard),
-              );
-              if (hazard?.processedMedias.isNotEmpty ?? false) {
-                return HazardMediasCarousel(
-                  id: hazard!.id!,
-                  medias: hazard.processedMedias,
-                  registerVideoLifecycle: false,
-                  videoPriority: VideoPriority.level2,
-                );
-              }
-
-              return Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 80.spMin),
-                  child: _iconBuilder(),
-                ),
-              );
-            },
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -332,39 +345,65 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             ),
           ),
         ),
-        if (widget.args.hazard.category?.name != null) ...[
-          8.spMin.hSizedBox,
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 12.spMin,
-              vertical: 6.spMin,
-            ),
-            decoration: BoxDecoration(
-              color:
-                  widget.args.hazard.severity?.color.withValues(
-                    alpha: 0.1,
-                  ) ??
-                  AppColors.extraLightGrey,
-              borderRadius: BorderRadius.circular(20.spMin),
-              border: Border.all(
-                color:
-                    widget.args.hazard.severity?.color.withValues(
-                      alpha: 0.3,
-                    ) ??
-                    AppColors.lightGrey,
-              ),
-            ),
-            child: Text(
-              widget.args.hazard.category!.name!,
-              style: TextStyle(
-                fontSize: 12.spMin,
-                fontWeight: FontWeight.w500,
-                color: widget.args.hazard.severity?.color ?? AppColors.grey,
-              ),
-            ),
-          ),
-        ],
+        8.spMin.hSizedBox,
+        Row(
+          children: [
+            _buildSource(),
+            if (widget.args.hazard.category?.name != null) ...[
+              8.spMin.wSizedBox,
+              _buildCategory(),
+            ],
+          ],
+        ),
       ],
+    );
+  }
+
+  Widget _buildSource() {
+    final source = widget.args.hazard.source;
+    final reportedBy = widget.args.hazard.reportedBy;
+    final color = source != null
+        ? AppColors.blue
+        : reportedBy?.reportsStatus.color ?? AppColors.lightGrey;
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.spMin,
+        vertical: 6.spMin,
+      ),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20.spMin),
+      ),
+      child: Text(
+        source != null ? 'Official' : 'Crowd Sourced',
+        style: TextStyle(
+          fontSize: 12.spMin,
+          fontWeight: FontWeight.w500,
+          color: AppColors.white,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategory() {
+    final color = widget.args.hazard.severity?.color ?? AppColors.grey;
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.spMin,
+        vertical: 6.spMin,
+      ),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20.spMin),
+      ),
+      child: Text(
+        widget.args.hazard.category!.name!,
+        style: TextStyle(
+          fontSize: 12.spMin,
+          fontWeight: FontWeight.w500,
+          color: AppColors.white,
+        ),
+      ),
     );
   }
 
@@ -721,7 +760,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
   Widget _buildAISummarySection() {
     return _buildSection(
-      title: 'AI Summary',
+      title: 'What We Know',
       icon: Icons.auto_awesome_outlined,
       child: Container(
         padding: EdgeInsets.all(16.spMin),
@@ -744,6 +783,44 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             Expanded(
               child: Text(
                 widget.args.hazard.aiSummary!,
+                style: TextStyle(
+                  fontSize: 14.spMin,
+                  height: 1.5,
+                  color: AppColors.black,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCallToActionSection() {
+    return _buildSection(
+      title: 'What To Do',
+      icon: Icons.lightbulb_outline,
+      child: Container(
+        padding: EdgeInsets.all(16.spMin),
+        decoration: BoxDecoration(
+          color: AppColors.orange.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12.spMin),
+          border: Border.all(
+            color: AppColors.orange.withValues(alpha: 0.2),
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              Icons.lightbulb,
+              color: AppColors.orange,
+              size: 20.spMin,
+            ),
+            12.spMin.wSizedBox,
+            Expanded(
+              child: Text(
+                widget.args.hazard.callToAction!,
                 style: TextStyle(
                   fontSize: 14.spMin,
                   height: 1.5,

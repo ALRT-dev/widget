@@ -60,6 +60,9 @@ abstract class Hazard with _$Hazard {
     /// The AI-determined confidence level of the hazard.
     final AIConfidence? aiConfidence,
 
+    /// The things users can do to mitigate the hazard.
+    final String? callToAction,
+
     /// The user who reported the hazard.
     ///
     /// If source is provided, this may be null.

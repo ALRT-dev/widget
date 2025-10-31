@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/notification/views/widgets/trust_meter.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
+import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -66,47 +67,65 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
 
     return InkWell(
       onTap: _gotoViewHazard,
-      borderRadius: BorderRadius.circular(10.r),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (widget.showSourceHeader) ...[
-            _headerBuilder(),
-            10.hSizedBox,
-          ],
-          if (widget.hazard.processedMedias.isNotEmpty) ...[
-            3.hSizedBox,
-            HazardMediasCarousel(
-              id: widget.hazard.id!,
-              medias: widget.hazard.processedMedias,
-            ),
-            15.hSizedBox,
-          ],
-          Row(
-            children: [
-              _iconBuilder(),
-              10.wSizedBox,
-              Expanded(
-                child: _titleBuilder(),
-              ),
-            ],
+      borderRadius: BorderRadius.circular(18.spMin),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: AppColors.lightGrey,
           ),
-          6.hSizedBox,
-          _shortDescriptionBuilder(),
-          8.hSizedBox,
-          _footerBuilder(),
-          if (widget.showTrustMeter) ...[
-            12.hSizedBox,
-            _trustMeterBuilder(),
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(18.spMin),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.showSourceHeader) ...[
+              _headerBuilder(),
+            ],
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (widget.hazard.processedMedias.isNotEmpty) ...[
+                  3.hSizedBox,
+                  HazardMediasCarousel(
+                    id: widget.hazard.id!,
+                    medias: widget.hazard.processedMedias,
+                  ),
+                  15.hSizedBox,
+                ],
+                Row(
+                  children: [
+                    _iconBuilder(),
+                    10.wSizedBox,
+                    Expanded(
+                      child: _titleBuilder(),
+                    ),
+                  ],
+                ),
+                6.hSizedBox,
+                _shortDescriptionBuilder(),
+                8.hSizedBox,
+                _footerBuilder(),
+                if (widget.showTrustMeter && widget.hazard.source == null) ...[
+                  12.hSizedBox,
+                  _trustMeterBuilder(),
+                ],
+              ],
+            ).pad(10.0),
           ],
-        ],
-      ).pad(10.0),
+        ),
+      ),
     ).pX(widget.horizontalPadding);
   }
 
   Widget _headerBuilder() {
     return Consumer(
       builder: (context, ref, child) {
+        final severity = ref.watch(
+          provider.select(
+            (value) => value.hazard.severity,
+          ),
+        );
         final source = ref.watch(
           provider.select(
             (value) => value.hazard.source,
@@ -123,76 +142,129 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           ),
         );
 
-        return Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
+        final foregroundColor = severity?.color.isLight ?? false
+            ? AppColors.black
+            : AppColors.white;
+
+        return Stack(
           children: [
-            Expanded(
+            Container(
+              decoration: BoxDecoration(
+                color: severity?.color,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16.spMin),
+                  topRight: Radius.circular(16.spMin),
+                ),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 15.spMin,
+                vertical: 15.spMin,
+              ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                spacing: 5.spMin,
                 children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Flexible(
+                          flex: 2,
+                          child: Text(
+                            source?.name ?? 'Crowd Sourced',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12.spMin,
+                              fontWeight: FontWeight.w600,
+                              color: foregroundColor,
+                            ),
+                          ),
+                        ),
+                        6.wSizedBox,
+                        Flexible(
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.circle,
+                                size: 4,
+                                color: foregroundColor,
+                              ),
+                              6.wSizedBox,
+                              Text(
+                                source != null
+                                    ? 'Verified'
+                                    : reportedBy?.reportsStatus.title ??
+                                          'Unverified',
+                                style: TextStyle(
+                                  fontSize: 12.spMin,
+                                  fontWeight: FontWeight.w500,
+                                  color: foregroundColor,
+                                ),
+                              ),
+                              4.wSizedBox,
+                              Icon(
+                                Icons.verified_rounded,
+                                size: 16.spMin,
+                                color: source != null
+                                    ? severity?.color.isLight ?? false
+                                          ? AppColors.blue
+                                          : AppColors.white
+                                    : reportedBy?.reportsStatus.color ??
+                                          AppColors.lightGrey,
+                              ),
+                              if (confidenceScore != null && !kDebugMode) ...[
+                                4.wSizedBox,
+                                Icon(
+                                  Icons.circle,
+                                  size: 4,
+                                  color: foregroundColor,
+                                ),
+                                6.wSizedBox,
+                                Flexible(
+                                  child: Text(
+                                    'ACS: $confidenceScore',
+                                    style: TextStyle(
+                                      fontSize: 12.spMin,
+                                      fontWeight: FontWeight.w500,
+                                      color: foregroundColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   Text(
-                    source?.name ?? 'Crowd Sourced',
+                    severity?.title ?? 'Unknown',
                     style: TextStyle(
                       fontSize: 12.spMin,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+                      color: foregroundColor,
                     ),
                   ),
-                  6.wSizedBox,
-                  const Icon(
-                    Icons.circle,
-                    size: 4,
-                    color: AppColors.grey,
-                  ),
-                  6.wSizedBox,
-                  Text(
-                    source != null
-                        ? 'Verified'
-                        : reportedBy?.reportsStatus.title ?? 'Unverified',
-                    style: TextStyle(
-                      fontSize: 12.spMin,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.grey,
-                    ),
-                  ),
-                  4.wSizedBox,
-                  Icon(
-                    Icons.verified_rounded,
-                    size: 16.spMin,
-                    color: source != null
-                        ? AppColors.blue
-                        : reportedBy?.reportsStatus.color ??
-                              AppColors.lightGrey,
-                  ),
-                  if (confidenceScore != null && kDebugMode) ...[
-                    4.wSizedBox,
-                    const Icon(
-                      Icons.circle,
-                      size: 4,
-                      color: AppColors.grey,
-                    ),
-                    6.wSizedBox,
-                    Flexible(
-                      child: Text(
-                        'ACS: $confidenceScore',
-                        style: TextStyle(
-                          fontSize: 12.spMin,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.grey,
-                        ),
-                      ),
-                    ),
+                  if (widget.showCloseButton &&
+                      widget.onClosePressed != null) ...[
+                    30.wSizedBox,
                   ],
                 ],
               ),
             ),
             if (widget.showCloseButton && widget.onClosePressed != null)
-              RoundButton(
-                icon: Icon(
-                  Icons.close_rounded,
-                  size: 20.spMin,
+              Positioned(
+                right: 10.0,
+                top: 0.0,
+                bottom: 0.0,
+                child: RoundButton(
+                  icon: Icon(
+                    Icons.close_rounded,
+                    size: 20.spMin,
+                  ),
+                  size: 30.0,
+                  backgroundColor: AppColors.white,
+                  onPressed: widget.onClosePressed,
                 ),
-                size: 30.0,
-                onPressed: widget.onClosePressed,
               ),
           ],
         );
@@ -313,17 +385,22 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       builder: (context, ref, child) {
         final shortDescription = ref.watch(
           provider.select(
-            (value) => value.hazard.shortDescription,
+            (value) => value.hazard.shortDescription?.trim(),
           ),
         );
-        if (shortDescription?.isEmpty ?? true) {
-          return const SizedBox.shrink();
-        }
+        final callToAction = ref.watch(
+          provider.select(
+            (value) => value.hazard.callToAction?.trim(),
+          ),
+        );
+
+        final text = [
+          if (shortDescription?.isNotEmpty ?? false) shortDescription,
+          if (callToAction?.isNotEmpty ?? false) callToAction!,
+        ].join(' ');
 
         return Text(
-          shortDescription!,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 2,
+          text,
           style: TextStyle(
             color: Colors.grey[600],
           ),
