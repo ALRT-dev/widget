@@ -171,12 +171,14 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                       color: AppColors.grey,
                     ),
                     6.wSizedBox,
-                    Text(
-                      'ACS: $confidenceScore',
-                      style: TextStyle(
-                        fontSize: 12.spMin,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.grey,
+                    Flexible(
+                      child: Text(
+                        'ACS: $confidenceScore',
+                        style: TextStyle(
+                          fontSize: 12.spMin,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.grey,
+                        ),
                       ),
                     ),
                   ],
@@ -201,43 +203,48 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
   Widget _iconBuilder() {
     return Consumer(
       builder: (context, ref, child) {
-        final severity = ref.watch(
+        final iconPath = ref.watch(
           provider.select(
-            (value) => value.hazard.severity,
+            (value) => value.hazard.iconPath,
           ),
         );
-        final category = ref.watch(
+        final fallbackIconPath = ref.watch(
           provider.select(
-            (value) => value.hazard.category,
+            (value) => value.hazard.fallbackIconPath,
+          ),
+        );
+        final unknownIconPath = ref.watch(
+          provider.select(
+            (value) => value.hazard.unknownIconPath,
           ),
         );
         return Container(
-          width: 40.spMin,
-          height: 40.spMin,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: severity?.color,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColor,
+                blurRadius: 10,
+                offset: const Offset(0.0, 0.0),
+              ),
+            ],
           ),
-          padding: EdgeInsets.all(7.spMin),
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.black26,
-            ),
-            child: Center(
-              child: Text(
-                category?.emoji ?? '❗',
-                style: TextStyle(
-                  fontSize: 16.spMin,
-                  shadows: [
-                    Shadow(
-                      offset: Offset(0.0, 0.0),
-                      blurRadius: 10.0,
-                      color: AppColors.black.withValues(alpha: 0.4),
-                    ),
-                  ],
-                ),
-              ).pL(3.0).pB(2.0),
+          child: Image.asset(
+            iconPath,
+            width: 30.spMin,
+            height: 30.spMin,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => Image.asset(
+              fallbackIconPath,
+              width: 30.spMin,
+              height: 30.spMin,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Image.asset(
+                unknownIconPath,
+                width: 30.spMin,
+                height: 30.spMin,
+                fit: BoxFit.contain,
+              ),
             ),
           ),
         );

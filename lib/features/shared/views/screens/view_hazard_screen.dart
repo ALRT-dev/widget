@@ -180,7 +180,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               return Center(
                 child: Padding(
                   padding: EdgeInsets.only(top: 80.spMin),
-                  child: _buildSeverityIcon(),
+                  child: _iconBuilder(),
                 ),
               );
             },
@@ -241,29 +241,67 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
-  Widget _buildSeverityIcon() {
-    final severity = widget.args.hazard.severity;
-    if (severity == null) return const SizedBox.shrink();
-
-    return Container(
-      width: 80.spMin,
-      height: 80.spMin,
-      decoration: BoxDecoration(
-        color: severity.color,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: severity.color.withValues(alpha: 0.3),
-            blurRadius: 20.spMin,
-            spreadRadius: 5.spMin,
+  Widget _iconBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final iconPath = ref.watch(
+          provider.select(
+            (value) => value.hazard?.iconPath,
           ),
-        ],
-      ),
-      child: Icon(
-        _getSeverityIcon(severity),
-        color: AppColors.white,
-        size: 40.spMin,
-      ),
+        );
+        if (iconPath == null) {
+          return const SizedBox.shrink();
+        }
+
+        final fallbackIconPath = ref.watch(
+          provider.select(
+            (value) => value.hazard?.fallbackIconPath,
+          ),
+        );
+        if (fallbackIconPath == null) {
+          return const SizedBox.shrink();
+        }
+
+        final unknownIconPath = ref.watch(
+          provider.select(
+            (value) => value.hazard?.unknownIconPath,
+          ),
+        );
+        if (unknownIconPath == null) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColor,
+                blurRadius: 25,
+                offset: const Offset(0.0, 0.0),
+              ),
+            ],
+          ),
+          child: Image.asset(
+            iconPath,
+            width: 80.spMin,
+            height: 80.spMin,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => Image.asset(
+              fallbackIconPath,
+              width: 80.spMin,
+              height: 80.spMin,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Image.asset(
+                unknownIconPath,
+                width: 80.spMin,
+                height: 80.spMin,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -284,28 +322,15 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            if (widget.args.hazard.category?.emoji != null) ...[
-              Text(
-                widget.args.hazard.category!.emoji!,
-                style: TextStyle(fontSize: 24.spMin),
-              ),
-              12.spMin.wSizedBox,
-            ],
-            Expanded(
-              child: Hero(
-                tag: 'hazard_title_${widget.args.hazard.id}',
-                child: Text(
-                  widget.args.hazard.title ?? 'Hazard Report',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24.spMin,
-                  ),
-                ),
-              ),
+        Hero(
+          tag: 'hazard_title_${widget.args.hazard.id}',
+          child: Text(
+            widget.args.hazard.title ?? 'Hazard Report',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 24.spMin,
             ),
-          ],
+          ),
         ),
         if (widget.args.hazard.category?.name != null) ...[
           8.spMin.hSizedBox,

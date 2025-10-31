@@ -79,6 +79,7 @@ flutter:
     - assets/logos/
     - assets/icons/
     - assets/images/
+    - assets/images/hazards/
     - assets/pins/
 
   fonts:

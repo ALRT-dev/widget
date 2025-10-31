@@ -1,6 +1,7 @@
+import 'package:flutter/material.dart' show ImageConfiguration, Size;
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hazard_app/features/map/views/widgets/custom_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
@@ -15,7 +16,6 @@ import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
-import 'package:widget_to_marker/widget_to_marker.dart';
 
 class HazardService {
   HazardService(final Ref ref) : _ref = ref;
@@ -306,13 +306,11 @@ class HazardService {
 
     for (final category in categories) {
       for (final severity in severities) {
-        final key = '${severity.name}_${category.emoji}';
-
-        final future = CustomMarker(
-          markerImagePath: severity.markerPath,
-          emoji: category.emoji ?? '❗',
-        ).toBitmapDescriptor().then((bitmap) => {key: bitmap});
-
+        final key = '${category.id}_${severity.name}';
+        final future = getBitmapDescriptorForHazard(
+          categoryId: category.id,
+          severity: severity,
+        ).then((bitmap) => {key: bitmap});
         futures.add(future);
       }
     }
@@ -327,6 +325,49 @@ class HazardService {
         },
       ),
     );
+  }
+
+  /// Gets a BitmapDescriptor for the given hazard category and severity.
+  Future<BitmapDescriptor> getBitmapDescriptorForHazard({
+    required final String categoryId,
+    required final HazardSeverity severity,
+    final Size size = const Size(40, 40),
+  }) async {
+    try {
+      final key = '${categoryId}_${severity.name}';
+      final assetPath = 'assets/images/hazards/$key.png';
+
+      final exists = await assetExists(assetPath: assetPath);
+      if (!exists) {
+        final exists = await assetExists(
+          assetPath: 'assets/images/hazards/other_${severity.name}.png',
+        );
+        if (!exists) {
+          final exists = await assetExists(
+            assetPath: 'assets/images/hazards/other_unknown.png',
+          );
+          if (!exists) {
+            return BitmapDescriptor.defaultMarker;
+          }
+
+          return BitmapDescriptor.asset(
+            ImageConfiguration(size: size),
+            'assets/images/hazards/other_unknown.png',
+          );
+        }
+
+        return BitmapDescriptor.asset(
+          ImageConfiguration(size: size),
+          'assets/images/hazards/other_${severity.name}.png',
+        );
+      }
+      return BitmapDescriptor.asset(
+        ImageConfiguration(size: size),
+        assetPath,
+      );
+    } catch (e) {
+      return BitmapDescriptor.defaultMarker;
+    }
   }
 
   /// Populates a hazard with any required data before processing.
@@ -344,5 +385,15 @@ class HazardService {
   ) async {
     final futures = hazards.map(populateHazardWithRequiredData).toList();
     return Future.wait(futures);
+  }
+
+  /// Checks if an asset exists at the given path.
+  Future<bool> assetExists({required final String assetPath}) async {
+    try {
+      await rootBundle.load(assetPath);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

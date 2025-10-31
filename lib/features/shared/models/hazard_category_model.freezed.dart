@@ -17,8 +17,8 @@ mixin _$HazardCategory {
 
 /// The unique identifier for the hazard category.
  String get id;/// The name of the hazard category.
- String? get name;/// The emoji representing the hazard category.
- String? get emoji;/// The number of hazards associated with this category.
+ String? get name;/// The description of the hazard category.
+ String? get description;/// The number of hazards associated with this category.
  int get hazardsCount;
 /// Create a copy of HazardCategory
 /// with the given fields replaced by the non-null parameter values.
@@ -32,16 +32,16 @@ $HazardCategoryCopyWith<HazardCategory> get copyWith => _$HazardCategoryCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardCategory&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.emoji, emoji) || other.emoji == emoji)&&(identical(other.hazardsCount, hazardsCount) || other.hazardsCount == hazardsCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardCategory&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.hazardsCount, hazardsCount) || other.hazardsCount == hazardsCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,emoji,hazardsCount);
+int get hashCode => Object.hash(runtimeType,id,name,description,hazardsCount);
 
 @override
 String toString() {
-  return 'HazardCategory(id: $id, name: $name, emoji: $emoji, hazardsCount: $hazardsCount)';
+  return 'HazardCategory(id: $id, name: $name, description: $description, hazardsCount: $hazardsCount)';
 }
 
 
@@ -52,7 +52,7 @@ abstract mixin class $HazardCategoryCopyWith<$Res>  {
   factory $HazardCategoryCopyWith(HazardCategory value, $Res Function(HazardCategory) _then) = _$HazardCategoryCopyWithImpl;
 @useResult
 $Res call({
- String id, String? name, String? emoji, int hazardsCount
+ String id, String? name, String? description, int hazardsCount
 });
 
 
@@ -69,11 +69,11 @@ class _$HazardCategoryCopyWithImpl<$Res>
 
 /// Create a copy of HazardCategory
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? emoji = freezed,Object? hazardsCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? description = freezed,Object? hazardsCount = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String?,emoji: freezed == emoji ? _self.emoji : emoji // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,hazardsCount: null == hazardsCount ? _self.hazardsCount : hazardsCount // ignore: cast_nullable_to_non_nullable
 as int,
   ));
@@ -160,10 +160,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? emoji,  int hazardsCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? description,  int hazardsCount)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardCategory() when $default != null:
-return $default(_that.id,_that.name,_that.emoji,_that.hazardsCount);case _:
+return $default(_that.id,_that.name,_that.description,_that.hazardsCount);case _:
   return orElse();
 
 }
@@ -181,10 +181,10 @@ return $default(_that.id,_that.name,_that.emoji,_that.hazardsCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? emoji,  int hazardsCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? description,  int hazardsCount)  $default,) {final _that = this;
 switch (_that) {
 case _HazardCategory():
-return $default(_that.id,_that.name,_that.emoji,_that.hazardsCount);case _:
+return $default(_that.id,_that.name,_that.description,_that.hazardsCount);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +201,10 @@ return $default(_that.id,_that.name,_that.emoji,_that.hazardsCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? emoji,  int hazardsCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? description,  int hazardsCount)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardCategory() when $default != null:
-return $default(_that.id,_that.name,_that.emoji,_that.hazardsCount);case _:
+return $default(_that.id,_that.name,_that.description,_that.hazardsCount);case _:
   return null;
 
 }
@@ -216,15 +216,15 @@ return $default(_that.id,_that.name,_that.emoji,_that.hazardsCount);case _:
 @JsonSerializable()
 
 class _HazardCategory implements HazardCategory {
-  const _HazardCategory({required this.id, this.name, this.emoji, this.hazardsCount = 0});
+  const _HazardCategory({required this.id, this.name, this.description, this.hazardsCount = 0});
   factory _HazardCategory.fromJson(Map<String, dynamic> json) => _$HazardCategoryFromJson(json);
 
 /// The unique identifier for the hazard category.
 @override final  String id;
 /// The name of the hazard category.
 @override final  String? name;
-/// The emoji representing the hazard category.
-@override final  String? emoji;
+/// The description of the hazard category.
+@override final  String? description;
 /// The number of hazards associated with this category.
 @override@JsonKey() final  int hazardsCount;
 
@@ -241,16 +241,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardCategory&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.emoji, emoji) || other.emoji == emoji)&&(identical(other.hazardsCount, hazardsCount) || other.hazardsCount == hazardsCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardCategory&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.hazardsCount, hazardsCount) || other.hazardsCount == hazardsCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,emoji,hazardsCount);
+int get hashCode => Object.hash(runtimeType,id,name,description,hazardsCount);
 
 @override
 String toString() {
-  return 'HazardCategory(id: $id, name: $name, emoji: $emoji, hazardsCount: $hazardsCount)';
+  return 'HazardCategory(id: $id, name: $name, description: $description, hazardsCount: $hazardsCount)';
 }
 
 
@@ -261,7 +261,7 @@ abstract mixin class _$HazardCategoryCopyWith<$Res> implements $HazardCategoryCo
   factory _$HazardCategoryCopyWith(_HazardCategory value, $Res Function(_HazardCategory) _then) = __$HazardCategoryCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? name, String? emoji, int hazardsCount
+ String id, String? name, String? description, int hazardsCount
 });
 
 
@@ -278,11 +278,11 @@ class __$HazardCategoryCopyWithImpl<$Res>
 
 /// Create a copy of HazardCategory
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? emoji = freezed,Object? hazardsCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? description = freezed,Object? hazardsCount = null,}) {
   return _then(_HazardCategory(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
-as String?,emoji: freezed == emoji ? _self.emoji : emoji // ignore: cast_nullable_to_non_nullable
+as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,hazardsCount: null == hazardsCount ? _self.hazardsCount : hazardsCount // ignore: cast_nullable_to_non_nullable
 as int,
   ));

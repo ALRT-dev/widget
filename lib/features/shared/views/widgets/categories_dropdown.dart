@@ -79,18 +79,21 @@ class _CategoriesDropdownState extends ConsumerState<CategoriesDropdown> {
           itemBuilder: (context, index) {
             final category = categories[index];
             return ListTile(
-              leading: Text(
-                category.emoji ?? '!',
-                style: TextStyle(
-                  fontSize: 18.spMin,
-                ),
-              ),
               title: Text(
                 category.name ?? 'N/A',
                 style: TextStyle(
                   fontSize: 16.spMin,
                 ),
               ),
+              subtitle: category.description != null
+                  ? Text(
+                      category.description!,
+                      style: TextStyle(
+                        fontSize: 14.spMin,
+                        color: AppColors.grey,
+                      ),
+                    )
+                  : null,
               onTap: () {
                 widget.onCategorySelected?.call(category);
                 close();

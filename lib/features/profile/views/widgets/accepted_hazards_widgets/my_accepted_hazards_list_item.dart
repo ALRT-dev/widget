@@ -141,7 +141,7 @@ class _MyAcceptedHazardsListItemState
         ),
         child: Center(
           child: Text(
-            widget.report.category?.emoji ?? '❗',
+            '❗',
             style: TextStyle(
               fontSize: 16.spMin,
               shadows: [

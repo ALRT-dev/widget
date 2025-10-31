@@ -125,5 +125,20 @@ abstract class Hazard with _$Hazard {
     return DateTime.now().isAfter(expiresAt!);
   }
 
+  /// The file path for the hazard icon based on its category and severity.
+  String get iconPath {
+    final severityName = severity?.name ?? HazardSeverity.info.name;
+    return 'assets/images/hazards/${categoryId}_$severityName.png';
+  }
+
+  /// The fallback file path for the hazard icon based on its severity.
+  String get fallbackIconPath {
+    final severityName = severity?.name ?? HazardSeverity.info.name;
+    return 'assets/images/hazards/other_$severityName.png';
+  }
+
+  /// The file path for the unknown hazard icon.
+  String get unknownIconPath => 'assets/images/hazards/other_unknown.png';
+
   factory Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);
 }

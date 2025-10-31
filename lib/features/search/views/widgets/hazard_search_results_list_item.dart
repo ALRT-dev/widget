@@ -110,7 +110,7 @@ class _HazardSearchResultsListItemState
         ),
         child: Center(
           child: Text(
-            widget.hazard.category?.emoji ?? '❗',
+            '❗',
             style: TextStyle(
               fontSize: 16.spMin,
               shadows: [

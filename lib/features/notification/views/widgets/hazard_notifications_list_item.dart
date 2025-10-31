@@ -125,11 +125,6 @@ class _HazardNotificationsListItemState
             (value) => value.hazard.severity,
           ),
         );
-        final category = ref.watch(
-          provider.select(
-            (value) => value.hazard.category,
-          ),
-        );
         return Container(
           width: 40.spMin,
           height: 40.spMin,
@@ -145,7 +140,7 @@ class _HazardNotificationsListItemState
             ),
             child: Center(
               child: Text(
-                category?.emoji ?? '❗',
+                '❗',
                 style: TextStyle(
                   fontSize: 16.spMin,
                   shadows: [

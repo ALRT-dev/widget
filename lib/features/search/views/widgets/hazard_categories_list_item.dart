@@ -43,14 +43,6 @@ class _HazardCategoriesListItemState
       label: Row(
         spacing: 5.spMin,
         children: [
-          if (widget.hazardCategory.emoji != null)
-            Text(
-              widget.hazardCategory.emoji!,
-              style: TextStyle(
-                fontSize: 16.spMin,
-                height: 1.0,
-              ),
-            ),
           Text(
             widget.hazardCategory.name ?? 'Error',
             style: TextStyle(

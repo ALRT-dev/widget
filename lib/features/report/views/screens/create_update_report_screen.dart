@@ -248,11 +248,7 @@ class _CreateUpdateReportScreenState
             return CategoriesDropdown(
               button: _inputBuilder(
                 hintText: 'Select a category',
-                value:
-                    selectedCategory?.emoji != null &&
-                        selectedCategory?.name != null
-                    ? '${selectedCategory!.emoji} ${selectedCategory.name}'
-                    : selectedCategory?.name,
+                value: selectedCategory?.name,
                 enabled: false,
               ),
               onCategorySelected: (category) => _updateCategory(

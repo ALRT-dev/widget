@@ -777,11 +777,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
     for (final hazard in hazards) {
       if (hazard.latitude == null || hazard.longitude == null) continue;
 
+      final categoryId = hazard.categoryId;
       final severity = hazard.severity ?? HazardSeverity.info;
-      final categoryEmoji = hazard.category?.emoji ?? '❗';
 
       final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
-      final key = '${severity.name}_$categoryEmoji';
+      final key = '${categoryId}_${severity.name}';
       final bitmapDescriptor = markerBitmaps[key];
       if (bitmapDescriptor == null) continue;
 
