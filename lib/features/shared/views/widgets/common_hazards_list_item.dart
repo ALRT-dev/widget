@@ -169,7 +169,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     child: Row(
                       children: [
                         Flexible(
-                          flex: 4,
+                          flex: 6,
                           child: Text(
                             source?.name ?? 'Crowd Sourced',
                             overflow: TextOverflow.ellipsis,
@@ -182,7 +182,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                         ),
                         6.wSizedBox,
                         Flexible(
-                          flex: 3,
+                          flex: 4,
                           child: Row(
                             children: [
                               Icon(
