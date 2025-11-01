@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
+import 'package:hazard_app/features/shared/enums/bushfire_alert_level_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/video_priority_types.dart';
@@ -105,8 +106,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   24.spMin.hSizedBox,
                   _buildDescriptionSection(),
                   24.spMin.hSizedBox,
-                  _buildSeveritySection(),
-                  24.spMin.hSizedBox,
+                  if (widget.args.hazard.bushFireAlertLevel == null ||
+                      widget.args.hazard.bushFireAlertLevel ==
+                          BushfireAlertLevel.advice) ...[
+                    _buildSeveritySection(),
+                    24.spMin.hSizedBox,
+                  ],
                   if (widget.args.hazard.source != null) ...[
                     _buildSourceSection(),
                     24.spMin.hSizedBox,
@@ -169,8 +174,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    widget.args.hazard.severity?.color.withValues(alpha: 0.1) ??
-                        AppColors.extraLightGrey,
+                    widget.args.hazard.color.withValues(alpha: 0.1),
                     AppColors.white,
                   ],
                 ),
@@ -392,7 +396,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   }
 
   Widget _buildCategory() {
-    final color = widget.args.hazard.severity?.color ?? AppColors.grey;
+    final color = widget.args.hazard.color;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 12.spMin,

@@ -1,6 +1,10 @@
+import 'dart:ui';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/shared/converters/date_time_converter.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
+import 'package:hazard_app/features/shared/enums/bushfire_alert_level_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
@@ -130,6 +134,12 @@ abstract class Hazard with _$Hazard {
 
   /// The file path for the hazard icon based on its category and severity.
   String get iconPath {
+    if (bushFireAlertLevel != null &&
+        bushFireAlertLevel != BushfireAlertLevel.advice) {
+      final alertLevelName = bushFireAlertLevel!.name;
+      return 'assets/images/hazards/${categoryId}_$alertLevelName.png';
+    }
+
     final severityName = severity?.name ?? HazardSeverity.info.name;
     return 'assets/images/hazards/${categoryId}_$severityName.png';
   }
@@ -141,7 +151,48 @@ abstract class Hazard with _$Hazard {
   }
 
   /// The file path for the unknown hazard icon.
-  String get unknownIconPath => 'assets/images/hazards/other_unknown.png';
+  String get unknownIconPath => 'assets/images/hazards/other_info.png';
+
+  /// Gets the appropriate BitmapDescriptor for the hazard marker.
+  BitmapDescriptor? getMarkerBitmapDescriptor(
+    Map<String, BitmapDescriptor> bitmapMap,
+  ) {
+    var key = '${categoryId}_${severity?.name ?? HazardSeverity.info.name}';
+
+    /// For bushfire hazards, use the bushfire alert level in the key
+    if (bushFireAlertLevel != null &&
+        bushFireAlertLevel != BushfireAlertLevel.advice) {
+      key = '${categoryId}_${bushFireAlertLevel!.name}';
+    }
+
+    return bitmapMap[key] ??
+        bitmapMap[fallbackIconPath] ??
+        bitmapMap[unknownIconPath];
+  }
+
+  /// Determines the bushfire alert level if the hazard is a bushfire.
+  ///
+  /// Returns null if the hazard is not a bushfire or if the description is empty.
+  BushfireAlertLevel? get bushFireAlertLevel {
+    if (!(category?.isBushfire ?? false) || (description?.isEmpty ?? true)) {
+      return null;
+    }
+    return BushfireAlertLevel.values.firstWhere(
+      (level) => description!.toLowerCase().contains(level.title.toLowerCase()),
+      orElse: () => BushfireAlertLevel.notApplicable,
+    );
+  }
+
+  /// The color associated with the hazard's severity.
+  Color get color {
+    // If the hazard is a bushfire and has a specific alert level, use that color
+    if (bushFireAlertLevel != null &&
+        bushFireAlertLevel != BushfireAlertLevel.advice) {
+      return bushFireAlertLevel!.color;
+    }
+
+    return severity?.color ?? HazardSeverity.info.color;
+  }
 
   factory Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);
 }

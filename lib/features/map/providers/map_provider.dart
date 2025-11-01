@@ -22,7 +22,6 @@ import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
-import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
@@ -777,12 +776,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
     for (final hazard in hazards) {
       if (hazard.latitude == null || hazard.longitude == null) continue;
 
-      final categoryId = hazard.categoryId;
-      final severity = hazard.severity ?? HazardSeverity.info;
-
       final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
-      final key = '${categoryId}_${severity.name}';
-      final bitmapDescriptor = markerBitmaps[key];
+      final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(markerBitmaps);
       if (bitmapDescriptor == null) continue;
 
       final marker = Marker(

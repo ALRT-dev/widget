@@ -215,8 +215,8 @@ return $default(_that.id,_that.name,_that.description,_that.hazardsCount);case _
 /// @nodoc
 @JsonSerializable()
 
-class _HazardCategory implements HazardCategory {
-  const _HazardCategory({required this.id, this.name, this.description, this.hazardsCount = 0});
+class _HazardCategory extends HazardCategory {
+  const _HazardCategory({required this.id, this.name, this.description, this.hazardsCount = 0}): super._();
   factory _HazardCategory.fromJson(Map<String, dynamic> json) => _$HazardCategoryFromJson(json);
 
 /// The unique identifier for the hazard category.

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/notification/views/widgets/trust_meter.dart';
+import 'package:hazard_app/features/shared/enums/bushfire_alert_level_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/extensions/color_extension.dart';
@@ -122,6 +123,16 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
   Widget _headerBuilder() {
     return Consumer(
       builder: (context, ref, child) {
+        final bushFireAlertLevel = ref.watch(
+          provider.select(
+            (value) => value.hazard.bushFireAlertLevel,
+          ),
+        );
+        final hazardColor = ref.watch(
+          provider.select(
+            (value) => value.hazard.color,
+          ),
+        );
         final severity = ref.watch(
           provider.select(
             (value) => value.hazard.severity,
@@ -143,7 +154,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           ),
         );
 
-        final foregroundColor = severity?.color.isLight ?? false
+        final foregroundColor = hazardColor.isLight
             ? AppColors.black
             : AppColors.white;
 
@@ -151,7 +162,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: severity?.color,
+                color: hazardColor,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16.spMin),
                   topRight: Radius.circular(16.spMin),
@@ -207,7 +218,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                                 Icons.verified_rounded,
                                 size: 16.spMin,
                                 color: source != null
-                                    ? severity?.color.isLight ?? false
+                                    ? hazardColor.isLight
                                           ? AppColors.blue
                                           : AppColors.white
                                     : reportedBy?.reportsStatus.color ??
@@ -238,7 +249,9 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                       ],
                     ),
                   ),
-                  if (severity != HazardSeverity.unknown)
+                  if (severity != HazardSeverity.unknown &&
+                      (bushFireAlertLevel == null ||
+                          bushFireAlertLevel == BushfireAlertLevel.advice))
                     Text(
                       severity?.title ?? 'Unknown',
                       style: TextStyle(

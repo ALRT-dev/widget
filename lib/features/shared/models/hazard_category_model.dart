@@ -5,6 +5,8 @@ part 'hazard_category_model.g.dart';
 
 @freezed
 abstract class HazardCategory with _$HazardCategory {
+  const HazardCategory._();
+
   const factory HazardCategory({
     /// The unique identifier for the hazard category.
     required final String id,
@@ -18,6 +20,9 @@ abstract class HazardCategory with _$HazardCategory {
     /// The number of hazards associated with this category.
     @Default(0) final int hazardsCount,
   }) = _HazardCategory;
+
+  /// Checks if the hazard category is bushfire.
+  bool get isBushfire => id == 'bushfire';
 
   factory HazardCategory.fromJson(Map<String, dynamic> json) =>
       _$HazardCategoryFromJson(json);

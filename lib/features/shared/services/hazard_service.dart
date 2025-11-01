@@ -304,6 +304,7 @@ class HazardService {
 
     final futures = <Future<Map<String, BitmapDescriptor>>>[];
 
+    // Generate bitmaps for each category and severity combination
     for (final category in categories) {
       for (final severity in severities) {
         final key = '${category.id}_${severity.name}';
@@ -313,6 +314,20 @@ class HazardService {
         ).then((bitmap) => {key: bitmap});
         futures.add(future);
       }
+    }
+
+    // Generate bitmaps for miscellaneous markers
+    final miscellaneousMarkerKeys = [
+      'bushfire_notApplicable',
+      'bushfire_plannedBurn',
+      'bushfire_responding',
+    ];
+    for (final key in miscellaneousMarkerKeys) {
+      final future = getBitmapDescriptorForAssetPath(
+        assetPath: 'assets/images/hazards/$key.png',
+        fallbackAssetPath: 'assets/images/hazards/bushfire_advice.png',
+      ).then((bitmap) => {key: bitmap});
+      futures.add(future);
     }
 
     final markerBitmaps = await Future.wait(futures);
@@ -337,34 +352,74 @@ class HazardService {
       final key = '${categoryId}_${severity.name}';
       final assetPath = 'assets/images/hazards/$key.png';
 
-      final exists = await assetExists(assetPath: assetPath);
-      if (!exists) {
-        final exists = await assetExists(
-          assetPath: 'assets/images/hazards/other_${severity.name}.png',
+      var exists = await assetExists(assetPath: assetPath);
+      if (exists) {
+        return BitmapDescriptor.asset(
+          ImageConfiguration(size: size),
+          assetPath,
         );
-        if (!exists) {
-          final exists = await assetExists(
-            assetPath: 'assets/images/hazards/other_unknown.png',
-          );
-          if (!exists) {
-            return BitmapDescriptor.defaultMarker;
-          }
+      }
 
-          return BitmapDescriptor.asset(
-            ImageConfiguration(size: size),
-            'assets/images/hazards/other_unknown.png',
-          );
-        }
-
+      exists = await assetExists(
+        assetPath: 'assets/images/hazards/other_${severity.name}.png',
+      );
+      if (exists) {
         return BitmapDescriptor.asset(
           ImageConfiguration(size: size),
           'assets/images/hazards/other_${severity.name}.png',
         );
       }
-      return BitmapDescriptor.asset(
-        ImageConfiguration(size: size),
-        assetPath,
+
+      exists = await assetExists(
+        assetPath: 'assets/images/hazards/other_info.png',
       );
+      if (exists) {
+        return BitmapDescriptor.asset(
+          ImageConfiguration(size: size),
+          'assets/images/hazards/other_info.png',
+        );
+      }
+
+      return BitmapDescriptor.defaultMarker;
+    } catch (e) {
+      return BitmapDescriptor.defaultMarker;
+    }
+  }
+
+  /// Gets a BitmapDescriptor for the given asset path, with a fallback option.
+  Future<BitmapDescriptor> getBitmapDescriptorForAssetPath({
+    required final String assetPath,
+    final Size size = const Size(40, 40),
+    final String fallbackAssetPath = 'assets/images/hazards/other_info.png',
+  }) async {
+    try {
+      var exists = await assetExists(assetPath: assetPath);
+      if (exists) {
+        return BitmapDescriptor.asset(
+          ImageConfiguration(size: size),
+          assetPath,
+        );
+      }
+
+      exists = await assetExists(assetPath: fallbackAssetPath);
+      if (exists) {
+        return BitmapDescriptor.asset(
+          ImageConfiguration(size: size),
+          fallbackAssetPath,
+        );
+      }
+
+      exists = await assetExists(
+        assetPath: 'assets/images/hazards/other_info.png',
+      );
+      if (exists) {
+        return BitmapDescriptor.asset(
+          ImageConfiguration(size: size),
+          'assets/images/hazards/other_info.png',
+        );
+      }
+
+      return BitmapDescriptor.defaultMarker;
     } catch (e) {
       return BitmapDescriptor.defaultMarker;
     }
