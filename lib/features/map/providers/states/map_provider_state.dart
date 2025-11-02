@@ -1,4 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:google_maps_cluster_manager_2/google_maps_cluster_manager_2.dart'
+    as cluster_manager;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
@@ -22,6 +24,9 @@ abstract class MapProviderState with _$MapProviderState {
 
     /// The set of markers displayed on the map.
     @Default(<Marker>{}) final Set<Marker> markers,
+
+    /// The cluster manager for hazard markers.
+    final cluster_manager.ClusterManager? clusterManager,
 
     /// The set of polylines displayed on the map.
     @Default(<Polyline>{}) final Set<Polyline> polylines,

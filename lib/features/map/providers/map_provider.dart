@@ -771,29 +771,43 @@ class MapProvider extends StateNotifier<MapProviderState> {
   /// Generates markers for all hazards in the state.
   void generateMarkers() async {
     final hazards = state.hazards;
-    final markers = <Marker>[];
+    final currentZoom = state.cameraPosition.zoom;
+
+    // Progressive clustering based on zoom level
+    if (currentZoom >= 12.0) {
+      // Show individual markers at very high zoom levels
+      _showAllIndividualMarkers();
+    } else {
+      // Show progressive clusters at lower zoom levels
+      _showProgressiveClusters(hazards, currentZoom);
+    }
+  }
+
+  /// Shows all individual hazard markers without clustering
+  void _showAllIndividualMarkers() async {
+    final hazards = state.hazards;
+    final individualMarkers = <Marker>[];
 
     for (final hazard in hazards) {
       if (hazard.latitude == null || hazard.longitude == null) continue;
 
       final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
       final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(markerBitmaps);
-      if (bitmapDescriptor == null) continue;
-
-      final marker = Marker(
-        markerId: MarkerId(
-          hazard.id ?? '${hazard.latitude},${hazard.longitude}',
-        ),
-        position: LatLng(
-          hazard.latitude!,
-          hazard.longitude!,
-        ),
-        onTap: () => updateSelectedHazard(hazard),
-        icon: bitmapDescriptor,
-      );
-      markers.add(marker);
+      if (bitmapDescriptor != null) {
+        individualMarkers.add(
+          Marker(
+            markerId: MarkerId(
+              hazard.id ?? '${hazard.latitude},${hazard.longitude}',
+            ),
+            position: LatLng(hazard.latitude!, hazard.longitude!),
+            onTap: () => updateSelectedHazard(hazard),
+            icon: bitmapDescriptor,
+          ),
+        );
+      }
     }
 
+    // Preserve non-hazard markers
     final selectedPlaceMarker = state.markers.firstWhereOrNull(
       (marker) => marker.markerId.value == 'selected_location',
     );
@@ -803,12 +817,264 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final currentUserLocationMarker = state.markers.firstWhereOrNull(
       (marker) => marker.markerId.value == 'user_location',
     );
-    updateMarkers({
-      ...markers.toSet(),
+
+    final allMarkers = <Marker>{
+      ...individualMarkers,
       if (selectedPlaceMarker != null) selectedPlaceMarker,
       ...routeLabelMarkers,
       if (currentUserLocationMarker != null) currentUserLocationMarker,
-    });
+    };
+
+    updateMarkers(allMarkers);
+  }
+
+  /// Shows progressive clusters based on zoom level and geographic proximity
+  void _showProgressiveClusters(List<Hazard> hazards, double zoomLevel) async {
+    if (hazards.isEmpty) return;
+
+    // Calculate cluster distance based on zoom level
+    // Higher zoom = smaller cluster distance (more granular clusters)
+    final clusterDistance = _getClusterDistance(zoomLevel);
+
+    // First group by category
+    final Map<String, List<Hazard>> hazardsByCategory = {};
+    for (final hazard in hazards) {
+      if (hazard.latitude == null || hazard.longitude == null) continue;
+
+      final categoryId = hazard.categoryId ?? 'unknown';
+      hazardsByCategory.putIfAbsent(categoryId, () => []);
+      hazardsByCategory[categoryId]!.add(hazard);
+    }
+
+    final clusterMarkerFutures = <Future<Marker>>[];
+    final individualMarkerFutures = <Future<Marker>>[];
+
+    // Create geographic clusters within each category
+    for (final entry in hazardsByCategory.entries) {
+      final categoryId = entry.key;
+      final categoryHazards = entry.value;
+
+      final categoryClusters = _createGeographicClusters(
+        categoryHazards,
+        clusterDistance,
+      );
+
+      // Create markers for each geographic cluster
+      for (int i = 0; i < categoryClusters.length; i++) {
+        final cluster = categoryClusters[i];
+
+        if (cluster.length == 1) {
+          // Show individual marker for single hazard
+          final hazard = cluster.first;
+          final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
+          final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(
+            markerBitmaps,
+          );
+
+          if (bitmapDescriptor != null) {
+            final individualMarker = Marker(
+              markerId: MarkerId(
+                hazard.id ?? '${hazard.latitude},${hazard.longitude}',
+              ),
+              position: LatLng(hazard.latitude!, hazard.longitude!),
+              onTap: () => updateSelectedHazard(hazard),
+              icon: bitmapDescriptor,
+            );
+            individualMarkerFutures.add(Future.value(individualMarker));
+          }
+        } else {
+          // Show cluster marker for multiple hazards
+          // Calculate cluster center
+          double totalLat = 0;
+          double totalLng = 0;
+          for (final hazard in cluster) {
+            totalLat += hazard.latitude!;
+            totalLng += hazard.longitude!;
+          }
+
+          final centerLat = totalLat / cluster.length;
+          final centerLng = totalLng / cluster.length;
+          final clusterPosition = LatLng(centerLat, centerLng);
+
+          // Create cluster marker using the first hazard's information
+          final firstHazard = cluster.first;
+
+          final future =
+              _createCategoryClusterMarkerIcon(
+                cluster.length,
+                firstHazard,
+              ).then(
+                (bitmapDescriptor) {
+                  return Marker(
+                    markerId: MarkerId('cluster_${categoryId}_$i'),
+                    position: clusterPosition,
+                    onTap: () {
+                      // Zoom in to break the cluster further
+                      _mapService.animateCamera(
+                        cameraUpdate: CameraUpdate.newLatLngBounds(
+                          cluster
+                              .map(
+                                (hazard) => LatLng(
+                                  hazard.latitude!,
+                                  hazard.longitude!,
+                                ),
+                              )
+                              .toList()
+                              .toBounds(),
+                          100.0,
+                        ),
+                      );
+                    },
+                    icon: bitmapDescriptor,
+                  );
+                },
+              );
+
+          clusterMarkerFutures.add(future);
+        }
+      }
+    }
+
+    final clusterMarkers = await Future.wait(clusterMarkerFutures);
+    final individualMarkers = await Future.wait(individualMarkerFutures);
+
+    // Preserve non-hazard markers
+    final selectedPlaceMarker = state.markers.firstWhereOrNull(
+      (marker) => marker.markerId.value == 'selected_location',
+    );
+    final routeLabelMarkers = state.markers.where(
+      (marker) => marker.markerId.value.startsWith('route_label_'),
+    );
+    final currentUserLocationMarker = state.markers.firstWhereOrNull(
+      (marker) => marker.markerId.value == 'user_location',
+    );
+
+    final allMarkers = <Marker>{
+      ...clusterMarkers,
+      ...individualMarkers,
+      if (selectedPlaceMarker != null) selectedPlaceMarker,
+      ...routeLabelMarkers,
+      if (currentUserLocationMarker != null) currentUserLocationMarker,
+    };
+
+    updateMarkers(allMarkers);
+  }
+
+  /// Gets the clustering distance based on zoom level
+  double _getClusterDistance(double zoomLevel) {
+    // Distance in kilometers for clustering
+    // Lower zoom = larger distance (fewer, bigger clusters)
+    // Higher zoom = smaller distance (more, smaller clusters)
+    if (zoomLevel <= 3) return 5000.0; // 10000km clusters
+    if (zoomLevel <= 4) return 700.0; // 900km clusters
+    if (zoomLevel <= 5) return 200.0; // 700km clusters
+    if (zoomLevel <= 6) return 100.0; // 100km clusters
+    if (zoomLevel <= 7) return 40.0; // 40km clusters
+    if (zoomLevel <= 8) return 20.0; // 20km clusters
+    if (zoomLevel <= 10) return 10.0; // 10km clusters
+    if (zoomLevel <= 12) return 5.0; // 5km clusters
+    return 2.0; // 2km clusters
+  }
+
+  /// Creates geographic clusters from a list of hazards based on distance
+  List<List<Hazard>> _createGeographicClusters(
+    List<Hazard> hazards,
+    double maxDistanceKm,
+  ) {
+    final clusters = <List<Hazard>>[];
+    final unprocessed = List<Hazard>.from(hazards);
+
+    while (unprocessed.isNotEmpty) {
+      final seed = unprocessed.removeAt(0);
+      final cluster = [seed];
+
+      // Find all hazards within clustering distance of the seed
+      for (int i = unprocessed.length - 1; i >= 0; i--) {
+        final hazard = unprocessed[i];
+        final distance =
+            calculateDistanceInMeters(
+              seed.latitude!,
+              seed.longitude!,
+              hazard.latitude!,
+              hazard.longitude!,
+            ) /
+            1000; // Convert to km
+
+        if (distance <= maxDistanceKm) {
+          cluster.add(hazard);
+          unprocessed.removeAt(i);
+        }
+      }
+
+      clusters.add(cluster);
+    }
+
+    return clusters;
+  }
+
+  /// Creates a cluster marker icon with the first hazard's icon and count badge
+  Future<BitmapDescriptor> _createCategoryClusterMarkerIcon(
+    int count,
+    Hazard firstHazard,
+  ) async {
+    const size = 60.0;
+    const countBadgeSize = 26.0;
+
+    final widget = SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Main hazard icon using the actual hazard icon path
+          Positioned.fill(
+            child: Image.asset(
+              firstHazard.iconPath,
+              width: size,
+              height: size,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Image.asset(
+                firstHazard.fallbackIconPath,
+                width: size,
+                height: size,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          // Count badge in top-right corner
+          Positioned(
+            top: 0,
+            left: 3.0,
+            child: Container(
+              width: countBadgeSize,
+              height: countBadgeSize,
+              decoration: BoxDecoration(
+                color: AppColors.red,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(2.0),
+              child: Center(
+                child: FittedBox(
+                  child: Text(
+                    '$count',
+                    style: const TextStyle(
+                      color: AppColors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return widget.toBitmapDescriptor(
+      logicalSize: const Size(size, size),
+      imageSize: const Size(size * 2, size * 2),
+    );
   }
 
   /// Updates [MapProviderState.isMapReady] to the given [isMapReady].
