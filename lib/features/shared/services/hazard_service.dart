@@ -315,7 +315,7 @@ class HazardService {
         ).then((bitmap) => {keyAws: bitmap});
         futures.add(futureAws);
 
-        final keyNonAws = '${category.id}_${severity.name}';
+        final keyNonAws = '${category.id}_${severity.name}_non_aws';
         final futureNonAws = getBitmapDescriptorForHazard(
           categoryId: category.id,
           severity: severity,
@@ -333,8 +333,8 @@ class HazardService {
     ];
     for (final key in miscellaneousMarkerKeys) {
       final future = getBitmapDescriptorForAssetPath(
-        assetPath: 'assets/images/hazards/$key.png',
-        fallbackAssetPath: 'assets/images/hazards/bushfire_advice.png',
+        assetPath: 'assets/images/hazards/aws/$key.png',
+        fallbackAssetPath: 'assets/images/hazards/aws/bushfire_advice.png',
       ).then((bitmap) => {key: bitmap});
       futures.add(future);
     }
@@ -359,9 +359,9 @@ class HazardService {
     final Size size = const Size(40, 40),
   }) async {
     try {
-      final key =
-          '${categoryId}_${severity.name}${isAwsCompliant ? '_aws' : ''}';
-      final assetPath = 'assets/images/hazards/$key.png';
+      final key = '${categoryId}_${severity.name}';
+      final assetPath =
+          'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}$key.png';
 
       var exists = await assetExists(assetPath: assetPath);
       if (exists) {
@@ -371,37 +371,14 @@ class HazardService {
         );
       }
 
-      // If AWS compliant asset not found, try non-AWS version for AWS requests
-      if (isAwsCompliant) {
-        final keyNonAws = '${categoryId}_${severity.name}';
-        final assetPathNonAws = 'assets/images/hazards/$keyNonAws.png';
-        exists = await assetExists(assetPath: assetPathNonAws);
-        if (exists) {
-          return BitmapDescriptor.asset(
-            ImageConfiguration(size: size),
-            assetPathNonAws,
-          );
-        }
-      }
-
       exists = await assetExists(
         assetPath:
-            'assets/images/hazards/other_${severity.name}${isAwsCompliant ? '_aws' : ''}.png',
+            'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severity.name}.png',
       );
       if (exists) {
         return BitmapDescriptor.asset(
           ImageConfiguration(size: size),
-          'assets/images/hazards/other_${severity.name}${isAwsCompliant ? '_aws' : ''}.png',
-        );
-      }
-
-      exists = await assetExists(
-        assetPath: 'assets/images/hazards/other_info.png',
-      );
-      if (exists) {
-        return BitmapDescriptor.asset(
-          ImageConfiguration(size: size),
-          'assets/images/hazards/other_info.png',
+          'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severity.name}.png',
         );
       }
 
@@ -431,16 +408,6 @@ class HazardService {
         return BitmapDescriptor.asset(
           ImageConfiguration(size: size),
           fallbackAssetPath,
-        );
-      }
-
-      exists = await assetExists(
-        assetPath: 'assets/images/hazards/other_info.png',
-      );
-      if (exists) {
-        return BitmapDescriptor.asset(
-          ImageConfiguration(size: size),
-          'assets/images/hazards/other_info.png',
         );
       }
 

@@ -283,15 +283,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           return const SizedBox.shrink();
         }
 
-        final unknownIconPath = ref.watch(
-          provider.select(
-            (value) => value.hazard?.unknownIconPath,
-          ),
-        );
-        if (unknownIconPath == null) {
-          return const SizedBox.shrink();
-        }
-
         return Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -313,12 +304,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               width: 80.spMin,
               height: 80.spMin,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Image.asset(
-                unknownIconPath,
-                width: 80.spMin,
-                height: 80.spMin,
-                fit: BoxFit.contain,
-              ),
             ),
           ),
         );

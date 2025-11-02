@@ -306,11 +306,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard.fallbackIconPath,
           ),
         );
-        final unknownIconPath = ref.watch(
-          provider.select(
-            (value) => value.hazard.unknownIconPath,
-          ),
-        );
         return Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -332,12 +327,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               width: 30.spMin,
               height: 30.spMin,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Image.asset(
-                unknownIconPath,
-                width: 30.spMin,
-                height: 30.spMin,
-                fit: BoxFit.contain,
-              ),
             ),
           ),
         );

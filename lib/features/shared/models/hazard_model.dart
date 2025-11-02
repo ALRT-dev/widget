@@ -140,23 +140,17 @@ abstract class Hazard with _$Hazard {
     if (bushFireAlertLevel != null &&
         bushFireAlertLevel != BushfireAlertLevel.advice) {
       final alertLevelName = bushFireAlertLevel!.name;
-      return 'assets/images/hazards/${categoryId}_$alertLevelName.png';
+      return 'assets/images/hazards/aws/${categoryId}_$alertLevelName.png';
     }
 
     final severityName = severity?.name ?? HazardSeverity.info.name;
-    return 'assets/images/hazards/${categoryId}_$severityName${isAwsCompliant == true ? '_aws' : ''}.png';
+    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${categoryId}_$severityName.png';
   }
 
   /// The fallback file path for the hazard icon based on its severity.
   String get fallbackIconPath {
     final severityName = severity?.name ?? HazardSeverity.info.name;
-    return 'assets/images/hazards/${categoryId}_$severityName.png';
-  }
-
-  /// The file path for the unknown hazard icon.
-  String get unknownIconPath {
-    final severityName = severity?.name ?? HazardSeverity.info.name;
-    return 'assets/images/hazards/other_$severityName.png';
+    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityName.png';
   }
 
   /// Gets the appropriate BitmapDescriptor for the hazard marker.
@@ -164,7 +158,7 @@ abstract class Hazard with _$Hazard {
     Map<String, BitmapDescriptor> bitmapMap,
   ) {
     var key =
-        '${categoryId}_${severity?.name ?? HazardSeverity.info.name}${isAwsCompliant == true ? '_aws' : ''}';
+        '${categoryId}_${severity?.name ?? HazardSeverity.info.name}${isAwsCompliant == true ? '_aws' : '_non_aws'}';
 
     /// For bushfire hazards, use the bushfire alert level in the key
     if (bushFireAlertLevel != null &&
@@ -172,9 +166,7 @@ abstract class Hazard with _$Hazard {
       key = '${categoryId}_${bushFireAlertLevel!.name}';
     }
 
-    return bitmapMap[key] ??
-        bitmapMap[fallbackIconPath] ??
-        bitmapMap[unknownIconPath];
+    return bitmapMap[key];
   }
 
   /// Determines the bushfire alert level if the hazard is a bushfire.

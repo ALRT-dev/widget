@@ -82,6 +82,8 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/images/hazards/
+    - assets/images/hazards/aws/
+    - assets/images/hazards/non_aws/
     - assets/pins/
 
   fonts:
