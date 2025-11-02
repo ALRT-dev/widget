@@ -144,17 +144,20 @@ abstract class Hazard with _$Hazard {
     }
 
     final severityName = severity?.name ?? HazardSeverity.info.name;
-    return 'assets/images/hazards/${categoryId}_$severityName.png';
+    return 'assets/images/hazards/${categoryId}_$severityName${isAwsCompliant == true ? '_aws' : ''}.png';
   }
 
   /// The fallback file path for the hazard icon based on its severity.
   String get fallbackIconPath {
     final severityName = severity?.name ?? HazardSeverity.info.name;
-    return 'assets/images/hazards/other_$severityName.png';
+    return 'assets/images/hazards/${categoryId}_$severityName.png';
   }
 
   /// The file path for the unknown hazard icon.
-  String get unknownIconPath => 'assets/images/hazards/other_info.png';
+  String get unknownIconPath {
+    final severityName = severity?.name ?? HazardSeverity.info.name;
+    return 'assets/images/hazards/other_$severityName.png';
+  }
 
   /// Gets the appropriate BitmapDescriptor for the hazard marker.
   BitmapDescriptor? getMarkerBitmapDescriptor(
@@ -182,7 +185,11 @@ abstract class Hazard with _$Hazard {
       return null;
     }
     return BushfireAlertLevel.values.firstWhere(
-      (level) => description!.toLowerCase().contains(level.title.toLowerCase()),
+      (level) => level.keywords.any(
+        (keyword) => description!.toLowerCase().contains(
+          RegExp(r'\b' + keyword + r'\b'),
+        ),
+      ),
       orElse: () => BushfireAlertLevel.notApplicable,
     );
   }
