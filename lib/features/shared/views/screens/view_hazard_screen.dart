@@ -20,6 +20,7 @@ import 'package:hazard_app/features/shared/providers/states/view_hazard_provider
 import 'package:hazard_app/features/shared/providers/video_preview_lifecycle_provider.dart';
 import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
+import 'package:hazard_app/features/shared/utils/open_link.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_expiry_timer.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
@@ -650,10 +651,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                         ),
                         4.spMin.hSizedBox,
                         GestureDetector(
-                          onTap: () {
-                            // TODO: Open URL in browser
-                            // You can implement URL launcher here
-                          },
+                          onTap: () => openLink(
+                            context: context,
+                            link: source.url!,
+                          ),
                           child: Text(
                             source.url!,
                             style: TextStyle(
