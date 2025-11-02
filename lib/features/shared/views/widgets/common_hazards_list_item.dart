@@ -138,6 +138,11 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard.severity,
           ),
         );
+        final severityTitle = ref.watch(
+          provider.select(
+            (value) => value.hazard.severityTitle,
+          ),
+        );
         final source = ref.watch(
           provider.select(
             (value) => value.hazard.source,
@@ -253,7 +258,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                       (bushFireAlertLevel == null ||
                           bushFireAlertLevel == BushfireAlertLevel.advice))
                     Text(
-                      severity?.title ?? 'Unknown',
+                      severityTitle,
                       style: TextStyle(
                         fontSize: 12.spMin,
                         fontWeight: FontWeight.w600,

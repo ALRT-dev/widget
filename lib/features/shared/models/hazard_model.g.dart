@@ -29,6 +29,7 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
     json['aiConfidence'],
   ),
   callToAction: json['callToAction'] as String?,
+  isAwsCompliant: json['isAwsCompliant'] as bool?,
   reportedBy: json['reportedBy'] == null
       ? null
       : AppUser.fromJson(json['reportedBy'] as Map<String, dynamic>),
@@ -88,6 +89,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'aiSeverity': ?_$HazardSeverityEnumMap[instance.aiSeverity],
   'aiConfidence': ?_$AIConfidenceEnumMap[instance.aiConfidence],
   'callToAction': ?instance.callToAction,
+  'isAwsCompliant': ?instance.isAwsCompliant,
   'reportedBy': ?instance.reportedBy?.toJson(),
   'reviewStatus': ?_$HazardReviewStatusEnumMap[instance.reviewStatus],
   'reviewFeedback': ?instance.reviewFeedback,
@@ -122,6 +124,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
 const _$HazardSeverityEnumMap = {
   HazardSeverity.unknown: 'unknown',
   HazardSeverity.info: 'info',
+  HazardSeverity.low: 'low',
   HazardSeverity.advice: 'advice',
   HazardSeverity.watchAndAct: 'watchAndAct',
   HazardSeverity.emergency: 'emergency',

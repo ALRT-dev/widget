@@ -204,10 +204,10 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
         vertical: 4.spMin,
       ),
       decoration: BoxDecoration(
-        color: severity.color.withValues(alpha: 0.2),
+        color: severity.colorAWS.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: (textColor ?? severity.color).withValues(alpha: 0.5),
+          color: (textColor ?? severity.colorAWS).withValues(alpha: 0.5),
         ),
       ),
       child: Text(
@@ -215,7 +215,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
         style: TextStyle(
           fontSize: 10.sp,
           fontWeight: FontWeight.w500,
-          color: textColor ?? severity.color,
+          color: textColor ?? severity.colorAWS,
         ),
       ),
     );

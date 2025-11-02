@@ -279,7 +279,7 @@ class _CreateUpdateReportScreenState
                 hintText: 'Select severity',
                 value: selectedSeverity == null
                     ? null
-                    : '${selectedSeverity.emoji} ${selectedSeverity.title}',
+                    : '${selectedSeverity.emoji} ${selectedSeverity.titleAws}',
                 enabled: false,
               ),
               onSeveritySelected: (severity) => _updateSeverity(

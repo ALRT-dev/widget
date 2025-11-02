@@ -131,7 +131,7 @@ class _MyAcceptedHazardsListItemState
       height: 45.spMin,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: widget.report.severity?.color,
+        color: widget.report.color,
       ),
       padding: EdgeInsets.all(8.spMin),
       child: Container(

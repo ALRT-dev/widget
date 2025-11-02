@@ -329,6 +329,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         return Icons.help_outline;
       case HazardSeverity.info:
         return Icons.info_outline;
+      case HazardSeverity.low:
+        return Icons.info_outline;
       case HazardSeverity.advice:
         return Icons.lightbulb_outline;
       case HazardSeverity.watchAndAct:
@@ -505,23 +507,26 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     final severity = widget.args.hazard.severity;
     if (severity == null) return const SizedBox.shrink();
 
+    final hazardColor = widget.args.hazard.color;
+    final severityTitle = widget.args.hazard.severityTitle;
+
     return _buildSection(
       title: 'Severity Level',
       icon: Icons.priority_high_outlined,
       child: Container(
         padding: EdgeInsets.all(16.spMin),
         decoration: BoxDecoration(
-          color: severity.color.withValues(alpha: 0.1),
+          color: hazardColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12.spMin),
           border: Border.all(
-            color: severity.color.withValues(alpha: 0.3),
+            color: hazardColor.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
           children: [
             Icon(
               _getSeverityIcon(severity),
-              color: severity.color,
+              color: hazardColor,
               size: 24.spMin,
             ),
             12.spMin.wSizedBox,
@@ -530,11 +535,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    severity.title,
+                    severityTitle,
                     style: TextStyle(
                       fontSize: 16.spMin,
                       fontWeight: FontWeight.bold,
-                      color: severity.color,
+                      color: hazardColor,
                     ),
                   ),
                   4.spMin.hSizedBox,
@@ -560,8 +565,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         return 'Severity level is unknown';
       case HazardSeverity.info:
         return 'General information about potential hazards';
+      case HazardSeverity.low:
+        return 'Be cautious and stay aware of your surroundings';
       case HazardSeverity.advice:
-        return 'Recommendations to help you prepare';
+        return 'Take necessary precautions and stay safe';
       case HazardSeverity.watchAndAct:
         return 'Conditions are changing, stay alert';
       case HazardSeverity.emergency:

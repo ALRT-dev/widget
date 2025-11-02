@@ -67,6 +67,9 @@ abstract class Hazard with _$Hazard {
     /// The things users can do to mitigate the hazard.
     final String? callToAction,
 
+    /// Indicates whether the hazard follows AWS standards.
+    final bool? isAwsCompliant,
+
     /// The user who reported the hazard.
     ///
     /// If source is provided, this may be null.
@@ -157,7 +160,8 @@ abstract class Hazard with _$Hazard {
   BitmapDescriptor? getMarkerBitmapDescriptor(
     Map<String, BitmapDescriptor> bitmapMap,
   ) {
-    var key = '${categoryId}_${severity?.name ?? HazardSeverity.info.name}';
+    var key =
+        '${categoryId}_${severity?.name ?? HazardSeverity.info.name}${isAwsCompliant == true ? '_aws' : ''}';
 
     /// For bushfire hazards, use the bushfire alert level in the key
     if (bushFireAlertLevel != null &&
@@ -191,7 +195,18 @@ abstract class Hazard with _$Hazard {
       return bushFireAlertLevel!.color;
     }
 
-    return severity?.color ?? HazardSeverity.info.color;
+    if (isAwsCompliant == true) {
+      return severity?.colorAWS ?? HazardSeverity.info.colorAWS;
+    }
+    return severity?.colorNonAWS ?? HazardSeverity.info.colorNonAWS;
+  }
+
+  /// The title associated with the hazard's severity.
+  String get severityTitle {
+    if (isAwsCompliant == true) {
+      return severity?.titleAws ?? HazardSeverity.info.titleAws;
+    }
+    return severity?.titleNonAWS ?? HazardSeverity.info.titleNonAWS;
   }
 
   factory Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);

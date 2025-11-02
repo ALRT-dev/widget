@@ -100,7 +100,7 @@ class _HazardSearchResultsListItemState
       height: 45.spMin,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: widget.hazard.severity?.color,
+        color: widget.hazard.color,
       ),
       padding: EdgeInsets.all(8.spMin),
       child: Container(

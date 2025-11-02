@@ -307,12 +307,21 @@ class HazardService {
     // Generate bitmaps for each category and severity combination
     for (final category in categories) {
       for (final severity in severities) {
-        final key = '${category.id}_${severity.name}';
-        final future = getBitmapDescriptorForHazard(
+        final keyAws = '${category.id}_${severity.name}_aws';
+        final futureAws = getBitmapDescriptorForHazard(
           categoryId: category.id,
           severity: severity,
-        ).then((bitmap) => {key: bitmap});
-        futures.add(future);
+          isAwsCompliant: true,
+        ).then((bitmap) => {keyAws: bitmap});
+        futures.add(futureAws);
+
+        final keyNonAws = '${category.id}_${severity.name}';
+        final futureNonAws = getBitmapDescriptorForHazard(
+          categoryId: category.id,
+          severity: severity,
+          isAwsCompliant: false,
+        ).then((bitmap) => {keyNonAws: bitmap});
+        futures.add(futureNonAws);
       }
     }
 
@@ -346,10 +355,12 @@ class HazardService {
   Future<BitmapDescriptor> getBitmapDescriptorForHazard({
     required final String categoryId,
     required final HazardSeverity severity,
+    final bool isAwsCompliant = false,
     final Size size = const Size(40, 40),
   }) async {
     try {
-      final key = '${categoryId}_${severity.name}';
+      final key =
+          '${categoryId}_${severity.name}${isAwsCompliant ? '_aws' : ''}';
       final assetPath = 'assets/images/hazards/$key.png';
 
       var exists = await assetExists(assetPath: assetPath);
@@ -360,13 +371,27 @@ class HazardService {
         );
       }
 
+      // If AWS compliant asset not found, try non-AWS version for AWS requests
+      if (isAwsCompliant) {
+        final keyNonAws = '${categoryId}_${severity.name}';
+        final assetPathNonAws = 'assets/images/hazards/$keyNonAws.png';
+        exists = await assetExists(assetPath: assetPathNonAws);
+        if (exists) {
+          return BitmapDescriptor.asset(
+            ImageConfiguration(size: size),
+            assetPathNonAws,
+          );
+        }
+      }
+
       exists = await assetExists(
-        assetPath: 'assets/images/hazards/other_${severity.name}.png',
+        assetPath:
+            'assets/images/hazards/other_${severity.name}${isAwsCompliant ? '_aws' : ''}.png',
       );
       if (exists) {
         return BitmapDescriptor.asset(
           ImageConfiguration(size: size),
-          'assets/images/hazards/other_${severity.name}.png',
+          'assets/images/hazards/other_${severity.name}${isAwsCompliant ? '_aws' : ''}.png',
         );
       }
 
@@ -459,6 +484,7 @@ class HazardService {
   String getFallbackCallToAction(final HazardSeverity severity) {
     return switch (severity) {
       HazardSeverity.info => 'Stay informed and follow any official guidance.',
+      HazardSeverity.low => 'Be cautious and stay aware of your surroundings.',
       HazardSeverity.advice => 'Take necessary precautions and stay safe.',
       HazardSeverity.watchAndAct =>
         'Be prepared to take action if the situation escalates.',

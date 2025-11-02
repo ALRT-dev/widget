@@ -120,9 +120,9 @@ class _HazardNotificationsListItemState
   Widget _iconBuilder() {
     return Consumer(
       builder: (context, ref, child) {
-        final severity = ref.watch(
+        final hazardColor = ref.watch(
           provider.select(
-            (value) => value.hazard.severity,
+            (value) => value.hazard.color,
           ),
         );
         return Container(
@@ -130,7 +130,7 @@ class _HazardNotificationsListItemState
           height: 40.spMin,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: severity?.color,
+            color: hazardColor,
           ),
           padding: EdgeInsets.all(8.spMin),
           child: Container(

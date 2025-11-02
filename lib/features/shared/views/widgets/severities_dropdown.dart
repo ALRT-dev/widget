@@ -43,7 +43,7 @@ class _SeveritiesDropdownState extends ConsumerState<SeveritiesDropdown> {
                 ),
               ),
               title: Text(
-                severity.title,
+                severity.titleAws,
                 style: TextStyle(
                   fontSize: 16.spMin,
                 ),

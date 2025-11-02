@@ -241,16 +241,16 @@ class _RouteHazardControlsState extends ConsumerState<RouteHazardControls> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: severity.color.withOpacity(0.2),
+        color: severity.colorAWS.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: severity.color.withOpacity(0.5)),
+        border: Border.all(color: severity.colorAWS.withOpacity(0.5)),
       ),
       child: Text(
         label,
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: severity.color,
+          color: severity.colorAWS,
         ),
       ),
     );
