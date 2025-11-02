@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
-import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -16,8 +15,7 @@ Future<void> openLink({
     name: 'openLink',
     future: () async {
       final uri = Uri.parse(link);
-      final result = await launchUrl(uri);
-      if (!result) throw AppError(message: 'Could not open link $link');
+      await launchUrl(uri);
     },
     onError: (error) {
       context.showErrorToast(

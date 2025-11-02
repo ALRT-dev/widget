@@ -9,6 +9,7 @@ import 'package:hazard_app/features/shared/enums/bushfire_alert_level_types.dart
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/video_priority_types.dart';
+import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -22,6 +23,7 @@ import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/utils/open_link.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
+import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_expiry_timer.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -149,7 +151,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           ),
         );
         return SliverAppBar(
-          expandedHeight: hasMedia ? 400.spMin : 200.spMin,
+          expandedHeight: hasMedia ? 400.spMin : 150.spMin,
           floating: false,
           pinned: true,
           backgroundColor: AppColors.white,
@@ -392,7 +394,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         style: TextStyle(
           fontSize: 12.spMin,
           fontWeight: FontWeight.w500,
-          color: AppColors.white,
+          color: color.isLight ? AppColors.black : AppColors.white,
         ),
       ),
     );
@@ -414,7 +416,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         style: TextStyle(
           fontSize: 12.spMin,
           fontWeight: FontWeight.w500,
-          color: AppColors.white,
+          color: color.isLight ? AppColors.black : AppColors.white,
         ),
       ),
     );
@@ -429,48 +431,61 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     return _buildSection(
       title: 'Location',
       icon: Icons.location_on_outlined,
-      child: Container(
-        padding: EdgeInsets.all(16.spMin),
-        decoration: BoxDecoration(
-          color: AppColors.extraLightGrey,
-          borderRadius: BorderRadius.circular(12.spMin),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.location_on,
-              color: AppColors.red,
-              size: 20.spMin,
+      child: Column(
+        children: [
+          if (widget.args.hazard.latitude != null &&
+              widget.args.hazard.longitude != null) ...[
+            SmallMapView(
+              hazard: widget.args.hazard,
+              height: 200,
+              borderRadius: 12,
             ),
-            12.spMin.wSizedBox,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.args.hazard.locationName != null
-                        ? 'Address'
-                        : 'Coordinates',
-                    style: TextStyle(
-                      fontSize: 12.spMin,
-                      color: AppColors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  4.spMin.hSizedBox,
-                  Text(
-                    widget.args.hazard.locationName ??
-                        '${widget.args.hazard.latitude!.toStringAsFixed(6)}, ${widget.args.hazard.longitude!.toStringAsFixed(6)}',
-                    style: TextStyle(
-                      fontSize: 14.spMin,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            10.hSizedBox,
           ],
-        ),
+          Container(
+            padding: EdgeInsets.all(16.spMin),
+            decoration: BoxDecoration(
+              color: AppColors.extraLightGrey,
+              borderRadius: BorderRadius.circular(12.spMin),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.location_on,
+                  color: AppColors.red,
+                  size: 20.spMin,
+                ),
+                12.spMin.wSizedBox,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.args.hazard.locationName != null
+                            ? 'Address'
+                            : 'Coordinates',
+                        style: TextStyle(
+                          fontSize: 12.spMin,
+                          color: AppColors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      4.spMin.hSizedBox,
+                      Text(
+                        widget.args.hazard.locationName ??
+                            '${widget.args.hazard.latitude!.toStringAsFixed(6)}, ${widget.args.hazard.longitude!.toStringAsFixed(6)}',
+                        style: TextStyle(
+                          fontSize: 14.spMin,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -484,7 +499,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     }
 
     return _buildSection(
-      title: 'Description',
+      title: 'Full Description',
       icon: Icons.description_outlined,
       child: Container(
         padding: EdgeInsets.all(16.spMin),
@@ -492,13 +507,19 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           color: AppColors.extraLightGrey,
           borderRadius: BorderRadius.circular(12.spMin),
         ),
-        child: Text(
-          description,
-          style: TextStyle(
-            fontSize: 16.spMin,
-            height: 1.5,
-            color: AppColors.black,
-          ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                description,
+                style: TextStyle(
+                  fontSize: 16.spMin,
+                  height: 1.5,
+                  color: AppColors.black,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -768,7 +789,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   Widget _buildAISummarySection() {
     return _buildSection(
       title: 'What We Know',
-      icon: Icons.auto_awesome_outlined,
+      icon: Icons.lightbulb_outline_rounded,
       child: Container(
         padding: EdgeInsets.all(16.spMin),
         decoration: BoxDecoration(
@@ -782,7 +803,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(
-              Icons.auto_awesome,
+              Icons.lightbulb,
               color: AppColors.blue,
               size: 20.spMin,
             ),
@@ -806,7 +827,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   Widget _buildCallToActionSection() {
     return _buildSection(
       title: 'What To Do',
-      icon: Icons.lightbulb_outline,
+      icon: Icons.lightbulb_outline_rounded,
       child: Container(
         padding: EdgeInsets.all(16.spMin),
         decoration: BoxDecoration(
