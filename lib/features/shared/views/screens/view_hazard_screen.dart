@@ -668,6 +668,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                               fontWeight: FontWeight.w600,
                               color: AppColors.blue,
                               decoration: TextDecoration.underline,
+                              decorationColor: AppColors.blue,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
