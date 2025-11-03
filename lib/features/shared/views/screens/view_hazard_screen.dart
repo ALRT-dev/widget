@@ -109,9 +109,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   24.spMin.hSizedBox,
                   _buildDescriptionSection(),
                   24.spMin.hSizedBox,
-                  if (widget.args.hazard.bushFireAlertLevel == null ||
-                      widget.args.hazard.bushFireAlertLevel ==
-                          BushfireAlertLevel.advice) ...[
+                  if ((widget.args.hazard.bushFireAlertLevel == null ||
+                          widget.args.hazard.bushFireAlertLevel ==
+                              BushfireAlertLevel.advice) &&
+                      widget.args.hazard.severity !=
+                          HazardSeverity.unknown) ...[
                     _buildSeveritySection(),
                     24.spMin.hSizedBox,
                   ],
@@ -361,7 +363,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         Row(
           children: [
             _buildSource(),
-            if (widget.args.hazard.category?.name != null) ...[
+            if (widget.args.hazard.category?.parent != null) ...[
               8.spMin.wSizedBox,
               _buildCategory(),
             ],
@@ -401,8 +403,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   }
 
   Widget _buildCategory() {
-    final color =
-        widget.args.hazard.category?.effectiveColor ?? widget.args.hazard.color;
+    final category = widget.args.hazard.category?.parent;
+    final color = category?.color ?? widget.args.hazard.color;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 12.spMin,
@@ -412,13 +414,26 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         color: color,
         borderRadius: BorderRadius.circular(20.spMin),
       ),
-      child: Text(
-        widget.args.hazard.category!.name!,
-        style: TextStyle(
-          fontSize: 12.spMin,
-          fontWeight: FontWeight.w500,
-          color: color.isLight ? AppColors.black : AppColors.white,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 5.spMin,
+        children: [
+          Image.asset(
+            'assets/images/hazards/non_aws/${category?.id}_user.png',
+            width: 16.spMin,
+            height: 16.spMin,
+            errorBuilder: (context, error, stackTrace) =>
+                const SizedBox.shrink(),
+          ),
+          Text(
+            widget.args.hazard.category!.parent!.name!,
+            style: TextStyle(
+              fontSize: 12.spMin,
+              fontWeight: FontWeight.w500,
+              color: color.isLight ? AppColors.black : AppColors.white,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -528,7 +543,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
   Widget _buildSeveritySection() {
     final severity = widget.args.hazard.severity;
-    if (severity == null) return const SizedBox.shrink();
+    if (severity == null || severity == HazardSeverity.unknown) {
+      return const SizedBox.shrink();
+    }
 
     final hazardColor = widget.args.hazard.color;
     final severityTitle = widget.args.hazard.severityTitle;

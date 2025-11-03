@@ -166,6 +166,14 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   topLeft: Radius.circular(16.spMin),
                   topRight: Radius.circular(16.spMin),
                 ),
+                border: severity != HazardSeverity.unknown
+                    ? null
+                    : Border(
+                        bottom: BorderSide(
+                          color: AppColors.lightGrey,
+                          width: 1,
+                        ),
+                      ),
               ),
               padding: EdgeInsets.symmetric(
                 horizontal: 15.spMin,

@@ -36,7 +36,7 @@ enum HazardSeverity {
   /// Returns the color associated with the hazard severity following AWS standards.
   Color get colorAWS {
     return switch (this) {
-      HazardSeverity.unknown => AppColors.grey,
+      HazardSeverity.unknown => AppColors.transparent,
       HazardSeverity.info => AppColors.info,
       HazardSeverity.advice => AppColors.advice,
       HazardSeverity.watchAndAct => AppColors.watchAndAct,
@@ -48,7 +48,7 @@ enum HazardSeverity {
   /// Returns the color associated with the hazard severity (not AWS standards).
   Color get colorNonAWS {
     return switch (this) {
-      HazardSeverity.unknown => AppColors.grey,
+      HazardSeverity.unknown => AppColors.transparent,
       HazardSeverity.info => AppColors.blue,
       HazardSeverity.low => AppColors.yellow,
       HazardSeverity.advice => AppColors.orange,

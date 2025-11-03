@@ -13,6 +13,7 @@ import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_source_model.dart';
 import 'package:hazard_app/features/shared/models/s3_media_model.dart';
+import 'package:hazard_app/others/app_colors.dart';
 
 part 'hazard_model.freezed.dart';
 part 'hazard_model.g.dart';
@@ -213,12 +214,20 @@ abstract class Hazard with _$Hazard {
     // If the hazard is a bushfire and has a specific alert level, use that color
     if (bushFireAlertLevel != null &&
         bushFireAlertLevel != BushfireAlertLevel.advice) {
-      return bushFireAlertLevel!.color;
+      return AppColors.transparent;
     }
 
+    // If the hazard is user-reported, use grey color
+    if (reportedBy != null) {
+      return AppColors.grey;
+    }
+
+    // If the hazard follows AWS standards, use AWS colors
     if (isAwsCompliant == true) {
       return severity?.colorAWS ?? HazardSeverity.info.colorAWS;
     }
+
+    // Otherwise, use non-AWS colors
     return severity?.colorNonAWS ?? HazardSeverity.info.colorNonAWS;
   }
 

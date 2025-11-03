@@ -430,7 +430,8 @@ class HazardService {
   Future<BitmapDescriptor> getBitmapDescriptorForAssetPath({
     required final String assetPath,
     final Size size = const Size(40, 40),
-    final String fallbackAssetPath = 'assets/images/hazards/other_info.png',
+    final String fallbackAssetPath =
+        'assets/images/hazards/non_aws/other_unknown.png',
   }) async {
     try {
       var exists = await assetExists(assetPath: assetPath);
