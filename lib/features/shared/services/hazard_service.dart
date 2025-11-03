@@ -313,6 +313,9 @@ class HazardService {
     final categories = categoriesResult.whenSuccess((cats) => cats) ?? [];
     final severities = HazardSeverity.values;
 
+    // Ensure the "other" category is included
+    categories.add(HazardCategory(id: 'other'));
+
     final futures = <Future<Map<String, BitmapDescriptor>>>[];
 
     // Generate bitmaps for each category and severity combination

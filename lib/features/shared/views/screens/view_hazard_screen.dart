@@ -363,7 +363,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         Row(
           children: [
             _buildSource(),
-            if (widget.args.hazard.category?.parent != null) ...[
+            if ((widget.args.hazard.category?.parent ??
+                    widget.args.hazard.category) !=
+                null) ...[
               8.spMin.wSizedBox,
               _buildCategory(),
             ],
@@ -403,7 +405,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   }
 
   Widget _buildCategory() {
-    final category = widget.args.hazard.category?.parent;
+    final category =
+        widget.args.hazard.category?.parent ?? widget.args.hazard.category;
     final color = category?.color ?? widget.args.hazard.color;
     return Container(
       padding: EdgeInsets.symmetric(
@@ -426,7 +429,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 const SizedBox.shrink(),
           ),
           Text(
-            widget.args.hazard.category!.parent!.name!,
+            category!.name!,
             style: TextStyle(
               fontSize: 12.spMin,
               fontWeight: FontWeight.w500,

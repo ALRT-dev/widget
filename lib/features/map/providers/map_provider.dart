@@ -1034,6 +1034,12 @@ class MapProvider extends StateNotifier<MapProviderState> {
                 width: size,
                 height: size,
                 fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Image.asset(
+                  firstHazard.fallbackIconPath2,
+                  width: size,
+                  height: size,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
