@@ -137,6 +137,10 @@ abstract class Hazard with _$Hazard {
 
   /// The file path for the hazard icon based on its category and severity.
   String get iconPath {
+    if (reportedBy != null) {
+      return 'assets/images/hazards/non_aws/${categoryId}_user.png';
+    }
+
     if (bushFireAlertLevel != null &&
         bushFireAlertLevel != BushfireAlertLevel.advice) {
       final alertLevelName = bushFireAlertLevel!.name;
@@ -149,6 +153,10 @@ abstract class Hazard with _$Hazard {
 
   /// The fallback file path for the hazard icon based on its severity.
   String get fallbackIconPath {
+    if (reportedBy != null) {
+      return 'assets/images/hazards/non_aws/other_user.png';
+    }
+
     final severityName = severity?.name ?? HazardSeverity.info.name;
     final parentCategoryId = category?.parentId;
     if (parentCategoryId != null) {
@@ -159,6 +167,10 @@ abstract class Hazard with _$Hazard {
 
   /// The second fallback file path for the hazard icon based on its severity.
   String get fallbackIconPath2 {
+    if (reportedBy != null) {
+      return 'assets/images/hazards/non_aws/other_user.png';
+    }
+
     final severityName = severity?.name ?? HazardSeverity.info.name;
     return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityName.png';
   }

@@ -336,15 +336,23 @@ class HazardService {
         ).then((bitmap) => {keyNonAws: bitmap});
         futures.add(futureNonAws);
       }
+
+      // Generate bitmaps for user markers
+      final key = '${category.parentId}_user';
+      final future = getBitmapDescriptorForAssetPath(
+        assetPath: 'assets/images/hazards/non_aws/$key.png',
+        fallbackAssetPath: 'assets/images/hazards/non_aws/other_user.png',
+      ).then((bitmap) => {key: bitmap});
+      futures.add(future);
     }
 
-    // Generate bitmaps for miscellaneous markers
-    final miscellaneousMarkerKeys = [
+    // Generate bitmaps for bushfire markers
+    final bushfireMarkerKeys = [
       'bushfire_notApplicable',
       'bushfire_plannedBurn',
       'bushfire_responding',
     ];
-    for (final key in miscellaneousMarkerKeys) {
+    for (final key in bushfireMarkerKeys) {
       final future = getBitmapDescriptorForAssetPath(
         assetPath: 'assets/images/hazards/aws/$key.png',
         fallbackAssetPath: 'assets/images/hazards/aws/bushfire_advice.png',
