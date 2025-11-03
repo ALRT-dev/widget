@@ -18,7 +18,10 @@ mixin _$HazardCategory {
 /// The unique identifier for the hazard category.
  String get id;/// The name of the hazard category.
  String? get name;/// The description of the hazard category.
- String? get description;/// The number of hazards associated with this category.
+ String? get description;/// The color associated with the hazard category.
+@ColorConverter() Color? get color;/// The ID of the parent category, if any.
+ String? get parentId;/// The parent category of this hazard category, if any.
+ HazardCategory? get parent;/// The number of hazards associated with this category.
  int get hazardsCount;
 /// Create a copy of HazardCategory
 /// with the given fields replaced by the non-null parameter values.
@@ -32,16 +35,16 @@ $HazardCategoryCopyWith<HazardCategory> get copyWith => _$HazardCategoryCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardCategory&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.hazardsCount, hazardsCount) || other.hazardsCount == hazardsCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardCategory&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.color, color) || other.color == color)&&(identical(other.parentId, parentId) || other.parentId == parentId)&&(identical(other.parent, parent) || other.parent == parent)&&(identical(other.hazardsCount, hazardsCount) || other.hazardsCount == hazardsCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,hazardsCount);
+int get hashCode => Object.hash(runtimeType,id,name,description,color,parentId,parent,hazardsCount);
 
 @override
 String toString() {
-  return 'HazardCategory(id: $id, name: $name, description: $description, hazardsCount: $hazardsCount)';
+  return 'HazardCategory(id: $id, name: $name, description: $description, color: $color, parentId: $parentId, parent: $parent, hazardsCount: $hazardsCount)';
 }
 
 
@@ -52,11 +55,11 @@ abstract mixin class $HazardCategoryCopyWith<$Res>  {
   factory $HazardCategoryCopyWith(HazardCategory value, $Res Function(HazardCategory) _then) = _$HazardCategoryCopyWithImpl;
 @useResult
 $Res call({
- String id, String? name, String? description, int hazardsCount
+ String id, String? name, String? description,@ColorConverter() Color? color, String? parentId, HazardCategory? parent, int hazardsCount
 });
 
 
-
+$HazardCategoryCopyWith<$Res>? get parent;
 
 }
 /// @nodoc
@@ -69,16 +72,31 @@ class _$HazardCategoryCopyWithImpl<$Res>
 
 /// Create a copy of HazardCategory
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? description = freezed,Object? hazardsCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? description = freezed,Object? color = freezed,Object? parentId = freezed,Object? parent = freezed,Object? hazardsCount = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,hazardsCount: null == hazardsCount ? _self.hazardsCount : hazardsCount // ignore: cast_nullable_to_non_nullable
+as String?,color: freezed == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as Color?,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
+as String?,parent: freezed == parent ? _self.parent : parent // ignore: cast_nullable_to_non_nullable
+as HazardCategory?,hazardsCount: null == hazardsCount ? _self.hazardsCount : hazardsCount // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
+/// Create a copy of HazardCategory
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HazardCategoryCopyWith<$Res>? get parent {
+    if (_self.parent == null) {
+    return null;
+  }
 
+  return $HazardCategoryCopyWith<$Res>(_self.parent!, (value) {
+    return _then(_self.copyWith(parent: value));
+  });
+}
 }
 
 
@@ -160,10 +178,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? description,  int hazardsCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? description, @ColorConverter()  Color? color,  String? parentId,  HazardCategory? parent,  int hazardsCount)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardCategory() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.hazardsCount);case _:
+return $default(_that.id,_that.name,_that.description,_that.color,_that.parentId,_that.parent,_that.hazardsCount);case _:
   return orElse();
 
 }
@@ -181,10 +199,10 @@ return $default(_that.id,_that.name,_that.description,_that.hazardsCount);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? description,  int hazardsCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? description, @ColorConverter()  Color? color,  String? parentId,  HazardCategory? parent,  int hazardsCount)  $default,) {final _that = this;
 switch (_that) {
 case _HazardCategory():
-return $default(_that.id,_that.name,_that.description,_that.hazardsCount);case _:
+return $default(_that.id,_that.name,_that.description,_that.color,_that.parentId,_that.parent,_that.hazardsCount);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +219,10 @@ return $default(_that.id,_that.name,_that.description,_that.hazardsCount);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? description,  int hazardsCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? description, @ColorConverter()  Color? color,  String? parentId,  HazardCategory? parent,  int hazardsCount)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardCategory() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.hazardsCount);case _:
+return $default(_that.id,_that.name,_that.description,_that.color,_that.parentId,_that.parent,_that.hazardsCount);case _:
   return null;
 
 }
@@ -216,7 +234,7 @@ return $default(_that.id,_that.name,_that.description,_that.hazardsCount);case _
 @JsonSerializable()
 
 class _HazardCategory extends HazardCategory {
-  const _HazardCategory({required this.id, this.name, this.description, this.hazardsCount = 0}): super._();
+  const _HazardCategory({required this.id, this.name, this.description, @ColorConverter() this.color, this.parentId, this.parent, this.hazardsCount = 0}): super._();
   factory _HazardCategory.fromJson(Map<String, dynamic> json) => _$HazardCategoryFromJson(json);
 
 /// The unique identifier for the hazard category.
@@ -225,6 +243,12 @@ class _HazardCategory extends HazardCategory {
 @override final  String? name;
 /// The description of the hazard category.
 @override final  String? description;
+/// The color associated with the hazard category.
+@override@ColorConverter() final  Color? color;
+/// The ID of the parent category, if any.
+@override final  String? parentId;
+/// The parent category of this hazard category, if any.
+@override final  HazardCategory? parent;
 /// The number of hazards associated with this category.
 @override@JsonKey() final  int hazardsCount;
 
@@ -241,16 +265,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardCategory&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.hazardsCount, hazardsCount) || other.hazardsCount == hazardsCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardCategory&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.color, color) || other.color == color)&&(identical(other.parentId, parentId) || other.parentId == parentId)&&(identical(other.parent, parent) || other.parent == parent)&&(identical(other.hazardsCount, hazardsCount) || other.hazardsCount == hazardsCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,hazardsCount);
+int get hashCode => Object.hash(runtimeType,id,name,description,color,parentId,parent,hazardsCount);
 
 @override
 String toString() {
-  return 'HazardCategory(id: $id, name: $name, description: $description, hazardsCount: $hazardsCount)';
+  return 'HazardCategory(id: $id, name: $name, description: $description, color: $color, parentId: $parentId, parent: $parent, hazardsCount: $hazardsCount)';
 }
 
 
@@ -261,11 +285,11 @@ abstract mixin class _$HazardCategoryCopyWith<$Res> implements $HazardCategoryCo
   factory _$HazardCategoryCopyWith(_HazardCategory value, $Res Function(_HazardCategory) _then) = __$HazardCategoryCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? name, String? description, int hazardsCount
+ String id, String? name, String? description,@ColorConverter() Color? color, String? parentId, HazardCategory? parent, int hazardsCount
 });
 
 
-
+@override $HazardCategoryCopyWith<$Res>? get parent;
 
 }
 /// @nodoc
@@ -278,17 +302,32 @@ class __$HazardCategoryCopyWithImpl<$Res>
 
 /// Create a copy of HazardCategory
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? description = freezed,Object? hazardsCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? description = freezed,Object? color = freezed,Object? parentId = freezed,Object? parent = freezed,Object? hazardsCount = null,}) {
   return _then(_HazardCategory(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,hazardsCount: null == hazardsCount ? _self.hazardsCount : hazardsCount // ignore: cast_nullable_to_non_nullable
+as String?,color: freezed == color ? _self.color : color // ignore: cast_nullable_to_non_nullable
+as Color?,parentId: freezed == parentId ? _self.parentId : parentId // ignore: cast_nullable_to_non_nullable
+as String?,parent: freezed == parent ? _self.parent : parent // ignore: cast_nullable_to_non_nullable
+as HazardCategory?,hazardsCount: null == hazardsCount ? _self.hazardsCount : hazardsCount // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
 
+/// Create a copy of HazardCategory
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HazardCategoryCopyWith<$Res>? get parent {
+    if (_self.parent == null) {
+    return null;
+  }
 
+  return $HazardCategoryCopyWith<$Res>(_self.parent!, (value) {
+    return _then(_self.copyWith(parent: value));
+  });
+}
 }
 
 // dart format on

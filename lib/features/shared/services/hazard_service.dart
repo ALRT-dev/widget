@@ -132,7 +132,7 @@ class HazardService {
     );
   }
 
-  /// Fetches all hazards along with categories from the server.
+  /// Fetches all hazards along with categories from the server making multiple parallel requests.
   Future<Either<GetHazardsWithCategoriesResponse, AppError>>
   getAllHazardsWithCategories({
     final int numberOfParallelRequests = 10,

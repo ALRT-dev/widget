@@ -11,6 +11,11 @@ _HazardCategory _$HazardCategoryFromJson(Map<String, dynamic> json) =>
       id: json['id'] as String,
       name: json['name'] as String?,
       description: json['description'] as String?,
+      color: const ColorConverter().fromJson(json['color'] as String?),
+      parentId: json['parentId'] as String?,
+      parent: json['parent'] == null
+          ? null
+          : HazardCategory.fromJson(json['parent'] as Map<String, dynamic>),
       hazardsCount: (json['hazardsCount'] as num?)?.toInt() ?? 0,
     );
 
@@ -19,5 +24,8 @@ Map<String, dynamic> _$HazardCategoryToJson(_HazardCategory instance) =>
       'id': instance.id,
       'name': ?instance.name,
       'description': ?instance.description,
+      'color': ?const ColorConverter().toJson(instance.color),
+      'parentId': ?instance.parentId,
+      'parent': ?instance.parent?.toJson(),
       'hazardsCount': instance.hazardsCount,
     };

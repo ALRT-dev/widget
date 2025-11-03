@@ -793,18 +793,16 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
       final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
       final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(markerBitmaps);
-      if (bitmapDescriptor != null) {
-        individualMarkers.add(
-          Marker(
-            markerId: MarkerId(
-              hazard.id ?? '${hazard.latitude},${hazard.longitude}',
-            ),
-            position: LatLng(hazard.latitude!, hazard.longitude!),
-            onTap: () => updateSelectedHazard(hazard),
-            icon: bitmapDescriptor,
+      individualMarkers.add(
+        Marker(
+          markerId: MarkerId(
+            hazard.id ?? '${hazard.latitude},${hazard.longitude}',
           ),
-        );
-      }
+          position: LatLng(hazard.latitude!, hazard.longitude!),
+          onTap: () => updateSelectedHazard(hazard),
+          icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
+        ),
+      );
     }
 
     // Preserve non-hazard markers

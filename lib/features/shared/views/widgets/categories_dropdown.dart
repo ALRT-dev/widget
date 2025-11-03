@@ -79,6 +79,12 @@ class _CategoriesDropdownState extends ConsumerState<CategoriesDropdown> {
           itemBuilder: (context, index) {
             final category = categories[index];
             return ListTile(
+              leading: Image.asset(
+                'assets/images/hazards/non_aws/${category.id}_unknown.png',
+                width: 32.spMin,
+                height: 32.spMin,
+                fit: BoxFit.contain,
+              ),
               title: Text(
                 category.name ?? 'N/A',
                 style: TextStyle(

@@ -386,7 +386,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   }
 
   Widget _buildCategory() {
-    final color = widget.args.hazard.color;
+    final color =
+        widget.args.hazard.category?.effectiveColor ?? widget.args.hazard.color;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 12.spMin,
