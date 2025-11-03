@@ -869,17 +869,15 @@ class MapProvider extends StateNotifier<MapProviderState> {
             markerBitmaps,
           );
 
-          if (bitmapDescriptor != null) {
-            final individualMarker = Marker(
-              markerId: MarkerId(
-                hazard.id ?? '${hazard.latitude},${hazard.longitude}',
-              ),
-              position: LatLng(hazard.latitude!, hazard.longitude!),
-              onTap: () => updateSelectedHazard(hazard),
-              icon: bitmapDescriptor,
-            );
-            individualMarkerFutures.add(Future.value(individualMarker));
-          }
+          final individualMarker = Marker(
+            markerId: MarkerId(
+              hazard.id ?? '${hazard.latitude},${hazard.longitude}',
+            ),
+            position: LatLng(hazard.latitude!, hazard.longitude!),
+            onTap: () => updateSelectedHazard(hazard),
+            icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
+          );
+          individualMarkerFutures.add(Future.value(individualMarker));
         } else {
           // Show cluster marker for multiple hazards
           // Calculate cluster center

@@ -22,7 +22,11 @@ abstract class HazardRepository {
     required final HazardSearchParams searchParams,
   });
 
-  Future<Either<List<HazardCategory>, AppError>> getHazardCategories();
+  Future<Either<List<HazardCategory>, AppError>> getAllHazardCategories();
+
+  Future<Either<List<HazardCategory>, AppError>> getAllParentHazardCategories();
+
+  Future<Either<List<HazardCategory>, AppError>> getAllSubHazardCategories();
 
   Future<Either<Hazard, AppError>> createHazardReport({
     required final Hazard hazard,
@@ -90,11 +94,11 @@ class HazardRepositoryImpl extends HazardRepository {
   }
 
   @override
-  Future<Either<List<HazardCategory>, AppError>> getHazardCategories() {
+  Future<Either<List<HazardCategory>, AppError>> getAllHazardCategories() {
     return runAsyncCall(
-      name: 'getHazardCategories',
+      name: 'getAllHazardCategories',
       future: () async {
-        final result = await _restClient.getHazardCategories();
+        final result = await _restClient.getAllHazardCategories();
         return Success(result);
       },
       onError: Failure.new,
@@ -182,6 +186,31 @@ class HazardRepositoryImpl extends HazardRepository {
           mediaFiles: mediaFiles?.map((media) => File(media.value)).toList(),
           removedMediaIds: removedMediaIds,
         );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<List<HazardCategory>, AppError>>
+  getAllParentHazardCategories() {
+    return runAsyncCall(
+      name: 'getAllParentHazardCategories',
+      future: () async {
+        final result = await _restClient.getAllParentHazardCategories();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<List<HazardCategory>, AppError>> getAllSubHazardCategories() {
+    return runAsyncCall(
+      name: 'getAllSubHazardCategories',
+      future: () async {
+        final result = await _restClient.getAllSubHazardCategories();
         return Success(result);
       },
       onError: Failure.new,

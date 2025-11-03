@@ -209,9 +209,20 @@ class HazardService {
     );
   }
 
-  /// Fetches the list of hazard categories from the server.
-  Future<Either<List<HazardCategory>, AppError>> getHazardCategories() {
-    return _hazardRepository.getHazardCategories();
+  /// Fetches the list of hazard categories from the server including parent and sub-categories.
+  Future<Either<List<HazardCategory>, AppError>> getAllHazardCategories() {
+    return _hazardRepository.getAllHazardCategories();
+  }
+
+  /// Fetches the list of parent hazard categories from the server.
+  Future<Either<List<HazardCategory>, AppError>>
+  getAllParentHazardCategories() {
+    return _hazardRepository.getAllParentHazardCategories();
+  }
+
+  /// Fetches the list of sub hazard categories from the server.
+  Future<Either<List<HazardCategory>, AppError>> getAllSubHazardCategories() {
+    return _hazardRepository.getAllSubHazardCategories();
   }
 
   /// Creates a new hazard report on the server.
@@ -298,7 +309,7 @@ class HazardService {
   /// Generates marker bitmaps for all hazard categories and severities.
   Future<Either<Map<String, BitmapDescriptor>, AppError>>
   generateHazardMarkerBitmaps() async {
-    final categoriesResult = await getHazardCategories();
+    final categoriesResult = await getAllSubHazardCategories();
     final categories = categoriesResult.whenSuccess((cats) => cats) ?? [];
     final severities = HazardSeverity.values;
 
@@ -310,6 +321,7 @@ class HazardService {
         final keyAws = '${category.id}_${severity.name}_aws';
         final futureAws = getBitmapDescriptorForHazard(
           categoryId: category.id,
+          parentCategoryId: category.parentId,
           severity: severity,
           isAwsCompliant: true,
         ).then((bitmap) => {keyAws: bitmap});
@@ -318,6 +330,7 @@ class HazardService {
         final keyNonAws = '${category.id}_${severity.name}_non_aws';
         final futureNonAws = getBitmapDescriptorForHazard(
           categoryId: category.id,
+          parentCategoryId: category.parentId,
           severity: severity,
           isAwsCompliant: false,
         ).then((bitmap) => {keyNonAws: bitmap});
@@ -354,11 +367,13 @@ class HazardService {
   /// Gets a BitmapDescriptor for the given hazard category and severity.
   Future<BitmapDescriptor> getBitmapDescriptorForHazard({
     required final String categoryId,
+    required final String? parentCategoryId,
     required final HazardSeverity severity,
     final bool isAwsCompliant = false,
     final Size size = const Size(40, 40),
   }) async {
     try {
+      // Check for child category asset
       final key = '${categoryId}_${severity.name}';
       final assetPath =
           'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}$key.png';
@@ -371,6 +386,21 @@ class HazardService {
         );
       }
 
+      // If child category asset doesn't exist, check for parent category asset
+      if (parentCategoryId != null) {
+        final parentKey = '${parentCategoryId}_${severity.name}';
+        final parentAssetPath =
+            'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}$parentKey.png';
+        exists = await assetExists(assetPath: parentAssetPath);
+        if (exists) {
+          return BitmapDescriptor.asset(
+            ImageConfiguration(size: size),
+            parentAssetPath,
+          );
+        }
+      }
+
+      // If neither exists, use the generic "other" asset for the severity
       exists = await assetExists(
         assetPath:
             'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severity.name}.png',

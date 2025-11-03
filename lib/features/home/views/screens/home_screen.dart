@@ -169,7 +169,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // fetch hazard categories for dropdowns
     ref
         .read(providerOfHazardCategoriesForDropdown.notifier)
-        .getAllHazardCategories();
+        .getAllParentHazardCategories();
   }
 
   /// Listens to the message received from the push notification.

@@ -89,7 +89,13 @@ abstract class RestClient {
   });
 
   @GET(kUrlHazardCategories)
-  Future<List<HazardCategory>> getHazardCategories();
+  Future<List<HazardCategory>> getAllHazardCategories();
+
+  @GET(kUrlHazardCategoriesParent)
+  Future<List<HazardCategory>> getAllParentHazardCategories();
+
+  @GET(kUrlHazardCategoriesSub)
+  Future<List<HazardCategory>> getAllSubHazardCategories();
 
   @POST(kUrlHazards)
   @MultiPart()

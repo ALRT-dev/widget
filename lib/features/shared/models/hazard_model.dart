@@ -150,6 +150,16 @@ abstract class Hazard with _$Hazard {
   /// The fallback file path for the hazard icon based on its severity.
   String get fallbackIconPath {
     final severityName = severity?.name ?? HazardSeverity.info.name;
+    final parentCategoryId = category?.parentId;
+    if (parentCategoryId != null) {
+      return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${parentCategoryId}_$severityName.png';
+    }
+    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityName.png';
+  }
+
+  /// The second fallback file path for the hazard icon based on its severity.
+  String get fallbackIconPath2 {
+    final severityName = severity?.name ?? HazardSeverity.info.name;
     return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityName.png';
   }
 

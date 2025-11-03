@@ -45,12 +45,12 @@ class HazardCategoriesProvider
   HazardService get _hazardService => _ref.read(providerOfHazardService);
 
   /// Fetches the list of hazard categories.
-  Future<void> getAllHazardCategories() async {
+  Future<void> getAllParentHazardCategories() async {
     state = state.copyWith(
       getAllHazardCategoriesState: const GetAllHazardCategoriesState.loading(),
     );
 
-    final result = await _hazardService.getHazardCategories();
+    final result = await _hazardService.getAllParentHazardCategories();
     if (!mounted) return;
 
     result.when(

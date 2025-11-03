@@ -24,6 +24,8 @@ const kUrlPushNotificationSettings = '$kUrlUser/push-notification-settings';
 const kUrlHazards = '/hazards';
 const kUrlHazardsWithCategories = '$kUrlHazards/hazards-with-categories';
 const kUrlHazardCategories = '/hazard-categories';
+const kUrlHazardCategoriesParent = '$kUrlHazardCategories/parent';
+const kUrlHazardCategoriesSub = '$kUrlHazardCategories/sub';
 const kUrlHazardVote = '$kUrlHazards/{hazardId}/vote';
 const kUrlHazardView = '$kUrlHazards/{hazardId}/view';
 
