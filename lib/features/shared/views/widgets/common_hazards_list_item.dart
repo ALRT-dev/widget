@@ -147,11 +147,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard.source,
           ),
         );
-        final reportedBy = ref.watch(
-          provider.select(
-            (value) => value.hazard.reportedBy,
-          ),
-        );
 
         final foregroundColor = hazardColor.isLight
             ? AppColors.black
@@ -188,6 +183,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                 children: [
                   Expanded(
                     child: Row(
+                      spacing: 6.spMin,
                       children: [
                         Flexible(
                           flex: 6,
@@ -201,61 +197,55 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                             ),
                           ),
                         ),
-                        6.wSizedBox,
-                        Flexible(
-                          flex: 4,
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.circle,
-                                size: 4,
-                                color: foregroundColor,
-                              ),
-                              6.wSizedBox,
-                              Text(
-                                source != null
-                                    ? 'Verified'
-                                    : reportedBy?.reportsStatus.title ??
-                                          'Unverified',
-                                style: TextStyle(
-                                  fontSize: 12.spMin,
-                                  fontWeight: FontWeight.w500,
+                        if (source != null)
+                          Flexible(
+                            flex: 4,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.circle,
+                                  size: 4,
                                   color: foregroundColor,
                                 ),
-                              ),
-                              4.wSizedBox,
-                              Icon(
-                                Icons.verified_rounded,
-                                size: 16.spMin,
-                                color: source != null
-                                    ? hazardColor.isLight
-                                          ? AppColors.blue
-                                          : AppColors.white
-                                    : reportedBy?.reportsStatus.color ??
-                                          AppColors.lightGrey,
-                              ),
-                              // if (confidenceScore != null && !kDebugMode) ...[
-                              //   4.wSizedBox,
-                              //   Icon(
-                              //     Icons.circle,
-                              //     size: 4,
-                              //     color: foregroundColor,
-                              //   ),
-                              //   6.wSizedBox,
-                              //   Flexible(
-                              //     child: Text(
-                              //       'ACS: $confidenceScore',
-                              //       style: TextStyle(
-                              //         fontSize: 12.spMin,
-                              //         fontWeight: FontWeight.w500,
-                              //         color: foregroundColor,
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ],
-                            ],
+                                6.wSizedBox,
+                                Text(
+                                  'Verified',
+                                  style: TextStyle(
+                                    fontSize: 12.spMin,
+                                    fontWeight: FontWeight.w500,
+                                    color: foregroundColor,
+                                  ),
+                                ),
+                                4.wSizedBox,
+                                Icon(
+                                  Icons.verified_rounded,
+                                  size: 16.spMin,
+                                  color: hazardColor.isLight
+                                      ? AppColors.blue
+                                      : AppColors.white,
+                                ),
+                                // if (confidenceScore != null && !kDebugMode) ...[
+                                //   4.wSizedBox,
+                                //   Icon(
+                                //     Icons.circle,
+                                //     size: 4,
+                                //     color: foregroundColor,
+                                //   ),
+                                //   6.wSizedBox,
+                                //   Flexible(
+                                //     child: Text(
+                                //       'ACS: $confidenceScore',
+                                //       style: TextStyle(
+                                //         fontSize: 12.spMin,
+                                //         fontWeight: FontWeight.w500,
+                                //         color: foregroundColor,
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ],
+                              ],
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),

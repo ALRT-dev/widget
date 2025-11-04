@@ -234,9 +234,10 @@ abstract class Hazard with _$Hazard {
       return AppColors.transparent;
     }
 
-    // If the hazard is user-reported, use grey color
+    // If the hazard is user-reported, use the user report status color
     if (reportedBy != null) {
-      return AppColors.grey;
+      final reportsStatus = reportedBy!.reportsStatus;
+      return reportsStatus.color;
     }
 
     // If the hazard follows AWS standards, use AWS colors

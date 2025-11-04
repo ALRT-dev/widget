@@ -122,11 +122,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     24.spMin.hSizedBox,
                   ],
                   _buildTimestampSection(),
-                  if (widget.args.hazard.aiConfidence != null &&
-                      widget.args.hazard.source == null) ...[
-                    24.spMin.hSizedBox,
-                    _buildAIAnalysisSection(),
-                  ],
                   if (widget.args.hazard.reportedBy?.id == loggedInUserId &&
                       widget.args.hazard.reviewStatus ==
                           HazardReviewStatus.accepted &&
@@ -875,6 +870,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildAIAnalysisSection() {
     return _buildSection(
       title: 'AI Analysis',
