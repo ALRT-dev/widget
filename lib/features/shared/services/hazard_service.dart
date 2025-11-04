@@ -341,10 +341,16 @@ class HazardService {
       }
 
       // Generate bitmaps for user markers
-      final key = '${category.parentId}_user';
+      late String key;
+      if (category.parentId != null) {
+        key = '${category.parentId}_user';
+      } else {
+        key = '${category.id}_user';
+      }
       final future = getBitmapDescriptorForAssetPath(
         assetPath: 'assets/images/hazards/non_aws/$key.png',
         fallbackAssetPath: 'assets/images/hazards/non_aws/other_user.png',
+        size: const Size(30, 30),
       ).then((bitmap) => {key: bitmap});
       futures.add(future);
     }

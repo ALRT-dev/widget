@@ -72,6 +72,7 @@ enum BushfireAlertLevel {
         return [
           'advice',
           'watch and act',
+          'watchandact',
           'emergency',
           'emergency warning',
           'prepare to leave',

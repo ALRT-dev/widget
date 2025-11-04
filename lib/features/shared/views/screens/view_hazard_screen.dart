@@ -408,27 +408,18 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     final category =
         widget.args.hazard.category?.parent ?? widget.args.hazard.category;
     final color = category?.color ?? widget.args.hazard.color;
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 12.spMin,
-        vertical: 6.spMin,
-      ),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(20.spMin),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 5.spMin,
-        children: [
-          Image.asset(
-            'assets/images/hazards/non_aws/${category?.id}_user.png',
-            width: 16.spMin,
-            height: 16.spMin,
-            errorBuilder: (context, error, stackTrace) =>
-                const SizedBox.shrink(),
+    return Row(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(20.spMin),
           ),
-          Text(
+          padding: EdgeInsets.symmetric(
+            vertical: 6.spMin,
+            horizontal: 12.spMin,
+          ),
+          child: Text(
             category!.name!,
             style: TextStyle(
               fontSize: 12.spMin,
@@ -436,8 +427,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               color: color.isLight ? AppColors.black : AppColors.white,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

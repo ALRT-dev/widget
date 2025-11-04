@@ -189,6 +189,10 @@ abstract class Hazard with _$Hazard {
       key = '${categoryId}_${bushFireAlertLevel!.name}';
     }
 
+    if (reportedBy != null) {
+      key = '${categoryId}_user';
+    }
+
     return bitmapMap[key];
   }
 
@@ -199,7 +203,7 @@ abstract class Hazard with _$Hazard {
     if (!(category?.isBushfire ?? false) || (description?.isEmpty ?? true)) {
       return null;
     }
-    return BushfireAlertLevel.values.firstWhere(
+    final matchedLevel = BushfireAlertLevel.values.firstWhere(
       (level) => level.keywords.any(
         (keyword) => description!.toLowerCase().contains(
           RegExp(r'\b' + keyword + r'\b'),
@@ -207,6 +211,19 @@ abstract class Hazard with _$Hazard {
       ),
       orElse: () => BushfireAlertLevel.notApplicable,
     );
+
+    if (matchedLevel != BushfireAlertLevel.advice) {
+      // if description contains 'advice', return advice level
+      return BushfireAlertLevel.advice.keywords.any(
+            (keyword) => description!.toLowerCase().contains(
+              RegExp(r'\b' + keyword + r'\b'),
+            ),
+          )
+          ? BushfireAlertLevel.advice
+          : matchedLevel;
+    }
+
+    return matchedLevel;
   }
 
   /// The color associated with the hazard's severity.

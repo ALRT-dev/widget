@@ -166,7 +166,10 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   topLeft: Radius.circular(16.spMin),
                   topRight: Radius.circular(16.spMin),
                 ),
-                border: severity != HazardSeverity.unknown
+                border:
+                    severity != HazardSeverity.unknown &&
+                        (bushFireAlertLevel == null ||
+                            bushFireAlertLevel == BushfireAlertLevel.advice)
                     ? null
                     : Border(
                         bottom: BorderSide(
