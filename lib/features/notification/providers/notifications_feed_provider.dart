@@ -10,9 +10,7 @@ import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/models/hazard_severity_with_count_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
-import 'package:hazard_app/features/shared/providers/hazard_severity_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 
 final providerOfNotificationsFeed =
@@ -41,10 +39,8 @@ class NotificationsFeedProvider
 
   NotificationService get _notificationService =>
       _ref.read(providerOfNotificationService);
-  HazardCategoriesProvider get _hazardCategoriesProvider =>
-      _ref.read(providerOfHazardCategoriesForNotifications.notifier);
-  HazardSeverityFiltersProvider get _hazardSeverityFiltersProvider =>
-      _ref.read(providerOfHazardSeverityFiltersForNotifications.notifier);
+  HazardFiltersProvider get _hazardFiltersProvider =>
+      _ref.read(providerOfHazardFiltersForNotifications.notifier);
 
   /// Listens to the socket for hazard updates, new hazards, and deletions.
   void _listenToSocketForHazards() {
@@ -119,11 +115,32 @@ class NotificationsFeedProvider
       getNotificationsFeed: const GetNotificationsFeed.loading(),
     );
 
+    final selectedCategories = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .selectedHazardCategories;
+    final selectedSeveritiesAws = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .selectedHazardSeveritiesAws;
+    final selectedSeveritiesNonAws = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .selectedHazardSeveritiesNonAws;
+
     final result = await _notificationService.getNotificationsFeed(
       searchParams: HazardSearchParams(
         searchString: state.searchString,
-        categoryIds: state.selectedCategories.map((e) => e.id).toList(),
-        severities: state.selectedSeverities.map((e) => e.severity).toList(),
+        categoryIds: selectedCategories.map((e) => e.id).toList(),
+        severities: {
+          ...Map.fromEntries(
+            selectedSeveritiesAws.map(
+              (e) => MapEntry(e.severity, true),
+            ),
+          ),
+          ...Map.fromEntries(
+            selectedSeveritiesNonAws.map(
+              (e) => MapEntry(e.severity, false),
+            ),
+          ),
+        },
       ),
     );
     if (!mounted) return;
@@ -138,13 +155,18 @@ class NotificationsFeedProvider
         );
 
         // add categories to the hazard categories provider
-        _hazardCategoriesProvider.updateHazardCategories(
-          hazardsWithCategories.categoryFilters,
+        _hazardFiltersProvider.updateHazardCategories(
+          hazardsWithCategories.availableFilters.categoryFilters,
         );
 
         // add severities to the hazard severity filters provider
-        _hazardSeverityFiltersProvider.updateHazardSeverities(
-          hazardsWithCategories.severityFilters,
+        _hazardFiltersProvider.updateHazardSeveritiesAws(
+          hazardsWithCategories.availableFilters.severityFiltersAws,
+        );
+
+        // add severities to the hazard severity filters provider
+        _hazardFiltersProvider.updateHazardSeveritiesNonAws(
+          hazardsWithCategories.availableFilters.severityFiltersNonAws,
         );
       },
       (error) {
@@ -159,22 +181,6 @@ class NotificationsFeedProvider
   void updateSearchString(final String searchString) {
     state = state.copyWith(
       searchString: searchString,
-    );
-  }
-
-  /// Updates [NotificationsFeedProviderState.selectedCategories] with the provided [selectedCategories].
-  void updateSelectedCategories(final List<HazardCategory> selectedCategories) {
-    state = state.copyWith(
-      selectedCategories: selectedCategories,
-    );
-  }
-
-  /// Updates [NotificationsFeedProviderState.selectedSeverities] with the provided [selectedSeverities].
-  void updateSelectedSeverities(
-    final List<HazardSeverityWithCount> selectedSeverities,
-  ) {
-    state = state.copyWith(
-      selectedSeverities: selectedSeverities,
     );
   }
 
@@ -223,13 +229,13 @@ class NotificationsFeedProvider
   /// Processes a [HazardCategory] received from the socket by adding or updating it in the hazard categories provider.
   void processCategoryFromSocket(final HazardCategory category) {
     final existingCategories = _ref
-        .read(providerOfHazardCategoriesForNotifications)
+        .read(providerOfHazardFiltersForNotifications)
         .hazardCategories;
 
     final index = existingCategories.indexWhere((c) => c.id == category.id);
     if (index == -1) {
       // category does not exist, add it
-      _hazardCategoriesProvider.addToHazardCategories(
+      _hazardFiltersProvider.addToHazardCategories(
         category.copyWith(
           hazardsCount: 1,
         ),
@@ -240,14 +246,14 @@ class NotificationsFeedProvider
       final updatedCategory = existingCategory.copyWith(
         hazardsCount: existingCategory.hazardsCount + 1,
       );
-      _hazardCategoriesProvider.updateHazardCategory(updatedCategory);
+      _hazardFiltersProvider.updateHazardCategory(updatedCategory);
     }
   }
 
   /// Removes a [HazardCategory] from the hazard categories provider or updates its hazards count based on the provided [categoryId].
   void removeCategoryFromSocket(final String categoryId) {
     final existingCategories = _ref
-        .read(providerOfHazardCategoriesForNotifications)
+        .read(providerOfHazardFiltersForNotifications)
         .hazardCategories;
 
     final index = existingCategories.indexWhere((c) => c.id == categoryId);
@@ -255,12 +261,12 @@ class NotificationsFeedProvider
       final existingCategory = existingCategories[index];
       final updatedCount = existingCategory.hazardsCount - 1;
       if (updatedCount <= 0) {
-        _hazardCategoriesProvider.removeFromHazardCategories(categoryId);
+        _hazardFiltersProvider.removeFromHazardCategories(categoryId);
       } else {
         final updatedCategory = existingCategory.copyWith(
           hazardsCount: updatedCount,
         );
-        _hazardCategoriesProvider.updateHazardCategory(updatedCategory);
+        _hazardFiltersProvider.updateHazardCategory(updatedCategory);
       }
     }
   }

@@ -5,18 +5,26 @@ import 'package:hazard_app/features/search/views/widgets/hazard_categories_list_
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
-import 'package:hazard_app/features/shared/providers/states/hazard_categories_provider_state.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/states/hazard_filters_provider_state.dart';
 
 class HazardCategoriesList extends ConsumerStatefulWidget {
   const HazardCategoriesList({
     super.key,
-    required this.categoriesKey,
+    required this.filtersKey,
+    this.isSmall = false,
+    this.separatorWidth = 10.0,
     this.onCategoriesSelectionUpdated,
   });
 
-  /// The key to identify the categories provider.
-  final String categoriesKey;
+  /// The key to identify the filters provider.
+  final String filtersKey;
+
+  /// Whether to display a smaller version of the list.
+  final bool isSmall;
+
+  /// The width of the separator between list items.
+  final double separatorWidth;
 
   /// Callback when the categories selection is updated.
   final Function(List<HazardCategory>)? onCategoriesSelectionUpdated;
@@ -30,7 +38,7 @@ class _HazardCategoriesListState extends ConsumerState<HazardCategoriesList> {
   @override
   Widget build(BuildContext context) {
     final getCategoriesState = ref.watch(
-      providerOfHazardCategories(widget.categoriesKey).select(
+      providerOfHazardFilters(widget.filtersKey).select(
         (value) => value.getAllHazardCategoriesState,
       ),
     );
@@ -45,7 +53,7 @@ class _HazardCategoriesListState extends ConsumerState<HazardCategoriesList> {
     return Consumer(
       builder: (context, ref, child) {
         final hazardCategories = ref.watch(
-          providerOfHazardCategories(widget.categoriesKey).select(
+          providerOfHazardFilters(widget.filtersKey).select(
             (value) => value.hazardCategories,
           ),
         );
@@ -54,7 +62,7 @@ class _HazardCategoriesListState extends ConsumerState<HazardCategoriesList> {
         return Align(
           alignment: Alignment.centerLeft,
           child: SizedBox(
-            height: 40.spMin,
+            height: widget.isSmall ? 30.spMin : 40.spMin,
             child: ListView.separated(
               itemCount: hazardCategories.length,
               scrollDirection: Axis.horizontal,
@@ -62,14 +70,16 @@ class _HazardCategoriesListState extends ConsumerState<HazardCategoriesList> {
               itemBuilder: (context, index) {
                 final hazardCategory = hazardCategories[index];
                 return HazardCategoriesListItem(
-                      categoriesKey: widget.categoriesKey,
+                      filtersKey: widget.filtersKey,
+                      isSmall: widget.isSmall,
                       hazardCategory: hazardCategory,
                       onSelected: (_) => _handleCategoriesSelectionUpdated(),
                     )
                     .pL(index == 0 ? 20.0 : 0.0)
                     .pR(index == (hazardCategories.length - 1) ? 20.0 : 0.0);
               },
-              separatorBuilder: (context, index) => 10.wSizedBox,
+              separatorBuilder: (context, index) =>
+                  widget.separatorWidth.wSizedBox,
             ),
           ),
         );
@@ -80,8 +90,8 @@ class _HazardCategoriesListState extends ConsumerState<HazardCategoriesList> {
   /// Handles the update of selected categories and invokes the callback if provided.
   void _handleCategoriesSelectionUpdated() {
     final selectedCategories = ref
-        .read(providerOfHazardCategories(widget.categoriesKey))
-        .selectedCategories;
+        .read(providerOfHazardFilters(widget.filtersKey))
+        .selectedHazardCategories;
     widget.onCategoriesSelectionUpdated?.call(selectedCategories);
   }
 }

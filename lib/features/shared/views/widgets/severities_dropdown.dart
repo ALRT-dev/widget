@@ -27,7 +27,7 @@ class _SeveritiesDropdownState extends ConsumerState<SeveritiesDropdown> {
   @override
   Widget build(BuildContext context) {
     return AlrtDropdown(
-      button: widget.button,
+      button: (context, isOpen) => widget.button,
       dropdownHeight: 232.0,
       menuContent: (context, close) {
         final severities = HazardSeverity.values;

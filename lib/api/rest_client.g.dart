@@ -351,7 +351,7 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<GetHazardsWithCategoriesResponse> getGetHazardsWithCategories({
+  Future<GetHazardsWithFiltersResponse> getGetHazardsWithCategories({
     required HazardSearchParams searchParams,
   }) async {
     final _extra = <String, dynamic>{};
@@ -359,20 +359,20 @@ class _RestClient implements RestClient {
     queryParameters.addAll(searchParams.toJson());
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<GetHazardsWithCategoriesResponse>(
+    final _options = _setStreamType<GetHazardsWithFiltersResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazards/hazards-with-categories',
+            '/hazards/hazards-with-filters',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late GetHazardsWithCategoriesResponse _value;
+    late GetHazardsWithFiltersResponse _value;
     try {
-      _value = GetHazardsWithCategoriesResponse.fromJson(_result.data!);
+      _value = GetHazardsWithFiltersResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -650,7 +650,7 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<GetHazardsWithCategoriesResponse> getNotificationsFeed({
+  Future<GetHazardsWithFiltersResponse> getNotificationsFeed({
     HazardSearchParams? searchParams,
   }) async {
     final _extra = <String, dynamic>{};
@@ -659,7 +659,7 @@ class _RestClient implements RestClient {
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<GetHazardsWithCategoriesResponse>(
+    final _options = _setStreamType<GetHazardsWithFiltersResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -670,9 +670,9 @@ class _RestClient implements RestClient {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late GetHazardsWithCategoriesResponse _value;
+    late GetHazardsWithFiltersResponse _value;
     try {
-      _value = GetHazardsWithCategoriesResponse.fromJson(_result.data!);
+      _value = GetHazardsWithFiltersResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

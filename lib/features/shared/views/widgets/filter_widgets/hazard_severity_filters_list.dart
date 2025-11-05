@@ -10,15 +10,24 @@ import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dar
 class HazardSeverityFiltersList extends ConsumerStatefulWidget {
   const HazardSeverityFiltersList({
     super.key,
-    required this.severityFiltersKey,
+    required this.filtersKey,
+    this.isAws = false,
+    this.separatorWidth = 10.0,
     this.onSeveritiesSelectionUpdated,
   });
 
-  /// The key to identify the severity filters provider.
-  final String severityFiltersKey;
+  /// The key to identify the specific hazard filters instance.
+  final String filtersKey;
 
-  /// Callback when the severity filters selection is updated.
-  final Function(List<HazardSeverityWithCount>)? onSeveritiesSelectionUpdated;
+  /// Indicates whether the filters are for AWS hazards.
+  final bool isAws;
+
+  /// The width of the separator between list items.
+  final double separatorWidth;
+
+  /// Callback function to notify when the selected severities are updated.
+  final void Function(List<HazardSeverityWithCount>)?
+  onSeveritiesSelectionUpdated;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -36,8 +45,10 @@ class _HazardSeverityFiltersListState
     return Consumer(
       builder: (context, ref, child) {
         final hazardSeverities = ref.watch(
-          providerOfHazardFilters(widget.severityFiltersKey).select(
-            (value) => value.hazardSeveritiesAws,
+          providerOfHazardFilters(widget.filtersKey).select(
+            (value) => widget.isAws
+                ? value.hazardSeveritiesAws
+                : value.hazardSeveritiesNonAws,
           ),
         );
         if (hazardSeverities.isEmpty) return const SizedBox();
@@ -50,17 +61,18 @@ class _HazardSeverityFiltersListState
               itemCount: hazardSeverities.length,
               scrollDirection: Axis.horizontal,
               shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 final hazardSeverity = hazardSeverities[index];
                 return HazardSeverityFiltersListItem(
-                      filtersKey: widget.severityFiltersKey,
-                      hazardSeverity: hazardSeverity,
-                      onSelected: (_) => _handleSeveritiesSelectionUpdated(),
-                    )
-                    .pL(index == 0 ? 20.0 : 0.0)
-                    .pR(index == (hazardSeverities.length - 1) ? 20.0 : 0.0);
+                  filtersKey: widget.filtersKey,
+                  isAws: widget.isAws,
+                  hazardSeverity: hazardSeverity,
+                  onSelected: (_) => _handleSeveritiesSelectionUpdated(),
+                ).pR(index == (hazardSeverities.length - 1) ? 20.0 : 0.0);
               },
-              separatorBuilder: (context, index) => 10.wSizedBox,
+              separatorBuilder: (context, index) =>
+                  widget.separatorWidth.wSizedBox,
             ),
           ),
         );
@@ -70,9 +82,13 @@ class _HazardSeverityFiltersListState
 
   /// Handles the update of selected severities.
   void _handleSeveritiesSelectionUpdated() {
-    final selectedSeverities = ref
-        .read(providerOfHazardFilters(widget.severityFiltersKey))
-        .selectedHazardSeveritiesAws;
+    final selectedSeverities = ref.read(
+      providerOfHazardFilters(widget.filtersKey).select(
+        (value) => widget.isAws
+            ? value.selectedHazardSeveritiesAws
+            : value.selectedHazardSeveritiesNonAws,
+      ),
+    );
     widget.onSeveritiesSelectionUpdated?.call(selectedSeverities);
   }
 }

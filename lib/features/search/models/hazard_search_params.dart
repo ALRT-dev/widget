@@ -17,7 +17,16 @@ abstract class HazardSearchParams with _$HazardSearchParams {
     @Default(<String>[]) final List<String> categoryIds,
 
     /// The severity levels to filter hazards.
-    final List<HazardSeverity>? severities,
+    ///
+    /// The key is the [HazardSeverity] and the value indicates whether aws complaint or not.
+    ///
+    /// Eg.
+    /// {
+    ///   HazardSeverity.advice: true, // If true, this severity level will be 'advice'
+    ///   HazardSeverity.advice: false, // If true, this severity level will be 'moderate'
+    ///   HazardSeverity.emergency: false, // If false, this severity level will be 'critical'
+    /// }
+    final Map<HazardSeverity, bool>? severities,
 
     /// The id of the user who reported the hazard to filter hazards.
     final String? reportedById,

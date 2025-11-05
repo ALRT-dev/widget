@@ -14,9 +14,9 @@ _HazardSearchParams _$HazardSearchParamsFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const <String>[],
-      severities: (json['severities'] as List<dynamic>?)
-          ?.map((e) => $enumDecode(_$HazardSeverityEnumMap, e))
-          .toList(),
+      severities: (json['severities'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry($enumDecode(_$HazardSeverityEnumMap, k), e as bool),
+      ),
       reportedById: json['reportedById'] as String?,
       reviewStatus:
           $enumDecodeNullable(
@@ -54,9 +54,9 @@ Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
     <String, dynamic>{
       'searchString': ?instance.searchString,
       'categoryIds': instance.categoryIds,
-      'severities': ?instance.severities
-          ?.map((e) => _$HazardSeverityEnumMap[e]!)
-          .toList(),
+      'severities': ?instance.severities?.map(
+        (k, e) => MapEntry(_$HazardSeverityEnumMap[k]!, e),
+      ),
       'reportedById': ?instance.reportedById,
       'reviewStatus': _$HazardReviewStatusEnumMap[instance.reviewStatus]!,
       'northeastLat': ?instance.northeastLat,

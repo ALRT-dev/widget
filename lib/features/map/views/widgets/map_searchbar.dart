@@ -39,7 +39,7 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
   Widget build(BuildContext context) {
     return AlrtDropdown(
       controller: _dropdownController,
-      button: Consumer(
+      button: (context, isOpen) => Consumer(
         builder: (context, ref, child) {
           final isSearchActive = ref.watch(
             providerOfPlacesForMap.select(

@@ -47,15 +47,31 @@ class AlrtDropdown extends ConsumerStatefulWidget {
     required this.menuContent,
     this.controller,
     this.dropdownHeight = 300,
+    this.dropdownWidth,
+    this.buttonAlignment = Alignment.bottomLeft,
+    this.dropdownAlignment = Alignment.topLeft,
   });
 
-  final Widget button;
+  /// The button widget that triggers the dropdown.
+  final Widget Function(BuildContext, bool) button;
 
+  /// The content of the dropdown menu.
   final Widget Function(BuildContext, Function()) menuContent;
 
+  /// The controller to manage the dropdown state.
   final AlrtDropdownController? controller;
 
+  /// The height of the dropdown menu.
   final double dropdownHeight;
+
+  /// The width of the dropdown menu. If not provided, it defaults to the button's width.
+  final double? dropdownWidth;
+
+  /// The alignment of the button relative to the dropdown menu.
+  final Alignment buttonAlignment;
+
+  /// The alignment of the dropdown menu relative to the button.
+  final Alignment dropdownAlignment;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _AlrtDropdownState();
@@ -66,6 +82,7 @@ class _AlrtDropdownState extends ConsumerState<AlrtDropdown> {
   final _layerLink = LayerLink();
 
   final _buttonKey = GlobalKey();
+  var _isOpen = false;
 
   @override
   void initState() {
@@ -99,14 +116,14 @@ class _AlrtDropdownState extends ConsumerState<AlrtDropdown> {
         child: CompositedTransformTarget(
           link: _layerLink,
           key: _buttonKey,
-          child: widget.button,
+          child: widget.button.call(context, _isOpen),
         ),
       );
     }
     return CompositedTransformTarget(
       link: _layerLink,
       key: _buttonKey,
-      child: widget.button,
+      child: widget.button.call(context, _isOpen),
     );
   }
 
@@ -140,8 +157,29 @@ class _AlrtDropdownState extends ConsumerState<AlrtDropdown> {
               child: CompositedTransformFollower(
                 link: _layerLink,
                 offset: Offset(0, 50.h),
+                targetAnchor: widget.buttonAlignment,
+                followerAnchor: widget.dropdownAlignment,
                 child: TapRegion(
                   onTapOutside: (event) {
+                    // check if the tap made on the button itself
+                    final renderBox =
+                        _buttonKey.currentContext?.findRenderObject()
+                            as RenderBox?;
+                    final buttonPosition =
+                        renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
+                    final buttonSize = renderBox?.size ?? Size.zero;
+                    final tapPosition = event.position;
+                    final isOnButton =
+                        (tapPosition.dx >= buttonPosition.dx &&
+                        tapPosition.dx <=
+                            buttonPosition.dx + buttonSize.width &&
+                        tapPosition.dy >= buttonPosition.dy &&
+                        tapPosition.dy <=
+                            buttonPosition.dy + buttonSize.height);
+                    if (isOnButton) {
+                      return; // do nothing if tapped on button
+                    }
+
                     // if no controller is provided, close the dropdown on outside tap
                     // otherwise, let the controller manage it
                     if (widget.controller == null) _closeDropdown();
@@ -149,7 +187,7 @@ class _AlrtDropdownState extends ConsumerState<AlrtDropdown> {
                   child: Material(
                     color: AppColors.transparent,
                     child: Container(
-                      width: buttonSize.width,
+                      width: widget.dropdownWidth ?? buttonSize.width,
                       height: widget.dropdownHeight,
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -175,10 +213,16 @@ class _AlrtDropdownState extends ConsumerState<AlrtDropdown> {
     );
 
     Overlay.of(context).insert(_entry!);
+    setState(() {
+      _isOpen = true;
+    });
   }
 
   void _closeDropdown() {
     _entry?.remove();
     _entry = null;
+    setState(() {
+      _isOpen = false;
+    });
   }
 }

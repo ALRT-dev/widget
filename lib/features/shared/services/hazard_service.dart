@@ -9,7 +9,7 @@ import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_filters_response_model.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:hazard_app/features/shared/providers/repository_providers.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
@@ -110,7 +110,7 @@ class HazardService {
   }
 
   /// Fetches hazards along with categories from the server.
-  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
+  Future<Either<GetHazardsWithFiltersResponse, AppError>>
   getHazardsWithCategories({
     required final HazardSearchParams searchParams,
   }) async {
@@ -133,7 +133,7 @@ class HazardService {
   }
 
   /// Fetches all hazards along with categories from the server making multiple parallel requests.
-  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
+  Future<Either<GetHazardsWithFiltersResponse, AppError>>
   getAllHazardsWithCategories({
     final int numberOfParallelRequests = 10,
     required final HazardSearchParams searchParams,
@@ -142,11 +142,11 @@ class HazardService {
     final pageSize = searchParams.pageSize;
     int currentPage = searchParams.page;
     bool hasMoreData = true;
-    GetHazardsWithCategoriesResponse? firstResponse;
+    GetHazardsWithFiltersResponse? firstResponse;
 
     while (hasMoreData) {
       final batchFutures =
-          <Future<Either<GetHazardsWithCategoriesResponse, AppError>>>[];
+          <Future<Either<GetHazardsWithFiltersResponse, AppError>>>[];
 
       // Create parallel requests for the current batch of pages
       for (int i = 0; i < numberOfParallelRequests; i++) {
@@ -203,7 +203,7 @@ class HazardService {
 
     // Return the combined response with all hazards
     return Success(
-      (firstResponse ?? const GetHazardsWithCategoriesResponse()).copyWith(
+      (firstResponse ?? const GetHazardsWithFiltersResponse()).copyWith(
         hazards: allHazards,
       ),
     );

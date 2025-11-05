@@ -8,7 +8,7 @@ import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
@@ -38,8 +38,8 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
 
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   UserService get _userService => _ref.read(providerOfUserService);
-  HazardCategoriesProvider get _hazardCategoriesProvider =>
-      _ref.read(providerOfHazardCategoriesForSearch.notifier);
+  HazardFiltersProvider get _hazardFiltersProvider =>
+      _ref.read(providerOfHazardFiltersForSearch.notifier);
   NotificationsFeedProvider get _notificationsFeedProvider =>
       _ref.read(providerOfNotificationsFeed.notifier);
   MyLocationSubscriptionsProvider get _myLocationSubscriptionsProvider =>
@@ -93,9 +93,9 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         );
         updateHazards(hazardsWithCategories.hazards);
 
-        // add categories to the hazard categories provider
-        _hazardCategoriesProvider.updateHazardCategories(
-          hazardsWithCategories.categoryFilters,
+        // add categories to the hazard filters provider
+        _hazardFiltersProvider.updateHazardCategories(
+          hazardsWithCategories.availableFilters.categoryFilters,
         );
 
         // update subscriptionId if there's an active subscription for this location

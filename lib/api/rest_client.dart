@@ -10,7 +10,7 @@ import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_filters_response_model.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:retrofit/retrofit.dart';
@@ -83,8 +83,8 @@ abstract class RestClient {
     @Queries() required final HazardSearchParams searchParams,
   });
 
-  @GET(kUrlHazardsWithCategories)
-  Future<GetHazardsWithCategoriesResponse> getGetHazardsWithCategories({
+  @GET(kUrlHazardsWithFilters)
+  Future<GetHazardsWithFiltersResponse> getGetHazardsWithCategories({
     @Queries() required final HazardSearchParams searchParams,
   });
 
@@ -132,7 +132,7 @@ abstract class RestClient {
   // ---------------------------- NOTIFICATION ----------------------------
 
   @GET(kUrlNotificationsFeed)
-  Future<GetHazardsWithCategoriesResponse> getNotificationsFeed({
+  Future<GetHazardsWithFiltersResponse> getNotificationsFeed({
     @Queries() final HazardSearchParams? searchParams,
   });
 

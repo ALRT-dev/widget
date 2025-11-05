@@ -15,9 +15,7 @@ T _$identity<T>(T value) => value;
 mixin _$NotificationsFeedProviderState {
 
 /// The search string to filter hazards by their title or description.
- String get searchString;/// The list of selected hazard categories to filter hazards.
- List<HazardCategory> get selectedCategories;/// The list of selected hazard severities to filter hazards.
- List<HazardSeverityWithCount> get selectedSeverities;/// The list of hazards in the notifications feed.
+ String get searchString;/// The list of hazards in the notifications feed.
  List<Hazard> get hazards;/// The state of fetching the notifications feed.
  GetNotificationsFeed get getNotificationsFeed;
 /// Create a copy of NotificationsFeedProviderState
@@ -30,16 +28,16 @@ $NotificationsFeedProviderStateCopyWith<NotificationsFeedProviderState> get copy
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is NotificationsFeedProviderState&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other.selectedCategories, selectedCategories)&&const DeepCollectionEquality().equals(other.selectedSeverities, selectedSeverities)&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.getNotificationsFeed, getNotificationsFeed) || other.getNotificationsFeed == getNotificationsFeed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is NotificationsFeedProviderState&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.getNotificationsFeed, getNotificationsFeed) || other.getNotificationsFeed == getNotificationsFeed));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(selectedCategories),const DeepCollectionEquality().hash(selectedSeverities),const DeepCollectionEquality().hash(hazards),getNotificationsFeed);
+int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(hazards),getNotificationsFeed);
 
 @override
 String toString() {
-  return 'NotificationsFeedProviderState(searchString: $searchString, selectedCategories: $selectedCategories, selectedSeverities: $selectedSeverities, hazards: $hazards, getNotificationsFeed: $getNotificationsFeed)';
+  return 'NotificationsFeedProviderState(searchString: $searchString, hazards: $hazards, getNotificationsFeed: $getNotificationsFeed)';
 }
 
 
@@ -50,7 +48,7 @@ abstract mixin class $NotificationsFeedProviderStateCopyWith<$Res>  {
   factory $NotificationsFeedProviderStateCopyWith(NotificationsFeedProviderState value, $Res Function(NotificationsFeedProviderState) _then) = _$NotificationsFeedProviderStateCopyWithImpl;
 @useResult
 $Res call({
- String searchString, List<HazardCategory> selectedCategories, List<HazardSeverityWithCount> selectedSeverities, List<Hazard> hazards, GetNotificationsFeed getNotificationsFeed
+ String searchString, List<Hazard> hazards, GetNotificationsFeed getNotificationsFeed
 });
 
 
@@ -67,12 +65,10 @@ class _$NotificationsFeedProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of NotificationsFeedProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? searchString = null,Object? selectedCategories = null,Object? selectedSeverities = null,Object? hazards = null,Object? getNotificationsFeed = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? searchString = null,Object? hazards = null,Object? getNotificationsFeed = null,}) {
   return _then(_self.copyWith(
 searchString: null == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
-as String,selectedCategories: null == selectedCategories ? _self.selectedCategories : selectedCategories // ignore: cast_nullable_to_non_nullable
-as List<HazardCategory>,selectedSeverities: null == selectedSeverities ? _self.selectedSeverities : selectedSeverities // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverityWithCount>,hazards: null == hazards ? _self.hazards : hazards // ignore: cast_nullable_to_non_nullable
+as String,hazards: null == hazards ? _self.hazards : hazards // ignore: cast_nullable_to_non_nullable
 as List<Hazard>,getNotificationsFeed: null == getNotificationsFeed ? _self.getNotificationsFeed : getNotificationsFeed // ignore: cast_nullable_to_non_nullable
 as GetNotificationsFeed,
   ));
@@ -168,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String searchString,  List<HazardCategory> selectedCategories,  List<HazardSeverityWithCount> selectedSeverities,  List<Hazard> hazards,  GetNotificationsFeed getNotificationsFeed)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String searchString,  List<Hazard> hazards,  GetNotificationsFeed getNotificationsFeed)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _NotificationsFeedProviderState() when $default != null:
-return $default(_that.searchString,_that.selectedCategories,_that.selectedSeverities,_that.hazards,_that.getNotificationsFeed);case _:
+return $default(_that.searchString,_that.hazards,_that.getNotificationsFeed);case _:
   return orElse();
 
 }
@@ -189,10 +185,10 @@ return $default(_that.searchString,_that.selectedCategories,_that.selectedSeveri
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String searchString,  List<HazardCategory> selectedCategories,  List<HazardSeverityWithCount> selectedSeverities,  List<Hazard> hazards,  GetNotificationsFeed getNotificationsFeed)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String searchString,  List<Hazard> hazards,  GetNotificationsFeed getNotificationsFeed)  $default,) {final _that = this;
 switch (_that) {
 case _NotificationsFeedProviderState():
-return $default(_that.searchString,_that.selectedCategories,_that.selectedSeverities,_that.hazards,_that.getNotificationsFeed);case _:
+return $default(_that.searchString,_that.hazards,_that.getNotificationsFeed);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +205,10 @@ return $default(_that.searchString,_that.selectedCategories,_that.selectedSeveri
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String searchString,  List<HazardCategory> selectedCategories,  List<HazardSeverityWithCount> selectedSeverities,  List<Hazard> hazards,  GetNotificationsFeed getNotificationsFeed)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String searchString,  List<Hazard> hazards,  GetNotificationsFeed getNotificationsFeed)?  $default,) {final _that = this;
 switch (_that) {
 case _NotificationsFeedProviderState() when $default != null:
-return $default(_that.searchString,_that.selectedCategories,_that.selectedSeverities,_that.hazards,_that.getNotificationsFeed);case _:
+return $default(_that.searchString,_that.hazards,_that.getNotificationsFeed);case _:
   return null;
 
 }
@@ -224,29 +220,11 @@ return $default(_that.searchString,_that.selectedCategories,_that.selectedSeveri
 
 
 class _NotificationsFeedProviderState implements NotificationsFeedProviderState {
-  const _NotificationsFeedProviderState({this.searchString = '', final  List<HazardCategory> selectedCategories = const <HazardCategory>[], final  List<HazardSeverityWithCount> selectedSeverities = const <HazardSeverityWithCount>[], final  List<Hazard> hazards = const <Hazard>[], this.getNotificationsFeed = const GetNotificationsFeed.initial()}): _selectedCategories = selectedCategories,_selectedSeverities = selectedSeverities,_hazards = hazards;
+  const _NotificationsFeedProviderState({this.searchString = '', final  List<Hazard> hazards = const <Hazard>[], this.getNotificationsFeed = const GetNotificationsFeed.initial()}): _hazards = hazards;
   
 
 /// The search string to filter hazards by their title or description.
 @override@JsonKey() final  String searchString;
-/// The list of selected hazard categories to filter hazards.
- final  List<HazardCategory> _selectedCategories;
-/// The list of selected hazard categories to filter hazards.
-@override@JsonKey() List<HazardCategory> get selectedCategories {
-  if (_selectedCategories is EqualUnmodifiableListView) return _selectedCategories;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_selectedCategories);
-}
-
-/// The list of selected hazard severities to filter hazards.
- final  List<HazardSeverityWithCount> _selectedSeverities;
-/// The list of selected hazard severities to filter hazards.
-@override@JsonKey() List<HazardSeverityWithCount> get selectedSeverities {
-  if (_selectedSeverities is EqualUnmodifiableListView) return _selectedSeverities;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_selectedSeverities);
-}
-
 /// The list of hazards in the notifications feed.
  final  List<Hazard> _hazards;
 /// The list of hazards in the notifications feed.
@@ -269,16 +247,16 @@ _$NotificationsFeedProviderStateCopyWith<_NotificationsFeedProviderState> get co
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NotificationsFeedProviderState&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other._selectedCategories, _selectedCategories)&&const DeepCollectionEquality().equals(other._selectedSeverities, _selectedSeverities)&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.getNotificationsFeed, getNotificationsFeed) || other.getNotificationsFeed == getNotificationsFeed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NotificationsFeedProviderState&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.getNotificationsFeed, getNotificationsFeed) || other.getNotificationsFeed == getNotificationsFeed));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(_selectedCategories),const DeepCollectionEquality().hash(_selectedSeverities),const DeepCollectionEquality().hash(_hazards),getNotificationsFeed);
+int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(_hazards),getNotificationsFeed);
 
 @override
 String toString() {
-  return 'NotificationsFeedProviderState(searchString: $searchString, selectedCategories: $selectedCategories, selectedSeverities: $selectedSeverities, hazards: $hazards, getNotificationsFeed: $getNotificationsFeed)';
+  return 'NotificationsFeedProviderState(searchString: $searchString, hazards: $hazards, getNotificationsFeed: $getNotificationsFeed)';
 }
 
 
@@ -289,7 +267,7 @@ abstract mixin class _$NotificationsFeedProviderStateCopyWith<$Res> implements $
   factory _$NotificationsFeedProviderStateCopyWith(_NotificationsFeedProviderState value, $Res Function(_NotificationsFeedProviderState) _then) = __$NotificationsFeedProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- String searchString, List<HazardCategory> selectedCategories, List<HazardSeverityWithCount> selectedSeverities, List<Hazard> hazards, GetNotificationsFeed getNotificationsFeed
+ String searchString, List<Hazard> hazards, GetNotificationsFeed getNotificationsFeed
 });
 
 
@@ -306,12 +284,10 @@ class __$NotificationsFeedProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of NotificationsFeedProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? searchString = null,Object? selectedCategories = null,Object? selectedSeverities = null,Object? hazards = null,Object? getNotificationsFeed = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? searchString = null,Object? hazards = null,Object? getNotificationsFeed = null,}) {
   return _then(_NotificationsFeedProviderState(
 searchString: null == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
-as String,selectedCategories: null == selectedCategories ? _self._selectedCategories : selectedCategories // ignore: cast_nullable_to_non_nullable
-as List<HazardCategory>,selectedSeverities: null == selectedSeverities ? _self._selectedSeverities : selectedSeverities // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverityWithCount>,hazards: null == hazards ? _self._hazards : hazards // ignore: cast_nullable_to_non_nullable
+as String,hazards: null == hazards ? _self._hazards : hazards // ignore: cast_nullable_to_non_nullable
 as List<Hazard>,getNotificationsFeed: null == getNotificationsFeed ? _self.getNotificationsFeed : getNotificationsFeed // ignore: cast_nullable_to_non_nullable
 as GetNotificationsFeed,
   ));

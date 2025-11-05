@@ -30,8 +30,7 @@ import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
-import 'package:hazard_app/features/shared/providers/hazard_severity_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/providers/user_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
@@ -79,14 +78,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfPlacesForSearch.select((value) => null));
     ref.watch(providerOfMainSearch.select((value) => null));
     ref.watch(providerOfNotificationsFeed.select((value) => null));
-    ref.watch(providerOfHazardCategoriesForDropdown.select((value) => null));
-    ref.watch(providerOfHazardCategoriesForSearch.select((value) => null));
+    ref.watch(providerOfHazardFiltersForMap.select((value) => null));
+    ref.watch(providerOfHazardFiltersForDropdown.select((value) => null));
+    ref.watch(providerOfHazardFiltersForSearch.select((value) => null));
     ref.watch(
-      providerOfHazardCategoriesForNotifications.select((value) => null),
-    );
-    ref.watch(providerOfHazardSeverityFiltersForSearch.select((value) => null));
-    ref.watch(
-      providerOfHazardSeverityFiltersForNotifications.select((value) => null),
+      providerOfHazardFiltersForNotifications.select((value) => null),
     );
     ref.watch(providerOfPushNotificationMessage.select((value) => null));
     ref.watch(providerOfHazardSocketManager.select((value) => null));
@@ -168,7 +164,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void _onInit() {
     // fetch hazard categories for dropdowns
     ref
-        .read(providerOfHazardCategoriesForDropdown.notifier)
+        .read(providerOfHazardFiltersForDropdown.notifier)
         .getAllParentHazardCategories();
   }
 

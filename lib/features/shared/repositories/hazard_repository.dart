@@ -7,7 +7,7 @@ import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_filters_response_model.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -17,7 +17,7 @@ abstract class HazardRepository {
     required final HazardSearchParams searchParams,
   });
 
-  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
+  Future<Either<GetHazardsWithFiltersResponse, AppError>>
   getGetHazardsWithCategories({
     required final HazardSearchParams searchParams,
   });
@@ -77,7 +77,7 @@ class HazardRepositoryImpl extends HazardRepository {
   }
 
   @override
-  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
+  Future<Either<GetHazardsWithFiltersResponse, AppError>>
   getGetHazardsWithCategories({
     required HazardSearchParams searchParams,
   }) {

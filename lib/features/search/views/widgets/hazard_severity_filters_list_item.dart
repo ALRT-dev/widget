@@ -2,22 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/shared/models/hazard_severity_with_count_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_severity_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class HazardSeverityFiltersListItem extends ConsumerStatefulWidget {
   const HazardSeverityFiltersListItem({
     super.key,
-    required this.severityFiltersKey,
+    required this.filtersKey,
     required this.hazardSeverity,
+    this.isAws = false,
     this.onSelected,
   });
 
-  /// The key to identify the severity filters provider.
-  final String severityFiltersKey;
+  /// The key to identify the specific hazard filters instance.
+  final String filtersKey;
 
   /// The hazard severity to be displayed.
   final HazardSeverityWithCount hazardSeverity;
+
+  /// Indicates whether the severity is for AWS hazards.
+  final bool isAws;
 
   /// Callback when a severity is selected.
   final Function(HazardSeverityWithCount)? onSelected;
@@ -32,10 +36,13 @@ class _HazardSeverityFiltersListItemState
   @override
   Widget build(BuildContext context) {
     final isSelected = ref.watch(
-      providerOfHazardSeverityFilters(widget.severityFiltersKey).select(
-        (value) => value.selectedSeverities
-            .map((e) => e.severity)
-            .contains(widget.hazardSeverity.severity),
+      providerOfHazardFilters(widget.filtersKey).select(
+        (value) =>
+            (widget.isAws
+                    ? value.selectedHazardSeveritiesAws
+                    : value.selectedHazardSeveritiesNonAws)
+                .map((e) => e.severity)
+                .contains(widget.hazardSeverity.severity),
       ),
     );
 
@@ -49,12 +56,13 @@ class _HazardSeverityFiltersListItemState
           Text(
             widget.hazardSeverity.severity.emoji,
             style: TextStyle(
-              fontSize: 14.spMin,
               height: 0.6,
             ),
           ),
           Text(
-            widget.hazardSeverity.severity.titleAws,
+            widget.isAws
+                ? widget.hazardSeverity.severity.titleAws
+                : widget.hazardSeverity.severity.titleNonAWS,
             style: TextStyle(
               color: isSelected ? AppColors.white : AppColors.grey,
               fontSize: 12.spMin,
@@ -90,11 +98,15 @@ class _HazardSeverityFiltersListItemState
 
   /// Updates the state with the given category.
   void _handleCategorySelection() {
-    ref
-        .read(
-          providerOfHazardSeverityFilters(widget.severityFiltersKey).notifier,
-        )
-        .toggleSelectedSeverity(widget.hazardSeverity);
+    if (widget.isAws) {
+      ref
+          .read(providerOfHazardFilters(widget.filtersKey).notifier)
+          .toggleSelectedHazardSeverityAws(widget.hazardSeverity);
+    } else {
+      ref
+          .read(providerOfHazardFilters(widget.filtersKey).notifier)
+          .toggleSelectedHazardSeverityNonAws(widget.hazardSeverity);
+    }
 
     widget.onSelected?.call(widget.hazardSeverity);
   }

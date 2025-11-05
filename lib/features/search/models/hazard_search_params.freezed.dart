@@ -18,7 +18,16 @@ mixin _$HazardSearchParams {
 /// The search string to filter hazards by their title or description.
  String? get searchString;/// The list of category IDs to filter hazards.
  List<String> get categoryIds;/// The severity levels to filter hazards.
- List<HazardSeverity>? get severities;/// The id of the user who reported the hazard to filter hazards.
+///
+/// The key is the [HazardSeverity] and the value indicates whether aws complaint or not.
+///
+/// Eg.
+/// {
+///   HazardSeverity.advice: true, // If true, this severity level will be 'advice'
+///   HazardSeverity.advice: false, // If true, this severity level will be 'moderate'
+///   HazardSeverity.emergency: false, // If false, this severity level will be 'critical'
+/// }
+ Map<HazardSeverity, bool>? get severities;/// The id of the user who reported the hazard to filter hazards.
  String? get reportedById;/// The review status to filter hazards.
 ///
 /// Defaults to [HazardReviewStatus.accepted] to show only accepted hazards.
@@ -63,7 +72,7 @@ abstract mixin class $HazardSearchParamsCopyWith<$Res>  {
   factory $HazardSearchParamsCopyWith(HazardSearchParams value, $Res Function(HazardSearchParams) _then) = _$HazardSearchParamsCopyWithImpl;
 @useResult
 $Res call({
- String? searchString, List<String> categoryIds, List<HazardSeverity>? severities, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool showExpired, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
+ String? searchString, List<String> categoryIds, Map<HazardSeverity, bool>? severities, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool showExpired, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
 });
 
 
@@ -85,7 +94,7 @@ class _$HazardSearchParamsCopyWithImpl<$Res>
 searchString: freezed == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
 as String?,categoryIds: null == categoryIds ? _self.categoryIds : categoryIds // ignore: cast_nullable_to_non_nullable
 as List<String>,severities: freezed == severities ? _self.severities : severities // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverity>?,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
+as Map<HazardSeverity, bool>?,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
 as String?,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
 as HazardReviewStatus,northeastLat: freezed == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
 as double?,northeastLng: freezed == northeastLng ? _self.northeastLng : northeastLng // ignore: cast_nullable_to_non_nullable
@@ -180,7 +189,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  List<HazardSeverity>? severities,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  Map<HazardSeverity, bool>? severities,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardSearchParams() when $default != null:
 return $default(_that.searchString,_that.categoryIds,_that.severities,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.showExpired,_that.sortSettings,_that.page,_that.pageSize);case _:
@@ -201,7 +210,7 @@ return $default(_that.searchString,_that.categoryIds,_that.severities,_that.repo
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  List<HazardSeverity>? severities,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  Map<HazardSeverity, bool>? severities,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)  $default,) {final _that = this;
 switch (_that) {
 case _HazardSearchParams():
 return $default(_that.searchString,_that.categoryIds,_that.severities,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.showExpired,_that.sortSettings,_that.page,_that.pageSize);case _:
@@ -221,7 +230,7 @@ return $default(_that.searchString,_that.categoryIds,_that.severities,_that.repo
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? searchString,  List<String> categoryIds,  List<HazardSeverity>? severities,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? searchString,  List<String> categoryIds,  Map<HazardSeverity, bool>? severities,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardSearchParams() when $default != null:
 return $default(_that.searchString,_that.categoryIds,_that.severities,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.showExpired,_that.sortSettings,_that.page,_that.pageSize);case _:
@@ -236,7 +245,7 @@ return $default(_that.searchString,_that.categoryIds,_that.severities,_that.repo
 @JsonSerializable()
 
 class _HazardSearchParams implements HazardSearchParams {
-  const _HazardSearchParams({this.searchString, final  List<String> categoryIds = const <String>[], final  List<HazardSeverity>? severities, this.reportedById, this.reviewStatus = HazardReviewStatus.accepted, this.northeastLat, this.northeastLng, this.southwestLat, this.southwestLng, this.showExpired = false, final  List<Map<SortCategory, SortOrder>> sortSettings = const <Map<SortCategory, SortOrder>>[{SortCategory.severity : SortOrder.desc}, {SortCategory.distance : SortOrder.asc}, {SortCategory.createdAt : SortOrder.desc}, {SortCategory.confidenceScore : SortOrder.desc}], this.page = 1, this.pageSize = 20}): _categoryIds = categoryIds,_severities = severities,_sortSettings = sortSettings;
+  const _HazardSearchParams({this.searchString, final  List<String> categoryIds = const <String>[], final  Map<HazardSeverity, bool>? severities, this.reportedById, this.reviewStatus = HazardReviewStatus.accepted, this.northeastLat, this.northeastLng, this.southwestLat, this.southwestLng, this.showExpired = false, final  List<Map<SortCategory, SortOrder>> sortSettings = const <Map<SortCategory, SortOrder>>[{SortCategory.severity : SortOrder.desc}, {SortCategory.distance : SortOrder.asc}, {SortCategory.createdAt : SortOrder.desc}, {SortCategory.confidenceScore : SortOrder.desc}], this.page = 1, this.pageSize = 20}): _categoryIds = categoryIds,_severities = severities,_sortSettings = sortSettings;
   factory _HazardSearchParams.fromJson(Map<String, dynamic> json) => _$HazardSearchParamsFromJson(json);
 
 /// The search string to filter hazards by their title or description.
@@ -251,14 +260,32 @@ class _HazardSearchParams implements HazardSearchParams {
 }
 
 /// The severity levels to filter hazards.
- final  List<HazardSeverity>? _severities;
+///
+/// The key is the [HazardSeverity] and the value indicates whether aws complaint or not.
+///
+/// Eg.
+/// {
+///   HazardSeverity.advice: true, // If true, this severity level will be 'advice'
+///   HazardSeverity.advice: false, // If true, this severity level will be 'moderate'
+///   HazardSeverity.emergency: false, // If false, this severity level will be 'critical'
+/// }
+ final  Map<HazardSeverity, bool>? _severities;
 /// The severity levels to filter hazards.
-@override List<HazardSeverity>? get severities {
+///
+/// The key is the [HazardSeverity] and the value indicates whether aws complaint or not.
+///
+/// Eg.
+/// {
+///   HazardSeverity.advice: true, // If true, this severity level will be 'advice'
+///   HazardSeverity.advice: false, // If true, this severity level will be 'moderate'
+///   HazardSeverity.emergency: false, // If false, this severity level will be 'critical'
+/// }
+@override Map<HazardSeverity, bool>? get severities {
   final value = _severities;
   if (value == null) return null;
-  if (_severities is EqualUnmodifiableListView) return _severities;
+  if (_severities is EqualUnmodifiableMapView) return _severities;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(value);
+  return EqualUnmodifiableMapView(value);
 }
 
 /// The id of the user who reported the hazard to filter hazards.
@@ -324,7 +351,7 @@ abstract mixin class _$HazardSearchParamsCopyWith<$Res> implements $HazardSearch
   factory _$HazardSearchParamsCopyWith(_HazardSearchParams value, $Res Function(_HazardSearchParams) _then) = __$HazardSearchParamsCopyWithImpl;
 @override @useResult
 $Res call({
- String? searchString, List<String> categoryIds, List<HazardSeverity>? severities, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool showExpired, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
+ String? searchString, List<String> categoryIds, Map<HazardSeverity, bool>? severities, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool showExpired, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
 });
 
 
@@ -346,7 +373,7 @@ class __$HazardSearchParamsCopyWithImpl<$Res>
 searchString: freezed == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
 as String?,categoryIds: null == categoryIds ? _self._categoryIds : categoryIds // ignore: cast_nullable_to_non_nullable
 as List<String>,severities: freezed == severities ? _self._severities : severities // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverity>?,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
+as Map<HazardSeverity, bool>?,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
 as String?,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
 as HazardReviewStatus,northeastLat: freezed == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
 as double?,northeastLng: freezed == northeastLng ? _self.northeastLng : northeastLng // ignore: cast_nullable_to_non_nullable

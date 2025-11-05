@@ -12,7 +12,7 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -20,7 +20,7 @@ class HazardSearchAppBar extends ConsumerStatefulWidget {
   const HazardSearchAppBar({super.key});
 
   static const placesSearchKey = 'HazardSearchAppBar';
-  static const categoriesKey = 'HazardSearchAppBar';
+  static const filtersKey = 'HazardSearchAppBarFilters';
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -48,7 +48,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
     return Consumer(
       builder: (context, ref, child) {
         final isCategoriesPresent = ref.watch(
-          providerOfHazardCategoriesForSearch.select(
+          providerOfHazardFiltersForSearch.select(
             (value) => value.hazardCategories.isNotEmpty,
           ),
         );
@@ -76,7 +76,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
                 _searchbarBuilder().pX(20.0),
                 15.hSizedBox,
                 HazardCategoriesList(
-                  categoriesKey: HazardSearchAppBar.categoriesKey,
+                  filtersKey: HazardSearchAppBar.filtersKey,
                   onCategoriesSelectionUpdated: _handleCategorySelectionChanged,
                 ),
                 if (isCategoriesPresent) 15.hSizedBox,
@@ -95,7 +95,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
   Widget _searchbarBuilder() {
     return AlrtDropdown(
       controller: _dropdownController,
-      button: Consumer(
+      button: (context, isOpen) => Consumer(
         builder: (context, ref, child) {
           final isSearchActive = ref.watch(
             providerOfPlacesForSearch.select(

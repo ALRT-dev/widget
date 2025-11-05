@@ -24,8 +24,7 @@ import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
-import 'package:hazard_app/features/shared/providers/hazard_severity_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/utils/location_helper.dart';
@@ -53,10 +52,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
   MapService get _mapService => _ref.read(providerOfMapService);
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   LocationService get _locationService => _ref.read(providerOfLocationService);
-  HazardCategoriesProvider get _hazardCategoriesProvider =>
-      _ref.read(providerOfHazardCategoriesForMap.notifier);
-  HazardSeverityFiltersProvider get _hazardSeverityFiltersProvider =>
-      _ref.read(providerOfHazardSeverityFiltersForMap.notifier);
+  HazardFiltersProvider get _hazardFiltersProvider =>
+      _ref.read(providerOfHazardFiltersForMap.notifier);
   HazardMarkersBitmapsProviderState get _hazardMarkerBitmapsProviderState =>
       _ref.read(providerOfHazardMarkerBitmaps);
 
@@ -130,16 +127,30 @@ class MapProvider extends StateNotifier<MapProviderState> {
     }
 
     final selectedCategories = _ref
-        .read(providerOfHazardCategoriesForMap)
-        .selectedCategories;
-    final selectedSeverities = _ref
-        .read(providerOfHazardSeverityFiltersForMap)
-        .selectedSeverities;
+        .read(providerOfHazardFiltersForMap)
+        .selectedHazardCategories;
+    final selectedSeveritiesAws = _ref
+        .read(providerOfHazardFiltersForMap)
+        .selectedHazardSeveritiesAws;
+    final selectedSeveritiesNonAws = _ref
+        .read(providerOfHazardFiltersForMap)
+        .selectedHazardSeveritiesNonAws;
 
     final result = await _hazardService.getAllHazardsWithCategories(
       searchParams: HazardSearchParams(
         categoryIds: selectedCategories.map((e) => e.id).toList(),
-        severities: selectedSeverities.map((e) => e.severity).toList(),
+        severities: {
+          ...Map.fromEntries(
+            selectedSeveritiesAws.map(
+              (e) => MapEntry(e.severity, true),
+            ),
+          ),
+          ...Map.fromEntries(
+            selectedSeveritiesNonAws.map(
+              (e) => MapEntry(e.severity, false),
+            ),
+          ),
+        },
         northeastLat: visibleBounds.northeast.latitude,
         northeastLng: visibleBounds.northeast.longitude,
         southwestLat: visibleBounds.southwest.latitude,
@@ -158,14 +169,19 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
         generateMarkers();
 
-        // Also update hazard categories in the hazard categories provider
-        _hazardCategoriesProvider.updateHazardCategories(
-          response.categoryFilters,
+        // Also update hazard categories in the hazard filters provider
+        _hazardFiltersProvider.updateHazardCategories(
+          response.availableFilters.categoryFilters,
         );
 
-        // Also update hazard severity filters in the hazard severity filters provider
-        _hazardSeverityFiltersProvider.updateHazardSeverities(
-          response.severityFilters,
+        // Also update hazard severity filters in the hazard filters provider
+        _hazardFiltersProvider.updateHazardSeveritiesAws(
+          response.availableFilters.severityFiltersAws,
+        );
+
+        // Also update hazard severity filters in the hazard filters provider
+        _hazardFiltersProvider.updateHazardSeveritiesNonAws(
+          response.availableFilters.severityFiltersNonAws,
         );
       },
       (l) {

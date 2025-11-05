@@ -6,7 +6,7 @@ import 'package:hazard_app/features/notification/providers/repository_providers.
 import 'package:hazard_app/features/notification/repositories/notification_repository.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_filters_response_model.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -22,8 +22,7 @@ class NotificationService {
   StreamSubscription<RemoteMessage>? _remoteMessageStreamSub;
 
   /// Fetches the hazards that the user has subscribed to for notifications.
-  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
-  getNotificationsFeed({
+  Future<Either<GetHazardsWithFiltersResponse, AppError>> getNotificationsFeed({
     final HazardSearchParams? searchParams,
   }) async {
     final result = await _notificationRepository.getNotificationsFeed(
