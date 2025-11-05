@@ -52,8 +52,6 @@ class MapProvider extends StateNotifier<MapProviderState> {
   MapService get _mapService => _ref.read(providerOfMapService);
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   LocationService get _locationService => _ref.read(providerOfLocationService);
-  HazardFiltersProvider get _hazardFiltersProvider =>
-      _ref.read(providerOfHazardFiltersForMap.notifier);
   HazardMarkersBitmapsProviderState get _hazardMarkerBitmapsProviderState =>
       _ref.read(providerOfHazardMarkerBitmaps);
 
@@ -128,15 +126,18 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     final selectedCategories = _ref
         .read(providerOfHazardFiltersForMap)
-        .selectedHazardCategories;
+        .selectedFilters
+        .categoryFilters;
     final selectedSeveritiesAws = _ref
         .read(providerOfHazardFiltersForMap)
-        .selectedHazardSeveritiesAws;
+        .selectedFilters
+        .severityFiltersAws;
     final selectedSeveritiesNonAws = _ref
         .read(providerOfHazardFiltersForMap)
-        .selectedHazardSeveritiesNonAws;
+        .selectedFilters
+        .severityFiltersNonAws;
 
-    final result = await _hazardService.getAllHazardsWithCategories(
+    final result = await _hazardService.getAllHazardsWithFilters(
       searchParams: HazardSearchParams(
         categoryIds: selectedCategories.map((e) => e.id).toList(),
         severities: {
@@ -163,26 +164,16 @@ class MapProvider extends StateNotifier<MapProviderState> {
     result.when(
       (response) {
         state = state.copyWith(
-          getMapHazardsState: GetMapHazardsState.success(response.hazards),
-          hazards: response.hazards,
+          getMapHazardsState: GetMapHazardsState.success(response.$1),
+          hazards: response.$1,
         );
+
+        // Update hazard filters in the filter provider
+        _ref
+            .read(providerOfHazardFiltersForMap.notifier)
+            .updateFilters(response.$2);
 
         generateMarkers();
-
-        // Also update hazard categories in the hazard filters provider
-        _hazardFiltersProvider.updateHazardCategories(
-          response.availableFilters.categoryFilters,
-        );
-
-        // Also update hazard severity filters in the hazard filters provider
-        _hazardFiltersProvider.updateHazardSeveritiesAws(
-          response.availableFilters.severityFiltersAws,
-        );
-
-        // Also update hazard severity filters in the hazard filters provider
-        _hazardFiltersProvider.updateHazardSeveritiesNonAws(
-          response.availableFilters.severityFiltersNonAws,
-        );
       },
       (l) {
         state = state.copyWith(

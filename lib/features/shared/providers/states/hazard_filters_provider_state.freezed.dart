@@ -14,13 +14,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HazardFiltersProviderState {
 
-/// The list of hazard categories fetched from the service.
- List<HazardCategory> get hazardCategories;/// The list of categories selected by the user.
- List<HazardCategory> get selectedHazardCategories;/// The list of hazard severities (AWS compliant) fetched from the service.
- List<HazardSeverityWithCount> get hazardSeveritiesAws;/// The list of AWS severities selected by the user.
- List<HazardSeverityWithCount> get selectedHazardSeveritiesAws;/// The list of hazard severities (Non-AWS compliant) fetched from the service.
- List<HazardSeverityWithCount> get hazardSeveritiesNonAws;/// The list of Non-AWS severities selected by the user.
- List<HazardSeverityWithCount> get selectedHazardSeveritiesNonAws;/// The state of fetching hazard categories.
+/// The complete set of hazard filters fetched from the service.
+ HazardFilters get filters;/// The currently selected hazard filters.
+ HazardFilters get selectedFilters;/// The list of all parent hazard categories.
+ List<HazardCategory> get parentHazardCategories;/// The state of fetching hazard filters.
+ GetHazardFiltersState get getHazardFiltersState;/// The state of fetching hazard categories.
  GetAllHazardCategoriesState get getAllHazardCategoriesState;
 /// Create a copy of HazardFiltersProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -32,16 +30,16 @@ $HazardFiltersProviderStateCopyWith<HazardFiltersProviderState> get copyWith => 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardFiltersProviderState&&const DeepCollectionEquality().equals(other.hazardCategories, hazardCategories)&&const DeepCollectionEquality().equals(other.selectedHazardCategories, selectedHazardCategories)&&const DeepCollectionEquality().equals(other.hazardSeveritiesAws, hazardSeveritiesAws)&&const DeepCollectionEquality().equals(other.selectedHazardSeveritiesAws, selectedHazardSeveritiesAws)&&const DeepCollectionEquality().equals(other.hazardSeveritiesNonAws, hazardSeveritiesNonAws)&&const DeepCollectionEquality().equals(other.selectedHazardSeveritiesNonAws, selectedHazardSeveritiesNonAws)&&(identical(other.getAllHazardCategoriesState, getAllHazardCategoriesState) || other.getAllHazardCategoriesState == getAllHazardCategoriesState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardFiltersProviderState&&(identical(other.filters, filters) || other.filters == filters)&&(identical(other.selectedFilters, selectedFilters) || other.selectedFilters == selectedFilters)&&const DeepCollectionEquality().equals(other.parentHazardCategories, parentHazardCategories)&&(identical(other.getHazardFiltersState, getHazardFiltersState) || other.getHazardFiltersState == getHazardFiltersState)&&(identical(other.getAllHazardCategoriesState, getAllHazardCategoriesState) || other.getAllHazardCategoriesState == getAllHazardCategoriesState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(hazardCategories),const DeepCollectionEquality().hash(selectedHazardCategories),const DeepCollectionEquality().hash(hazardSeveritiesAws),const DeepCollectionEquality().hash(selectedHazardSeveritiesAws),const DeepCollectionEquality().hash(hazardSeveritiesNonAws),const DeepCollectionEquality().hash(selectedHazardSeveritiesNonAws),getAllHazardCategoriesState);
+int get hashCode => Object.hash(runtimeType,filters,selectedFilters,const DeepCollectionEquality().hash(parentHazardCategories),getHazardFiltersState,getAllHazardCategoriesState);
 
 @override
 String toString() {
-  return 'HazardFiltersProviderState(hazardCategories: $hazardCategories, selectedHazardCategories: $selectedHazardCategories, hazardSeveritiesAws: $hazardSeveritiesAws, selectedHazardSeveritiesAws: $selectedHazardSeveritiesAws, hazardSeveritiesNonAws: $hazardSeveritiesNonAws, selectedHazardSeveritiesNonAws: $selectedHazardSeveritiesNonAws, getAllHazardCategoriesState: $getAllHazardCategoriesState)';
+  return 'HazardFiltersProviderState(filters: $filters, selectedFilters: $selectedFilters, parentHazardCategories: $parentHazardCategories, getHazardFiltersState: $getHazardFiltersState, getAllHazardCategoriesState: $getAllHazardCategoriesState)';
 }
 
 
@@ -52,11 +50,11 @@ abstract mixin class $HazardFiltersProviderStateCopyWith<$Res>  {
   factory $HazardFiltersProviderStateCopyWith(HazardFiltersProviderState value, $Res Function(HazardFiltersProviderState) _then) = _$HazardFiltersProviderStateCopyWithImpl;
 @useResult
 $Res call({
- List<HazardCategory> hazardCategories, List<HazardCategory> selectedHazardCategories, List<HazardSeverityWithCount> hazardSeveritiesAws, List<HazardSeverityWithCount> selectedHazardSeveritiesAws, List<HazardSeverityWithCount> hazardSeveritiesNonAws, List<HazardSeverityWithCount> selectedHazardSeveritiesNonAws, GetAllHazardCategoriesState getAllHazardCategoriesState
+ HazardFilters filters, HazardFilters selectedFilters, List<HazardCategory> parentHazardCategories, GetHazardFiltersState getHazardFiltersState, GetAllHazardCategoriesState getAllHazardCategoriesState
 });
 
 
-$GetAllHazardCategoriesStateCopyWith<$Res> get getAllHazardCategoriesState;
+$HazardFiltersCopyWith<$Res> get filters;$HazardFiltersCopyWith<$Res> get selectedFilters;$GetHazardFiltersStateCopyWith<$Res> get getHazardFiltersState;$GetAllHazardCategoriesStateCopyWith<$Res> get getAllHazardCategoriesState;
 
 }
 /// @nodoc
@@ -69,19 +67,44 @@ class _$HazardFiltersProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HazardFiltersProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? hazardCategories = null,Object? selectedHazardCategories = null,Object? hazardSeveritiesAws = null,Object? selectedHazardSeveritiesAws = null,Object? hazardSeveritiesNonAws = null,Object? selectedHazardSeveritiesNonAws = null,Object? getAllHazardCategoriesState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? filters = null,Object? selectedFilters = null,Object? parentHazardCategories = null,Object? getHazardFiltersState = null,Object? getAllHazardCategoriesState = null,}) {
   return _then(_self.copyWith(
-hazardCategories: null == hazardCategories ? _self.hazardCategories : hazardCategories // ignore: cast_nullable_to_non_nullable
-as List<HazardCategory>,selectedHazardCategories: null == selectedHazardCategories ? _self.selectedHazardCategories : selectedHazardCategories // ignore: cast_nullable_to_non_nullable
-as List<HazardCategory>,hazardSeveritiesAws: null == hazardSeveritiesAws ? _self.hazardSeveritiesAws : hazardSeveritiesAws // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverityWithCount>,selectedHazardSeveritiesAws: null == selectedHazardSeveritiesAws ? _self.selectedHazardSeveritiesAws : selectedHazardSeveritiesAws // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverityWithCount>,hazardSeveritiesNonAws: null == hazardSeveritiesNonAws ? _self.hazardSeveritiesNonAws : hazardSeveritiesNonAws // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverityWithCount>,selectedHazardSeveritiesNonAws: null == selectedHazardSeveritiesNonAws ? _self.selectedHazardSeveritiesNonAws : selectedHazardSeveritiesNonAws // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverityWithCount>,getAllHazardCategoriesState: null == getAllHazardCategoriesState ? _self.getAllHazardCategoriesState : getAllHazardCategoriesState // ignore: cast_nullable_to_non_nullable
+filters: null == filters ? _self.filters : filters // ignore: cast_nullable_to_non_nullable
+as HazardFilters,selectedFilters: null == selectedFilters ? _self.selectedFilters : selectedFilters // ignore: cast_nullable_to_non_nullable
+as HazardFilters,parentHazardCategories: null == parentHazardCategories ? _self.parentHazardCategories : parentHazardCategories // ignore: cast_nullable_to_non_nullable
+as List<HazardCategory>,getHazardFiltersState: null == getHazardFiltersState ? _self.getHazardFiltersState : getHazardFiltersState // ignore: cast_nullable_to_non_nullable
+as GetHazardFiltersState,getAllHazardCategoriesState: null == getAllHazardCategoriesState ? _self.getAllHazardCategoriesState : getAllHazardCategoriesState // ignore: cast_nullable_to_non_nullable
 as GetAllHazardCategoriesState,
   ));
 }
 /// Create a copy of HazardFiltersProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HazardFiltersCopyWith<$Res> get filters {
+  
+  return $HazardFiltersCopyWith<$Res>(_self.filters, (value) {
+    return _then(_self.copyWith(filters: value));
+  });
+}/// Create a copy of HazardFiltersProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HazardFiltersCopyWith<$Res> get selectedFilters {
+  
+  return $HazardFiltersCopyWith<$Res>(_self.selectedFilters, (value) {
+    return _then(_self.copyWith(selectedFilters: value));
+  });
+}/// Create a copy of HazardFiltersProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$GetHazardFiltersStateCopyWith<$Res> get getHazardFiltersState {
+  
+  return $GetHazardFiltersStateCopyWith<$Res>(_self.getHazardFiltersState, (value) {
+    return _then(_self.copyWith(getHazardFiltersState: value));
+  });
+}/// Create a copy of HazardFiltersProviderState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -172,10 +195,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<HazardCategory> hazardCategories,  List<HazardCategory> selectedHazardCategories,  List<HazardSeverityWithCount> hazardSeveritiesAws,  List<HazardSeverityWithCount> selectedHazardSeveritiesAws,  List<HazardSeverityWithCount> hazardSeveritiesNonAws,  List<HazardSeverityWithCount> selectedHazardSeveritiesNonAws,  GetAllHazardCategoriesState getAllHazardCategoriesState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( HazardFilters filters,  HazardFilters selectedFilters,  List<HazardCategory> parentHazardCategories,  GetHazardFiltersState getHazardFiltersState,  GetAllHazardCategoriesState getAllHazardCategoriesState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardFiltersProviderState() when $default != null:
-return $default(_that.hazardCategories,_that.selectedHazardCategories,_that.hazardSeveritiesAws,_that.selectedHazardSeveritiesAws,_that.hazardSeveritiesNonAws,_that.selectedHazardSeveritiesNonAws,_that.getAllHazardCategoriesState);case _:
+return $default(_that.filters,_that.selectedFilters,_that.parentHazardCategories,_that.getHazardFiltersState,_that.getAllHazardCategoriesState);case _:
   return orElse();
 
 }
@@ -193,10 +216,10 @@ return $default(_that.hazardCategories,_that.selectedHazardCategories,_that.haza
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<HazardCategory> hazardCategories,  List<HazardCategory> selectedHazardCategories,  List<HazardSeverityWithCount> hazardSeveritiesAws,  List<HazardSeverityWithCount> selectedHazardSeveritiesAws,  List<HazardSeverityWithCount> hazardSeveritiesNonAws,  List<HazardSeverityWithCount> selectedHazardSeveritiesNonAws,  GetAllHazardCategoriesState getAllHazardCategoriesState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( HazardFilters filters,  HazardFilters selectedFilters,  List<HazardCategory> parentHazardCategories,  GetHazardFiltersState getHazardFiltersState,  GetAllHazardCategoriesState getAllHazardCategoriesState)  $default,) {final _that = this;
 switch (_that) {
 case _HazardFiltersProviderState():
-return $default(_that.hazardCategories,_that.selectedHazardCategories,_that.hazardSeveritiesAws,_that.selectedHazardSeveritiesAws,_that.hazardSeveritiesNonAws,_that.selectedHazardSeveritiesNonAws,_that.getAllHazardCategoriesState);case _:
+return $default(_that.filters,_that.selectedFilters,_that.parentHazardCategories,_that.getHazardFiltersState,_that.getAllHazardCategoriesState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -213,10 +236,10 @@ return $default(_that.hazardCategories,_that.selectedHazardCategories,_that.haza
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<HazardCategory> hazardCategories,  List<HazardCategory> selectedHazardCategories,  List<HazardSeverityWithCount> hazardSeveritiesAws,  List<HazardSeverityWithCount> selectedHazardSeveritiesAws,  List<HazardSeverityWithCount> hazardSeveritiesNonAws,  List<HazardSeverityWithCount> selectedHazardSeveritiesNonAws,  GetAllHazardCategoriesState getAllHazardCategoriesState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( HazardFilters filters,  HazardFilters selectedFilters,  List<HazardCategory> parentHazardCategories,  GetHazardFiltersState getHazardFiltersState,  GetAllHazardCategoriesState getAllHazardCategoriesState)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardFiltersProviderState() when $default != null:
-return $default(_that.hazardCategories,_that.selectedHazardCategories,_that.hazardSeveritiesAws,_that.selectedHazardSeveritiesAws,_that.hazardSeveritiesNonAws,_that.selectedHazardSeveritiesNonAws,_that.getAllHazardCategoriesState);case _:
+return $default(_that.filters,_that.selectedFilters,_that.parentHazardCategories,_that.getHazardFiltersState,_that.getAllHazardCategoriesState);case _:
   return null;
 
 }
@@ -228,63 +251,24 @@ return $default(_that.hazardCategories,_that.selectedHazardCategories,_that.haza
 
 
 class _HazardFiltersProviderState extends HazardFiltersProviderState {
-  const _HazardFiltersProviderState({final  List<HazardCategory> hazardCategories = const <HazardCategory>[], final  List<HazardCategory> selectedHazardCategories = const <HazardCategory>[], final  List<HazardSeverityWithCount> hazardSeveritiesAws = const <HazardSeverityWithCount>[], final  List<HazardSeverityWithCount> selectedHazardSeveritiesAws = const <HazardSeverityWithCount>[], final  List<HazardSeverityWithCount> hazardSeveritiesNonAws = const <HazardSeverityWithCount>[], final  List<HazardSeverityWithCount> selectedHazardSeveritiesNonAws = const <HazardSeverityWithCount>[], this.getAllHazardCategoriesState = const GetAllHazardCategoriesState.initial()}): _hazardCategories = hazardCategories,_selectedHazardCategories = selectedHazardCategories,_hazardSeveritiesAws = hazardSeveritiesAws,_selectedHazardSeveritiesAws = selectedHazardSeveritiesAws,_hazardSeveritiesNonAws = hazardSeveritiesNonAws,_selectedHazardSeveritiesNonAws = selectedHazardSeveritiesNonAws,super._();
+  const _HazardFiltersProviderState({this.filters = const HazardFilters(), this.selectedFilters = const HazardFilters(), final  List<HazardCategory> parentHazardCategories = const <HazardCategory>[], this.getHazardFiltersState = const GetHazardFiltersState.initial(), this.getAllHazardCategoriesState = const GetAllHazardCategoriesState.initial()}): _parentHazardCategories = parentHazardCategories,super._();
   
 
-/// The list of hazard categories fetched from the service.
- final  List<HazardCategory> _hazardCategories;
-/// The list of hazard categories fetched from the service.
-@override@JsonKey() List<HazardCategory> get hazardCategories {
-  if (_hazardCategories is EqualUnmodifiableListView) return _hazardCategories;
+/// The complete set of hazard filters fetched from the service.
+@override@JsonKey() final  HazardFilters filters;
+/// The currently selected hazard filters.
+@override@JsonKey() final  HazardFilters selectedFilters;
+/// The list of all parent hazard categories.
+ final  List<HazardCategory> _parentHazardCategories;
+/// The list of all parent hazard categories.
+@override@JsonKey() List<HazardCategory> get parentHazardCategories {
+  if (_parentHazardCategories is EqualUnmodifiableListView) return _parentHazardCategories;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_hazardCategories);
+  return EqualUnmodifiableListView(_parentHazardCategories);
 }
 
-/// The list of categories selected by the user.
- final  List<HazardCategory> _selectedHazardCategories;
-/// The list of categories selected by the user.
-@override@JsonKey() List<HazardCategory> get selectedHazardCategories {
-  if (_selectedHazardCategories is EqualUnmodifiableListView) return _selectedHazardCategories;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_selectedHazardCategories);
-}
-
-/// The list of hazard severities (AWS compliant) fetched from the service.
- final  List<HazardSeverityWithCount> _hazardSeveritiesAws;
-/// The list of hazard severities (AWS compliant) fetched from the service.
-@override@JsonKey() List<HazardSeverityWithCount> get hazardSeveritiesAws {
-  if (_hazardSeveritiesAws is EqualUnmodifiableListView) return _hazardSeveritiesAws;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_hazardSeveritiesAws);
-}
-
-/// The list of AWS severities selected by the user.
- final  List<HazardSeverityWithCount> _selectedHazardSeveritiesAws;
-/// The list of AWS severities selected by the user.
-@override@JsonKey() List<HazardSeverityWithCount> get selectedHazardSeveritiesAws {
-  if (_selectedHazardSeveritiesAws is EqualUnmodifiableListView) return _selectedHazardSeveritiesAws;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_selectedHazardSeveritiesAws);
-}
-
-/// The list of hazard severities (Non-AWS compliant) fetched from the service.
- final  List<HazardSeverityWithCount> _hazardSeveritiesNonAws;
-/// The list of hazard severities (Non-AWS compliant) fetched from the service.
-@override@JsonKey() List<HazardSeverityWithCount> get hazardSeveritiesNonAws {
-  if (_hazardSeveritiesNonAws is EqualUnmodifiableListView) return _hazardSeveritiesNonAws;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_hazardSeveritiesNonAws);
-}
-
-/// The list of Non-AWS severities selected by the user.
- final  List<HazardSeverityWithCount> _selectedHazardSeveritiesNonAws;
-/// The list of Non-AWS severities selected by the user.
-@override@JsonKey() List<HazardSeverityWithCount> get selectedHazardSeveritiesNonAws {
-  if (_selectedHazardSeveritiesNonAws is EqualUnmodifiableListView) return _selectedHazardSeveritiesNonAws;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_selectedHazardSeveritiesNonAws);
-}
-
+/// The state of fetching hazard filters.
+@override@JsonKey() final  GetHazardFiltersState getHazardFiltersState;
 /// The state of fetching hazard categories.
 @override@JsonKey() final  GetAllHazardCategoriesState getAllHazardCategoriesState;
 
@@ -298,16 +282,16 @@ _$HazardFiltersProviderStateCopyWith<_HazardFiltersProviderState> get copyWith =
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardFiltersProviderState&&const DeepCollectionEquality().equals(other._hazardCategories, _hazardCategories)&&const DeepCollectionEquality().equals(other._selectedHazardCategories, _selectedHazardCategories)&&const DeepCollectionEquality().equals(other._hazardSeveritiesAws, _hazardSeveritiesAws)&&const DeepCollectionEquality().equals(other._selectedHazardSeveritiesAws, _selectedHazardSeveritiesAws)&&const DeepCollectionEquality().equals(other._hazardSeveritiesNonAws, _hazardSeveritiesNonAws)&&const DeepCollectionEquality().equals(other._selectedHazardSeveritiesNonAws, _selectedHazardSeveritiesNonAws)&&(identical(other.getAllHazardCategoriesState, getAllHazardCategoriesState) || other.getAllHazardCategoriesState == getAllHazardCategoriesState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardFiltersProviderState&&(identical(other.filters, filters) || other.filters == filters)&&(identical(other.selectedFilters, selectedFilters) || other.selectedFilters == selectedFilters)&&const DeepCollectionEquality().equals(other._parentHazardCategories, _parentHazardCategories)&&(identical(other.getHazardFiltersState, getHazardFiltersState) || other.getHazardFiltersState == getHazardFiltersState)&&(identical(other.getAllHazardCategoriesState, getAllHazardCategoriesState) || other.getAllHazardCategoriesState == getAllHazardCategoriesState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_hazardCategories),const DeepCollectionEquality().hash(_selectedHazardCategories),const DeepCollectionEquality().hash(_hazardSeveritiesAws),const DeepCollectionEquality().hash(_selectedHazardSeveritiesAws),const DeepCollectionEquality().hash(_hazardSeveritiesNonAws),const DeepCollectionEquality().hash(_selectedHazardSeveritiesNonAws),getAllHazardCategoriesState);
+int get hashCode => Object.hash(runtimeType,filters,selectedFilters,const DeepCollectionEquality().hash(_parentHazardCategories),getHazardFiltersState,getAllHazardCategoriesState);
 
 @override
 String toString() {
-  return 'HazardFiltersProviderState(hazardCategories: $hazardCategories, selectedHazardCategories: $selectedHazardCategories, hazardSeveritiesAws: $hazardSeveritiesAws, selectedHazardSeveritiesAws: $selectedHazardSeveritiesAws, hazardSeveritiesNonAws: $hazardSeveritiesNonAws, selectedHazardSeveritiesNonAws: $selectedHazardSeveritiesNonAws, getAllHazardCategoriesState: $getAllHazardCategoriesState)';
+  return 'HazardFiltersProviderState(filters: $filters, selectedFilters: $selectedFilters, parentHazardCategories: $parentHazardCategories, getHazardFiltersState: $getHazardFiltersState, getAllHazardCategoriesState: $getAllHazardCategoriesState)';
 }
 
 
@@ -318,11 +302,11 @@ abstract mixin class _$HazardFiltersProviderStateCopyWith<$Res> implements $Haza
   factory _$HazardFiltersProviderStateCopyWith(_HazardFiltersProviderState value, $Res Function(_HazardFiltersProviderState) _then) = __$HazardFiltersProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<HazardCategory> hazardCategories, List<HazardCategory> selectedHazardCategories, List<HazardSeverityWithCount> hazardSeveritiesAws, List<HazardSeverityWithCount> selectedHazardSeveritiesAws, List<HazardSeverityWithCount> hazardSeveritiesNonAws, List<HazardSeverityWithCount> selectedHazardSeveritiesNonAws, GetAllHazardCategoriesState getAllHazardCategoriesState
+ HazardFilters filters, HazardFilters selectedFilters, List<HazardCategory> parentHazardCategories, GetHazardFiltersState getHazardFiltersState, GetAllHazardCategoriesState getAllHazardCategoriesState
 });
 
 
-@override $GetAllHazardCategoriesStateCopyWith<$Res> get getAllHazardCategoriesState;
+@override $HazardFiltersCopyWith<$Res> get filters;@override $HazardFiltersCopyWith<$Res> get selectedFilters;@override $GetHazardFiltersStateCopyWith<$Res> get getHazardFiltersState;@override $GetAllHazardCategoriesStateCopyWith<$Res> get getAllHazardCategoriesState;
 
 }
 /// @nodoc
@@ -335,20 +319,45 @@ class __$HazardFiltersProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HazardFiltersProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? hazardCategories = null,Object? selectedHazardCategories = null,Object? hazardSeveritiesAws = null,Object? selectedHazardSeveritiesAws = null,Object? hazardSeveritiesNonAws = null,Object? selectedHazardSeveritiesNonAws = null,Object? getAllHazardCategoriesState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? filters = null,Object? selectedFilters = null,Object? parentHazardCategories = null,Object? getHazardFiltersState = null,Object? getAllHazardCategoriesState = null,}) {
   return _then(_HazardFiltersProviderState(
-hazardCategories: null == hazardCategories ? _self._hazardCategories : hazardCategories // ignore: cast_nullable_to_non_nullable
-as List<HazardCategory>,selectedHazardCategories: null == selectedHazardCategories ? _self._selectedHazardCategories : selectedHazardCategories // ignore: cast_nullable_to_non_nullable
-as List<HazardCategory>,hazardSeveritiesAws: null == hazardSeveritiesAws ? _self._hazardSeveritiesAws : hazardSeveritiesAws // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverityWithCount>,selectedHazardSeveritiesAws: null == selectedHazardSeveritiesAws ? _self._selectedHazardSeveritiesAws : selectedHazardSeveritiesAws // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverityWithCount>,hazardSeveritiesNonAws: null == hazardSeveritiesNonAws ? _self._hazardSeveritiesNonAws : hazardSeveritiesNonAws // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverityWithCount>,selectedHazardSeveritiesNonAws: null == selectedHazardSeveritiesNonAws ? _self._selectedHazardSeveritiesNonAws : selectedHazardSeveritiesNonAws // ignore: cast_nullable_to_non_nullable
-as List<HazardSeverityWithCount>,getAllHazardCategoriesState: null == getAllHazardCategoriesState ? _self.getAllHazardCategoriesState : getAllHazardCategoriesState // ignore: cast_nullable_to_non_nullable
+filters: null == filters ? _self.filters : filters // ignore: cast_nullable_to_non_nullable
+as HazardFilters,selectedFilters: null == selectedFilters ? _self.selectedFilters : selectedFilters // ignore: cast_nullable_to_non_nullable
+as HazardFilters,parentHazardCategories: null == parentHazardCategories ? _self._parentHazardCategories : parentHazardCategories // ignore: cast_nullable_to_non_nullable
+as List<HazardCategory>,getHazardFiltersState: null == getHazardFiltersState ? _self.getHazardFiltersState : getHazardFiltersState // ignore: cast_nullable_to_non_nullable
+as GetHazardFiltersState,getAllHazardCategoriesState: null == getAllHazardCategoriesState ? _self.getAllHazardCategoriesState : getAllHazardCategoriesState // ignore: cast_nullable_to_non_nullable
 as GetAllHazardCategoriesState,
   ));
 }
 
 /// Create a copy of HazardFiltersProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HazardFiltersCopyWith<$Res> get filters {
+  
+  return $HazardFiltersCopyWith<$Res>(_self.filters, (value) {
+    return _then(_self.copyWith(filters: value));
+  });
+}/// Create a copy of HazardFiltersProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HazardFiltersCopyWith<$Res> get selectedFilters {
+  
+  return $HazardFiltersCopyWith<$Res>(_self.selectedFilters, (value) {
+    return _then(_self.copyWith(selectedFilters: value));
+  });
+}/// Create a copy of HazardFiltersProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$GetHazardFiltersStateCopyWith<$Res> get getHazardFiltersState {
+  
+  return $GetHazardFiltersStateCopyWith<$Res>(_self.getHazardFiltersState, (value) {
+    return _then(_self.copyWith(getHazardFiltersState: value));
+  });
+}/// Create a copy of HazardFiltersProviderState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
@@ -738,6 +747,398 @@ as AppError,
 }
 
 /// Create a copy of GetAllHazardCategoriesState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppErrorCopyWith<$Res> get error {
+  
+  return $AppErrorCopyWith<$Res>(_self.error, (value) {
+    return _then(_self.copyWith(error: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$GetHazardFiltersState {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GetHazardFiltersState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'GetHazardFiltersState()';
+}
+
+
+}
+
+/// @nodoc
+class $GetHazardFiltersStateCopyWith<$Res>  {
+$GetHazardFiltersStateCopyWith(GetHazardFiltersState _, $Res Function(GetHazardFiltersState) __);
+}
+
+
+/// Adds pattern-matching-related methods to [GetHazardFiltersState].
+extension GetHazardFiltersStatePatterns on GetHazardFiltersState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _GetHazardFiltersStateInitial value)?  initial,TResult Function( _GetHazardFiltersStateLoading value)?  loading,TResult Function( _GetHazardFiltersStateSuccess value)?  success,TResult Function( _GetHazardFiltersStateError value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _GetHazardFiltersStateInitial() when initial != null:
+return initial(_that);case _GetHazardFiltersStateLoading() when loading != null:
+return loading(_that);case _GetHazardFiltersStateSuccess() when success != null:
+return success(_that);case _GetHazardFiltersStateError() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _GetHazardFiltersStateInitial value)  initial,required TResult Function( _GetHazardFiltersStateLoading value)  loading,required TResult Function( _GetHazardFiltersStateSuccess value)  success,required TResult Function( _GetHazardFiltersStateError value)  error,}){
+final _that = this;
+switch (_that) {
+case _GetHazardFiltersStateInitial():
+return initial(_that);case _GetHazardFiltersStateLoading():
+return loading(_that);case _GetHazardFiltersStateSuccess():
+return success(_that);case _GetHazardFiltersStateError():
+return error(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _GetHazardFiltersStateInitial value)?  initial,TResult? Function( _GetHazardFiltersStateLoading value)?  loading,TResult? Function( _GetHazardFiltersStateSuccess value)?  success,TResult? Function( _GetHazardFiltersStateError value)?  error,}){
+final _that = this;
+switch (_that) {
+case _GetHazardFiltersStateInitial() when initial != null:
+return initial(_that);case _GetHazardFiltersStateLoading() when loading != null:
+return loading(_that);case _GetHazardFiltersStateSuccess() when success != null:
+return success(_that);case _GetHazardFiltersStateError() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( HazardFilters hazardFilters)?  success,TResult Function( AppError error)?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _GetHazardFiltersStateInitial() when initial != null:
+return initial();case _GetHazardFiltersStateLoading() when loading != null:
+return loading();case _GetHazardFiltersStateSuccess() when success != null:
+return success(_that.hazardFilters);case _GetHazardFiltersStateError() when error != null:
+return error(_that.error);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( HazardFilters hazardFilters)  success,required TResult Function( AppError error)  error,}) {final _that = this;
+switch (_that) {
+case _GetHazardFiltersStateInitial():
+return initial();case _GetHazardFiltersStateLoading():
+return loading();case _GetHazardFiltersStateSuccess():
+return success(_that.hazardFilters);case _GetHazardFiltersStateError():
+return error(_that.error);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( HazardFilters hazardFilters)?  success,TResult? Function( AppError error)?  error,}) {final _that = this;
+switch (_that) {
+case _GetHazardFiltersStateInitial() when initial != null:
+return initial();case _GetHazardFiltersStateLoading() when loading != null:
+return loading();case _GetHazardFiltersStateSuccess() when success != null:
+return success(_that.hazardFilters);case _GetHazardFiltersStateError() when error != null:
+return error(_that.error);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _GetHazardFiltersStateInitial implements GetHazardFiltersState {
+  const _GetHazardFiltersStateInitial();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetHazardFiltersStateInitial);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'GetHazardFiltersState.initial()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _GetHazardFiltersStateLoading implements GetHazardFiltersState {
+  const _GetHazardFiltersStateLoading();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetHazardFiltersStateLoading);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'GetHazardFiltersState.loading()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _GetHazardFiltersStateSuccess implements GetHazardFiltersState {
+  const _GetHazardFiltersStateSuccess(this.hazardFilters);
+  
+
+ final  HazardFilters hazardFilters;
+
+/// Create a copy of GetHazardFiltersState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$GetHazardFiltersStateSuccessCopyWith<_GetHazardFiltersStateSuccess> get copyWith => __$GetHazardFiltersStateSuccessCopyWithImpl<_GetHazardFiltersStateSuccess>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetHazardFiltersStateSuccess&&(identical(other.hazardFilters, hazardFilters) || other.hazardFilters == hazardFilters));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,hazardFilters);
+
+@override
+String toString() {
+  return 'GetHazardFiltersState.success(hazardFilters: $hazardFilters)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$GetHazardFiltersStateSuccessCopyWith<$Res> implements $GetHazardFiltersStateCopyWith<$Res> {
+  factory _$GetHazardFiltersStateSuccessCopyWith(_GetHazardFiltersStateSuccess value, $Res Function(_GetHazardFiltersStateSuccess) _then) = __$GetHazardFiltersStateSuccessCopyWithImpl;
+@useResult
+$Res call({
+ HazardFilters hazardFilters
+});
+
+
+$HazardFiltersCopyWith<$Res> get hazardFilters;
+
+}
+/// @nodoc
+class __$GetHazardFiltersStateSuccessCopyWithImpl<$Res>
+    implements _$GetHazardFiltersStateSuccessCopyWith<$Res> {
+  __$GetHazardFiltersStateSuccessCopyWithImpl(this._self, this._then);
+
+  final _GetHazardFiltersStateSuccess _self;
+  final $Res Function(_GetHazardFiltersStateSuccess) _then;
+
+/// Create a copy of GetHazardFiltersState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? hazardFilters = null,}) {
+  return _then(_GetHazardFiltersStateSuccess(
+null == hazardFilters ? _self.hazardFilters : hazardFilters // ignore: cast_nullable_to_non_nullable
+as HazardFilters,
+  ));
+}
+
+/// Create a copy of GetHazardFiltersState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$HazardFiltersCopyWith<$Res> get hazardFilters {
+  
+  return $HazardFiltersCopyWith<$Res>(_self.hazardFilters, (value) {
+    return _then(_self.copyWith(hazardFilters: value));
+  });
+}
+}
+
+/// @nodoc
+
+
+class _GetHazardFiltersStateError implements GetHazardFiltersState {
+  const _GetHazardFiltersStateError(this.error);
+  
+
+ final  AppError error;
+
+/// Create a copy of GetHazardFiltersState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$GetHazardFiltersStateErrorCopyWith<_GetHazardFiltersStateError> get copyWith => __$GetHazardFiltersStateErrorCopyWithImpl<_GetHazardFiltersStateError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetHazardFiltersStateError&&(identical(other.error, error) || other.error == error));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,error);
+
+@override
+String toString() {
+  return 'GetHazardFiltersState.error(error: $error)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$GetHazardFiltersStateErrorCopyWith<$Res> implements $GetHazardFiltersStateCopyWith<$Res> {
+  factory _$GetHazardFiltersStateErrorCopyWith(_GetHazardFiltersStateError value, $Res Function(_GetHazardFiltersStateError) _then) = __$GetHazardFiltersStateErrorCopyWithImpl;
+@useResult
+$Res call({
+ AppError error
+});
+
+
+$AppErrorCopyWith<$Res> get error;
+
+}
+/// @nodoc
+class __$GetHazardFiltersStateErrorCopyWithImpl<$Res>
+    implements _$GetHazardFiltersStateErrorCopyWith<$Res> {
+  __$GetHazardFiltersStateErrorCopyWithImpl(this._self, this._then);
+
+  final _GetHazardFiltersStateError _self;
+  final $Res Function(_GetHazardFiltersStateError) _then;
+
+/// Create a copy of GetHazardFiltersState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
+  return _then(_GetHazardFiltersStateError(
+null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as AppError,
+  ));
+}
+
+/// Create a copy of GetHazardFiltersState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')

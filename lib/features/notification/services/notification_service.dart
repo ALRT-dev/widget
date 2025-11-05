@@ -6,7 +6,8 @@ import 'package:hazard_app/features/notification/providers/repository_providers.
 import 'package:hazard_app/features/notification/repositories/notification_repository.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_filters_response_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_filters.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -22,24 +23,54 @@ class NotificationService {
   StreamSubscription<RemoteMessage>? _remoteMessageStreamSub;
 
   /// Fetches the hazards that the user has subscribed to for notifications.
-  Future<Either<GetHazardsWithFiltersResponse, AppError>> getNotificationsFeed({
+  Future<Either<List<Hazard>, AppError>> getNotificationsFeed({
     final HazardSearchParams? searchParams,
   }) async {
     final result = await _notificationRepository.getNotificationsFeed(
       searchParams: searchParams,
     );
 
-    final success = await result.whenSuccess((response) async {
-      final populatedHazards = await _hazardService
-          .populateHazardsWithRequiredData(response.hazards);
-      return response.copyWith(
-        hazards: populatedHazards,
-      );
-    });
+    final success = await result.whenSuccess(
+      _hazardService.populateHazardsWithRequiredData,
+    );
 
     return result.copyWith(
       success: (_) => success,
     );
+  }
+
+  /// Fetches the hazards that the user has subscribed to for notifications.
+  Future<Either<(List<Hazard>, HazardFilters), AppError>>
+  getNotificationsFeedWithFilters({
+    final HazardSearchParams? searchParams,
+  }) async {
+    final feedFuture = getNotificationsFeed(
+      searchParams: searchParams,
+    );
+    final filtersFuture = _hazardService.getHazardFilters(
+      searchParams: searchParams ?? HazardSearchParams(),
+      includeSubscribed: true,
+    );
+
+    final results = await Future.wait([
+      feedFuture,
+      filtersFuture,
+    ]);
+
+    final feedResult = results[0] as Either<List<Hazard>, AppError>;
+    final filtersResult = results[1] as Either<HazardFilters, AppError>;
+
+    if (feedResult.isFailure) {
+      return Failure(feedResult.failure);
+    }
+    if (filtersResult.isFailure) {
+      return Failure(filtersResult.failure);
+    }
+
+    return Success((
+      feedResult.success,
+      filtersResult.success,
+    ));
   }
 
   /// Gets the fcm token from Firebase Cloud Messaging.

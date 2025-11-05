@@ -152,10 +152,7 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
       builder: (context, ref, child) {
         final isFiltersAvailable = ref.watch(
           providerOfHazardFiltersForNotifications.select(
-            (value) =>
-                value.hazardCategories.isNotEmpty ||
-                value.hazardSeveritiesAws.isNotEmpty ||
-                value.hazardSeveritiesNonAws.isNotEmpty,
+            (value) => value.isFiltersAvailable,
           ),
         );
         if (!isFiltersAvailable) {

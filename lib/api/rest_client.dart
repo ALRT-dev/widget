@@ -9,8 +9,9 @@ import 'package:hazard_app/features/notification/models/push_notification_update
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_filters.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_filters_response_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:retrofit/retrofit.dart';
@@ -83,9 +84,15 @@ abstract class RestClient {
     @Queries() required final HazardSearchParams searchParams,
   });
 
-  @GET(kUrlHazardsWithFilters)
-  Future<GetHazardsWithFiltersResponse> getGetHazardsWithCategories({
+  @GET(kUrlHazardsWithSubscriptionId)
+  Future<GetHazardsWithSubscriptionIdResponse> getGetHazardsWithSubscriptionId({
     @Queries() required final HazardSearchParams searchParams,
+  });
+
+  @GET(kUrlHazardFilters)
+  Future<HazardFilters> getHazardFilters({
+    @Queries() required final HazardSearchParams searchParams,
+    @Query('includeSubscribed') final bool includeSubscribed = false,
   });
 
   @GET(kUrlHazardCategories)
@@ -132,7 +139,7 @@ abstract class RestClient {
   // ---------------------------- NOTIFICATION ----------------------------
 
   @GET(kUrlNotificationsFeed)
-  Future<GetHazardsWithFiltersResponse> getNotificationsFeed({
+  Future<List<Hazard>> getNotificationsFeed({
     @Queries() final HazardSearchParams? searchParams,
   });
 

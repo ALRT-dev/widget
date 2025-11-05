@@ -37,8 +37,6 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
 
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   UserService get _userService => _ref.read(providerOfUserService);
-  HazardFiltersProvider get _hazardFiltersProvider =>
-      _ref.read(providerOfHazardFiltersForSearch.notifier);
   NotificationsFeedProvider get _notificationsFeedProvider =>
       _ref.read(providerOfNotificationsFeed.notifier);
   MyLocationSubscriptionsProvider get _myLocationSubscriptionsProvider =>
@@ -74,15 +72,18 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
 
     final selectedCategories = _ref
         .read(providerOfHazardFiltersForSearch)
-        .selectedHazardCategories;
+        .selectedFilters
+        .categoryFilters;
     final selectedSeveritiesAws = _ref
         .read(providerOfHazardFiltersForSearch)
-        .selectedHazardSeveritiesAws;
+        .selectedFilters
+        .severityFiltersAws;
     final selectedSeveritiesNonAws = _ref
         .read(providerOfHazardFiltersForSearch)
-        .selectedHazardSeveritiesNonAws;
+        .selectedFilters
+        .severityFiltersNonAws;
 
-    final result = await _hazardService.getHazardsWithCategories(
+    final result = await _hazardService.getHazardsWithSubscriptionIdAndFilters(
       searchParams: HazardSearchParams(
         northeastLat: location!.bounds?.northeastLat,
         northeastLng: location.bounds?.northeastLng,
@@ -106,30 +107,21 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
     if (!mounted) return;
 
     result.when(
-      (hazardsWithCategories) {
+      (response) {
         state = state.copyWith(
           getHazardsByLocationState: GetHazardsByLocationState.success(
-            hazardsWithCategories.hazards,
+            response.$1.hazards,
           ),
         );
-        updateHazards(hazardsWithCategories.hazards);
-
-        // add categories to the hazard filters provider
-        _hazardFiltersProvider.updateHazardCategories(
-          hazardsWithCategories.availableFilters.categoryFilters,
-        );
-
-        // add severities to the hazard filters provider
-        _hazardFiltersProvider.updateHazardSeveritiesAws(
-          hazardsWithCategories.availableFilters.severityFiltersAws,
-        );
-
-        _hazardFiltersProvider.updateHazardSeveritiesNonAws(
-          hazardsWithCategories.availableFilters.severityFiltersNonAws,
-        );
+        updateHazards(response.$1.hazards);
 
         // update subscriptionId if there's an active subscription for this location
-        updateSubscriptionId(hazardsWithCategories.subscriptionId);
+        updateSubscriptionId(response.$1.subscriptionId);
+
+        // update hazard filters in the filter provider
+        _ref
+            .read(providerOfHazardFiltersForSearch.notifier)
+            .updateFilters(response.$2);
       },
       (error) {
         state = state.copyWith(

@@ -37,7 +37,7 @@ class _HazardCategoriesListItemState
   Widget build(BuildContext context) {
     final isSelected = ref.watch(
       providerOfHazardFilters(widget.filtersKey).select(
-        (value) => value.selectedHazardCategories
+        (value) => value.selectedFilters.categoryFilters
             .map((e) => e.id)
             .contains(widget.hazardCategory.id),
       ),

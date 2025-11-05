@@ -54,7 +54,7 @@ class _HazardCategoriesListState extends ConsumerState<HazardCategoriesList> {
       builder: (context, ref, child) {
         final hazardCategories = ref.watch(
           providerOfHazardFilters(widget.filtersKey).select(
-            (value) => value.hazardCategories,
+            (value) => value.filters.categoryFilters,
           ),
         );
         if (hazardCategories.isEmpty) return const SizedBox();
@@ -91,7 +91,8 @@ class _HazardCategoriesListState extends ConsumerState<HazardCategoriesList> {
   void _handleCategoriesSelectionUpdated() {
     final selectedCategories = ref
         .read(providerOfHazardFilters(widget.filtersKey))
-        .selectedHazardCategories;
+        .selectedFilters
+        .categoryFilters;
     widget.onCategoriesSelectionUpdated?.call(selectedCategories);
   }
 }

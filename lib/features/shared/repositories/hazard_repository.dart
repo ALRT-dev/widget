@@ -6,8 +6,9 @@ import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_filters.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_filters_response_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -17,9 +18,14 @@ abstract class HazardRepository {
     required final HazardSearchParams searchParams,
   });
 
-  Future<Either<GetHazardsWithFiltersResponse, AppError>>
-  getGetHazardsWithCategories({
+  Future<Either<GetHazardsWithSubscriptionIdResponse, AppError>>
+  getGetHazardsWithSubscriptionId({
     required final HazardSearchParams searchParams,
+  });
+
+  Future<Either<HazardFilters, AppError>> getHazardFilters({
+    required final HazardSearchParams searchParams,
+    final bool includeSubscribed = false,
   });
 
   Future<Either<List<HazardCategory>, AppError>> getAllHazardCategories();
@@ -77,15 +83,33 @@ class HazardRepositoryImpl extends HazardRepository {
   }
 
   @override
-  Future<Either<GetHazardsWithFiltersResponse, AppError>>
-  getGetHazardsWithCategories({
+  Future<Either<GetHazardsWithSubscriptionIdResponse, AppError>>
+  getGetHazardsWithSubscriptionId({
     required HazardSearchParams searchParams,
   }) {
     return runAsyncCall(
-      name: 'getGetHazardsWithCategories',
+      name: 'getGetHazardsWithSubscriptionId',
       future: () async {
-        final result = await _restClient.getGetHazardsWithCategories(
+        final result = await _restClient.getGetHazardsWithSubscriptionId(
           searchParams: searchParams,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<HazardFilters, AppError>> getHazardFilters({
+    required HazardSearchParams searchParams,
+    bool includeSubscribed = false,
+  }) {
+    return runAsyncCall(
+      name: 'getHazardFilters',
+      future: () async {
+        final result = await _restClient.getHazardFilters(
+          searchParams: searchParams,
+          includeSubscribed: includeSubscribed,
         );
         return Success(result);
       },

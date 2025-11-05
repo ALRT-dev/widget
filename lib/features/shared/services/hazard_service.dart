@@ -8,8 +8,9 @@ import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_filters.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_filters_response_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:hazard_app/features/shared/providers/repository_providers.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
@@ -109,44 +110,20 @@ class HazardService {
     return Success(allHazards);
   }
 
-  /// Fetches hazards along with categories from the server.
-  Future<Either<GetHazardsWithFiltersResponse, AppError>>
-  getHazardsWithCategories({
-    required final HazardSearchParams searchParams,
-  }) async {
-    final result = await _hazardRepository.getGetHazardsWithCategories(
-      searchParams: searchParams,
-    );
-
-    final success = await result.whenSuccess((response) async {
-      final populatedHazards = await populateHazardsWithRequiredData(
-        response.hazards,
-      );
-      return response.copyWith(
-        hazards: populatedHazards,
-      );
-    });
-
-    return result.copyWith(
-      success: (_) => success,
-    );
-  }
-
-  /// Fetches all hazards along with categories from the server making multiple parallel requests.
-  Future<Either<GetHazardsWithFiltersResponse, AppError>>
-  getAllHazardsWithCategories({
+  /// Fetches all hazards along with filters from the server making multiple parallel requests.
+  Future<Either<(List<Hazard>, HazardFilters), AppError>>
+  getAllHazardsWithFilters({
     final int numberOfParallelRequests = 10,
     required final HazardSearchParams searchParams,
   }) async {
     final allHazards = <Hazard>[];
+
     final pageSize = searchParams.pageSize;
     int currentPage = searchParams.page;
     bool hasMoreData = true;
-    GetHazardsWithFiltersResponse? firstResponse;
 
     while (hasMoreData) {
-      final batchFutures =
-          <Future<Either<GetHazardsWithFiltersResponse, AppError>>>[];
+      final batchFutures = <Future<Either<List<Hazard>, AppError>>>[];
 
       // Create parallel requests for the current batch of pages
       for (int i = 0; i < numberOfParallelRequests; i++) {
@@ -154,11 +131,7 @@ class HazardService {
           page: currentPage + i,
         );
 
-        batchFutures.add(
-          getHazardsWithCategories(
-            searchParams: pageSearchParams,
-          ),
-        );
+        batchFutures.add(getHazards(searchParams: pageSearchParams));
       }
 
       // Wait for this batch to complete
@@ -168,16 +141,13 @@ class HazardService {
       bool hasDataInThisBatch = false;
       for (final result in batchResults) {
         final error = result.when(
-          (response) {
-            // Store the first response to preserve categories and metadata
-            firstResponse ??= response;
-
-            if (response.hazards.isNotEmpty) {
-              allHazards.addAll(response.hazards);
+          (hazards) {
+            if (hazards.isNotEmpty) {
+              allHazards.addAll(hazards);
               hasDataInThisBatch = true;
 
               // If this page has fewer items than page size, it's the last page
-              if (response.hazards.length < pageSize) {
+              if (hazards.length < pageSize) {
                 hasMoreData = false;
               }
             }
@@ -201,11 +171,82 @@ class HazardService {
       currentPage += numberOfParallelRequests;
     }
 
+    final filtersResult = await getHazardFilters(
+      searchParams: searchParams,
+    );
+    if (filtersResult.isFailure) {
+      return Failure(filtersResult.failure);
+    }
+    final filters = filtersResult.success;
+
     // Return the combined response with all hazards
-    return Success(
-      (firstResponse ?? const GetHazardsWithFiltersResponse()).copyWith(
-        hazards: allHazards,
-      ),
+    return Success((allHazards, filters));
+  }
+
+  /// Fetches hazards along with subscription ID from the server.
+  Future<Either<GetHazardsWithSubscriptionIdResponse, AppError>>
+  getHazardsWithSubscriptionId({
+    required final HazardSearchParams searchParams,
+  }) async {
+    final result = await _hazardRepository.getGetHazardsWithSubscriptionId(
+      searchParams: searchParams,
+    );
+
+    final success = await result.whenSuccess((response) async {
+      final populatedHazards = await populateHazardsWithRequiredData(
+        response.hazards,
+      );
+      return response.copyWith(
+        hazards: populatedHazards,
+      );
+    });
+
+    return result.copyWith(
+      success: (_) => success,
+    );
+  }
+
+  /// Fetches hazards along with categories from the server.
+  Future<
+    Either<(GetHazardsWithSubscriptionIdResponse, HazardFilters), AppError>
+  >
+  getHazardsWithSubscriptionIdAndFilters({
+    required final HazardSearchParams searchParams,
+  }) async {
+    final hazardsFuture = getHazardsWithSubscriptionId(
+      searchParams: searchParams,
+    );
+    final filtersFuture = getHazardFilters(
+      searchParams: searchParams,
+    );
+
+    final results = await Future.wait([
+      hazardsFuture,
+      filtersFuture,
+    ]);
+
+    final hazardsResult =
+        results[0] as Either<GetHazardsWithSubscriptionIdResponse, AppError>;
+    final filtersResult = results[1] as Either<HazardFilters, AppError>;
+
+    if (hazardsResult.isFailure) {
+      return Failure(hazardsResult.failure);
+    }
+    if (filtersResult.isFailure) {
+      return Failure(filtersResult.failure);
+    }
+
+    return Success((hazardsResult.success, filtersResult.success));
+  }
+
+  /// Fetches hazard filters from the server.
+  Future<Either<HazardFilters, AppError>> getHazardFilters({
+    required final HazardSearchParams searchParams,
+    final bool includeSubscribed = false,
+  }) async {
+    return await _hazardRepository.getHazardFilters(
+      searchParams: searchParams,
+      includeSubscribed: includeSubscribed,
     );
   }
 

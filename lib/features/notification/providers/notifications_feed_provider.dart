@@ -117,15 +117,18 @@ class NotificationsFeedProvider
 
     final selectedCategories = _ref
         .read(providerOfHazardFiltersForNotifications)
-        .selectedHazardCategories;
+        .selectedFilters
+        .categoryFilters;
     final selectedSeveritiesAws = _ref
         .read(providerOfHazardFiltersForNotifications)
-        .selectedHazardSeveritiesAws;
+        .selectedFilters
+        .severityFiltersAws;
     final selectedSeveritiesNonAws = _ref
         .read(providerOfHazardFiltersForNotifications)
-        .selectedHazardSeveritiesNonAws;
+        .selectedFilters
+        .severityFiltersNonAws;
 
-    final result = await _notificationService.getNotificationsFeed(
+    final result = await _notificationService.getNotificationsFeedWithFilters(
       searchParams: HazardSearchParams(
         searchString: state.searchString,
         categoryIds: selectedCategories.map((e) => e.id).toList(),
@@ -146,28 +149,16 @@ class NotificationsFeedProvider
     if (!mounted) return;
 
     result.when(
-      (hazardsWithCategories) {
-        updateHazards(hazardsWithCategories.hazards);
+      (response) {
         state = state.copyWith(
           getNotificationsFeed: GetNotificationsFeed.success(
-            hazardsWithCategories.hazards,
+            response.$1,
           ),
         );
+        updateHazards(response.$1);
 
-        // add categories to the hazard categories provider
-        _hazardFiltersProvider.updateHazardCategories(
-          hazardsWithCategories.availableFilters.categoryFilters,
-        );
-
-        // add severities to the hazard severity filters provider
-        _hazardFiltersProvider.updateHazardSeveritiesAws(
-          hazardsWithCategories.availableFilters.severityFiltersAws,
-        );
-
-        // add severities to the hazard severity filters provider
-        _hazardFiltersProvider.updateHazardSeveritiesNonAws(
-          hazardsWithCategories.availableFilters.severityFiltersNonAws,
-        );
+        // Update filters in the hazard filters provider
+        _hazardFiltersProvider.updateFilters(response.$2);
       },
       (error) {
         state = state.copyWith(
@@ -230,12 +221,13 @@ class NotificationsFeedProvider
   void processCategoryFromSocket(final HazardCategory category) {
     final existingCategories = _ref
         .read(providerOfHazardFiltersForNotifications)
-        .hazardCategories;
+        .filters
+        .categoryFilters;
 
     final index = existingCategories.indexWhere((c) => c.id == category.id);
     if (index == -1) {
       // category does not exist, add it
-      _hazardFiltersProvider.addToHazardCategories(
+      _hazardFiltersProvider.addToCategoryFilters(
         category.copyWith(
           hazardsCount: 1,
         ),
@@ -246,7 +238,7 @@ class NotificationsFeedProvider
       final updatedCategory = existingCategory.copyWith(
         hazardsCount: existingCategory.hazardsCount + 1,
       );
-      _hazardFiltersProvider.updateHazardCategory(updatedCategory);
+      _hazardFiltersProvider.updateCategoryFilter(updatedCategory);
     }
   }
 
@@ -254,19 +246,20 @@ class NotificationsFeedProvider
   void removeCategoryFromSocket(final String categoryId) {
     final existingCategories = _ref
         .read(providerOfHazardFiltersForNotifications)
-        .hazardCategories;
+        .filters
+        .categoryFilters;
 
     final index = existingCategories.indexWhere((c) => c.id == categoryId);
     if (index != -1) {
       final existingCategory = existingCategories[index];
       final updatedCount = existingCategory.hazardsCount - 1;
       if (updatedCount <= 0) {
-        _hazardFiltersProvider.removeFromHazardCategories(categoryId);
+        _hazardFiltersProvider.removeFromCategoryFilters(categoryId);
       } else {
         final updatedCategory = existingCategory.copyWith(
           hazardsCount: updatedCount,
         );
-        _hazardFiltersProvider.updateHazardCategory(updatedCategory);
+        _hazardFiltersProvider.updateCategoryFilter(updatedCategory);
       }
     }
   }

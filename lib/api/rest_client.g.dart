@@ -351,7 +351,7 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<GetHazardsWithFiltersResponse> getGetHazardsWithCategories({
+  Future<GetHazardsWithSubscriptionIdResponse> getGetHazardsWithSubscriptionId({
     required HazardSearchParams searchParams,
   }) async {
     final _extra = <String, dynamic>{};
@@ -359,20 +359,53 @@ class _RestClient implements RestClient {
     queryParameters.addAll(searchParams.toJson());
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<GetHazardsWithFiltersResponse>(
+    final _options = _setStreamType<GetHazardsWithSubscriptionIdResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazards/hazards-with-filters',
+            '/hazards/hazards-with-subscription-id',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late GetHazardsWithFiltersResponse _value;
+    late GetHazardsWithSubscriptionIdResponse _value;
     try {
-      _value = GetHazardsWithFiltersResponse.fromJson(_result.data!);
+      _value = GetHazardsWithSubscriptionIdResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<HazardFilters> getHazardFilters({
+    required HazardSearchParams searchParams,
+    bool includeSubscribed = false,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'includeSubscribed': includeSubscribed,
+    };
+    queryParameters.addAll(searchParams.toJson());
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<HazardFilters>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/hazards/filters',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late HazardFilters _value;
+    try {
+      _value = HazardFilters.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -650,7 +683,7 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<GetHazardsWithFiltersResponse> getNotificationsFeed({
+  Future<List<Hazard>> getNotificationsFeed({
     HazardSearchParams? searchParams,
   }) async {
     final _extra = <String, dynamic>{};
@@ -659,7 +692,7 @@ class _RestClient implements RestClient {
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<GetHazardsWithFiltersResponse>(
+    final _options = _setStreamType<List<Hazard>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -669,10 +702,12 @@ class _RestClient implements RestClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late GetHazardsWithFiltersResponse _value;
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<Hazard> _value;
     try {
-      _value = GetHazardsWithFiltersResponse.fromJson(_result.data!);
+      _value = _result.data!
+          .map((dynamic i) => Hazard.fromJson(i as Map<String, dynamic>))
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

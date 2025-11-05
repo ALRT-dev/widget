@@ -81,25 +81,38 @@ class _HazardFiltersBottomsheetContentState
   }
 
   Widget _categoryFiltersBuilder() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Categories',
-          style: TextStyle(
-            fontSize: 14.spMin,
-            fontWeight: FontWeight.w600,
-            color: AppColors.black,
+    return Consumer(
+      builder: (context, ref, child) {
+        final hasCategories = ref.watch(
+          providerOfHazardFilters(widget.filtersKey).select(
+            (value) => value.filters.categoryFilters.isNotEmpty,
           ),
-        ).pL(20.0),
-        8.hSizedBox,
-        HazardCategoriesList(
-          filtersKey: widget.filtersKey,
-          isSmall: true,
-          separatorWidth: 5.0,
-          onCategoriesSelectionUpdated: widget.onCategoriesSelectionUpdated,
-        ),
-      ],
+        );
+        if (!hasCategories) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Categories',
+              style: TextStyle(
+                fontSize: 14.spMin,
+                fontWeight: FontWeight.w600,
+                color: AppColors.black,
+              ),
+            ).pL(20.0),
+            8.hSizedBox,
+            HazardCategoriesList(
+              filtersKey: widget.filtersKey,
+              isSmall: true,
+              separatorWidth: 5.0,
+              onCategoriesSelectionUpdated: widget.onCategoriesSelectionUpdated,
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -108,12 +121,12 @@ class _HazardFiltersBottomsheetContentState
       builder: (context, ref, child) {
         final hasAwsSeverities = ref.watch(
           providerOfHazardFilters(widget.filtersKey).select(
-            (value) => value.hazardSeveritiesAws.isNotEmpty,
+            (value) => value.filters.severityFiltersAws.isNotEmpty,
           ),
         );
         final hasNonAwsSeverities = ref.watch(
           providerOfHazardFilters(widget.filtersKey).select(
-            (value) => value.hazardSeveritiesNonAws.isNotEmpty,
+            (value) => value.filters.severityFiltersNonAws.isNotEmpty,
           ),
         );
 

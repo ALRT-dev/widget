@@ -80,10 +80,7 @@ class _HazardFiltersButtonState extends ConsumerState<HazardFiltersButton> {
       builder: (context, ref, child) {
         final count = ref.watch(
           providerOfHazardFilters(widget.filtersKey).select(
-            (value) =>
-                value.selectedHazardCategories.length +
-                value.selectedHazardSeveritiesAws.length +
-                value.selectedHazardSeveritiesNonAws.length,
+            (value) => value.selectedFiltersCount,
           ),
         );
         if (count == 0) {

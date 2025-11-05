@@ -147,10 +147,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
       builder: (context, ref, child) {
         final isFiltersAvailable = ref.watch(
           providerOfHazardFiltersForSearch.select(
-            (value) =>
-                value.hazardCategories.isNotEmpty ||
-                value.hazardSeveritiesAws.isNotEmpty ||
-                value.hazardSeveritiesNonAws.isNotEmpty,
+            (value) => value.isFiltersAvailable,
           ),
         );
         if (!isFiltersAvailable) {

@@ -37,7 +37,7 @@ class _HazardSeverityFiltersListState
       builder: (context, ref, child) {
         final hazardSeverities = ref.watch(
           providerOfHazardFilters(widget.severityFiltersKey).select(
-            (value) => value.hazardSeveritiesAws,
+            (value) => value.filters.severityFiltersAws,
           ),
         );
         if (hazardSeverities.isEmpty) return const SizedBox();
@@ -72,7 +72,8 @@ class _HazardSeverityFiltersListState
   void _handleSeveritiesSelectionUpdated() {
     final selectedSeverities = ref
         .read(providerOfHazardFilters(widget.severityFiltersKey))
-        .selectedHazardSeveritiesAws;
+        .selectedFilters
+        .severityFiltersAws;
     widget.onSeveritiesSelectionUpdated?.call(selectedSeverities);
   }
 }

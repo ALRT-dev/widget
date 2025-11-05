@@ -71,7 +71,7 @@ class _CategoriesDropdownState extends ConsumerState<CategoriesDropdown> {
       builder: (context, ref, child) {
         final categories = ref.watch(
           providerOfHazardFiltersForDropdown.select(
-            (value) => value.hazardCategories,
+            (value) => value.parentHazardCategories,
           ),
         );
         return ListView.separated(

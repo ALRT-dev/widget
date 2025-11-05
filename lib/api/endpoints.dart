@@ -22,7 +22,9 @@ const kUrlPushNotificationSettings = '$kUrlUser/push-notification-settings';
 // ---------------------------- HAZARD ----------------------------
 
 const kUrlHazards = '/hazards';
-const kUrlHazardsWithFilters = '$kUrlHazards/hazards-with-filters';
+const kUrlHazardsWithSubscriptionId =
+    '$kUrlHazards/hazards-with-subscription-id';
+const kUrlHazardFilters = '$kUrlHazards/filters';
 const kUrlHazardCategories = '/hazard-categories';
 const kUrlHazardCategoriesParent = '$kUrlHazardCategories/parent';
 const kUrlHazardCategoriesSub = '$kUrlHazardCategories/sub';

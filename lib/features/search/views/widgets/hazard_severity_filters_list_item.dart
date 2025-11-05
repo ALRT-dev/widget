@@ -39,8 +39,8 @@ class _HazardSeverityFiltersListItemState
       providerOfHazardFilters(widget.filtersKey).select(
         (value) =>
             (widget.isAws
-                    ? value.selectedHazardSeveritiesAws
-                    : value.selectedHazardSeveritiesNonAws)
+                    ? value.selectedFilters.severityFiltersAws
+                    : value.selectedFilters.severityFiltersNonAws)
                 .map((e) => e.severity)
                 .contains(widget.hazardSeverity.severity),
       ),

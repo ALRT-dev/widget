@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/models/hazard_severity_with_count_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_filters.dart';
 
 part 'hazard_filters_provider_state.freezed.dart';
 
@@ -10,51 +10,42 @@ abstract class HazardFiltersProviderState with _$HazardFiltersProviderState {
   const HazardFiltersProviderState._();
 
   const factory HazardFiltersProviderState({
-    /// The list of hazard categories fetched from the service.
-    @Default(<HazardCategory>[]) final List<HazardCategory> hazardCategories,
+    /// The complete set of hazard filters fetched from the service.
+    @Default(HazardFilters()) final HazardFilters filters,
 
-    /// The list of categories selected by the user.
+    /// The currently selected hazard filters.
+    @Default(HazardFilters()) final HazardFilters selectedFilters,
+
+    /// The list of all parent hazard categories.
     @Default(<HazardCategory>[])
-    final List<HazardCategory> selectedHazardCategories,
+    final List<HazardCategory> parentHazardCategories,
 
-    /// The list of hazard severities (AWS compliant) fetched from the service.
-    @Default(<HazardSeverityWithCount>[])
-    final List<HazardSeverityWithCount> hazardSeveritiesAws,
-
-    /// The list of AWS severities selected by the user.
-    @Default(<HazardSeverityWithCount>[])
-    final List<HazardSeverityWithCount> selectedHazardSeveritiesAws,
-
-    /// The list of hazard severities (Non-AWS compliant) fetched from the service.
-    @Default(<HazardSeverityWithCount>[])
-    final List<HazardSeverityWithCount> hazardSeveritiesNonAws,
-
-    /// The list of Non-AWS severities selected by the user.
-    @Default(<HazardSeverityWithCount>[])
-    final List<HazardSeverityWithCount> selectedHazardSeveritiesNonAws,
+    /// The state of fetching hazard filters.
+    @Default(GetHazardFiltersState.initial())
+    final GetHazardFiltersState getHazardFiltersState,
 
     /// The state of fetching hazard categories.
     @Default(GetAllHazardCategoriesState.initial())
-    GetAllHazardCategoriesState getAllHazardCategoriesState,
+    final GetAllHazardCategoriesState getAllHazardCategoriesState,
   }) = _HazardFiltersProviderState;
 
   /// Indicates whether any filters are currently available.
   bool get isFiltersAvailable =>
-      hazardCategories.isNotEmpty ||
-      hazardSeveritiesAws.isNotEmpty ||
-      hazardSeveritiesNonAws.isNotEmpty;
+      filters.categoryFilters.isNotEmpty ||
+      filters.severityFiltersAws.isNotEmpty ||
+      filters.severityFiltersNonAws.isNotEmpty;
 
   /// Indicates whether any filters are currently selected.
   bool get isFiltersSelected =>
-      selectedHazardCategories.isNotEmpty ||
-      selectedHazardSeveritiesAws.isNotEmpty ||
-      selectedHazardSeveritiesNonAws.isNotEmpty;
+      selectedFilters.categoryFilters.isNotEmpty ||
+      selectedFilters.severityFiltersAws.isNotEmpty ||
+      selectedFilters.severityFiltersNonAws.isNotEmpty;
 
   /// Returns the total count of selected filters.
   int get selectedFiltersCount =>
-      selectedHazardCategories.length +
-      selectedHazardSeveritiesAws.length +
-      selectedHazardSeveritiesNonAws.length;
+      selectedFilters.categoryFilters.length +
+      selectedFilters.severityFiltersAws.length +
+      selectedFilters.severityFiltersNonAws.length;
 }
 
 @freezed
@@ -69,4 +60,16 @@ class GetAllHazardCategoriesState with _$GetAllHazardCategoriesState {
   const factory GetAllHazardCategoriesState.error(
     final AppError error,
   ) = _GetAllHazardCategoriesStateError;
+}
+
+@freezed
+class GetHazardFiltersState with _$GetHazardFiltersState {
+  const factory GetHazardFiltersState.initial() = _GetHazardFiltersStateInitial;
+  const factory GetHazardFiltersState.loading() = _GetHazardFiltersStateLoading;
+  const factory GetHazardFiltersState.success(
+    final HazardFilters hazardFilters,
+  ) = _GetHazardFiltersStateSuccess;
+  const factory GetHazardFiltersState.error(
+    final AppError error,
+  ) = _GetHazardFiltersStateError;
 }
