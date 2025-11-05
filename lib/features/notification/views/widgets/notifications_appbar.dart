@@ -9,7 +9,7 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
-import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_dropdown.dart';
+import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class NotificationsAppBar extends ConsumerStatefulWidget {
@@ -161,7 +161,7 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
         if (!isFiltersAvailable) {
           return const SizedBox.shrink();
         }
-        return HazardFiltersDropdown(
+        return HazardFiltersButton(
           filtersKey: NotificationsAppBar.filtersKey,
           onCategoriesSelectionUpdated: (_) => _getHazards(),
           onSeveritiesSelectionUpdated: (_) => _getHazards(),

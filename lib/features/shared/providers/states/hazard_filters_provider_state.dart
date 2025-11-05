@@ -7,6 +7,8 @@ part 'hazard_filters_provider_state.freezed.dart';
 
 @freezed
 abstract class HazardFiltersProviderState with _$HazardFiltersProviderState {
+  const HazardFiltersProviderState._();
+
   const factory HazardFiltersProviderState({
     /// The list of hazard categories fetched from the service.
     @Default(<HazardCategory>[]) final List<HazardCategory> hazardCategories,
@@ -35,6 +37,24 @@ abstract class HazardFiltersProviderState with _$HazardFiltersProviderState {
     @Default(GetAllHazardCategoriesState.initial())
     GetAllHazardCategoriesState getAllHazardCategoriesState,
   }) = _HazardFiltersProviderState;
+
+  /// Indicates whether any filters are currently available.
+  bool get isFiltersAvailable =>
+      hazardCategories.isNotEmpty ||
+      hazardSeveritiesAws.isNotEmpty ||
+      hazardSeveritiesNonAws.isNotEmpty;
+
+  /// Indicates whether any filters are currently selected.
+  bool get isFiltersSelected =>
+      selectedHazardCategories.isNotEmpty ||
+      selectedHazardSeveritiesAws.isNotEmpty ||
+      selectedHazardSeveritiesNonAws.isNotEmpty;
+
+  /// Returns the total count of selected filters.
+  int get selectedFiltersCount =>
+      selectedHazardCategories.length +
+      selectedHazardSeveritiesAws.length +
+      selectedHazardSeveritiesNonAws.length;
 }
 
 @freezed

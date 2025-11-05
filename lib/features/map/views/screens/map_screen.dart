@@ -11,7 +11,7 @@ import 'package:hazard_app/features/map/views/widgets/selected_location_preview.
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
-import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_dropdown.dart';
+import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -128,16 +128,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       builder: (context, ref, child) {
         final isFiltersAvailable = ref.watch(
           providerOfHazardFiltersForMap.select(
-            (value) =>
-                value.hazardCategories.isNotEmpty ||
-                value.hazardSeveritiesAws.isNotEmpty ||
-                value.hazardSeveritiesNonAws.isNotEmpty,
+            (value) => value.isFiltersAvailable,
           ),
         );
-        if (!isFiltersAvailable) {
+        final isFilterSelected = ref.watch(
+          providerOfHazardFiltersForMap.select(
+            (value) => value.isFiltersSelected,
+          ),
+        );
+        if (!isFiltersAvailable && !isFilterSelected) {
           return const SizedBox.shrink();
         }
-        return HazardFiltersDropdown(
+
+        return HazardFiltersButton(
           filtersKey: MapScreen.filtersKey,
           onCategoriesSelectionUpdated: (_) => _getMapHazards(),
           onSeveritiesSelectionUpdated: (_) => _getMapHazards(),
