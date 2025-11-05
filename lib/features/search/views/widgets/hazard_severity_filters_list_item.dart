@@ -54,7 +54,9 @@ class _HazardSeverityFiltersListItemState
         spacing: 5.spMin,
         children: [
           Text(
-            widget.hazardSeverity.severity.emoji,
+            widget.isAws
+                ? widget.hazardSeverity.severity.emojiAws
+                : widget.hazardSeverity.severity.emojiNonAws,
             style: TextStyle(
               height: 0.6,
             ),

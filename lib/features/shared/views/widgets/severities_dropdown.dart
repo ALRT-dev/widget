@@ -37,7 +37,7 @@ class _SeveritiesDropdownState extends ConsumerState<SeveritiesDropdown> {
             final severity = severities[index];
             return ListTile(
               leading: Text(
-                severity.emoji,
+                severity.emojiNonAws,
                 style: TextStyle(
                   fontSize: 16.spMin,
                 ),

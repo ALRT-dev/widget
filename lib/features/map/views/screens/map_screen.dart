@@ -88,24 +88,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   return Row(
                     children: [
                       Expanded(child: MapSearchbar()),
-                      Consumer(
-                        builder: (context, ref, child) {
-                          final isFiltersAvailable = ref.watch(
-                            providerOfHazardFiltersForMap.select(
-                              (value) =>
-                                  value.hazardCategories.isNotEmpty ||
-                                  value.hazardSeveritiesAws.isNotEmpty ||
-                                  value.hazardSeveritiesNonAws.isNotEmpty,
-                            ),
-                          );
-                          if (!isFiltersAvailable) {
-                            return const SizedBox.shrink();
-                          }
-                          return HazardFiltersDropdown(
-                            filtersKey: MapScreen.filtersKey,
-                          ).pL(10.0);
-                        },
-                      ),
+                      _filtersButtonBuilder(),
                     ],
                   );
                 },
@@ -140,6 +123,29 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
+  Widget _filtersButtonBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isFiltersAvailable = ref.watch(
+          providerOfHazardFiltersForMap.select(
+            (value) =>
+                value.hazardCategories.isNotEmpty ||
+                value.hazardSeveritiesAws.isNotEmpty ||
+                value.hazardSeveritiesNonAws.isNotEmpty,
+          ),
+        );
+        if (!isFiltersAvailable) {
+          return const SizedBox.shrink();
+        }
+        return HazardFiltersDropdown(
+          filtersKey: MapScreen.filtersKey,
+          onCategoriesSelectionUpdated: (_) => _getMapHazards(),
+          onSeveritiesSelectionUpdated: (_) => _getMapHazards(),
+        ).pL(10.0);
+      },
+    );
+  }
+
   /// Handles the map movement by updating the camera position in the provider.
   void _handleMapMoved(CameraPosition position) {
     ref
@@ -158,5 +164,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ..getRoutePlanHazardsToAvoid();
       },
     );
+  }
+
+  /// Fetches the hazards for the current map view.
+  void _getMapHazards() {
+    ref.read(providerOfMap.notifier).getMapHazards();
   }
 }

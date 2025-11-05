@@ -6,7 +6,6 @@ import 'package:hazard_app/features/notification/providers/notifications_feed_pr
 import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
-import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
@@ -73,13 +72,35 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
       getHazardsByLocationState: const GetHazardsByLocationState.loading(),
     );
 
+    final selectedCategories = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .selectedHazardCategories;
+    final selectedSeveritiesAws = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .selectedHazardSeveritiesAws;
+    final selectedSeveritiesNonAws = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .selectedHazardSeveritiesNonAws;
+
     final result = await _hazardService.getHazardsWithCategories(
       searchParams: HazardSearchParams(
         northeastLat: location!.bounds?.northeastLat,
         northeastLng: location.bounds?.northeastLng,
         southwestLat: location.bounds?.southwestLat,
         southwestLng: location.bounds?.southwestLng,
-        categoryIds: state.selectedCategories.map((e) => e.id).toList(),
+        categoryIds: selectedCategories.map((e) => e.id).toList(),
+        severities: {
+          ...Map.fromEntries(
+            selectedSeveritiesAws.map(
+              (e) => MapEntry(e.severity, true),
+            ),
+          ),
+          ...Map.fromEntries(
+            selectedSeveritiesNonAws.map(
+              (e) => MapEntry(e.severity, false),
+            ),
+          ),
+        },
       ),
     );
     if (!mounted) return;
@@ -96,6 +117,15 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         // add categories to the hazard filters provider
         _hazardFiltersProvider.updateHazardCategories(
           hazardsWithCategories.availableFilters.categoryFilters,
+        );
+
+        // add severities to the hazard filters provider
+        _hazardFiltersProvider.updateHazardSeveritiesAws(
+          hazardsWithCategories.availableFilters.severityFiltersAws,
+        );
+
+        _hazardFiltersProvider.updateHazardSeveritiesNonAws(
+          hazardsWithCategories.availableFilters.severityFiltersNonAws,
         );
 
         // update subscriptionId if there's an active subscription for this location
@@ -213,13 +243,6 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
 
     // every time the searched location is updated, reset the subscriptionId
     updateSubscriptionId(null);
-  }
-
-  /// Updates [MainSearchProviderState.selectedCategories] with the given [categories].
-  void updateSelectedCategories(final List<HazardCategory> categories) {
-    state = state.copyWith(
-      selectedCategories: categories,
-    );
   }
 
   /// Updates [MainSearchProviderState.hazards] with the given [hazards].

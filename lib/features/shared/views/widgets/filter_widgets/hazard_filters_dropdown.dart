@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/search/views/widgets/hazard_categories_list.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_severity_with_count_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_severity_filters_list.dart';
@@ -15,10 +16,29 @@ class HazardFiltersDropdown extends ConsumerStatefulWidget {
   const HazardFiltersDropdown({
     super.key,
     required this.filtersKey,
+    this.buttonShadow = const [
+      BoxShadow(
+        color: AppColors.shadowColor,
+        blurRadius: 10.0,
+        offset: Offset(0, 0.0),
+      ),
+    ],
+    this.onCategoriesSelectionUpdated,
+    this.onSeveritiesSelectionUpdated,
   });
 
   /// The key to identify the specific hazard filters instance.
   final String filtersKey;
+
+  /// The box shadow to apply to the dropdown button.
+  final List<BoxShadow> buttonShadow;
+
+  /// Callback when the selected categories are updated.
+  final void Function(List<HazardCategory>)? onCategoriesSelectionUpdated;
+
+  /// Callback when the selected severities are updated.
+  final void Function(List<HazardSeverityWithCount>)?
+  onSeveritiesSelectionUpdated;
 
   @override
   ConsumerState<HazardFiltersDropdown> createState() =>
@@ -50,13 +70,7 @@ class _HazardFiltersDropdownState extends ConsumerState<HazardFiltersDropdown> {
             border: Border.all(
               color: AppColors.lightGrey,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColor,
-                blurRadius: 10.0,
-                offset: Offset(0, 0.0),
-              ),
-            ],
+            boxShadow: widget.buttonShadow,
           ),
           child: Icon(
             isOpen ? Icons.close_rounded : Icons.filter_list,
@@ -136,7 +150,7 @@ class _HazardFiltersDropdownState extends ConsumerState<HazardFiltersDropdown> {
           filtersKey: widget.filtersKey,
           isSmall: true,
           separatorWidth: 5.0,
-          onCategoriesSelectionUpdated: (_) => _getMapHazards(),
+          onCategoriesSelectionUpdated: widget.onCategoriesSelectionUpdated,
         ),
       ],
     );
@@ -173,6 +187,7 @@ class _HazardFiltersDropdownState extends ConsumerState<HazardFiltersDropdown> {
             8.hSizedBox,
             if (hasAwsSeverities)
               SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
                     Text(
@@ -187,13 +202,15 @@ class _HazardFiltersDropdownState extends ConsumerState<HazardFiltersDropdown> {
                       filtersKey: widget.filtersKey,
                       isAws: true,
                       separatorWidth: 5.0,
-                      onSeveritiesSelectionUpdated: (_) => _getMapHazards(),
+                      onSeveritiesSelectionUpdated:
+                          widget.onSeveritiesSelectionUpdated,
                     ),
                   ],
                 ),
               ).pB(6.0),
             if (hasNonAwsSeverities)
               SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
                     Text(
@@ -208,7 +225,8 @@ class _HazardFiltersDropdownState extends ConsumerState<HazardFiltersDropdown> {
                       filtersKey: widget.filtersKey,
                       isAws: false,
                       separatorWidth: 5.0,
-                      onSeveritiesSelectionUpdated: (_) => _getMapHazards(),
+                      onSeveritiesSelectionUpdated:
+                          widget.onSeveritiesSelectionUpdated,
                     ),
                   ],
                 ),
@@ -217,10 +235,5 @@ class _HazardFiltersDropdownState extends ConsumerState<HazardFiltersDropdown> {
         );
       },
     );
-  }
-
-  /// Gets the map hazards based on the selected filters.
-  void _getMapHazards() {
-    ref.read(providerOfMap.notifier).getMapHazards();
   }
 }

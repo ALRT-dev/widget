@@ -48,7 +48,7 @@ class AlrtDropdown extends ConsumerStatefulWidget {
     this.controller,
     this.dropdownHeight = 300,
     this.dropdownWidth,
-    this.buttonAlignment = Alignment.bottomLeft,
+    this.buttonAlignment = Alignment.topLeft,
     this.dropdownAlignment = Alignment.topLeft,
   });
 
@@ -156,7 +156,7 @@ class _AlrtDropdownState extends ConsumerState<AlrtDropdown> {
             Positioned(
               child: CompositedTransformFollower(
                 link: _layerLink,
-                offset: Offset(0, 50.h),
+                offset: Offset(0, 57.spMin),
                 targetAnchor: widget.buttonAlignment,
                 followerAnchor: widget.dropdownAlignment,
                 child: TapRegion(

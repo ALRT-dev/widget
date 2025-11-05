@@ -57,13 +57,26 @@ enum HazardSeverity {
     };
   }
 
-  String get emoji {
+  /// Returns the emoji associated with the hazard severity following AWS standards.
+  String get emojiAws {
     return switch (this) {
       HazardSeverity.unknown => '⚪',
       HazardSeverity.info => '🔵',
-      HazardSeverity.low => '🟢',
       HazardSeverity.advice => '🟡',
       HazardSeverity.watchAndAct => '🟠',
+      HazardSeverity.emergency => '🔴',
+      (_) => '⚪',
+    };
+  }
+
+  /// Returns the emoji associated with the hazard severity (not AWS standards).
+  String get emojiNonAws {
+    return switch (this) {
+      HazardSeverity.unknown => '⚪',
+      HazardSeverity.info => '🔵',
+      HazardSeverity.low => '🟡',
+      HazardSeverity.advice => '🟠',
+      HazardSeverity.watchAndAct => '🔴',
       HazardSeverity.emergency => '🔴',
     };
   }
