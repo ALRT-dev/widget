@@ -242,11 +242,11 @@ abstract class Hazard with _$Hazard {
 
     // If the hazard follows AWS standards, use AWS colors
     if (isAwsCompliant == true) {
-      return severity?.colorAWS ?? HazardSeverity.info.colorAWS;
+      return severity?.colorAws ?? HazardSeverity.info.colorAws;
     }
 
     // Otherwise, use non-AWS colors
-    return severity?.colorNonAWS ?? HazardSeverity.info.colorNonAWS;
+    return severity?.colorNonAws ?? HazardSeverity.info.colorNonAws;
   }
 
   /// The title associated with the hazard's severity.
@@ -254,7 +254,7 @@ abstract class Hazard with _$Hazard {
     if (isAwsCompliant == true) {
       return severity?.titleAws ?? HazardSeverity.info.titleAws;
     }
-    return severity?.titleNonAWS ?? HazardSeverity.info.titleNonAWS;
+    return severity?.titleNonAws ?? HazardSeverity.info.titleNonAws;
   }
 
   factory Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);

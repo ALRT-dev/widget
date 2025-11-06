@@ -64,7 +64,7 @@ class _HazardSeverityFiltersListItemState
           Text(
             widget.isAws
                 ? widget.hazardSeverity.severity.titleAws
-                : widget.hazardSeverity.severity.titleNonAWS,
+                : widget.hazardSeverity.severity.titleNonAws,
             style: TextStyle(
               color: isSelected ? AppColors.white : AppColors.grey,
               fontSize: 12.spMin,

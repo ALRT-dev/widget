@@ -547,7 +547,6 @@ class HazardService {
   String getFallbackCallToAction(final HazardSeverity severity) {
     return switch (severity) {
       HazardSeverity.info => 'Stay informed and follow any official guidance.',
-      HazardSeverity.low => 'Be cautious and stay aware of your surroundings.',
       HazardSeverity.advice => 'Take necessary precautions and stay safe.',
       HazardSeverity.watchAndAct =>
         'Be prepared to take action if the situation escalates.',

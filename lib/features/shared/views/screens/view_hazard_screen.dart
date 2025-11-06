@@ -329,8 +329,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         return Icons.help_outline;
       case HazardSeverity.info:
         return Icons.info_outline;
-      case HazardSeverity.low:
-        return Icons.info_outline;
       case HazardSeverity.advice:
         return Icons.lightbulb_outline;
       case HazardSeverity.watchAndAct:
@@ -594,8 +592,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         return 'Severity level is unknown';
       case HazardSeverity.info:
         return 'General information about potential hazards';
-      case HazardSeverity.low:
-        return 'Be cautious and stay aware of your surroundings';
       case HazardSeverity.advice:
         return 'Take necessary precautions and stay safe';
       case HazardSeverity.watchAndAct:
