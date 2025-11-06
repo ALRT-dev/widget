@@ -8,6 +8,7 @@ import 'package:hazard_app/features/notification/providers/states/notifications_
 import 'package:hazard_app/features/notification/services/notification_service.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
@@ -142,6 +143,17 @@ class NotificationsFeedProvider
             selectedSeveritiesNonAws.map(
               (e) => MapEntry(e.severity, false),
             ),
+          ),
+
+          // if unknown or info severity is selected for non-AWS, include them for AWS as well
+          ...Map.fromEntries(
+            selectedSeveritiesNonAws
+                .where(
+                  (e) =>
+                      e.severity == HazardSeverity.unknown ||
+                      e.severity == HazardSeverity.info,
+                )
+                .map((e) => MapEntry(e.severity, true)),
           ),
         },
       ),

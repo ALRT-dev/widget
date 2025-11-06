@@ -22,6 +22,7 @@ import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
@@ -150,6 +151,17 @@ class MapProvider extends StateNotifier<MapProviderState> {
             selectedSeveritiesNonAws.map(
               (e) => MapEntry(e.severity, false),
             ),
+          ),
+
+          // if unknown or info severity is selected for non-AWS, include them for AWS as well
+          ...Map.fromEntries(
+            selectedSeveritiesNonAws
+                .where(
+                  (e) =>
+                      e.severity == HazardSeverity.unknown ||
+                      e.severity == HazardSeverity.info,
+                )
+                .map((e) => MapEntry(e.severity, true)),
           ),
         },
         northeastLat: visibleBounds.northeast.latitude,
