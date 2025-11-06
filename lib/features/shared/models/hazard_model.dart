@@ -214,13 +214,14 @@ abstract class Hazard with _$Hazard {
 
     if (matchedLevel != BushfireAlertLevel.advice) {
       // if description contains 'advice', return advice level
-      return BushfireAlertLevel.advice.keywords.any(
-            (keyword) => description!.toLowerCase().contains(
-              RegExp(r'\b' + keyword + r'\b'),
-            ),
-          )
-          ? BushfireAlertLevel.advice
-          : matchedLevel;
+      final isAdvice = BushfireAlertLevel.advice.keywords.any(
+        (keyword) => description!.toLowerCase().contains(
+          RegExp(r'\b' + keyword + r'\b'),
+        ),
+      );
+      if (isAdvice) {
+        return BushfireAlertLevel.advice;
+      }
     }
 
     return matchedLevel;

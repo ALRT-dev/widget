@@ -81,11 +81,7 @@ enum BushfireAlertLevel {
           'stay informed',
           'be aware',
           'caution',
-          'alert',
           'information',
-          'update',
-          'notification',
-          'warning',
           'advisory',
         ];
     }
