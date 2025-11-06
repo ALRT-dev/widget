@@ -122,6 +122,8 @@ class HazardService {
     int currentPage = searchParams.page;
     bool hasMoreData = true;
 
+    Either<HazardFilters, AppError>? filtersResult;
+
     while (hasMoreData) {
       final batchFutures = <Future<Either<List<Hazard>, AppError>>>[];
 
@@ -135,7 +137,12 @@ class HazardService {
       }
 
       // Wait for this batch to complete
-      final batchResults = await Future.wait(batchFutures);
+      final results = await Future.wait([
+        Future.wait(batchFutures),
+        if (filtersResult == null) getHazardFilters(searchParams: searchParams),
+      ]);
+      final batchResults = results[0] as List<Either<List<Hazard>, AppError>>;
+      filtersResult = results[1] as Either<HazardFilters, AppError>?;
 
       // Process batch results
       bool hasDataInThisBatch = false;
@@ -171,13 +178,13 @@ class HazardService {
       currentPage += numberOfParallelRequests;
     }
 
-    final filtersResult = await getHazardFilters(
-      searchParams: searchParams,
-    );
-    if (filtersResult.isFailure) {
-      return Failure(filtersResult.failure);
+    if (filtersResult?.isFailure ?? true) {
+      return Failure(
+        filtersResult?.failure ??
+            AppError(message: 'Failed to fetch hazard filters.'),
+      );
     }
-    final filters = filtersResult.success;
+    final filters = filtersResult!.success;
 
     // Return the combined response with all hazards
     return Success((allHazards, filters));
