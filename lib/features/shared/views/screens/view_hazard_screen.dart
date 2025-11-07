@@ -89,26 +89,29 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeaderSection(),
+                  24.spMin.hSizedBox,
                   if (widget.args.hazard.reportedBy?.id == loggedInUserId &&
                       widget.args.hazard.reviewStatus ==
                           HazardReviewStatus.rejected &&
-                      widget.args.hazard.reviewFeedback != null) ...[
-                    24.spMin.hSizedBox,
+                      (widget.args.hazard.reviewFeedback?.isNotEmpty ??
+                          false)) ...[
                     _buildReviewFeedbackSection(),
+                    24.spMin.hSizedBox,
                   ],
-                  24.spMin.hSizedBox,
                   _buildLocationSection(),
-                  if (widget.args.hazard.aiSummary != null) ...[
-                    24.spMin.hSizedBox,
+                  24.spMin.hSizedBox,
+                  if (widget.args.hazard.aiSummary?.isNotEmpty ?? false) ...[
                     _buildAISummarySection(),
-                  ],
-                  if (widget.args.hazard.callToAction != null) ...[
                     24.spMin.hSizedBox,
-                    _buildCallToActionSection(),
                   ],
-                  24.spMin.hSizedBox,
-                  _buildDescriptionSection(),
-                  24.spMin.hSizedBox,
+                  if (widget.args.hazard.callToAction?.isNotEmpty ?? false) ...[
+                    _buildCallToActionSection(),
+                    24.spMin.hSizedBox,
+                  ],
+                  if (widget.args.hazard.description?.isNotEmpty ?? false) ...[
+                    _buildDescriptionSection(),
+                    24.spMin.hSizedBox,
+                  ],
                   if ((widget.args.hazard.bushFireAlertLevel == null ||
                           widget.args.hazard.bushFireAlertLevel ==
                               BushfireAlertLevel.advice) &&
@@ -122,11 +125,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     24.spMin.hSizedBox,
                   ],
                   _buildTimestampSection(),
+                  24.spMin.hSizedBox,
                   if (widget.args.hazard.reportedBy?.id == loggedInUserId &&
                       widget.args.hazard.reviewStatus ==
                           HazardReviewStatus.accepted &&
                       widget.args.hazard.reviewFeedback != null) ...[
-                    24.spMin.hSizedBox,
                     _buildReviewFeedbackSection(),
                   ],
                   32.spMin.hSizedBox,

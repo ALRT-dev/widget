@@ -519,9 +519,6 @@ class HazardService {
       processedMedias: await _mediaService.convertS3MediaToAlrtMedia(
         s3Medias: hazard.medias,
       ),
-      callToAction:
-          hazard.callToAction ??
-          getFallbackCallToAction(hazard.severity ?? HazardSeverity.unknown),
     );
   }
 
@@ -541,19 +538,5 @@ class HazardService {
     } catch (e) {
       return false;
     }
-  }
-
-  /// Gets a fallback call to action message based on hazard severity.
-  String getFallbackCallToAction(final HazardSeverity severity) {
-    return switch (severity) {
-      HazardSeverity.info => 'Stay informed and follow any official guidance.',
-      HazardSeverity.advice => 'Take necessary precautions and stay safe.',
-      HazardSeverity.watchAndAct =>
-        'Be prepared to take action if the situation escalates.',
-      HazardSeverity.emergency =>
-        'Follow emergency procedures and seek safety immediately.',
-      HazardSeverity.unknown =>
-        'Stay alert and follow local safety guidelines.',
-    };
   }
 }
