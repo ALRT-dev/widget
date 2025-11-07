@@ -366,6 +366,12 @@ class HazardService {
 
     final futures = <Future<Map<String, BitmapDescriptor>>>[];
 
+    final parentCategories = categories
+        .map((cat) => cat.parentId)
+        .where((parentId) => parentId != null)
+        .cast<String>()
+        .toList();
+
     // Generate bitmaps for each category and severity combination
     for (final category in categories) {
       for (final severity in severities) {
@@ -401,6 +407,29 @@ class HazardService {
         size: const Size(30, 30),
       ).then((bitmap) => {key: bitmap});
       futures.add(future);
+    }
+
+    // Generate bitmaps for parent categories
+    for (final parentCategoryId in parentCategories) {
+      for (final severity in severities) {
+        final keyAws = '${parentCategoryId}_${severity.name}_aws';
+        final futureAws = getBitmapDescriptorForHazard(
+          categoryId: parentCategoryId,
+          parentCategoryId: null,
+          severity: severity,
+          isAwsCompliant: true,
+        ).then((bitmap) => {keyAws: bitmap});
+        futures.add(futureAws);
+
+        final keyNonAws = '${parentCategoryId}_${severity.name}_non_aws';
+        final futureNonAws = getBitmapDescriptorForHazard(
+          categoryId: parentCategoryId,
+          parentCategoryId: null,
+          severity: severity,
+          isAwsCompliant: false,
+        ).then((bitmap) => {keyNonAws: bitmap});
+        futures.add(futureNonAws);
+      }
     }
 
     // Generate bitmaps for bushfire markers

@@ -167,15 +167,25 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     result.when(
       (response) {
+        final hazards = response.$1;
+        final filters = response.$2;
+
         state = state.copyWith(
-          getMapHazardsState: GetMapHazardsState.success(response.$1),
-          hazards: response.$1,
+          getMapHazardsState: GetMapHazardsState.success(hazards),
+          hazards: hazards,
         );
 
         // Update hazard filters in the filter provider
         _ref
             .read(providerOfHazardFiltersForMap.notifier)
-            .updateFilters(response.$2);
+            .updateFilters(filters);
+
+        final selectedHazard = hazards.firstWhereOrNull(
+          (hazard) => hazard.id == state.selectedHazard?.id,
+        );
+        if (selectedHazard != null) {
+          updateSelectedHazard(selectedHazard);
+        }
 
         generateMarkers();
       },

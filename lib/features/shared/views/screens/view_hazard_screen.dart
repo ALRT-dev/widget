@@ -129,7 +129,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   if (widget.args.hazard.reportedBy?.id == loggedInUserId &&
                       widget.args.hazard.reviewStatus ==
                           HazardReviewStatus.accepted &&
-                      widget.args.hazard.reviewFeedback != null) ...[
+                      (widget.args.hazard.reviewFeedback?.isNotEmpty ??
+                          false)) ...[
                     _buildReviewFeedbackSection(),
                   ],
                   32.spMin.hSizedBox,
