@@ -5,8 +5,8 @@ import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/search/models/hazard_severity_filter_model.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
-import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
@@ -91,29 +91,10 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         southwestLat: location.bounds?.southwestLat,
         southwestLng: location.bounds?.southwestLng,
         categoryIds: selectedCategories.map((e) => e.id).toList(),
-        severities: {
-          ...Map.fromEntries(
-            selectedSeveritiesAws.map(
-              (e) => MapEntry(e.severity, true),
-            ),
-          ),
-          ...Map.fromEntries(
-            selectedSeveritiesNonAws.map(
-              (e) => MapEntry(e.severity, false),
-            ),
-          ),
-
-          // if unknown or info severity is selected for non-AWS, include them for AWS as well
-          ...Map.fromEntries(
-            selectedSeveritiesNonAws
-                .where(
-                  (e) =>
-                      e.severity == HazardSeverity.unknown ||
-                      e.severity == HazardSeverity.info,
-                )
-                .map((e) => MapEntry(e.severity, true)),
-          ),
-        },
+        severityFilter: HazardSeverityFilter(
+          aws: selectedSeveritiesAws.map((e) => e.severity).toList(),
+          nonAws: selectedSeveritiesNonAws.map((e) => e.severity).toList(),
+        ),
       ),
     );
     if (!mounted) return;

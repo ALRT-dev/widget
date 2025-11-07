@@ -7,8 +7,8 @@ import 'package:hazard_app/features/notification/providers/service_providers.dar
 import 'package:hazard_app/features/notification/providers/states/notifications_feed_provider_state.dart';
 import 'package:hazard_app/features/notification/services/notification_service.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/search/models/hazard_severity_filter_model.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
-import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
@@ -133,29 +133,10 @@ class NotificationsFeedProvider
       searchParams: HazardSearchParams(
         searchString: state.searchString,
         categoryIds: selectedCategories.map((e) => e.id).toList(),
-        severities: {
-          ...Map.fromEntries(
-            selectedSeveritiesAws.map(
-              (e) => MapEntry(e.severity, true),
-            ),
-          ),
-          ...Map.fromEntries(
-            selectedSeveritiesNonAws.map(
-              (e) => MapEntry(e.severity, false),
-            ),
-          ),
-
-          // if unknown or info severity is selected for non-AWS, include them for AWS as well
-          ...Map.fromEntries(
-            selectedSeveritiesNonAws
-                .where(
-                  (e) =>
-                      e.severity == HazardSeverity.unknown ||
-                      e.severity == HazardSeverity.info,
-                )
-                .map((e) => MapEntry(e.severity, true)),
-          ),
-        },
+        severityFilter: HazardSeverityFilter(
+          aws: selectedSeveritiesAws.map((e) => e.severity).toList(),
+          nonAws: selectedSeveritiesNonAws.map((e) => e.severity).toList(),
+        ),
       ),
     );
     if (!mounted) return;

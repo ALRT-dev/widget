@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hazard_app/features/search/models/hazard_severity_filter_model.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
-import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 
@@ -16,17 +16,8 @@ abstract class HazardSearchParams with _$HazardSearchParams {
     /// The list of category IDs to filter hazards.
     @Default(<String>[]) final List<String> categoryIds,
 
-    /// The severity levels to filter hazards.
-    ///
-    /// The key is the [HazardSeverity] and the value indicates whether aws complaint or not.
-    ///
-    /// Eg.
-    /// {
-    ///   HazardSeverity.advice: true, // If true, this severity level will be 'advice'
-    ///   HazardSeverity.advice: false, // If true, this severity level will be 'moderate'
-    ///   HazardSeverity.emergency: false, // If false, this severity level will be 'critical'
-    /// }
-    final Map<HazardSeverity, bool>? severities,
+    /// The severity filter to filter hazards.
+    final HazardSeverityFilter? severityFilter,
 
     /// The id of the user who reported the hazard to filter hazards.
     final String? reportedById,

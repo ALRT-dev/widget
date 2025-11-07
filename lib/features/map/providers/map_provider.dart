@@ -22,6 +22,7 @@ import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/search/models/hazard_severity_filter_model.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
@@ -141,29 +142,20 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final result = await _hazardService.getAllHazardsWithFilters(
       searchParams: HazardSearchParams(
         categoryIds: selectedCategories.map((e) => e.id).toList(),
-        severities: {
-          ...Map.fromEntries(
-            selectedSeveritiesAws.map(
-              (e) => MapEntry(e.severity, true),
-            ),
-          ),
-          ...Map.fromEntries(
-            selectedSeveritiesNonAws.map(
-              (e) => MapEntry(e.severity, false),
-            ),
-          ),
-
-          // if unknown or info severity is selected for non-AWS, include them for AWS as well
-          ...Map.fromEntries(
-            selectedSeveritiesNonAws
+        severityFilter: HazardSeverityFilter(
+          aws: [
+            ...selectedSeveritiesAws.map((e) => e.severity),
+            ...selectedSeveritiesNonAws
                 .where(
                   (e) =>
-                      e.severity == HazardSeverity.unknown ||
-                      e.severity == HazardSeverity.info,
+                      e.severity != HazardSeverity.advice &&
+                      e.severity != HazardSeverity.watchAndAct &&
+                      e.severity != HazardSeverity.emergency,
                 )
-                .map((e) => MapEntry(e.severity, true)),
-          ),
-        },
+                .map((e) => e.severity),
+          ],
+          nonAws: selectedSeveritiesNonAws.map((e) => e.severity).toList(),
+        ),
         northeastLat: visibleBounds.northeast.latitude,
         northeastLng: visibleBounds.northeast.longitude,
         southwestLat: visibleBounds.southwest.latitude,

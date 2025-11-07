@@ -14,9 +14,11 @@ _HazardSearchParams _$HazardSearchParamsFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const <String>[],
-      severities: (json['severities'] as Map<String, dynamic>?)?.map(
-        (k, e) => MapEntry($enumDecode(_$HazardSeverityEnumMap, k), e as bool),
-      ),
+      severityFilter: json['severityFilter'] == null
+          ? null
+          : HazardSeverityFilter.fromJson(
+              json['severityFilter'] as Map<String, dynamic>,
+            ),
       reportedById: json['reportedById'] as String?,
       reviewStatus:
           $enumDecodeNullable(
@@ -54,9 +56,7 @@ Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
     <String, dynamic>{
       'searchString': ?instance.searchString,
       'categoryIds': instance.categoryIds,
-      'severities': ?instance.severities?.map(
-        (k, e) => MapEntry(_$HazardSeverityEnumMap[k]!, e),
-      ),
+      'severityFilter': ?instance.severityFilter?.toJson(),
       'reportedById': ?instance.reportedById,
       'reviewStatus': _$HazardReviewStatusEnumMap[instance.reviewStatus]!,
       'northeastLat': ?instance.northeastLat,
@@ -75,14 +75,6 @@ Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
       'page': instance.page,
       'pageSize': instance.pageSize,
     };
-
-const _$HazardSeverityEnumMap = {
-  HazardSeverity.unknown: 'unknown',
-  HazardSeverity.info: 'info',
-  HazardSeverity.advice: 'advice',
-  HazardSeverity.watchAndAct: 'watchAndAct',
-  HazardSeverity.emergency: 'emergency',
-};
 
 const _$HazardReviewStatusEnumMap = {
   HazardReviewStatus.pending: 'pending',
