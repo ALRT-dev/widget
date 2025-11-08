@@ -448,9 +448,7 @@ class _CreateUpdateReportScreenState
         (value) =>
             value.hazardToCreateOrUpdate.occurredAt != null &&
             value.hazardToCreateOrUpdate.category != null &&
-            value.hazardToCreateOrUpdate.locationName != null &&
-            (value.hazardToCreateOrUpdate.description != null &&
-                value.hazardToCreateOrUpdate.description!.isNotEmpty),
+            value.hazardToCreateOrUpdate.locationName != null,
       ),
     );
   }
@@ -572,7 +570,7 @@ class _CreateUpdateReportScreenState
   /// Handles the submission of the report.
   void _handleSubmitReport() {
     ref.read(providerOfCreateReport.notifier).createOrUpdateReport();
-    // _clearAll();
+    _clearAll();
   }
 
   /// Handles the action when user wants to submit another report.

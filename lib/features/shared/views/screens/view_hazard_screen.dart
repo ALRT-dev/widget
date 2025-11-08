@@ -108,7 +108,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     _buildCallToActionSection(),
                     24.spMin.hSizedBox,
                   ],
-                  if (widget.args.hazard.description?.isNotEmpty ?? false) ...[
+                  if (!widget.args.hazard.isUserReported &&
+                      (widget.args.hazard.description?.isNotEmpty ??
+                          false)) ...[
                     _buildDescriptionSection(),
                     24.spMin.hSizedBox,
                   ],
