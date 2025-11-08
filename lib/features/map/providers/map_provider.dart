@@ -250,6 +250,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
   /// Fetches address from coordinates using the map service and updates the state accordingly.
   Future<void> getAddressFromCoordinates({
     required final LatLng coordinates,
+    final bool getSubUrbOnly = false,
   }) async {
     final isLoading = state.getAddressFromCoordinatesState.maybeWhen(
       orElse: () => false,
@@ -264,6 +265,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     final result = await _mapService.getAddressFromCoordinates(
       coordinates: coordinates,
+      getSubUrbOnly: getSubUrbOnly,
     );
     if (!mounted) return;
 

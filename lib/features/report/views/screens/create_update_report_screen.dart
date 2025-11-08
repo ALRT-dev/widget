@@ -527,6 +527,7 @@ class _CreateUpdateReportScreenState
       SelectLocationScreen.route,
       extra: SelectLocationScreenArgs(
         initialLocation: selectedLocation,
+        getSubUrbOnly: true,
       ),
     );
     if (!mounted) return;

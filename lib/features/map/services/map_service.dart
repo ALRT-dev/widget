@@ -80,9 +80,11 @@ class MapService {
 
   Future<Either<String, AppError>> getAddressFromCoordinates({
     required final LatLng coordinates,
+    final bool getSubUrbOnly = false,
   }) {
     return _mapRepository.getAddressFromCoordinates(
       coordinates: coordinates,
+      getSubUrbOnly: getSubUrbOnly,
     );
   }
 

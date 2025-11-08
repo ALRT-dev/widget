@@ -7,7 +7,6 @@ import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
-import 'package:hazard_app/features/map/providers/service_providers.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_on_map_screen.dart';
 import 'package:hazard_app/features/map/views/widgets/place_search_results_list.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
@@ -18,10 +17,14 @@ import 'package:hazard_app/others/app_colors.dart';
 class SelectLocationScreenArgs {
   SelectLocationScreenArgs({
     this.initialLocation,
+    this.getSubUrbOnly = false,
   });
 
   /// The initial location to be displayed on the map when the screen loads.
   final AlrtLocation? initialLocation;
+
+  /// Whether to get only the suburb part of the address.
+  final bool getSubUrbOnly;
 }
 
 class SelectLocationScreen extends ConsumerStatefulWidget {
@@ -48,7 +51,8 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
   @override
   void initState() {
     super.initState();
-    _searchController.text = widget.args?.initialLocation?.name ??
+    _searchController.text =
+        widget.args?.initialLocation?.name ??
         widget.args?.initialLocation?.address ??
         '';
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -225,14 +229,12 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
       SelectLocationOnMapScreen.route,
       extra: SelectLocationOnMapScreenArgs(
         initialLocation: widget.args?.initialLocation,
+        getSubUrbOnly: widget.args?.getSubUrbOnly ?? false,
       ),
     );
     if (!mounted) return;
 
     if (location != null && location is AlrtLocation) {
-      ref
-          .read(providerOfMapService)
-          .getAddressFromCoordinates(coordinates: location.latLng);
       context.pop(location);
     }
   }
