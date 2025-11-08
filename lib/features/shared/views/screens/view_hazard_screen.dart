@@ -127,14 +127,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     24.spMin.hSizedBox,
                   ],
                   _buildTimestampSection(),
-                  24.spMin.hSizedBox,
-                  if (widget.args.hazard.reportedBy?.id == loggedInUserId &&
-                      widget.args.hazard.reviewStatus ==
-                          HazardReviewStatus.accepted &&
-                      (widget.args.hazard.reviewFeedback?.isNotEmpty ??
-                          false)) ...[
-                    _buildReviewFeedbackSection(),
-                  ],
                   32.spMin.hSizedBox,
                 ],
               ),
@@ -715,31 +707,39 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       icon: Icons.schedule_outlined,
       child: Column(
         children: [
-          if (widget.args.hazard.occurredAt != null)
+          if (widget.args.hazard.occurredAt != null) ...[
             _buildTimestampRow(
               label: 'Occurred',
               dateTime: widget.args.hazard.occurredAt!,
               icon: Icons.event_outlined,
             ),
+            12.hSizedBox,
+          ],
           if (widget.args.hazard.createdAt != null) ...[
-            if (widget.args.hazard.occurredAt != null) 12.spMin.hSizedBox,
             _buildTimestampRow(
-              label: 'Reported',
+              label: 'Posted',
               dateTime: widget.args.hazard.createdAt!,
-              icon: Icons.report_outlined,
+              icon: Icons.post_add_outlined,
             ),
+            12.spMin.hSizedBox,
+          ],
+          if (widget.args.hazard.updatedAt != null &&
+              widget.args.hazard.updatedAt != widget.args.hazard.createdAt) ...[
+            _buildTimestampRow(
+              label: 'Updated',
+              dateTime: widget.args.hazard.updatedAt!,
+              icon: Icons.update_outlined,
+            ),
+            12.spMin.hSizedBox,
           ],
           if (widget.args.hazard.expiresAt != null) ...[
-            if (widget.args.hazard.occurredAt != null ||
-                widget.args.hazard.createdAt != null)
-              12.spMin.hSizedBox,
             _buildTimestampRow(
               label: 'Expires',
               dateTime: widget.args.hazard.expiresAt!,
               dateTimeWidget: HazardExpiryTimer(
                 expiryDateTime: widget.args.hazard.expiresAt!,
               ),
-              icon: Icons.schedule_outlined,
+              icon: Icons.timer_outlined,
             ),
           ],
         ],
