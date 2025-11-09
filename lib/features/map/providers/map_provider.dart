@@ -26,6 +26,7 @@ import 'package:hazard_app/features/search/models/hazard_severity_filter_model.d
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/utils/location_helper.dart';
@@ -174,6 +175,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
         );
         if (selectedHazard != null) {
           updateSelectedHazard(selectedHazard);
+        }
+
+        // Update all the hazards in the hazard item providers
+        for (final hazard in hazards) {
+          if (hazard.id == null) continue;
+          final hazardItemProvider = providerOfHazardItem(hazard.id!);
+          _ref.read(hazardItemProvider.notifier).updateHazard(hazard);
         }
 
         generateMarkers();

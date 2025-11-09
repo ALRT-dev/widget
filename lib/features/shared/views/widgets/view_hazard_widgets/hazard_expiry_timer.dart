@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -136,7 +137,10 @@ class _HazardExpiryTimerState extends ConsumerState<HazardExpiryTimer> {
           4.wSizedBox,
         ],
         Text(
-          _formatDuration(_timeRemaining),
+          // if remaining time is greater than 1 month, show the exact expiry date
+          _timeRemaining.inDays > 30
+              ? widget.expiryDateTime.formattedDateOnly
+              : _formatDuration(_timeRemaining),
           style: textStyle,
         ),
       ],

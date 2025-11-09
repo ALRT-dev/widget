@@ -25,7 +25,7 @@ class _MapHazardPreviewState extends ConsumerState<MapHazardPreview> {
     }
 
     return CommonHazardsListItem(
-      key: ValueKey('map_hazard_preview_${selectedHazard.id}'),
+      key: ValueKey(selectedHazard.id),
       hazard: selectedHazard,
       horizontalPadding: 0.0,
       showCloseButton: true,

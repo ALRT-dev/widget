@@ -202,6 +202,7 @@ class _HazardSearchResultsListState
           itemBuilder: (context, index) {
             final hazard = hazards[index];
             return CommonHazardsListItem(
+              key: ValueKey(hazard.id),
               hazard: hazard,
               showTrustMeter: false,
             );

@@ -12,26 +12,28 @@ final providerOfHazardItem =
     StateNotifierProvider.family<
       HazardItemProvider,
       HazardItemProviderState,
-      Hazard
+      String
     >(
-      (final ref, final hazard) => HazardItemProvider(
+      (final ref, final hazardId) => HazardItemProvider(
         ref: ref,
-        state: HazardItemProviderState(
-          hazard: hazard,
-        ),
+        hazardId: hazardId,
+        state: HazardItemProviderState(),
       ),
     );
 
 class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
   HazardItemProvider({
     required final Ref ref,
+    required final String hazardId,
     required final HazardItemProviderState state,
   }) : _ref = ref,
+       _hazardId = hazardId,
        super(state) {
     _listenToHazardUpdates();
   }
 
   final Ref _ref;
+  final String _hazardId;
 
   HazardService get _hazardService => _ref.read(providerOfHazardService);
 
@@ -41,11 +43,11 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
         .read(providerOfHazardSocketManager)
         .updateHazardStream
         .listen((updatedHazard) {
-          if (updatedHazard.id == state.hazard.id) {
+          if (updatedHazard.id == state.hazard?.id) {
             updateHazard(
               updatedHazard.copyWith(
                 // No need to update userVoteType as it's not sent in the update
-                userVoteType: state.hazard.userVoteType,
+                userVoteType: state.hazard?.userVoteType,
               ),
             );
           }
@@ -65,9 +67,9 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
       voteState: const VoteHazardState.loading(),
     );
 
-    final initialVoteType = state.hazard.userVoteType;
-    final initialUpvoteCount = state.hazard.upvoteCount;
-    final initialDownvoteCount = state.hazard.downvoteCount;
+    final initialVoteType = state.hazard?.userVoteType;
+    final initialUpvoteCount = state.hazard?.upvoteCount ?? 0;
+    final initialDownvoteCount = state.hazard?.downvoteCount ?? 0;
 
     // immediately update the vote in the UI for a better user experience
     if (voteType == initialVoteType) {
@@ -103,7 +105,7 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
     }
 
     final result = await _hazardService.voteHazard(
-      hazardId: state.hazard.id!,
+      hazardId: _hazardId,
       voteType: voteType,
     );
     if (!mounted) return;
@@ -130,7 +132,7 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
   }
 
   /// Updates [HazardItemProviderState.hazard] with the new [hazard].
-  void updateHazard(final Hazard hazard) {
+  void updateHazard(final Hazard? hazard) {
     state = state.copyWith(
       hazard: hazard,
     );
@@ -139,7 +141,7 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
   /// Updates the user vote type in the hazard state.
   void updateVoteTypeInTheState(final HazardVoteType? voteType) {
     updateHazard(
-      state.hazard.copyWith(
+      state.hazard?.copyWith(
         userVoteType: voteType,
       ),
     );
@@ -148,7 +150,7 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
   /// Updates the upvote count in the hazard state.
   void updateUpvoteCountInTheState(final int upvoteCount) {
     updateHazard(
-      state.hazard.copyWith(
+      state.hazard?.copyWith(
         upvoteCount: upvoteCount,
       ),
     );
@@ -157,7 +159,7 @@ class HazardItemProvider extends StateNotifier<HazardItemProviderState> {
   /// Updates the downvote count in the hazard state.
   void updateDownvoteCountInTheState(final int downvoteCount) {
     updateHazard(
-      state.hazard.copyWith(
+      state.hazard?.copyWith(
         downvoteCount: downvoteCount,
       ),
     );

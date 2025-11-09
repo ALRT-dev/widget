@@ -56,7 +56,18 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
 }
 
 class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
-  late final provider = providerOfHazardItem(widget.hazard);
+  late final provider = providerOfHazardItem(widget.hazard.id ?? 'unknown');
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final isHazardNull = ref.read(provider).hazard == null;
+      if (isHazardNull) {
+        ref.read(provider.notifier).updateHazard(widget.hazard);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +75,17 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     ref.watch(provider.select((value) => null));
 
     _listenToVoteHazardState();
+
+    final isHazardNull = ref.watch(
+      provider.select(
+        (value) => value.hazard == null,
+      ),
+    );
+    if (isHazardNull) {
+      return const SizedBox.shrink();
+    }
+
+    print('Category: ${widget.hazard.category}, Title: ${widget.hazard.title}');
 
     return InkWell(
       onTap: _gotoViewHazard,
@@ -123,22 +145,22 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       builder: (context, ref, child) {
         final hazardColor = ref.watch(
           provider.select(
-            (value) => value.hazard.color,
+            (value) => value.hazard!.color,
           ),
         );
         final severity = ref.watch(
           provider.select(
-            (value) => value.hazard.severity,
+            (value) => value.hazard!.severity,
           ),
         );
         final severityTitle = ref.watch(
           provider.select(
-            (value) => value.hazard.severityTitle,
+            (value) => value.hazard!.severityTitle,
           ),
         );
         final source = ref.watch(
           provider.select(
-            (value) => value.hazard.source,
+            (value) => value.hazard!.source,
           ),
         );
 
@@ -282,19 +304,20 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       builder: (context, ref, child) {
         final iconPath = ref.watch(
           provider.select(
-            (value) => value.hazard.iconPath,
+            (value) => value.hazard!.iconPath,
           ),
         );
         final fallbackIconPath = ref.watch(
           provider.select(
-            (value) => value.hazard.fallbackIconPath,
+            (value) => value.hazard!.fallbackIconPath,
           ),
         );
         final fallbackIconPath2 = ref.watch(
           provider.select(
-            (value) => value.hazard.fallbackIconPath2,
+            (value) => value.hazard!.fallbackIconPath2,
           ),
         );
+
         return Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -334,12 +357,12 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       builder: (context, ref, child) {
         final title = ref.watch(
           provider.select(
-            (value) => value.hazard.title ?? 'Unknown Hazard',
+            (value) => value.hazard!.title ?? 'Unknown Hazard',
           ),
         );
         final createdAt = ref.watch(
           provider.select(
-            (value) => value.hazard.createdAt,
+            (value) => value.hazard!.createdAt,
           ),
         );
         return RichText(
@@ -390,16 +413,16 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       builder: (context, ref, child) {
         final shortDescription = ref.watch(
           provider.select(
-            (value) => value.hazard.shortDescription?.trim(),
+            (value) => value.hazard!.shortDescription?.trim(),
           ),
         );
         final callToAction = ref.watch(
           provider.select(
             (value) =>
-                !value.hazard.isUserReported &&
-                    value.hazard.severity == HazardSeverity.unknown
+                !value.hazard!.isUserReported &&
+                    value.hazard!.severity == HazardSeverity.unknown
                 ? null
-                : value.hazard.callToAction?.trim(),
+                : value.hazard!.callToAction?.trim(),
           ),
         );
 
@@ -426,12 +449,12 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           builder: (context, ref, child) {
             final otherLatitude = ref.watch(
               provider.select(
-                (value) => value.hazard.latitude,
+                (value) => value.hazard!.latitude,
               ),
             );
             final otherLongitude = ref.watch(
               provider.select(
-                (value) => value.hazard.longitude,
+                (value) => value.hazard!.longitude,
               ),
             );
             if (otherLatitude == null || otherLongitude == null) {
@@ -475,7 +498,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           builder: (context, ref, child) {
             final expiresAt = ref.watch(
               provider.select(
-                (value) => value.hazard.expiresAt,
+                (value) => value.hazard!.expiresAt,
               ),
             );
 
@@ -504,13 +527,13 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     return Consumer(
       builder: (context, ref, child) {
         final voteType = ref.watch(
-          provider.select((value) => value.hazard.userVoteType),
+          provider.select((value) => value.hazard!.userVoteType),
         );
         final voteCount = ref.watch(
-          provider.select((value) => value.hazard.voteCount),
+          provider.select((value) => value.hazard!.voteCount),
         );
         final isExpired = ref.watch(
-          provider.select((value) => value.hazard.isExpired),
+          provider.select((value) => value.hazard!.isExpired),
         );
 
         return TrustMeter(
@@ -550,6 +573,8 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
   /// Navigate to the View Hazard screen with the current hazard as an argument.
   void _gotoViewHazard() {
     final hazard = ref.read(provider).hazard;
+    if (hazard == null) return;
+
     context.unfocusInputs();
     context.push(
       ViewHazardScreen.route,
@@ -561,7 +586,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
 
   /// Handle voting on the hazard by updating the provider and calling the vote function.
   void _voteOnHazard(final HazardVoteType type) {
-    final isExpired = ref.read(provider).hazard.isExpired;
+    final isExpired = ref.read(provider).hazard?.isExpired ?? false;
     if (isExpired) {
       context.showErrorToast(
         message: 'Cannot vote on an expired hazard.',
