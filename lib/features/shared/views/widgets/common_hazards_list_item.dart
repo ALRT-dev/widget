@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/notification/views/widgets/trust_meter.dart';
-import 'package:hazard_app/features/shared/enums/bushfire_alert_level_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/extensions/color_extension.dart';
@@ -122,11 +121,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
   Widget _headerBuilder() {
     return Consumer(
       builder: (context, ref, child) {
-        final bushFireAlertLevel = ref.watch(
-          provider.select(
-            (value) => value.hazard.bushFireAlertLevel,
-          ),
-        );
         final hazardColor = ref.watch(
           provider.select(
             (value) => value.hazard.color,
@@ -161,10 +155,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   topLeft: Radius.circular(16.spMin),
                   topRight: Radius.circular(16.spMin),
                 ),
-                border:
-                    severity != HazardSeverity.unknown &&
-                        (bushFireAlertLevel == null ||
-                            bushFireAlertLevel == BushfireAlertLevel.advice)
+                border: severity != HazardSeverity.unknown
                     ? null
                     : Border(
                         bottom: BorderSide(
@@ -249,9 +240,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                       ],
                     ),
                   ),
-                  if (severity != HazardSeverity.unknown &&
-                      (bushFireAlertLevel == null ||
-                          bushFireAlertLevel == BushfireAlertLevel.advice))
+                  if (severity != HazardSeverity.unknown)
                     Text(
                       severityTitle,
                       style: TextStyle(
@@ -406,7 +395,9 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         );
         final callToAction = ref.watch(
           provider.select(
-            (value) => value.hazard.callToAction?.trim(),
+            (value) => value.hazard.severity == HazardSeverity.unknown
+                ? null
+                : value.hazard.callToAction?.trim(),
           ),
         );
 

@@ -142,7 +142,7 @@ class HazardService {
         if (filtersResult == null) getHazardFilters(searchParams: searchParams),
       ]);
       final batchResults = results[0] as List<Either<List<Hazard>, AppError>>;
-      filtersResult = results[1] as Either<HazardFilters, AppError>?;
+      filtersResult ??= results[1] as Either<HazardFilters, AppError>?;
 
       // Process batch results
       bool hasDataInThisBatch = false;

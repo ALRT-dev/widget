@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
-import 'package:hazard_app/features/shared/enums/bushfire_alert_level_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/video_priority_types.dart';
@@ -104,7 +103,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     _buildAISummarySection(),
                     24.spMin.hSizedBox,
                   ],
-                  if (widget.args.hazard.callToAction?.isNotEmpty ?? false) ...[
+                  if (widget.args.hazard.severity != HazardSeverity.unknown &&
+                      (widget.args.hazard.callToAction?.isNotEmpty ??
+                          false)) ...[
                     _buildCallToActionSection(),
                     24.spMin.hSizedBox,
                   ],
@@ -114,11 +115,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     _buildDescriptionSection(),
                     24.spMin.hSizedBox,
                   ],
-                  if ((widget.args.hazard.bushFireAlertLevel == null ||
-                          widget.args.hazard.bushFireAlertLevel ==
-                              BushfireAlertLevel.advice) &&
-                      widget.args.hazard.severity !=
-                          HazardSeverity.unknown) ...[
+                  if (widget.args.hazard.severity !=
+                      HazardSeverity.unknown) ...[
                     _buildSeveritySection(),
                     24.spMin.hSizedBox,
                   ],
@@ -500,7 +498,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     }
 
     return _buildSection(
-      title: 'Full Description',
+      title: 'Official Description',
       icon: Icons.description_outlined,
       child: Container(
         padding: EdgeInsets.all(16.spMin),

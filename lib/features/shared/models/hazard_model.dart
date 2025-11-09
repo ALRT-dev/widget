@@ -13,7 +13,6 @@ import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_source_model.dart';
 import 'package:hazard_app/features/shared/models/s3_media_model.dart';
-import 'package:hazard_app/others/app_colors.dart';
 
 part 'hazard_model.freezed.dart';
 part 'hazard_model.g.dart';
@@ -145,12 +144,6 @@ abstract class Hazard with _$Hazard {
       return 'assets/images/hazards/non_aws/${categoryId}_user.png';
     }
 
-    if (bushFireAlertLevel != null &&
-        bushFireAlertLevel != BushfireAlertLevel.advice) {
-      final alertLevelName = bushFireAlertLevel!.name;
-      return 'assets/images/hazards/aws/${categoryId}_$alertLevelName.png';
-    }
-
     final severityName = severity?.name ?? HazardSeverity.info.name;
     return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${categoryId}_$severityName.png';
   }
@@ -185,12 +178,6 @@ abstract class Hazard with _$Hazard {
   ) {
     var key =
         '${categoryId}_${severity?.name ?? HazardSeverity.info.name}${isAwsCompliant == true ? '_aws' : '_non_aws'}';
-
-    /// For bushfire hazards, use the bushfire alert level in the key
-    if (bushFireAlertLevel != null &&
-        bushFireAlertLevel != BushfireAlertLevel.advice) {
-      key = '${categoryId}_${bushFireAlertLevel!.name}';
-    }
 
     if (reportedBy != null) {
       key = '${categoryId}_user';
@@ -232,12 +219,6 @@ abstract class Hazard with _$Hazard {
 
   /// The color associated with the hazard's severity.
   Color get color {
-    // If the hazard is a bushfire and has a specific alert level, use that color
-    if (bushFireAlertLevel != null &&
-        bushFireAlertLevel != BushfireAlertLevel.advice) {
-      return AppColors.transparent;
-    }
-
     // If the hazard is user-reported, use the user report status color
     if (reportedBy != null) {
       final reportsStatus = reportedBy!.reportsStatus;
