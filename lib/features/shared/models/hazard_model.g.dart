@@ -19,6 +19,7 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   category: json['category'] == null
       ? null
       : HazardCategory.fromJson(json['category'] as Map<String, dynamic>),
+  fireStatus: $enumDecodeNullable(_$FireStatusEnumMap, json['fireStatus']),
   source: json['source'] == null
       ? null
       : HazardSource.fromJson(json['source'] as Map<String, dynamic>),
@@ -84,6 +85,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'locationName': ?instance.locationName,
   'categoryId': ?instance.categoryId,
   'category': ?instance.category?.toJson(),
+  'fireStatus': ?_$FireStatusEnumMap[instance.fireStatus],
   'source': ?instance.source?.toJson(),
   'aiSummary': ?instance.aiSummary,
   'aiSeverity': ?_$HazardSeverityEnumMap[instance.aiSeverity],
@@ -127,6 +129,13 @@ const _$HazardSeverityEnumMap = {
   HazardSeverity.advice: 'advice',
   HazardSeverity.watchAndAct: 'watchAndAct',
   HazardSeverity.emergency: 'emergency',
+};
+
+const _$FireStatusEnumMap = {
+  FireStatus.active: 'active',
+  FireStatus.beingControlled: 'beingControlled',
+  FireStatus.underControl: 'underControl',
+  FireStatus.closed: 'closed',
 };
 
 const _$AIConfidenceEnumMap = {

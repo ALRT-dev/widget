@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/fire_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
@@ -433,15 +434,12 @@ class HazardService {
     }
 
     // Generate bitmaps for bushfire markers
-    final bushfireMarkerKeys = [
-      'bushfire_notApplicable',
-      'bushfire_plannedBurn',
-      'bushfire_responding',
-    ];
-    for (final key in bushfireMarkerKeys) {
+    for (final fireStatus in FireStatus.values) {
+      final key = 'fireStatus_${fireStatus.name}';
       final future = getBitmapDescriptorForAssetPath(
-        assetPath: 'assets/images/hazards/aws/$key.png',
-        fallbackAssetPath: 'assets/images/hazards/aws/bushfire_advice.png',
+        assetPath: 'assets/images/hazards/non_aws/$key.png',
+        fallbackAssetPath:
+            'assets/images/hazards/non_aws/fireStatus_underControl.png',
       ).then((bitmap) => {key: bitmap});
       futures.add(future);
     }

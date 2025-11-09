@@ -4,7 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/shared/converters/date_time_converter.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
-import 'package:hazard_app/features/shared/enums/bushfire_alert_level_types.dart';
+import 'package:hazard_app/features/shared/enums/fire_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
@@ -51,6 +51,11 @@ abstract class Hazard with _$Hazard {
 
     /// The category the hazard belongs to.
     final HazardCategory? category,
+
+    /// The fire status of the hazard (if applicable).
+    ///
+    /// If the hazard is not a fire-related hazard, this will be null.
+    final FireStatus? fireStatus,
 
     /// The source details of the hazard.
     final HazardSource? source,
@@ -140,6 +145,13 @@ abstract class Hazard with _$Hazard {
 
   /// The file path for the hazard icon based on its category and severity.
   String get iconPath {
+    if (fireStatus != null) {
+      if ((categoryId == "bushfire" && isAwsCompliant == false) ||
+          categoryId == "otherFire") {
+        return 'assets/images/hazards/non_aws/fireStatus_${fireStatus!.name}.png';
+      }
+    }
+
     if (reportedBy != null) {
       return 'assets/images/hazards/non_aws/${categoryId}_user.png';
     }
@@ -179,42 +191,20 @@ abstract class Hazard with _$Hazard {
     var key =
         '${categoryId}_${severity?.name ?? HazardSeverity.info.name}${isAwsCompliant == true ? '_aws' : '_non_aws'}';
 
+    // Check for fire status override
+    if (fireStatus != null) {
+      if ((categoryId == "bushfire" && isAwsCompliant == false) ||
+          categoryId == "otherFire") {
+        key = 'fireStatus_${fireStatus!.name}';
+      }
+    }
+
+    // Check for user-reported override
     if (reportedBy != null) {
       key = '${categoryId}_user';
     }
 
     return bitmapMap[key];
-  }
-
-  /// Determines the bushfire alert level if the hazard is a bushfire.
-  ///
-  /// Returns null if the hazard is not a bushfire or if the description is empty.
-  BushfireAlertLevel? get bushFireAlertLevel {
-    if (!(category?.isBushfire ?? false) || (description?.isEmpty ?? true)) {
-      return null;
-    }
-    final matchedLevel = BushfireAlertLevel.values.firstWhere(
-      (level) => level.keywords.any(
-        (keyword) => description!.toLowerCase().contains(
-          RegExp(r'\b' + keyword + r'\b'),
-        ),
-      ),
-      orElse: () => BushfireAlertLevel.notApplicable,
-    );
-
-    if (matchedLevel != BushfireAlertLevel.advice) {
-      // if description contains 'advice', return advice level
-      final isAdvice = BushfireAlertLevel.advice.keywords.any(
-        (keyword) => description!.toLowerCase().contains(
-          RegExp(r'\b' + keyword + r'\b'),
-        ),
-      );
-      if (isAdvice) {
-        return BushfireAlertLevel.advice;
-      }
-    }
-
-    return matchedLevel;
   }
 
   /// The color associated with the hazard's severity.

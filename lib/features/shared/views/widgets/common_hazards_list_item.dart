@@ -395,7 +395,9 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         );
         final callToAction = ref.watch(
           provider.select(
-            (value) => value.hazard.severity == HazardSeverity.unknown
+            (value) =>
+                !value.hazard.isUserReported &&
+                    value.hazard.severity == HazardSeverity.unknown
                 ? null
                 : value.hazard.callToAction?.trim(),
           ),
