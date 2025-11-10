@@ -1,3 +1,8 @@
+## v1.0.0+7 - 2025/11/09
+* UI improvements
+* Hazard icon updates
+
+
 ## v1.0.0+6 - 2025/11/08
 * UI improvements
 * Hazard icon updates
