@@ -42,7 +42,7 @@ class AppTheme {
             color: AppColors.primary,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100.spMin),
+            borderRadius: BorderRadius.circular(12.spMin),
           ),
           foregroundColor: AppColors.black,
           textStyle: TextStyle(
