@@ -85,8 +85,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       return const SizedBox.shrink();
     }
 
-    print('Category: ${widget.hazard.category}, Title: ${widget.hazard.title}');
-
     return InkWell(
       onTap: _gotoViewHazard,
       borderRadius: BorderRadius.circular(18.spMin),
