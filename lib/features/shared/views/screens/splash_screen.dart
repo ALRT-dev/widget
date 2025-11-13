@@ -165,10 +165,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       duration: const Duration(milliseconds: 600),
       child: Padding(
         padding: const EdgeInsets.only(bottom: 48),
-        child: Image.asset(
-          'assets/logos/alrt_logo_detailed.png',
-          width: 320,
-          filterQuality: FilterQuality.high,
+        child: Hero(
+          tag: 'app_logo',
+          child: Image.asset(
+            'assets/logos/alrt_logo_detailed.png',
+            width: 320,
+            filterQuality: FilterQuality.high,
+          ),
         ),
       ),
     );

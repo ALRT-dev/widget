@@ -140,10 +140,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   Widget _buildBrandSection() {
     return Column(
       children: [
-        Image.asset(
-          'assets/logos/alrt_logo_detailed.png',
-          width: 250,
-          filterQuality: FilterQuality.high,
+        Hero(
+          tag: 'app_logo',
+          child: Image.asset(
+            'assets/logos/alrt_logo_detailed.png',
+            width: 250,
+            filterQuality: FilterQuality.high,
+          ),
         ),
         Text(
           'Welcome to ALRT',
@@ -151,7 +154,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         ),
         8.hSizedBox,
         Text(
-          'Fast, plain-language safety alerts. Pick your role to tailor your experience.',
+          'Fast, plain-language safety alerts.',
           textAlign: TextAlign.center,
           style: TextStyle(
             color: AppColors.grey,
