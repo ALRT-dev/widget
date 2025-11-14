@@ -4,6 +4,7 @@ import 'package:hazard_app/features/auth/models/auth_success_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
+import 'package:hazard_app/others/env.dart';
 
 abstract class AuthRepository {
   Future<Either<void, AppError>> initializeGoogleSignIn();
@@ -28,7 +29,9 @@ class AuthRepositoryImpl implements AuthRepository {
     return runAsyncCall(
       name: 'initializeGoogleSignIn',
       future: () async {
-        await _googleSignIn.initialize();
+        await _googleSignIn.initialize(
+          serverClientId: Env.googleAuthServerClientId,
+        );
         return const Success(null);
       },
       onError: Failure.new,

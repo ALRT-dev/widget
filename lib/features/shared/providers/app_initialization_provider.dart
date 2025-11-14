@@ -71,7 +71,9 @@ class AppInitializationProvider extends Notifier<bool> {
   }
 
   /// Generates hazard marker bitmaps.
-  Future<void> _generateMarkerBitmaps() {
+  Future<void> _generateMarkerBitmaps() async {
+    final isLoggedIn = ref.read(providerOfLoggedInUser) != null;
+    if (!isLoggedIn) return;
     return ref
         .read(providerOfHazardMarkerBitmaps.notifier)
         .generateMarkerBitmaps();
