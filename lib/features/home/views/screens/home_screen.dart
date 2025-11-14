@@ -35,9 +35,22 @@ import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provi
 import 'package:hazard_app/features/shared/providers/user_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 
+class HomeScreenArgs {
+  final HomeTab initialTab;
+
+  HomeScreenArgs({
+    this.initialTab = HomeTab.map,
+  });
+}
+
 class HomeScreen extends ConsumerStatefulWidget {
   /// Displays the home screen of the app.
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    required this.args,
+  });
+
+  final HomeScreenArgs args;
 
   static const route = '/home';
 
@@ -49,6 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin {
   late final _tabController = TabController(
     length: HomeTab.values.length,
+    initialIndex: widget.args.initialTab.index,
     vsync: this,
   );
 
@@ -162,6 +176,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   void _onInit() {
+    ref.read(providerOfHomeTab.notifier).state = widget.args.initialTab;
+
     // fetch hazard categories for dropdowns
     ref
         .read(providerOfHazardFiltersForDropdown.notifier)

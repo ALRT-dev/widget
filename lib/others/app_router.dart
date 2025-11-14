@@ -8,6 +8,12 @@ import 'package:hazard_app/features/map/views/screens/navigation_screen.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_on_map_screen.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
+import 'package:hazard_app/features/onboarding/views/onboarding_alert_sources_screen.dart';
+import 'package:hazard_app/features/onboarding/views/onboarding_complete_screen.dart';
+import 'package:hazard_app/features/onboarding/views/onboarding_emergency_screen.dart';
+import 'package:hazard_app/features/onboarding/views/onboarding_location_screen.dart';
+import 'package:hazard_app/features/onboarding/views/onboarding_radius_screen.dart';
+import 'package:hazard_app/features/onboarding/views/onboarding_welcome_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
@@ -42,9 +48,47 @@ class AppRouter {
           },
         ),
         GoRoute(
+          path: OnboardingWelcomeScreen.route,
+          builder: (context, state) {
+            return const OnboardingWelcomeScreen();
+          },
+        ),
+        GoRoute(
+          path: OnboardingLocationScreen.route,
+          builder: (context, state) {
+            return const OnboardingLocationScreen();
+          },
+        ),
+        GoRoute(
+          path: OnboardingRadiusScreen.route,
+          builder: (context, state) {
+            return const OnboardingRadiusScreen();
+          },
+        ),
+        GoRoute(
+          path: OnboardingAlertSourcesScreen.route,
+          builder: (context, state) {
+            return const OnboardingAlertSourcesScreen();
+          },
+        ),
+        GoRoute(
+          path: OnboardingEmergencyScreen.route,
+          builder: (context, state) {
+            return const OnboardingEmergencyScreen();
+          },
+        ),
+        GoRoute(
+          path: OnboardingCompleteScreen.route,
+          builder: (context, state) {
+            return const OnboardingCompleteScreen();
+          },
+        ),
+        GoRoute(
           path: HomeScreen.route,
           builder: (context, state) {
-            return const HomeScreen();
+            return HomeScreen(
+              args: (state.extra as HomeScreenArgs?) ?? HomeScreenArgs(),
+            );
           },
         ),
         GoRoute(
