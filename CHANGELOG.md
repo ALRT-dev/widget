@@ -1,3 +1,7 @@
+## v1.0.0+8 - 2025/11/14
+* New UI for Auth and Onboarding flows
+
+
 ## v1.0.0+7 - 2025/11/09
 * UI improvements
 * Hazard icon updates
