@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/shared/enums/user_reports_status_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/utils/location_helper.dart';
@@ -21,8 +20,8 @@ abstract class AppUser with _$AppUser {
     /// The user's email address.
     final String? email,
 
-    /// Indicates the onboarding step the user is currently on.
-    final OnboardingStep? onboardingStep,
+    /// Indicates the onboarding steps the user has completed.
+    @Default(false) final bool isOnboardingCompleted,
 
     /// The URL of the user's profile picture.
     @JsonKey(name: 'profilePicturePresignedUrl')

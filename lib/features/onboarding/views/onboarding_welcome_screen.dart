@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
+import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/gradient_button.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/logo.dart';
-import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -483,20 +482,6 @@ class _OnboardingWelcomeScreenState
   }
 
   void _onGetStarted() async {
-    final result = await ref
-        .read(providerOfOnboarding.notifier)
-        .startOnboarding();
-    if (!mounted) return;
-
-    result.when(
-      (onboardingResponse) {
-        context.push(onboardingResponse.nextOnboardingStep.route);
-      },
-      (error) {
-        context.showErrorToast(
-          message: error.message,
-        );
-      },
-    );
+    context.push(OnboardingStep.welcome.nextStep.route);
   }
 }

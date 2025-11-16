@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/logo.dart';
@@ -660,7 +661,7 @@ class _OnboardingEmergencyScreenState
 
     result.when(
       (onboardingResponse) {
-        context.push(onboardingResponse.nextOnboardingStep.route);
+        context.push(OnboardingStep.tosAcceptance.nextStep.route);
       },
       (error) {
         context.showErrorToast(

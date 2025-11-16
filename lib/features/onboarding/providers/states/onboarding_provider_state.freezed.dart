@@ -14,8 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$OnboardingProviderState {
 
-/// The current step in the onboarding process.
- OnboardingStep get currentOnboardingStep;/// The selected notification radius during onboarding.
+/// The selected notification radius during onboarding.
  int? get selectedRadius;/// The selected notification preference during onboarding.
  PushNotificationPreference? get selectedNotificationPreference;/// The state of continuing the onboarding process.
  ContinueOnboarding get continueOnboarding;
@@ -29,16 +28,16 @@ $OnboardingProviderStateCopyWith<OnboardingProviderState> get copyWith => _$Onbo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OnboardingProviderState&&(identical(other.currentOnboardingStep, currentOnboardingStep) || other.currentOnboardingStep == currentOnboardingStep)&&(identical(other.selectedRadius, selectedRadius) || other.selectedRadius == selectedRadius)&&(identical(other.selectedNotificationPreference, selectedNotificationPreference) || other.selectedNotificationPreference == selectedNotificationPreference)&&(identical(other.continueOnboarding, continueOnboarding) || other.continueOnboarding == continueOnboarding));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OnboardingProviderState&&(identical(other.selectedRadius, selectedRadius) || other.selectedRadius == selectedRadius)&&(identical(other.selectedNotificationPreference, selectedNotificationPreference) || other.selectedNotificationPreference == selectedNotificationPreference)&&(identical(other.continueOnboarding, continueOnboarding) || other.continueOnboarding == continueOnboarding));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currentOnboardingStep,selectedRadius,selectedNotificationPreference,continueOnboarding);
+int get hashCode => Object.hash(runtimeType,selectedRadius,selectedNotificationPreference,continueOnboarding);
 
 @override
 String toString() {
-  return 'OnboardingProviderState(currentOnboardingStep: $currentOnboardingStep, selectedRadius: $selectedRadius, selectedNotificationPreference: $selectedNotificationPreference, continueOnboarding: $continueOnboarding)';
+  return 'OnboardingProviderState(selectedRadius: $selectedRadius, selectedNotificationPreference: $selectedNotificationPreference, continueOnboarding: $continueOnboarding)';
 }
 
 
@@ -49,7 +48,7 @@ abstract mixin class $OnboardingProviderStateCopyWith<$Res>  {
   factory $OnboardingProviderStateCopyWith(OnboardingProviderState value, $Res Function(OnboardingProviderState) _then) = _$OnboardingProviderStateCopyWithImpl;
 @useResult
 $Res call({
- OnboardingStep currentOnboardingStep, int? selectedRadius, PushNotificationPreference? selectedNotificationPreference, ContinueOnboarding continueOnboarding
+ int? selectedRadius, PushNotificationPreference? selectedNotificationPreference, ContinueOnboarding continueOnboarding
 });
 
 
@@ -66,10 +65,9 @@ class _$OnboardingProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of OnboardingProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? currentOnboardingStep = null,Object? selectedRadius = freezed,Object? selectedNotificationPreference = freezed,Object? continueOnboarding = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? selectedRadius = freezed,Object? selectedNotificationPreference = freezed,Object? continueOnboarding = null,}) {
   return _then(_self.copyWith(
-currentOnboardingStep: null == currentOnboardingStep ? _self.currentOnboardingStep : currentOnboardingStep // ignore: cast_nullable_to_non_nullable
-as OnboardingStep,selectedRadius: freezed == selectedRadius ? _self.selectedRadius : selectedRadius // ignore: cast_nullable_to_non_nullable
+selectedRadius: freezed == selectedRadius ? _self.selectedRadius : selectedRadius // ignore: cast_nullable_to_non_nullable
 as int?,selectedNotificationPreference: freezed == selectedNotificationPreference ? _self.selectedNotificationPreference : selectedNotificationPreference // ignore: cast_nullable_to_non_nullable
 as PushNotificationPreference?,continueOnboarding: null == continueOnboarding ? _self.continueOnboarding : continueOnboarding // ignore: cast_nullable_to_non_nullable
 as ContinueOnboarding,
@@ -166,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( OnboardingStep currentOnboardingStep,  int? selectedRadius,  PushNotificationPreference? selectedNotificationPreference,  ContinueOnboarding continueOnboarding)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? selectedRadius,  PushNotificationPreference? selectedNotificationPreference,  ContinueOnboarding continueOnboarding)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _OnboardingProviderState() when $default != null:
-return $default(_that.currentOnboardingStep,_that.selectedRadius,_that.selectedNotificationPreference,_that.continueOnboarding);case _:
+return $default(_that.selectedRadius,_that.selectedNotificationPreference,_that.continueOnboarding);case _:
   return orElse();
 
 }
@@ -187,10 +185,10 @@ return $default(_that.currentOnboardingStep,_that.selectedRadius,_that.selectedN
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( OnboardingStep currentOnboardingStep,  int? selectedRadius,  PushNotificationPreference? selectedNotificationPreference,  ContinueOnboarding continueOnboarding)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? selectedRadius,  PushNotificationPreference? selectedNotificationPreference,  ContinueOnboarding continueOnboarding)  $default,) {final _that = this;
 switch (_that) {
 case _OnboardingProviderState():
-return $default(_that.currentOnboardingStep,_that.selectedRadius,_that.selectedNotificationPreference,_that.continueOnboarding);case _:
+return $default(_that.selectedRadius,_that.selectedNotificationPreference,_that.continueOnboarding);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +205,10 @@ return $default(_that.currentOnboardingStep,_that.selectedRadius,_that.selectedN
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( OnboardingStep currentOnboardingStep,  int? selectedRadius,  PushNotificationPreference? selectedNotificationPreference,  ContinueOnboarding continueOnboarding)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? selectedRadius,  PushNotificationPreference? selectedNotificationPreference,  ContinueOnboarding continueOnboarding)?  $default,) {final _that = this;
 switch (_that) {
 case _OnboardingProviderState() when $default != null:
-return $default(_that.currentOnboardingStep,_that.selectedRadius,_that.selectedNotificationPreference,_that.continueOnboarding);case _:
+return $default(_that.selectedRadius,_that.selectedNotificationPreference,_that.continueOnboarding);case _:
   return null;
 
 }
@@ -222,11 +220,9 @@ return $default(_that.currentOnboardingStep,_that.selectedRadius,_that.selectedN
 
 
 class _OnboardingProviderState implements OnboardingProviderState {
-  const _OnboardingProviderState({this.currentOnboardingStep = OnboardingStep.welcome, this.selectedRadius, this.selectedNotificationPreference, this.continueOnboarding = const ContinueOnboarding.initial()});
+  const _OnboardingProviderState({this.selectedRadius, this.selectedNotificationPreference, this.continueOnboarding = const ContinueOnboarding.initial()});
   
 
-/// The current step in the onboarding process.
-@override@JsonKey() final  OnboardingStep currentOnboardingStep;
 /// The selected notification radius during onboarding.
 @override final  int? selectedRadius;
 /// The selected notification preference during onboarding.
@@ -244,16 +240,16 @@ _$OnboardingProviderStateCopyWith<_OnboardingProviderState> get copyWith => __$O
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OnboardingProviderState&&(identical(other.currentOnboardingStep, currentOnboardingStep) || other.currentOnboardingStep == currentOnboardingStep)&&(identical(other.selectedRadius, selectedRadius) || other.selectedRadius == selectedRadius)&&(identical(other.selectedNotificationPreference, selectedNotificationPreference) || other.selectedNotificationPreference == selectedNotificationPreference)&&(identical(other.continueOnboarding, continueOnboarding) || other.continueOnboarding == continueOnboarding));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OnboardingProviderState&&(identical(other.selectedRadius, selectedRadius) || other.selectedRadius == selectedRadius)&&(identical(other.selectedNotificationPreference, selectedNotificationPreference) || other.selectedNotificationPreference == selectedNotificationPreference)&&(identical(other.continueOnboarding, continueOnboarding) || other.continueOnboarding == continueOnboarding));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,currentOnboardingStep,selectedRadius,selectedNotificationPreference,continueOnboarding);
+int get hashCode => Object.hash(runtimeType,selectedRadius,selectedNotificationPreference,continueOnboarding);
 
 @override
 String toString() {
-  return 'OnboardingProviderState(currentOnboardingStep: $currentOnboardingStep, selectedRadius: $selectedRadius, selectedNotificationPreference: $selectedNotificationPreference, continueOnboarding: $continueOnboarding)';
+  return 'OnboardingProviderState(selectedRadius: $selectedRadius, selectedNotificationPreference: $selectedNotificationPreference, continueOnboarding: $continueOnboarding)';
 }
 
 
@@ -264,7 +260,7 @@ abstract mixin class _$OnboardingProviderStateCopyWith<$Res> implements $Onboard
   factory _$OnboardingProviderStateCopyWith(_OnboardingProviderState value, $Res Function(_OnboardingProviderState) _then) = __$OnboardingProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- OnboardingStep currentOnboardingStep, int? selectedRadius, PushNotificationPreference? selectedNotificationPreference, ContinueOnboarding continueOnboarding
+ int? selectedRadius, PushNotificationPreference? selectedNotificationPreference, ContinueOnboarding continueOnboarding
 });
 
 
@@ -281,10 +277,9 @@ class __$OnboardingProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of OnboardingProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? currentOnboardingStep = null,Object? selectedRadius = freezed,Object? selectedNotificationPreference = freezed,Object? continueOnboarding = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? selectedRadius = freezed,Object? selectedNotificationPreference = freezed,Object? continueOnboarding = null,}) {
   return _then(_OnboardingProviderState(
-currentOnboardingStep: null == currentOnboardingStep ? _self.currentOnboardingStep : currentOnboardingStep // ignore: cast_nullable_to_non_nullable
-as OnboardingStep,selectedRadius: freezed == selectedRadius ? _self.selectedRadius : selectedRadius // ignore: cast_nullable_to_non_nullable
+selectedRadius: freezed == selectedRadius ? _self.selectedRadius : selectedRadius // ignore: cast_nullable_to_non_nullable
 as int?,selectedNotificationPreference: freezed == selectedNotificationPreference ? _self.selectedNotificationPreference : selectedNotificationPreference // ignore: cast_nullable_to_non_nullable
 as PushNotificationPreference?,continueOnboarding: null == continueOnboarding ? _self.continueOnboarding : continueOnboarding // ignore: cast_nullable_to_non_nullable
 as ContinueOnboarding,
@@ -420,12 +415,12 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( OnboardingStep nextOnboardingStep)?  success,TResult Function( AppError error)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  success,TResult Function( AppError error)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ContinueOnboardingInitial() when initial != null:
 return initial();case _ContinueOnboardingLoading() when loading != null:
 return loading();case _ContinueOnboardingSuccess() when success != null:
-return success(_that.nextOnboardingStep);case _ContinueOnboardingError() when error != null:
+return success();case _ContinueOnboardingError() when error != null:
 return error(_that.error);case _:
   return orElse();
 
@@ -444,12 +439,12 @@ return error(_that.error);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( OnboardingStep nextOnboardingStep)  success,required TResult Function( AppError error)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  success,required TResult Function( AppError error)  error,}) {final _that = this;
 switch (_that) {
 case _ContinueOnboardingInitial():
 return initial();case _ContinueOnboardingLoading():
 return loading();case _ContinueOnboardingSuccess():
-return success(_that.nextOnboardingStep);case _ContinueOnboardingError():
+return success();case _ContinueOnboardingError():
 return error(_that.error);case _:
   throw StateError('Unexpected subclass');
 
@@ -467,12 +462,12 @@ return error(_that.error);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( OnboardingStep nextOnboardingStep)?  success,TResult? Function( AppError error)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  success,TResult? Function( AppError error)?  error,}) {final _that = this;
 switch (_that) {
 case _ContinueOnboardingInitial() when initial != null:
 return initial();case _ContinueOnboardingLoading() when loading != null:
 return loading();case _ContinueOnboardingSuccess() when success != null:
-return success(_that.nextOnboardingStep);case _ContinueOnboardingError() when error != null:
+return success();case _ContinueOnboardingError() when error != null:
 return error(_that.error);case _:
   return null;
 
@@ -549,67 +544,33 @@ String toString() {
 
 
 class _ContinueOnboardingSuccess implements ContinueOnboarding {
-  const _ContinueOnboardingSuccess(this.nextOnboardingStep);
+  const _ContinueOnboardingSuccess();
   
 
- final  OnboardingStep nextOnboardingStep;
 
-/// Create a copy of ContinueOnboarding
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$ContinueOnboardingSuccessCopyWith<_ContinueOnboardingSuccess> get copyWith => __$ContinueOnboardingSuccessCopyWithImpl<_ContinueOnboardingSuccess>(this, _$identity);
+
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ContinueOnboardingSuccess&&(identical(other.nextOnboardingStep, nextOnboardingStep) || other.nextOnboardingStep == nextOnboardingStep));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ContinueOnboardingSuccess);
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,nextOnboardingStep);
+int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'ContinueOnboarding.success(nextOnboardingStep: $nextOnboardingStep)';
+  return 'ContinueOnboarding.success()';
 }
 
 
 }
 
-/// @nodoc
-abstract mixin class _$ContinueOnboardingSuccessCopyWith<$Res> implements $ContinueOnboardingCopyWith<$Res> {
-  factory _$ContinueOnboardingSuccessCopyWith(_ContinueOnboardingSuccess value, $Res Function(_ContinueOnboardingSuccess) _then) = __$ContinueOnboardingSuccessCopyWithImpl;
-@useResult
-$Res call({
- OnboardingStep nextOnboardingStep
-});
 
 
-
-
-}
-/// @nodoc
-class __$ContinueOnboardingSuccessCopyWithImpl<$Res>
-    implements _$ContinueOnboardingSuccessCopyWith<$Res> {
-  __$ContinueOnboardingSuccessCopyWithImpl(this._self, this._then);
-
-  final _ContinueOnboardingSuccess _self;
-  final $Res Function(_ContinueOnboardingSuccess) _then;
-
-/// Create a copy of ContinueOnboarding
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? nextOnboardingStep = null,}) {
-  return _then(_ContinueOnboardingSuccess(
-null == nextOnboardingStep ? _self.nextOnboardingStep : nextOnboardingStep // ignore: cast_nullable_to_non_nullable
-as OnboardingStep,
-  ));
-}
-
-
-}
 
 /// @nodoc
 

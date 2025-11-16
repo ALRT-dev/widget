@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/gradient_button.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
@@ -859,7 +860,7 @@ class _OnboardingLocationScreenState
 
     result.when(
       (onboardingResponse) {
-        context.push(onboardingResponse.nextOnboardingStep.route);
+        context.push(OnboardingStep.location.nextStep.route);
       },
       (error) {
         context.showErrorToast(

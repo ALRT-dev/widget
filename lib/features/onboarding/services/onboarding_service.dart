@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/onboarding/enums/push_notification_preference_types.dart';
-import 'package:hazard_app/features/onboarding/models/onboarding_response_model.dart';
 import 'package:hazard_app/features/onboarding/providers/repository_providers.dart';
 import 'package:hazard_app/features/onboarding/repositories/onboarding_repository.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -14,13 +13,8 @@ class OnboardingService {
   OnboardingRepository get _onboardingRepository =>
       _ref.read(providerOfOnboardingRepository);
 
-  /// Starts the user onboarding process.
-  Future<Either<OnboardingResponse, AppError>> startOnboarding() {
-    return _onboardingRepository.startOnboarding();
-  }
-
   /// Sets the user's location during onboarding.
-  Future<Either<OnboardingResponse, AppError>> setOnboardingLocation({
+  Future<Either<void, AppError>> setOnboardingLocation({
     required double latitude,
     required double longitude,
     String? locationName,
@@ -33,7 +27,7 @@ class OnboardingService {
   }
 
   /// Sets the user's notification radius during onboarding.
-  Future<Either<OnboardingResponse, AppError>> setOnboardingRadius({
+  Future<Either<void, AppError>> setOnboardingRadius({
     required double radiusInKm,
   }) {
     return _onboardingRepository.setOnboardingRadius(
@@ -42,8 +36,7 @@ class OnboardingService {
   }
 
   /// Sets the user's notification preferences during onboarding.
-  Future<Either<OnboardingResponse, AppError>>
-  setOnboardingNotificationPreferences({
+  Future<Either<void, AppError>> setOnboardingNotificationPreferences({
     required PushNotificationPreference pushNotificationPreference,
   }) {
     return _onboardingRepository.setOnboardingNotificationPreferences(
@@ -52,8 +45,7 @@ class OnboardingService {
   }
 
   /// Accepts the terms of service during onboarding.
-  Future<Either<OnboardingResponse, AppError>>
-  acceptOnboardingTermsOfService() {
+  Future<Either<void, AppError>> acceptOnboardingTermsOfService() {
     return _onboardingRepository.acceptOnboardingTermsOfService();
   }
 }

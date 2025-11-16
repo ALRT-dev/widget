@@ -1,29 +1,25 @@
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/onboarding/enums/push_notification_preference_types.dart';
-import 'package:hazard_app/features/onboarding/models/onboarding_response_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 
 abstract class OnboardingRepository {
-  Future<Either<OnboardingResponse, AppError>> startOnboarding();
-
-  Future<Either<OnboardingResponse, AppError>> setOnboardingLocation({
+  Future<Either<void, AppError>> setOnboardingLocation({
     required final double latitude,
     required final double longitude,
     final String? locationName,
   });
 
-  Future<Either<OnboardingResponse, AppError>> setOnboardingRadius({
+  Future<Either<void, AppError>> setOnboardingRadius({
     required final double radiusInKm,
   });
 
-  Future<Either<OnboardingResponse, AppError>>
-  setOnboardingNotificationPreferences({
+  Future<Either<void, AppError>> setOnboardingNotificationPreferences({
     required final PushNotificationPreference pushNotificationPreference,
   });
 
-  Future<Either<OnboardingResponse, AppError>> acceptOnboardingTermsOfService();
+  Future<Either<void, AppError>> acceptOnboardingTermsOfService();
 }
 
 class OnboardingRepositoryImpl implements OnboardingRepository {
@@ -34,19 +30,7 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   final RestClient _restClient;
 
   @override
-  Future<Either<OnboardingResponse, AppError>> startOnboarding() {
-    return runAsyncCall(
-      name: 'startOnboarding',
-      future: () async {
-        final result = await _restClient.startOnboarding();
-        return Success(result);
-      },
-      onError: Failure.new,
-    );
-  }
-
-  @override
-  Future<Either<OnboardingResponse, AppError>> setOnboardingLocation({
+  Future<Either<void, AppError>> setOnboardingLocation({
     required double latitude,
     required double longitude,
     String? locationName,
@@ -66,7 +50,7 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   }
 
   @override
-  Future<Either<OnboardingResponse, AppError>> setOnboardingRadius({
+  Future<Either<void, AppError>> setOnboardingRadius({
     required double radiusInKm,
   }) {
     return runAsyncCall(
@@ -82,8 +66,7 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   }
 
   @override
-  Future<Either<OnboardingResponse, AppError>>
-  setOnboardingNotificationPreferences({
+  Future<Either<void, AppError>> setOnboardingNotificationPreferences({
     required PushNotificationPreference pushNotificationPreference,
   }) {
     return runAsyncCall(
@@ -99,8 +82,7 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   }
 
   @override
-  Future<Either<OnboardingResponse, AppError>>
-  acceptOnboardingTermsOfService() {
+  Future<Either<void, AppError>> acceptOnboardingTermsOfService() {
     return runAsyncCall(
       name: 'acceptOnboardingTermsOfService',
       future: () async {

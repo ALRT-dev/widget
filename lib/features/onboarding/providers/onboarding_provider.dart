@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/onboarding/enums/push_notification_preference_types.dart';
-import 'package:hazard_app/features/onboarding/models/onboarding_response_model.dart';
 import 'package:hazard_app/features/onboarding/providers/service_providers.dart';
 import 'package:hazard_app/features/onboarding/providers/states/onboarding_provider_state.dart';
 import 'package:hazard_app/features/onboarding/services/onboarding_service.dart';
@@ -38,37 +37,8 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
     return _locationProvider.getLocation();
   }
 
-  /// Starts the user onboarding process.
-  Future<Either<OnboardingResponse, AppError>> startOnboarding() async {
-    state = state.copyWith(
-      continueOnboarding: const ContinueOnboarding.loading(),
-    );
-
-    final result = await _onboardingService.startOnboarding();
-
-    if (mounted) {
-      result.when(
-        (onboardingResponse) {
-          state = state.copyWith(
-            continueOnboarding: ContinueOnboarding.success(
-              onboardingResponse.nextOnboardingStep,
-            ),
-            currentOnboardingStep: onboardingResponse.nextOnboardingStep,
-          );
-        },
-        (error) {
-          state = state.copyWith(
-            continueOnboarding: ContinueOnboarding.error(error),
-          );
-        },
-      );
-    }
-
-    return result;
-  }
-
   /// Sets the user's location during onboarding.
-  Future<Either<OnboardingResponse, AppError>> setOnboardingLocation() async {
+  Future<Either<void, AppError>> setOnboardingLocation() async {
     state = state.copyWith(
       continueOnboarding: const ContinueOnboarding.loading(),
     );
@@ -87,10 +57,7 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
       result.when(
         (onboardingResponse) {
           state = state.copyWith(
-            continueOnboarding: ContinueOnboarding.success(
-              onboardingResponse.nextOnboardingStep,
-            ),
-            currentOnboardingStep: onboardingResponse.nextOnboardingStep,
+            continueOnboarding: ContinueOnboarding.success(),
           );
         },
         (error) {
@@ -105,7 +72,7 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
   }
 
   /// Sets the user's notification radius during onboarding.
-  Future<Either<OnboardingResponse, AppError>> setOnboardingRadius() async {
+  Future<Either<void, AppError>> setOnboardingRadius() async {
     if (state.selectedRadius == null) {
       return Failure(AppError(message: 'No radius selected'));
     }
@@ -122,10 +89,7 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
       result.when(
         (onboardingResponse) {
           state = state.copyWith(
-            continueOnboarding: ContinueOnboarding.success(
-              onboardingResponse.nextOnboardingStep,
-            ),
-            currentOnboardingStep: onboardingResponse.nextOnboardingStep,
+            continueOnboarding: ContinueOnboarding.success(),
           );
         },
         (error) {
@@ -140,8 +104,7 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
   }
 
   /// Sets the user's notification preferences during onboarding.
-  Future<Either<OnboardingResponse, AppError>>
-  setOnboardingNotificationPreferences() async {
+  Future<Either<void, AppError>> setOnboardingNotificationPreferences() async {
     if (state.selectedNotificationPreference == null) {
       return Failure(
         AppError(message: 'No notification preference selected'),
@@ -160,10 +123,7 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
       result.when(
         (onboardingResponse) {
           state = state.copyWith(
-            continueOnboarding: ContinueOnboarding.success(
-              onboardingResponse.nextOnboardingStep,
-            ),
-            currentOnboardingStep: onboardingResponse.nextOnboardingStep,
+            continueOnboarding: ContinueOnboarding.success(),
           );
         },
         (error) {
@@ -178,8 +138,7 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
   }
 
   /// Accepts the terms of service during onboarding.
-  Future<Either<OnboardingResponse, AppError>>
-  acceptOnboardingTermsOfService() async {
+  Future<Either<void, AppError>> acceptOnboardingTermsOfService() async {
     state = state.copyWith(
       continueOnboarding: const ContinueOnboarding.loading(),
     );
@@ -190,10 +149,7 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
       result.when(
         (onboardingResponse) {
           state = state.copyWith(
-            continueOnboarding: ContinueOnboarding.success(
-              onboardingResponse.nextOnboardingStep,
-            ),
-            currentOnboardingStep: onboardingResponse.nextOnboardingStep,
+            continueOnboarding: ContinueOnboarding.success(),
           );
         },
         (error) {

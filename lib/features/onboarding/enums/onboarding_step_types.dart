@@ -23,4 +23,20 @@ enum OnboardingStep {
         return '/onboarding/complete';
     }
   }
+
+  /// Returns the previous onboarding step.
+  OnboardingStep get previousStep {
+    return OnboardingStep.values[(index - 1).clamp(
+      0,
+      OnboardingStep.values.length - 1,
+    )];
+  }
+
+  /// Returns the next onboarding step.
+  OnboardingStep get nextStep {
+    return OnboardingStep.values[(index + 1).clamp(
+      0,
+      OnboardingStep.values.length - 1,
+    )];
+  }
 }

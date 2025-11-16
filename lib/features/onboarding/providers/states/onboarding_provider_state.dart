@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/onboarding/enums/push_notification_preference_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 
@@ -8,9 +7,6 @@ part 'onboarding_provider_state.freezed.dart';
 @freezed
 abstract class OnboardingProviderState with _$OnboardingProviderState {
   const factory OnboardingProviderState({
-    /// The current step in the onboarding process.
-    @Default(OnboardingStep.welcome) final OnboardingStep currentOnboardingStep,
-
     /// The selected notification radius during onboarding.
     final int? selectedRadius,
 
@@ -27,9 +23,7 @@ abstract class OnboardingProviderState with _$OnboardingProviderState {
 class ContinueOnboarding with _$ContinueOnboarding {
   const factory ContinueOnboarding.initial() = _ContinueOnboardingInitial;
   const factory ContinueOnboarding.loading() = _ContinueOnboardingLoading;
-  const factory ContinueOnboarding.success(
-    final OnboardingStep nextOnboardingStep,
-  ) = _ContinueOnboardingSuccess;
+  const factory ContinueOnboarding.success() = _ContinueOnboardingSuccess;
   const factory ContinueOnboarding.error(
     final AppError error,
   ) = _ContinueOnboardingError;

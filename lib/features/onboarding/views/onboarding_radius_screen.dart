@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/gradient_button.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
@@ -854,10 +855,7 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
       _showConfirmation = false;
     });
 
-    final currentOnboardingStep = ref
-        .read(providerOfOnboarding)
-        .currentOnboardingStep;
-    context.push(currentOnboardingStep.route);
+    context.push(OnboardingStep.radius.nextStep.route);
   }
 
   void _onNext() async {

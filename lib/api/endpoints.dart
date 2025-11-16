@@ -7,6 +7,14 @@ const kUrlBaseDev = 'http://192.168.1.65:9000/api';
 const kUrlOAuthGoogle = '/auth/oauth/google';
 const kUrlRefreshToken = '/auth/refresh-token';
 
+// ---------------------------- ONBOARDING ----------------------------
+
+const kUrlOnboarding = '/onboarding';
+const kUrlOnboardingLocation = '$kUrlOnboarding/location';
+const kUrlOnboardingRadius = '$kUrlOnboarding/radius';
+const kUrlOnboardingNotifications = '$kUrlOnboarding/notifications';
+const kUrlOnboardingAcceptTos = '$kUrlOnboarding/accept-tos';
+
 // ---------------------------- USER ----------------------------
 
 const kUrlUser = '/user';
@@ -30,15 +38,6 @@ const kUrlHazardCategoriesParent = '$kUrlHazardCategories/parent';
 const kUrlHazardCategoriesSub = '$kUrlHazardCategories/sub';
 const kUrlHazardVote = '$kUrlHazards/{hazardId}/vote';
 const kUrlHazardView = '$kUrlHazards/{hazardId}/view';
-
-// ---------------------------- ONBOARDING ----------------------------
-
-const kUrlOnboarding = '/onboarding';
-const kUrlOnboardingStart = '$kUrlOnboarding/start';
-const kUrlOnboardingLocation = '$kUrlOnboarding/location';
-const kUrlOnboardingRadius = '$kUrlOnboarding/radius';
-const kUrlOnboardingNotifications = '$kUrlOnboarding/notifications';
-const kUrlOnboardingAcceptTos = '$kUrlOnboarding/accept-tos';
 
 // ---------------------------- NOTIFICATION ----------------------------
 

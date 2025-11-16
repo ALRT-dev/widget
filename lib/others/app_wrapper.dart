@@ -72,10 +72,8 @@ class _AppWrapperState extends ConsumerState<AppWrapper> {
 
     final loggedInUser = ref.read(providerOfLoggedInUser);
     if (loggedInUser != null) {
-      if (loggedInUser.onboardingStep != OnboardingStep.completed) {
-        _gotoOnboardingScreen(
-          loggedInUser.onboardingStep ?? OnboardingStep.welcome,
-        );
+      if (!loggedInUser.isOnboardingCompleted) {
+        _gotoOnboardingScreen();
       } else {
         _gotoHomeScreen();
       }
@@ -90,8 +88,8 @@ class _AppWrapperState extends ConsumerState<AppWrapper> {
   }
 
   /// Navigates to the onboarding screen based on the current onboarding step.
-  void _gotoOnboardingScreen(final OnboardingStep onboardingStep) {
-    context.go(onboardingStep.route);
+  void _gotoOnboardingScreen() {
+    context.go(OnboardingStep.welcome.route);
   }
 
   /// Navigates to the home screen.
