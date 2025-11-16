@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart' hide DatePickerTheme;
-import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
+import 'package:hazard_app/features/report/views/widgets/create_report_categories_list.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
-import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
-import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
-import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
-import 'package:hazard_app/features/shared/views/widgets/categories_dropdown.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
-import 'package:hazard_app/features/shared/views/widgets/severities_dropdown.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class CreateUpdateReportScreenArgs {
@@ -48,11 +43,16 @@ class CreateUpdateReportScreen extends ConsumerStatefulWidget {
 
 class _CreateUpdateReportScreenState
     extends ConsumerState<CreateUpdateReportScreen> {
+  final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _titleController.text =
+        widget.args?.hazardToUpdate?.title ??
+        ref.read(providerOfCreateReport).hazardToCreateOrUpdate.title ??
+        '';
     _descriptionController.text =
         widget.args?.hazardToUpdate?.description ??
         ref.read(providerOfCreateReport).hazardToCreateOrUpdate.description ??
@@ -107,14 +107,39 @@ class _CreateUpdateReportScreenState
       padding: EdgeInsets.all(20.spMin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 20.h,
         children: [
-          _dateTimeBuilder(),
-          _categoryBuilder(),
-          _locationBuilder(),
-          _descriptionBuilder(),
-          _mediaBuilder(),
-          0.hSizedBox,
+          _sectionTitleBuilder(
+            title: 'Select Category',
+            isRequired: true,
+          ),
+          10.hSizedBox,
+          CreateReportCategoriesList(),
+          24.hSizedBox,
+          Consumer(
+            builder: (context, ref, child) {
+              final hasSelectedCategory = ref.watch(
+                providerOfCreateReport.select(
+                  (value) => value.hazardToCreateOrUpdate.category != null,
+                ),
+              );
+              if (!hasSelectedCategory) return const SizedBox.shrink();
+
+              return Column(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 24.spMin,
+                    children: [
+                      _locationBuilder(),
+                      _titleBuilder(),
+                      _descriptionBuilder(),
+                      _mediaBuilder(),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );
@@ -154,13 +179,29 @@ class _CreateUpdateReportScreenState
     );
   }
 
-  Widget _titleBuilder(final String title) {
-    return Text(
-      title,
-      style: TextStyle(
-        fontSize: 14.sp,
-        fontWeight: FontWeight.w600,
-      ),
+  Widget _sectionTitleBuilder({
+    required final String title,
+    final bool isRequired = false,
+  }) {
+    return Row(
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        if (!isRequired)
+          Text(
+            ' (Optional)',
+            style: TextStyle(
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w400,
+              color: AppColors.grey,
+            ),
+          ),
+      ],
     );
   }
 
@@ -205,88 +246,17 @@ class _CreateUpdateReportScreenState
     ).onPressed(onPressed);
   }
 
-  Widget _dateTimeBuilder() {
+  Widget _titleBuilder() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8.h,
       children: [
-        _titleBuilder('Date & Time'),
-        Consumer(
-          builder: (context, ref, child) {
-            final dateTime = ref.watch(
-              providerOfCreateReport.select(
-                (value) => value.hazardToCreateOrUpdate.occurredAt,
-              ),
-            );
-
-            return _inputBuilder(
-              hintText: 'Select a date & time',
-              value: dateTime?.formattedWithTime,
-              enabled: false,
-              onPressed: _openDateTimePicker,
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _categoryBuilder() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8.h,
-      children: [
-        _titleBuilder('Category'),
-        Consumer(
-          builder: (context, ref, child) {
-            final selectedCategory = ref.watch(
-              providerOfCreateReport.select(
-                (value) => value.hazardToCreateOrUpdate.category,
-              ),
-            );
-            return CategoriesDropdown(
-              button: _inputBuilder(
-                hintText: 'Select a category',
-                value: selectedCategory?.name,
-                enabled: false,
-              ),
-              onCategorySelected: (category) => _updateCategory(
-                category,
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  // ignore: unused_element
-  Widget _severityBuilder() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8.h,
-      children: [
-        _titleBuilder('Severity'),
-        Consumer(
-          builder: (context, ref, child) {
-            final selectedSeverity = ref.watch(
-              providerOfCreateReport.select(
-                (value) => value.hazardToCreateOrUpdate.severity,
-              ),
-            );
-            return SeveritiesDropdown(
-              button: _inputBuilder(
-                hintText: 'Select severity',
-                value: selectedSeverity == null
-                    ? null
-                    : '${selectedSeverity.emojiNonAws} ${selectedSeverity.titleNonAws}',
-                enabled: false,
-              ),
-              onSeveritySelected: (severity) => _updateSeverity(
-                severity,
-              ),
-            );
-          },
+        _sectionTitleBuilder(title: 'Title'),
+        _inputBuilder(
+          hintText: 'Brief description',
+          controller: _titleController,
+          textCapitalization: TextCapitalization.sentences,
+          onChanged: (value) => _updateTitle(value.trim()),
         ),
       ],
     );
@@ -297,7 +267,10 @@ class _CreateUpdateReportScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8.h,
       children: [
-        _titleBuilder('Location'),
+        _sectionTitleBuilder(
+          title: 'Location',
+          isRequired: true,
+        ),
         Consumer(
           builder: (context, ref, child) {
             final locationName = ref.watch(
@@ -306,7 +279,7 @@ class _CreateUpdateReportScreenState
               ),
             );
             return _inputBuilder(
-              hintText: 'Select a location',
+              hintText: 'Where is it happening?',
               value: locationName,
               enabled: false,
               onPressed: _gotoSelectLocationScreen,
@@ -322,9 +295,9 @@ class _CreateUpdateReportScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8.h,
       children: [
-        _titleBuilder('Description'),
+        _sectionTitleBuilder(title: 'Description'),
         _inputBuilder(
-          hintText: 'Write a description of the hazard',
+          hintText: 'Provide details...',
           controller: _descriptionController,
           minLines: 5,
           maxLines: 10,
@@ -342,7 +315,7 @@ class _CreateUpdateReportScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8.h,
       children: [
-        _titleBuilder('Media'),
+        _sectionTitleBuilder(title: 'Upload Media'),
         CreateReportMediasList(),
       ],
     );
@@ -431,12 +404,11 @@ class _CreateUpdateReportScreenState
     return ref.watch(
       providerOfCreateReport.select(
         (value) =>
-            value.hazardToCreateOrUpdate.occurredAt != null ||
-            value.hazardToCreateOrUpdate.locationName != null ||
             value.hazardToCreateOrUpdate.category != null ||
-            (value.hazardToCreateOrUpdate.description != null &&
-                value.hazardToCreateOrUpdate.description!.isNotEmpty) ||
-            (value.medias.isNotEmpty),
+            (value.hazardToCreateOrUpdate.title?.isNotEmpty ?? false) ||
+            value.hazardToCreateOrUpdate.locationName != null ||
+            (value.hazardToCreateOrUpdate.description?.isNotEmpty ?? false) ||
+            value.medias.isNotEmpty,
       ),
     );
   }
@@ -446,7 +418,6 @@ class _CreateUpdateReportScreenState
     return ref.watch(
       providerOfCreateReport.select(
         (value) =>
-            value.hazardToCreateOrUpdate.occurredAt != null &&
             value.hazardToCreateOrUpdate.category != null &&
             value.hazardToCreateOrUpdate.locationName != null,
       ),
@@ -459,48 +430,6 @@ class _CreateUpdateReportScreenState
     ref.read(providerOfCreateReport.notifier)
       ..updateHazardToCreateOrUpdate(widget.args?.hazardToUpdate ?? Hazard())
       ..updateMedias(widget.args?.hazardToUpdate?.processedMedias ?? []);
-  }
-
-  /// Opens a date and time picker dialog.
-  void _openDateTimePicker() {
-    context.unfocusInputs();
-
-    final initialDate =
-        ref.read(providerOfCreateReport).hazardToCreateOrUpdate.occurredAt ??
-        // DateTime.now() is not working here somehow so using this workaround
-        DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-          DateTime.now().hour,
-          DateTime.now().minute,
-        );
-
-    DatePicker.showDateTimePicker(
-      context,
-      showTitleActions: true,
-      theme: DatePickerTheme(
-        headerColor: AppColors.primary,
-        backgroundColor: AppColors.white,
-        itemStyle: TextStyle(
-          color: AppColors.black,
-          fontSize: 18.sp,
-        ),
-        doneStyle: TextStyle(
-          color: AppColors.white,
-          fontSize: 16.sp,
-        ),
-        cancelStyle: TextStyle(
-          color: AppColors.white,
-          fontSize: 16.sp,
-        ),
-        containerHeight: 400.h,
-      ),
-      minTime: DateTime(DateTime.now().year - 1),
-      maxTime: DateTime.now(),
-      onConfirm: _updateDateTime,
-      currentTime: initialDate,
-    );
   }
 
   /// Navigates to the Select Location screen.
@@ -535,19 +464,9 @@ class _CreateUpdateReportScreenState
     }
   }
 
-  /// Updates the datetime in the state.
-  void _updateDateTime(final DateTime dateTime) {
-    ref.read(providerOfCreateReport.notifier).updateDateTime(dateTime);
-  }
-
-  /// Updates the category in the state.
-  void _updateCategory(final HazardCategory category) {
-    ref.read(providerOfCreateReport.notifier).updateCategory(category);
-  }
-
-  /// Updates the severity in the state.
-  void _updateSeverity(final HazardSeverity severity) {
-    ref.read(providerOfCreateReport.notifier).updateSeverity(severity);
+  /// Updates the title in the state.
+  void _updateTitle(final String title) {
+    ref.read(providerOfCreateReport.notifier).updateTitle(title);
   }
 
   /// Updates the location in the state.

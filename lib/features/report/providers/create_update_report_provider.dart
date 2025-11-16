@@ -34,7 +34,9 @@ class CreateReportProvider
     required final Ref ref,
     required final CreateUpdateReportProviderState state,
   }) : _ref = ref,
-       super(state);
+       super(state) {
+    getCategoriesToSelect();
+  }
 
   final Ref _ref;
   MediaService get _mediaService => _ref.read(providerOfMediaService);
@@ -44,13 +46,37 @@ class CreateReportProvider
   MyHazardsProviderState get _myHazardsProviderState =>
       _ref.read(providerOfMyHazards);
 
+  /// Fetches the list of hazard categories to select from and updates the state accordingly.
+  Future<void> getCategoriesToSelect() async {
+    state = state.copyWith(
+      getCategoriesToSelectState: GetCategoriesToSelectState.loading(),
+    );
+
+    final result = await _hazardService.getAllParentHazardCategories();
+    if (!mounted) return;
+
+    result.when(
+      (categories) {
+        state = state.copyWith(
+          getCategoriesToSelectState: GetCategoriesToSelectState.success(
+            categories,
+          ),
+          categoriesToSelect: categories,
+        );
+      },
+      (error) {
+        state = state.copyWith(
+          getCategoriesToSelectState: GetCategoriesToSelectState.error(error),
+        );
+      },
+    );
+  }
+
   /// Creates or updates a hazard report using the data in the current state.
   Future<void> createOrUpdateReport() async {
     updateReportSubmitted(true);
 
     final hazard = state.hazardToCreateOrUpdate.copyWith(
-      title:
-          'Hazard at ${state.hazardToCreateOrUpdate.locationName ?? 'Unknown Location'}',
       categoryId: state.hazardToCreateOrUpdate.category?.id,
       category: null,
     );
@@ -164,6 +190,15 @@ class CreateReportProvider
   void updateHazardToCreateOrUpdate(final Hazard hazard) {
     state = state.copyWith(
       hazardToCreateOrUpdate: hazard,
+    );
+  }
+
+  /// Updates [CreateUpdateReportProviderState.hazardToCreateOrUpdate.title] with the given [title].
+  void updateTitle(final String title) {
+    updateHazardToCreateOrUpdate(
+      state.hazardToCreateOrUpdate.copyWith(
+        title: title,
+      ),
     );
   }
 
