@@ -23,7 +23,7 @@ enum UserReportsStatus {
   Color get color {
     switch (this) {
       case UserReportsStatus.unverified:
-        return AppColors.grey;
+        return AppColors.lightGrey;
       case UserReportsStatus.emerging:
         return AppColors.brown;
       case UserReportsStatus.verified:
