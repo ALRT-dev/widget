@@ -854,99 +854,75 @@ class MapProvider extends StateNotifier<MapProviderState> {
     // Higher zoom = smaller cluster distance (more granular clusters)
     final clusterDistance = _getClusterDistance(zoomLevel);
 
-    // First group by category
-    final Map<String, List<Hazard>> hazardsByCategory = {};
-    for (final hazard in hazards) {
-      if (hazard.latitude == null || hazard.longitude == null) continue;
-
-      final categoryId = hazard.categoryId ?? 'unknown';
-      hazardsByCategory.putIfAbsent(categoryId, () => []);
-      hazardsByCategory[categoryId]!.add(hazard);
-    }
-
     final clusterMarkerFutures = <Future<Marker>>[];
     final individualMarkerFutures = <Future<Marker>>[];
 
-    // Create geographic clusters within each category
-    for (final entry in hazardsByCategory.entries) {
-      final categoryId = entry.key;
-      final categoryHazards = entry.value;
+    if (zoomLevel < 10.0) {
+      // Unified clustering for zoom < 10: cluster all hazard types together
+      final validHazards = hazards
+          .where(
+            (hazard) => hazard.latitude != null && hazard.longitude != null,
+          )
+          .toList();
 
-      final categoryClusters = _createGeographicClusters(
-        categoryHazards,
+      final unifiedClusters = _createGeographicClusters(
+        validHazards,
         clusterDistance,
       );
 
-      // Create markers for each geographic cluster
-      for (int i = 0; i < categoryClusters.length; i++) {
-        final cluster = categoryClusters[i];
+      // Create markers for each unified cluster
+      for (int i = 0; i < unifiedClusters.length; i++) {
+        final cluster = unifiedClusters[i];
+
+        final clusterMarkerId = 'unified_cluster_$i';
+        final future = _convertHazardsToClusterMarkers(
+          cluster: cluster,
+          clusterMarkerId: clusterMarkerId,
+        );
 
         if (cluster.length == 1) {
-          // Show individual marker for single hazard
-          final hazard = cluster.first;
-          final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
-          final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(
-            markerBitmaps,
-          );
-
-          final individualMarker = Marker(
-            markerId: MarkerId(
-              hazard.id ?? '${hazard.latitude},${hazard.longitude}',
-            ),
-            position: LatLng(hazard.latitude!, hazard.longitude!),
-            onTap: () => updateSelectedHazard(hazard),
-            icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
-          );
-          individualMarkerFutures.add(Future.value(individualMarker));
+          individualMarkerFutures.add(future);
         } else {
-          // Show cluster marker for multiple hazards
-          // Calculate cluster center
-          double totalLat = 0;
-          double totalLng = 0;
-          for (final hazard in cluster) {
-            totalLat += hazard.latitude!;
-            totalLng += hazard.longitude!;
-          }
-
-          final centerLat = totalLat / cluster.length;
-          final centerLng = totalLng / cluster.length;
-          final clusterPosition = LatLng(centerLat, centerLng);
-
-          // Create cluster marker using the first hazard's information
-          final firstHazard = cluster.first;
-
-          final future =
-              _createCategoryClusterMarkerIcon(
-                cluster.length,
-                firstHazard,
-              ).then(
-                (bitmapDescriptor) {
-                  return Marker(
-                    markerId: MarkerId('cluster_${categoryId}_$i'),
-                    position: clusterPosition,
-                    onTap: () {
-                      // Zoom in to break the cluster further
-                      _mapService.animateCamera(
-                        cameraUpdate: CameraUpdate.newLatLngBounds(
-                          cluster
-                              .map(
-                                (hazard) => LatLng(
-                                  hazard.latitude!,
-                                  hazard.longitude!,
-                                ),
-                              )
-                              .toList()
-                              .toBounds(),
-                          100.0,
-                        ),
-                      );
-                    },
-                    icon: bitmapDescriptor,
-                  );
-                },
-              );
-
           clusterMarkerFutures.add(future);
+        }
+      }
+    } else {
+      // Category-specific clustering for zoom >= 10: cluster by category (original behavior)
+      // First group by category
+      final Map<String, List<Hazard>> hazardsByCategory = {};
+      for (final hazard in hazards) {
+        if (hazard.latitude == null || hazard.longitude == null) continue;
+
+        final categoryId = hazard.categoryId ?? 'unknown';
+        hazardsByCategory.putIfAbsent(categoryId, () => []);
+        hazardsByCategory[categoryId]!.add(hazard);
+      }
+
+      // Create geographic clusters within each category
+      for (final entry in hazardsByCategory.entries) {
+        final categoryId = entry.key;
+        final categoryHazards = entry.value;
+
+        final categoryClusters = _createGeographicClusters(
+          categoryHazards,
+          clusterDistance,
+        );
+
+        // Create markers for each geographic cluster
+        for (int i = 0; i < categoryClusters.length; i++) {
+          final cluster = categoryClusters[i];
+
+          final clusterMarkerId = 'category_${categoryId}_cluster_$i';
+          final future = _convertHazardsToClusterMarkers(
+            cluster: cluster,
+            clusterMarkerId: clusterMarkerId,
+          );
+
+          if (cluster.length == 1) {
+            individualMarkerFutures.add(future);
+          } else {
+            clusterMarkerFutures.add(future);
+          }
         }
       }
     }
@@ -976,19 +952,90 @@ class MapProvider extends StateNotifier<MapProviderState> {
     updateMarkers(allMarkers);
   }
 
+  /// Converts a cluster of hazards into a cluster marker or individual markers
+  Future<Marker> _convertHazardsToClusterMarkers({
+    required final List<Hazard> cluster,
+    required final String clusterMarkerId,
+  }) async {
+    if (cluster.length == 1) {
+      // Show individual marker for single hazard
+      final hazard = cluster.first;
+      final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
+      final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(
+        markerBitmaps,
+      );
+
+      final individualMarker = Marker(
+        markerId: MarkerId(
+          hazard.id ?? '${hazard.latitude},${hazard.longitude}',
+        ),
+        position: LatLng(hazard.latitude!, hazard.longitude!),
+        onTap: () => updateSelectedHazard(hazard),
+        icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
+      );
+      return individualMarker;
+    } else {
+      // Show cluster marker for multiple hazards
+      // Calculate cluster center
+      double totalLat = 0;
+      double totalLng = 0;
+      for (final hazard in cluster) {
+        totalLat += hazard.latitude!;
+        totalLng += hazard.longitude!;
+      }
+
+      final centerLat = totalLat / cluster.length;
+      final centerLng = totalLng / cluster.length;
+      final clusterPosition = LatLng(centerLat, centerLng);
+
+      // Create cluster marker using the first hazard's information
+      final firstHazard = cluster.first;
+
+      return _createCategoryClusterMarkerIcon(
+        cluster.length,
+        firstHazard,
+      ).then(
+        (bitmapDescriptor) {
+          return Marker(
+            markerId: MarkerId(clusterMarkerId),
+            position: clusterPosition,
+            onTap: () {
+              // Zoom in to break the cluster further
+              _mapService.animateCamera(
+                cameraUpdate: CameraUpdate.newLatLngBounds(
+                  cluster
+                      .map(
+                        (hazard) => LatLng(
+                          hazard.latitude!,
+                          hazard.longitude!,
+                        ),
+                      )
+                      .toList()
+                      .toBounds(),
+                  100.0,
+                ),
+              );
+            },
+            icon: bitmapDescriptor,
+          );
+        },
+      );
+    }
+  }
+
   /// Gets the clustering distance based on zoom level
   double _getClusterDistance(double zoomLevel) {
     // Distance in kilometers for clustering
     // Lower zoom = larger distance (fewer, bigger clusters)
     // Higher zoom = smaller distance (more, smaller clusters)
     if (zoomLevel <= 3) return 5000.0; // 10000km clusters
-    if (zoomLevel <= 4) return 700.0; // 900km clusters
-    if (zoomLevel <= 5) return 200.0; // 700km clusters
-    if (zoomLevel <= 6) return 100.0; // 100km clusters
-    if (zoomLevel <= 7) return 40.0; // 40km clusters
-    if (zoomLevel <= 8) return 20.0; // 20km clusters
-    if (zoomLevel <= 10) return 10.0; // 10km clusters
-    if (zoomLevel <= 12) return 5.0; // 5km clusters
+    if (zoomLevel <= 4) return 1000.0; // 900km clusters
+    if (zoomLevel <= 5) return 500.0; // 700km clusters
+    if (zoomLevel <= 6) return 200.0; // 100km clusters
+    if (zoomLevel <= 7) return 100.0; // 40km clusters
+    if (zoomLevel <= 8) return 100.0; // 20km clusters
+    if (zoomLevel <= 10) return 50.0; // 10km clusters
+    if (zoomLevel <= 12) return 20.0; // 5km clusters
     return 2.0; // 2km clusters
   }
 
