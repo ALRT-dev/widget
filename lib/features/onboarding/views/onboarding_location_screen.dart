@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_radius_screen.dart';
+import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/gradient_button.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/logo.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/confirmation_popup.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -155,10 +156,6 @@ class _OnboardingLocationScreenState
       _showConfirmation = false;
     });
     _onNext();
-  }
-
-  void _onNext() {
-    context.push(OnboardingRadiusScreen.route);
   }
 
   @override
@@ -851,6 +848,24 @@ class _OnboardingLocationScreenState
           child: child,
         ),
       ),
+    );
+  }
+
+  void _onNext() async {
+    final result = await ref
+        .read(providerOfOnboarding.notifier)
+        .setOnboardingLocation();
+    if (!mounted) return;
+
+    result.when(
+      (onboardingResponse) {
+        context.push(onboardingResponse.nextOnboardingStep.route);
+      },
+      (error) {
+        context.showErrorToast(
+          message: error.message,
+        );
+      },
     );
   }
 }

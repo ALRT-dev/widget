@@ -10,6 +10,10 @@ _AppUser _$AppUserFromJson(Map<String, dynamic> json) => _AppUser(
   id: json['id'] as String?,
   name: json['name'] as String?,
   email: json['email'] as String?,
+  onboardingStep: $enumDecodeNullable(
+    _$OnboardingStepEnumMap,
+    json['onboardingStep'],
+  ),
   profilePictureUrl: json['profilePicturePresignedUrl'] as String?,
   latitude: (json['latitude'] as num?)?.toDouble(),
   longitude: (json['longitude'] as num?)?.toDouble(),
@@ -31,6 +35,7 @@ Map<String, dynamic> _$AppUserToJson(_AppUser instance) => <String, dynamic>{
   'id': ?instance.id,
   'name': ?instance.name,
   'email': ?instance.email,
+  'onboardingStep': ?_$OnboardingStepEnumMap[instance.onboardingStep],
   'profilePicturePresignedUrl': ?instance.profilePictureUrl,
   'latitude': ?instance.latitude,
   'longitude': ?instance.longitude,
@@ -42,6 +47,15 @@ Map<String, dynamic> _$AppUserToJson(_AppUser instance) => <String, dynamic>{
   'upvotesReceivedCount': instance.upvotesReceivedCount,
   'reportsStatus': _$UserReportsStatusEnumMap[instance.reportsStatus]!,
   'createdAt': ?instance.createdAt?.toIso8601String(),
+};
+
+const _$OnboardingStepEnumMap = {
+  OnboardingStep.welcome: 'welcome',
+  OnboardingStep.location: 'location',
+  OnboardingStep.radius: 'radius',
+  OnboardingStep.pushNotification: 'pushNotification',
+  OnboardingStep.tosAcceptance: 'tosAcceptance',
+  OnboardingStep.completed: 'completed',
 };
 
 const _$UserReportsStatusEnumMap = {

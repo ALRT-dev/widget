@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_emergency_screen.dart';
+import 'package:hazard_app/features/onboarding/enums/push_notification_preference_types.dart';
+import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/gradient_button.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/logo.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/confirmation_popup.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class AlertSourceOption {
-  final String id;
+  final PushNotificationPreference preference;
   final IconData icon;
   final String label;
   final String description;
@@ -20,7 +22,7 @@ class AlertSourceOption {
   final Color iconColor;
 
   const AlertSourceOption({
-    required this.id,
+    required this.preference,
     required this.icon,
     required this.label,
     required this.description,
@@ -53,12 +55,11 @@ class _OnboardingAlertSourcesScreenState
   late Animation<double> _bellPulseAnimation;
   late Animation<double> _bellRotateAnimation;
 
-  String _selectedSource = '';
   bool _showConfirmation = false;
 
   final List<AlertSourceOption> _sourceOptions = const [
     AlertSourceOption(
-      id: 'official',
+      preference: PushNotificationPreference.official,
       icon: Icons.security,
       label: 'Official alerts only',
       description: 'Verified alerts from authorities',
@@ -66,7 +67,7 @@ class _OnboardingAlertSourcesScreenState
       iconColor: AppColors.white,
     ),
     AlertSourceOption(
-      id: 'crowd',
+      preference: PushNotificationPreference.crowdSourced,
       icon: Icons.group,
       label: 'Crowd reported alerts',
       description: 'Community-sourced reports',
@@ -74,7 +75,7 @@ class _OnboardingAlertSourcesScreenState
       iconColor: AppColors.white,
     ),
     AlertSourceOption(
-      id: 'both',
+      preference: PushNotificationPreference.all,
       icon: Icons.layers,
       label: 'Both',
       description: 'Official + community reports',
@@ -199,33 +200,14 @@ class _OnboardingAlertSourcesScreenState
     super.dispose();
   }
 
-  void _handleSelectSource(String sourceId) {
-    setState(() {
-      _selectedSource = sourceId;
-    });
+  void _handleSelectSource(final PushNotificationPreference preference) {
+    ref
+        .read(providerOfOnboarding.notifier)
+        .updateSelectedNotificationPreference(preference);
 
     _selectionController.forward().then((_) {
       _selectionController.reverse();
     });
-  }
-
-  void _handleNext() {
-    if (_selectedSource.isNotEmpty) {
-      setState(() {
-        _showConfirmation = true;
-      });
-    }
-  }
-
-  void _handleConfirmationComplete() {
-    setState(() {
-      _showConfirmation = false;
-    });
-    _onNext();
-  }
-
-  void _onNext() {
-    context.push(OnboardingEmergencyScreen.route);
   }
 
   @override
@@ -406,120 +388,129 @@ class _OnboardingAlertSourcesScreenState
   }
 
   Widget _buildSourceOptionCard(AlertSourceOption option, int index) {
-    final isSelected = _selectedSource == option.id;
+    return Consumer(
+      builder: (context, ref, child) {
+        final isSelected = ref.watch(
+          providerOfOnboarding.select(
+            (state) =>
+                state.selectedNotificationPreference == option.preference,
+          ),
+        );
 
-    return AnimatedBuilder(
-      animation: _cardControllers[index],
-      builder: (context, child) {
-        final slideAnimation =
-            Tween<Offset>(
-              begin: const Offset(-20, 0),
-              end: Offset.zero,
-            ).animate(
-              CurvedAnimation(
-                parent: _cardControllers[index],
-                curve: Curves.easeOut,
-              ),
-            );
-
-        final opacityAnimation =
-            Tween<double>(
-              begin: 0.0,
-              end: 1.0,
-            ).animate(
-              CurvedAnimation(
-                parent: _cardControllers[index],
-                curve: Curves.easeOut,
-              ),
-            );
-
-        return Transform.translate(
-          offset: slideAnimation.value,
-          child: Opacity(
-            opacity: opacityAnimation.value,
-            child: GestureDetector(
-              onTap: () => _handleSelectSource(option.id),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: double.infinity,
-                padding: EdgeInsets.all(20.spMin),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16.spMin),
-                  border: Border.all(
-                    color: isSelected
-                        ? AppColors.orange
-                        : AppColors.lightGrey.withValues(alpha: 0.5),
-                    width: 2,
+        return AnimatedBuilder(
+          animation: _cardControllers[index],
+          builder: (context, child) {
+            final slideAnimation =
+                Tween<Offset>(
+                  begin: const Offset(-20, 0),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(
+                    parent: _cardControllers[index],
+                    curve: Curves.easeOut,
                   ),
-                  color: isSelected
-                      ? AppColors.orange.withValues(alpha: 0.05)
-                      : AppColors.white,
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: AppColors.orange.withValues(alpha: 0.2),
-                            blurRadius: 10.spMin,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
-                      : [],
-                ),
-                child: Row(
-                  children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: EdgeInsets.all(12.spMin),
-                      decoration: BoxDecoration(
-                        color: option.backgroundColor,
-                        borderRadius: BorderRadius.circular(12.spMin),
+                );
+
+            final opacityAnimation =
+                Tween<double>(
+                  begin: 0.0,
+                  end: 1.0,
+                ).animate(
+                  CurvedAnimation(
+                    parent: _cardControllers[index],
+                    curve: Curves.easeOut,
+                  ),
+                );
+
+            return Transform.translate(
+              offset: slideAnimation.value,
+              child: Opacity(
+                opacity: opacityAnimation.value,
+                child: GestureDetector(
+                  onTap: () => _handleSelectSource(option.preference),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20.spMin),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.spMin),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.orange
+                            : AppColors.lightGrey.withValues(alpha: 0.5),
+                        width: 2,
                       ),
-                      child: Icon(
-                        option.icon,
-                        size: 24.spMin,
-                        color: AppColors.white,
-                      ),
+                      color: isSelected
+                          ? AppColors.orange.withValues(alpha: 0.05)
+                          : AppColors.white,
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: AppColors.orange.withValues(alpha: 0.2),
+                                blurRadius: 10.spMin,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : [],
                     ),
-                    16.wSizedBox,
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            option.label,
-                            style: TextStyle(
-                              fontSize: 16.spMin,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.black,
-                            ),
+                    child: Row(
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: EdgeInsets.all(12.spMin),
+                          decoration: BoxDecoration(
+                            color: option.backgroundColor,
+                            borderRadius: BorderRadius.circular(12.spMin),
                           ),
-                          4.hSizedBox,
-                          Text(
-                            option.description,
-                            style: TextStyle(
-                              fontSize: 14.spMin,
-                              color: AppColors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (isSelected)
-                      AnimatedScale(
-                        scale: 1.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: Text(
-                          '✓',
-                          style: TextStyle(
-                            fontSize: 24.spMin,
-                            color: AppColors.orange,
+                          child: Icon(
+                            option.icon,
+                            size: 24.spMin,
+                            color: AppColors.white,
                           ),
                         ),
-                      ),
-                  ],
+                        16.wSizedBox,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                option.label,
+                                style: TextStyle(
+                                  fontSize: 16.spMin,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.black,
+                                ),
+                              ),
+                              4.hSizedBox,
+                              Text(
+                                option.description,
+                                style: TextStyle(
+                                  fontSize: 14.spMin,
+                                  color: AppColors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (isSelected)
+                          AnimatedScale(
+                            scale: 1.0,
+                            duration: const Duration(milliseconds: 200),
+                            child: Text(
+                              '✓',
+                              style: TextStyle(
+                                fontSize: 24.spMin,
+                                color: AppColors.orange,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
@@ -541,7 +532,7 @@ class _OnboardingAlertSourcesScreenState
                 size: 20.spMin,
                 color: AppColors.white,
               ),
-              onPressed: _selectedSource.isNotEmpty ? _handleNext : null,
+              onPressed: _onNext,
             ),
           ),
         );
@@ -555,6 +546,37 @@ class _OnboardingAlertSourcesScreenState
       message:
           "Alert preferences saved! You're all set to receive relevant safety updates.",
       onComplete: _handleConfirmationComplete,
+    );
+  }
+
+  void _handleConfirmationComplete() {
+    setState(() {
+      _showConfirmation = false;
+    });
+
+    final currentOnboardingStep = ref
+        .read(providerOfOnboarding)
+        .currentOnboardingStep;
+    context.push(currentOnboardingStep.route);
+  }
+
+  void _onNext() async {
+    final result = await ref
+        .read(providerOfOnboarding.notifier)
+        .setOnboardingNotificationPreferences();
+    if (!mounted) return;
+
+    result.when(
+      (onboardingResponse) {
+        setState(() {
+          _showConfirmation = true;
+        });
+      },
+      (error) {
+        context.showErrorToast(
+          message: error.message,
+        );
+      },
     );
   }
 }

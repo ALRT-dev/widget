@@ -18,7 +18,8 @@ mixin _$AppUser {
 /// The user's unique identifier.
  String? get id;/// The user's display name.
  String? get name;/// The user's email address.
- String? get email;/// The URL of the user's profile picture.
+ String? get email;/// Indicates the onboarding step the user is currently on.
+ OnboardingStep? get onboardingStep;/// The URL of the user's profile picture.
 @JsonKey(name: 'profilePicturePresignedUrl') String? get profilePictureUrl;/// The processed profile picture media.
 ///
 /// This field is not included in JSON serialization/deserialization and is generated using [profilePictureUrl].
@@ -45,16 +46,16 @@ $AppUserCopyWith<AppUser> get copyWith => _$AppUserCopyWithImpl<AppUser>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppUser&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.processedProfilePicture, processedProfilePicture) || other.processedProfilePicture == processedProfilePicture)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.locationName, locationName) || other.locationName == locationName)&&(identical(other.xpPoints, xpPoints) || other.xpPoints == xpPoints)&&(identical(other.reliabilityScore, reliabilityScore) || other.reliabilityScore == reliabilityScore)&&(identical(other.hazardsViewedCount, hazardsViewedCount) || other.hazardsViewedCount == hazardsViewedCount)&&(identical(other.hazardsReportedCount, hazardsReportedCount) || other.hazardsReportedCount == hazardsReportedCount)&&(identical(other.upvotesReceivedCount, upvotesReceivedCount) || other.upvotesReceivedCount == upvotesReceivedCount)&&(identical(other.reportsStatus, reportsStatus) || other.reportsStatus == reportsStatus)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AppUser&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.onboardingStep, onboardingStep) || other.onboardingStep == onboardingStep)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.processedProfilePicture, processedProfilePicture) || other.processedProfilePicture == processedProfilePicture)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.locationName, locationName) || other.locationName == locationName)&&(identical(other.xpPoints, xpPoints) || other.xpPoints == xpPoints)&&(identical(other.reliabilityScore, reliabilityScore) || other.reliabilityScore == reliabilityScore)&&(identical(other.hazardsViewedCount, hazardsViewedCount) || other.hazardsViewedCount == hazardsViewedCount)&&(identical(other.hazardsReportedCount, hazardsReportedCount) || other.hazardsReportedCount == hazardsReportedCount)&&(identical(other.upvotesReceivedCount, upvotesReceivedCount) || other.upvotesReceivedCount == upvotesReceivedCount)&&(identical(other.reportsStatus, reportsStatus) || other.reportsStatus == reportsStatus)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,email,profilePictureUrl,processedProfilePicture,latitude,longitude,locationName,xpPoints,reliabilityScore,hazardsViewedCount,hazardsReportedCount,upvotesReceivedCount,reportsStatus,createdAt);
+int get hashCode => Object.hash(runtimeType,id,name,email,onboardingStep,profilePictureUrl,processedProfilePicture,latitude,longitude,locationName,xpPoints,reliabilityScore,hazardsViewedCount,hazardsReportedCount,upvotesReceivedCount,reportsStatus,createdAt);
 
 @override
 String toString() {
-  return 'AppUser(id: $id, name: $name, email: $email, profilePictureUrl: $profilePictureUrl, processedProfilePicture: $processedProfilePicture, latitude: $latitude, longitude: $longitude, locationName: $locationName, xpPoints: $xpPoints, reliabilityScore: $reliabilityScore, hazardsViewedCount: $hazardsViewedCount, hazardsReportedCount: $hazardsReportedCount, upvotesReceivedCount: $upvotesReceivedCount, reportsStatus: $reportsStatus, createdAt: $createdAt)';
+  return 'AppUser(id: $id, name: $name, email: $email, onboardingStep: $onboardingStep, profilePictureUrl: $profilePictureUrl, processedProfilePicture: $processedProfilePicture, latitude: $latitude, longitude: $longitude, locationName: $locationName, xpPoints: $xpPoints, reliabilityScore: $reliabilityScore, hazardsViewedCount: $hazardsViewedCount, hazardsReportedCount: $hazardsReportedCount, upvotesReceivedCount: $upvotesReceivedCount, reportsStatus: $reportsStatus, createdAt: $createdAt)';
 }
 
 
@@ -65,7 +66,7 @@ abstract mixin class $AppUserCopyWith<$Res>  {
   factory $AppUserCopyWith(AppUser value, $Res Function(AppUser) _then) = _$AppUserCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? name, String? email,@JsonKey(name: 'profilePicturePresignedUrl') String? profilePictureUrl,@JsonKey(includeFromJson: false, includeToJson: false) AlrtMedia? processedProfilePicture, double? latitude, double? longitude, String? locationName, int xpPoints, double reliabilityScore, int hazardsViewedCount, int hazardsReportedCount, int upvotesReceivedCount, UserReportsStatus reportsStatus, DateTime? createdAt
+ String? id, String? name, String? email, OnboardingStep? onboardingStep,@JsonKey(name: 'profilePicturePresignedUrl') String? profilePictureUrl,@JsonKey(includeFromJson: false, includeToJson: false) AlrtMedia? processedProfilePicture, double? latitude, double? longitude, String? locationName, int xpPoints, double reliabilityScore, int hazardsViewedCount, int hazardsReportedCount, int upvotesReceivedCount, UserReportsStatus reportsStatus, DateTime? createdAt
 });
 
 
@@ -82,12 +83,13 @@ class _$AppUserCopyWithImpl<$Res>
 
 /// Create a copy of AppUser
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? email = freezed,Object? profilePictureUrl = freezed,Object? processedProfilePicture = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? locationName = freezed,Object? xpPoints = null,Object? reliabilityScore = null,Object? hazardsViewedCount = null,Object? hazardsReportedCount = null,Object? upvotesReceivedCount = null,Object? reportsStatus = null,Object? createdAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? email = freezed,Object? onboardingStep = freezed,Object? profilePictureUrl = freezed,Object? processedProfilePicture = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? locationName = freezed,Object? xpPoints = null,Object? reliabilityScore = null,Object? hazardsViewedCount = null,Object? hazardsReportedCount = null,Object? upvotesReceivedCount = null,Object? reportsStatus = null,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String?,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+as String?,onboardingStep: freezed == onboardingStep ? _self.onboardingStep : onboardingStep // ignore: cast_nullable_to_non_nullable
+as OnboardingStep?,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
 as String?,processedProfilePicture: freezed == processedProfilePicture ? _self.processedProfilePicture : processedProfilePicture // ignore: cast_nullable_to_non_nullable
 as AlrtMedia?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
@@ -196,10 +198,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? name,  String? email, @JsonKey(name: 'profilePicturePresignedUrl')  String? profilePictureUrl, @JsonKey(includeFromJson: false, includeToJson: false)  AlrtMedia? processedProfilePicture,  double? latitude,  double? longitude,  String? locationName,  int xpPoints,  double reliabilityScore,  int hazardsViewedCount,  int hazardsReportedCount,  int upvotesReceivedCount,  UserReportsStatus reportsStatus,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? name,  String? email,  OnboardingStep? onboardingStep, @JsonKey(name: 'profilePicturePresignedUrl')  String? profilePictureUrl, @JsonKey(includeFromJson: false, includeToJson: false)  AlrtMedia? processedProfilePicture,  double? latitude,  double? longitude,  String? locationName,  int xpPoints,  double reliabilityScore,  int hazardsViewedCount,  int hazardsReportedCount,  int upvotesReceivedCount,  UserReportsStatus reportsStatus,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AppUser() when $default != null:
-return $default(_that.id,_that.name,_that.email,_that.profilePictureUrl,_that.processedProfilePicture,_that.latitude,_that.longitude,_that.locationName,_that.xpPoints,_that.reliabilityScore,_that.hazardsViewedCount,_that.hazardsReportedCount,_that.upvotesReceivedCount,_that.reportsStatus,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.email,_that.onboardingStep,_that.profilePictureUrl,_that.processedProfilePicture,_that.latitude,_that.longitude,_that.locationName,_that.xpPoints,_that.reliabilityScore,_that.hazardsViewedCount,_that.hazardsReportedCount,_that.upvotesReceivedCount,_that.reportsStatus,_that.createdAt);case _:
   return orElse();
 
 }
@@ -217,10 +219,10 @@ return $default(_that.id,_that.name,_that.email,_that.profilePictureUrl,_that.pr
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? name,  String? email, @JsonKey(name: 'profilePicturePresignedUrl')  String? profilePictureUrl, @JsonKey(includeFromJson: false, includeToJson: false)  AlrtMedia? processedProfilePicture,  double? latitude,  double? longitude,  String? locationName,  int xpPoints,  double reliabilityScore,  int hazardsViewedCount,  int hazardsReportedCount,  int upvotesReceivedCount,  UserReportsStatus reportsStatus,  DateTime? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? name,  String? email,  OnboardingStep? onboardingStep, @JsonKey(name: 'profilePicturePresignedUrl')  String? profilePictureUrl, @JsonKey(includeFromJson: false, includeToJson: false)  AlrtMedia? processedProfilePicture,  double? latitude,  double? longitude,  String? locationName,  int xpPoints,  double reliabilityScore,  int hazardsViewedCount,  int hazardsReportedCount,  int upvotesReceivedCount,  UserReportsStatus reportsStatus,  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _AppUser():
-return $default(_that.id,_that.name,_that.email,_that.profilePictureUrl,_that.processedProfilePicture,_that.latitude,_that.longitude,_that.locationName,_that.xpPoints,_that.reliabilityScore,_that.hazardsViewedCount,_that.hazardsReportedCount,_that.upvotesReceivedCount,_that.reportsStatus,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.email,_that.onboardingStep,_that.profilePictureUrl,_that.processedProfilePicture,_that.latitude,_that.longitude,_that.locationName,_that.xpPoints,_that.reliabilityScore,_that.hazardsViewedCount,_that.hazardsReportedCount,_that.upvotesReceivedCount,_that.reportsStatus,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -237,10 +239,10 @@ return $default(_that.id,_that.name,_that.email,_that.profilePictureUrl,_that.pr
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? name,  String? email, @JsonKey(name: 'profilePicturePresignedUrl')  String? profilePictureUrl, @JsonKey(includeFromJson: false, includeToJson: false)  AlrtMedia? processedProfilePicture,  double? latitude,  double? longitude,  String? locationName,  int xpPoints,  double reliabilityScore,  int hazardsViewedCount,  int hazardsReportedCount,  int upvotesReceivedCount,  UserReportsStatus reportsStatus,  DateTime? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? name,  String? email,  OnboardingStep? onboardingStep, @JsonKey(name: 'profilePicturePresignedUrl')  String? profilePictureUrl, @JsonKey(includeFromJson: false, includeToJson: false)  AlrtMedia? processedProfilePicture,  double? latitude,  double? longitude,  String? locationName,  int xpPoints,  double reliabilityScore,  int hazardsViewedCount,  int hazardsReportedCount,  int upvotesReceivedCount,  UserReportsStatus reportsStatus,  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _AppUser() when $default != null:
-return $default(_that.id,_that.name,_that.email,_that.profilePictureUrl,_that.processedProfilePicture,_that.latitude,_that.longitude,_that.locationName,_that.xpPoints,_that.reliabilityScore,_that.hazardsViewedCount,_that.hazardsReportedCount,_that.upvotesReceivedCount,_that.reportsStatus,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.email,_that.onboardingStep,_that.profilePictureUrl,_that.processedProfilePicture,_that.latitude,_that.longitude,_that.locationName,_that.xpPoints,_that.reliabilityScore,_that.hazardsViewedCount,_that.hazardsReportedCount,_that.upvotesReceivedCount,_that.reportsStatus,_that.createdAt);case _:
   return null;
 
 }
@@ -252,7 +254,7 @@ return $default(_that.id,_that.name,_that.email,_that.profilePictureUrl,_that.pr
 @JsonSerializable()
 
 class _AppUser extends AppUser {
-  const _AppUser({this.id, this.name, this.email, @JsonKey(name: 'profilePicturePresignedUrl') this.profilePictureUrl, @JsonKey(includeFromJson: false, includeToJson: false) this.processedProfilePicture, this.latitude, this.longitude, this.locationName, this.xpPoints = 0, this.reliabilityScore = 0.0, this.hazardsViewedCount = 0, this.hazardsReportedCount = 0, this.upvotesReceivedCount = 0, this.reportsStatus = UserReportsStatus.unverified, this.createdAt}): super._();
+  const _AppUser({this.id, this.name, this.email, this.onboardingStep, @JsonKey(name: 'profilePicturePresignedUrl') this.profilePictureUrl, @JsonKey(includeFromJson: false, includeToJson: false) this.processedProfilePicture, this.latitude, this.longitude, this.locationName, this.xpPoints = 0, this.reliabilityScore = 0.0, this.hazardsViewedCount = 0, this.hazardsReportedCount = 0, this.upvotesReceivedCount = 0, this.reportsStatus = UserReportsStatus.unverified, this.createdAt}): super._();
   factory _AppUser.fromJson(Map<String, dynamic> json) => _$AppUserFromJson(json);
 
 /// The user's unique identifier.
@@ -261,6 +263,8 @@ class _AppUser extends AppUser {
 @override final  String? name;
 /// The user's email address.
 @override final  String? email;
+/// Indicates the onboarding step the user is currently on.
+@override final  OnboardingStep? onboardingStep;
 /// The URL of the user's profile picture.
 @override@JsonKey(name: 'profilePicturePresignedUrl') final  String? profilePictureUrl;
 /// The processed profile picture media.
@@ -301,16 +305,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppUser&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.processedProfilePicture, processedProfilePicture) || other.processedProfilePicture == processedProfilePicture)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.locationName, locationName) || other.locationName == locationName)&&(identical(other.xpPoints, xpPoints) || other.xpPoints == xpPoints)&&(identical(other.reliabilityScore, reliabilityScore) || other.reliabilityScore == reliabilityScore)&&(identical(other.hazardsViewedCount, hazardsViewedCount) || other.hazardsViewedCount == hazardsViewedCount)&&(identical(other.hazardsReportedCount, hazardsReportedCount) || other.hazardsReportedCount == hazardsReportedCount)&&(identical(other.upvotesReceivedCount, upvotesReceivedCount) || other.upvotesReceivedCount == upvotesReceivedCount)&&(identical(other.reportsStatus, reportsStatus) || other.reportsStatus == reportsStatus)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AppUser&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.onboardingStep, onboardingStep) || other.onboardingStep == onboardingStep)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.processedProfilePicture, processedProfilePicture) || other.processedProfilePicture == processedProfilePicture)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.locationName, locationName) || other.locationName == locationName)&&(identical(other.xpPoints, xpPoints) || other.xpPoints == xpPoints)&&(identical(other.reliabilityScore, reliabilityScore) || other.reliabilityScore == reliabilityScore)&&(identical(other.hazardsViewedCount, hazardsViewedCount) || other.hazardsViewedCount == hazardsViewedCount)&&(identical(other.hazardsReportedCount, hazardsReportedCount) || other.hazardsReportedCount == hazardsReportedCount)&&(identical(other.upvotesReceivedCount, upvotesReceivedCount) || other.upvotesReceivedCount == upvotesReceivedCount)&&(identical(other.reportsStatus, reportsStatus) || other.reportsStatus == reportsStatus)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,email,profilePictureUrl,processedProfilePicture,latitude,longitude,locationName,xpPoints,reliabilityScore,hazardsViewedCount,hazardsReportedCount,upvotesReceivedCount,reportsStatus,createdAt);
+int get hashCode => Object.hash(runtimeType,id,name,email,onboardingStep,profilePictureUrl,processedProfilePicture,latitude,longitude,locationName,xpPoints,reliabilityScore,hazardsViewedCount,hazardsReportedCount,upvotesReceivedCount,reportsStatus,createdAt);
 
 @override
 String toString() {
-  return 'AppUser(id: $id, name: $name, email: $email, profilePictureUrl: $profilePictureUrl, processedProfilePicture: $processedProfilePicture, latitude: $latitude, longitude: $longitude, locationName: $locationName, xpPoints: $xpPoints, reliabilityScore: $reliabilityScore, hazardsViewedCount: $hazardsViewedCount, hazardsReportedCount: $hazardsReportedCount, upvotesReceivedCount: $upvotesReceivedCount, reportsStatus: $reportsStatus, createdAt: $createdAt)';
+  return 'AppUser(id: $id, name: $name, email: $email, onboardingStep: $onboardingStep, profilePictureUrl: $profilePictureUrl, processedProfilePicture: $processedProfilePicture, latitude: $latitude, longitude: $longitude, locationName: $locationName, xpPoints: $xpPoints, reliabilityScore: $reliabilityScore, hazardsViewedCount: $hazardsViewedCount, hazardsReportedCount: $hazardsReportedCount, upvotesReceivedCount: $upvotesReceivedCount, reportsStatus: $reportsStatus, createdAt: $createdAt)';
 }
 
 
@@ -321,7 +325,7 @@ abstract mixin class _$AppUserCopyWith<$Res> implements $AppUserCopyWith<$Res> {
   factory _$AppUserCopyWith(_AppUser value, $Res Function(_AppUser) _then) = __$AppUserCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? name, String? email,@JsonKey(name: 'profilePicturePresignedUrl') String? profilePictureUrl,@JsonKey(includeFromJson: false, includeToJson: false) AlrtMedia? processedProfilePicture, double? latitude, double? longitude, String? locationName, int xpPoints, double reliabilityScore, int hazardsViewedCount, int hazardsReportedCount, int upvotesReceivedCount, UserReportsStatus reportsStatus, DateTime? createdAt
+ String? id, String? name, String? email, OnboardingStep? onboardingStep,@JsonKey(name: 'profilePicturePresignedUrl') String? profilePictureUrl,@JsonKey(includeFromJson: false, includeToJson: false) AlrtMedia? processedProfilePicture, double? latitude, double? longitude, String? locationName, int xpPoints, double reliabilityScore, int hazardsViewedCount, int hazardsReportedCount, int upvotesReceivedCount, UserReportsStatus reportsStatus, DateTime? createdAt
 });
 
 
@@ -338,12 +342,13 @@ class __$AppUserCopyWithImpl<$Res>
 
 /// Create a copy of AppUser
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? email = freezed,Object? profilePictureUrl = freezed,Object? processedProfilePicture = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? locationName = freezed,Object? xpPoints = null,Object? reliabilityScore = null,Object? hazardsViewedCount = null,Object? hazardsReportedCount = null,Object? upvotesReceivedCount = null,Object? reportsStatus = null,Object? createdAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? email = freezed,Object? onboardingStep = freezed,Object? profilePictureUrl = freezed,Object? processedProfilePicture = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? locationName = freezed,Object? xpPoints = null,Object? reliabilityScore = null,Object? hazardsViewedCount = null,Object? hazardsReportedCount = null,Object? upvotesReceivedCount = null,Object? reportsStatus = null,Object? createdAt = freezed,}) {
   return _then(_AppUser(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String?,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+as String?,onboardingStep: freezed == onboardingStep ? _self.onboardingStep : onboardingStep // ignore: cast_nullable_to_non_nullable
+as OnboardingStep?,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
 as String?,processedProfilePicture: freezed == processedProfilePicture ? _self.processedProfilePicture : processedProfilePicture // ignore: cast_nullable_to_non_nullable
 as AlrtMedia?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable

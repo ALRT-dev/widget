@@ -3,16 +3,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/views/screens/auth_screen.dart';
 import 'package:hazard_app/features/home/views/screens/home_screen.dart';
+import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/shared/providers/app_initialization_provider.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/splash_screen.dart';
+
+class AppWrapperArgs {
+  const AppWrapperArgs({this.homeScreenArgs});
+
+  /// The arguments for the home screen.
+  final HomeScreenArgs? homeScreenArgs;
+}
 
 class AppWrapper extends ConsumerStatefulWidget {
   /// A simple wrapper widget for the app's main content.
   ///
   /// If the user is not logged in, it shows the auth screen.
   /// If the user is logged in, it shows the home screen.
-  const AppWrapper({super.key});
+  const AppWrapper({
+    super.key,
+    required this.args,
+  });
+
+  /// The arguments for the app wrapper.
+  final AppWrapperArgs args;
 
   static const route = '/';
 
@@ -58,7 +72,13 @@ class _AppWrapperState extends ConsumerState<AppWrapper> {
 
     final loggedInUser = ref.read(providerOfLoggedInUser);
     if (loggedInUser != null) {
-      _gotoHomeScreen();
+      if (loggedInUser.onboardingStep != OnboardingStep.completed) {
+        _gotoOnboardingScreen(
+          loggedInUser.onboardingStep ?? OnboardingStep.welcome,
+        );
+      } else {
+        _gotoHomeScreen();
+      }
     } else {
       _gotoAuthScreen();
     }
@@ -69,8 +89,16 @@ class _AppWrapperState extends ConsumerState<AppWrapper> {
     context.go(AuthScreen.route);
   }
 
+  /// Navigates to the onboarding screen based on the current onboarding step.
+  void _gotoOnboardingScreen(final OnboardingStep onboardingStep) {
+    context.go(onboardingStep.route);
+  }
+
   /// Navigates to the home screen.
   void _gotoHomeScreen() {
-    context.go(HomeScreen.route);
+    context.go(
+      HomeScreen.route,
+      extra: widget.args.homeScreenArgs,
+    );
   }
 }

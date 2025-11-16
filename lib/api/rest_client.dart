@@ -6,6 +6,7 @@ import 'package:hazard_app/api/endpoints.dart';
 import 'package:hazard_app/features/auth/models/auth_success_model.dart';
 import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
 import 'package:hazard_app/features/notification/models/push_notification_update_input_model.dart';
+import 'package:hazard_app/features/onboarding/models/onboarding_response_model.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
@@ -147,4 +148,29 @@ abstract class RestClient {
   Future<HttpResponse> sendPushNotificationToken({
     @Field() required final String token,
   });
+
+  // ---------------------------- ONBOARDING ----------------------------
+
+  @POST(kUrlOnboardingStart)
+  Future<OnboardingResponse> startOnboarding();
+
+  @POST(kUrlOnboardingLocation)
+  Future<OnboardingResponse> setOnboardingLocation({
+    @Field() required final double latitude,
+    @Field() required final double longitude,
+    @Field() final String? locationName,
+  });
+
+  @POST(kUrlOnboardingRadius)
+  Future<OnboardingResponse> setOnboardingRadius({
+    @Field() required final double radiusInKm,
+  });
+
+  @POST(kUrlOnboardingNotifications)
+  Future<OnboardingResponse> setOnboardingNotificationPreferences({
+    @Field() required final String pushNotificationPreference,
+  });
+
+  @POST(kUrlOnboardingAcceptTos)
+  Future<OnboardingResponse> acceptOnboardingTermsOfService();
 }

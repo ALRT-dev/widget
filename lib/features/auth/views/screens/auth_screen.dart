@@ -8,7 +8,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/providers/auth_provider.dart';
 import 'package:hazard_app/features/auth/providers/states/auth_provider_state.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_welcome_screen.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
@@ -16,6 +15,7 @@ import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_theme.dart';
+import 'package:hazard_app/others/app_wrapper.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   /// The authentication screen where users can sign in or sign up.
@@ -414,7 +414,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   /// Navigates to the app wrapper screen.
   void _gotoWrapper() {
-    context.go(OnboardingWelcomeScreen.route);
+    context.go(AppWrapper.route);
   }
 }
 

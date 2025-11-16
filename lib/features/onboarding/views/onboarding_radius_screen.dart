@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_alert_sources_screen.dart';
+import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/gradient_button.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/logo.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/confirmation_popup.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -51,7 +52,6 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
   late List<Animation<double>> _alertScaleAnimations;
   late List<Animation<double>> _alertOpacityAnimations;
 
-  int _selectedRadius = 0;
   bool _showConfirmation = false;
 
   final List<RadiusOption> _radiusOptions = const [
@@ -252,33 +252,12 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
   }
 
   void _handleSelectRadius(int radius) {
-    setState(() {
-      _selectedRadius = radius;
-    });
+    ref.read(providerOfOnboarding.notifier).updateSelectedRadius(radius);
 
     _resetRadiusAnimations();
     Future.delayed(const Duration(milliseconds: 100), () {
       _startRadiusAnimations();
     });
-  }
-
-  void _handleNext() {
-    if (_selectedRadius > 0) {
-      setState(() {
-        _showConfirmation = true;
-      });
-    }
-  }
-
-  void _handleConfirmationComplete() {
-    setState(() {
-      _showConfirmation = false;
-    });
-    _onNext();
-  }
-
-  void _onNext() {
-    context.push(OnboardingAlertSourcesScreen.route);
   }
 
   @override
@@ -423,7 +402,19 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
                   Center(child: _buildRadiusCircles()),
                   Center(child: _buildCenterPin()),
                   Center(child: _buildAlertIndicators()),
-                  if (_selectedRadius > 0) _buildRadiusLabel(),
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final selectedRadius = ref.watch(
+                        providerOfOnboarding.select(
+                          (value) => value.selectedRadius,
+                        ),
+                      );
+                      if (selectedRadius != null && selectedRadius > 0) {
+                        return _buildRadiusLabel();
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -437,28 +428,37 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
     return AnimatedBuilder(
       animation: _radiusController,
       builder: (context, child) {
-        return Stack(
-          alignment: Alignment.center,
-          children: List.generate(_selectedRadius, (index) {
-            final size = (index + 1) * 80.spMin;
-            return Transform.scale(
-              scale: _radiusScaleAnimations[index].value,
-              child: Opacity(
-                opacity: _radiusOpacityAnimations[index].value,
-                child: Container(
-                  width: size,
-                  height: size,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.orange,
-                      width: 2,
-                    ),
-                  ),
-                ),
+        return Consumer(
+          builder: (context, ref, child) {
+            final selectedRadius = ref.watch(
+              providerOfOnboarding.select(
+                (value) => value.selectedRadius ?? 0,
               ),
             );
-          }),
+            return Stack(
+              alignment: Alignment.center,
+              children: List.generate(selectedRadius, (index) {
+                final size = (index + 1) * 80.spMin;
+                return Transform.scale(
+                  scale: _radiusScaleAnimations[index].value,
+                  child: Opacity(
+                    opacity: _radiusOpacityAnimations[index].value,
+                    child: Container(
+                      width: size,
+                      height: size,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.orange,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            );
+          },
         );
       },
     );
@@ -567,46 +567,55 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
   }
 
   Widget _buildAlertIndicators() {
-    if (_selectedRadius == 0) return const SizedBox.shrink();
+    return Consumer(
+      builder: (context, ref, child) {
+        final selectedRadius = ref.watch(
+          providerOfOnboarding.select(
+            (value) => value.selectedRadius ?? 0,
+          ),
+        );
+        if (selectedRadius == 0) return const SizedBox.shrink();
 
-    return Stack(
-      alignment: Alignment.center,
-      children: List.generate(6, (index) {
-        final angle = (index * 60) * (math.pi / 180);
-        final distance = math.min(_selectedRadius * 40.spMin, 160.spMin);
-        final x = math.cos(angle) * distance;
-        final y = math.sin(angle) * distance;
+        return Stack(
+          alignment: Alignment.center,
+          children: List.generate(6, (index) {
+            final angle = (index * 60) * (math.pi / 180);
+            final distance = math.min(selectedRadius * 40.spMin, 160.spMin);
+            final x = math.cos(angle) * distance;
+            final y = math.sin(angle) * distance;
 
-        return AnimatedBuilder(
-          animation: _alertControllers[index],
-          builder: (context, child) {
-            return Transform.translate(
-              offset: Offset(x, y),
-              child: Transform.scale(
-                scale: _alertScaleAnimations[index].value,
-                child: Opacity(
-                  opacity: _alertOpacityAnimations[index].value,
-                  child: Container(
-                    width: 16.spMin,
-                    height: 16.spMin,
-                    decoration: BoxDecoration(
-                      color: AppColors.blue,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.blue.withValues(alpha: 0.4),
-                          blurRadius: 4.spMin,
-                          offset: const Offset(0, 2),
+            return AnimatedBuilder(
+              animation: _alertControllers[index],
+              builder: (context, child) {
+                return Transform.translate(
+                  offset: Offset(x, y),
+                  child: Transform.scale(
+                    scale: _alertScaleAnimations[index].value,
+                    child: Opacity(
+                      opacity: _alertOpacityAnimations[index].value,
+                      child: Container(
+                        width: 16.spMin,
+                        height: 16.spMin,
+                        decoration: BoxDecoration(
+                          color: AppColors.blue,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.blue.withValues(alpha: 0.4),
+                              blurRadius: 4.spMin,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             );
-          },
+          }),
         );
-      }),
+      },
     );
   }
 
@@ -643,13 +652,23 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
                       ),
                     ],
                   ),
-                  child: Text(
-                    '$_selectedRadius km radius',
-                    style: TextStyle(
-                      fontSize: 14.spMin,
-                      color: AppColors.black,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Consumer(
+                    builder: (context, ref, child) {
+                      final selectedRadius = ref.watch(
+                        providerOfOnboarding.select(
+                          (value) => value.selectedRadius ?? 0,
+                        ),
+                      );
+
+                      return Text(
+                        '$selectedRadius km radius',
+                        style: TextStyle(
+                          fontSize: 14.spMin,
+                          color: AppColors.black,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -683,92 +702,103 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
   }
 
   Widget _buildRadiusOptionCard(RadiusOption option, int index) {
-    final isSelected = _selectedRadius == option.value;
+    return Consumer(
+      builder: (context, ref, child) {
+        final selectedRadius = ref.watch(
+          providerOfOnboarding.select(
+            (value) => value.selectedRadius,
+          ),
+        );
+        final isSelected = selectedRadius == option.value;
 
-    return TweenAnimationBuilder<double>(
-      duration: Duration(milliseconds: 600 + (index * 100)),
-      tween: Tween<double>(begin: -20, end: 0),
-      curve: Curves.easeOut,
-      builder: (context, offset, child) {
         return TweenAnimationBuilder<double>(
           duration: Duration(milliseconds: 600 + (index * 100)),
-          tween: Tween<double>(begin: 0, end: 1),
+          tween: Tween<double>(begin: -20, end: 0),
           curve: Curves.easeOut,
-          builder: (context, opacity, child) {
-            return Transform.translate(
-              offset: Offset(offset, 0),
-              child: Opacity(
-                opacity: opacity,
-                child: GestureDetector(
-                  onTap: () => _handleSelectRadius(option.value),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: double.infinity,
-                    padding: EdgeInsets.all(16.spMin),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16.spMin),
-                      border: Border.all(
-                        color: isSelected
-                            ? AppColors.orange
-                            : AppColors.lightGrey,
-                        width: 2,
-                      ),
-                      color: isSelected
-                          ? AppColors.orange.withValues(alpha: 0.05)
-                          : AppColors.white,
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: AppColors.orange.withValues(alpha: 0.2),
-                                blurRadius: 8.spMin,
-                                offset: const Offset(0, 4),
-                              ),
-                            ]
-                          : [],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+          builder: (context, offset, child) {
+            return TweenAnimationBuilder<double>(
+              duration: Duration(milliseconds: 600 + (index * 100)),
+              tween: Tween<double>(begin: 0, end: 1),
+              curve: Curves.easeOut,
+              builder: (context, opacity, child) {
+                return Transform.translate(
+                  offset: Offset(offset, 0),
+                  child: Opacity(
+                    opacity: opacity,
+                    child: GestureDetector(
+                      onTap: () => _handleSelectRadius(option.value),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16.spMin),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16.spMin),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppColors.orange
+                                : AppColors.lightGrey,
+                            width: 2,
+                          ),
+                          color: isSelected
+                              ? AppColors.orange.withValues(alpha: 0.05)
+                              : AppColors.white,
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.orange.withValues(
+                                      alpha: 0.2,
+                                    ),
+                                    blurRadius: 8.spMin,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ]
+                              : [],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              option.label,
-                              style: TextStyle(
-                                fontSize: 16.spMin,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.black,
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  option.label,
+                                  style: TextStyle(
+                                    fontSize: 16.spMin,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.black,
+                                  ),
+                                ),
+                                4.hSizedBox,
+                                Text(
+                                  option.description,
+                                  style: TextStyle(
+                                    fontSize: 14.spMin,
+                                    color: AppColors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
-                            4.hSizedBox,
-                            Text(
-                              option.description,
-                              style: TextStyle(
-                                fontSize: 14.spMin,
-                                color: AppColors.grey,
+                            AnimatedScale(
+                              scale: isSelected ? 1.2 : 1.0,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.elasticOut,
+                              child: Text(
+                                isSelected ? '✓' : '○',
+                                style: TextStyle(
+                                  fontSize: 24.spMin,
+                                  color: isSelected
+                                      ? AppColors.orange
+                                      : AppColors.grey,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        AnimatedScale(
-                          scale: isSelected ? 1.2 : 1.0,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.elasticOut,
-                          child: Text(
-                            isSelected ? '✓' : '○',
-                            style: TextStyle(
-                              fontSize: 24.spMin,
-                              color: isSelected
-                                  ? AppColors.orange
-                                  : AppColors.grey,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         );
@@ -792,7 +822,7 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
                 size: 20.spMin,
                 color: AppColors.white,
               ),
-              onPressed: _selectedRadius > 0 ? _handleNext : null,
+              onPressed: _onNext,
             ),
           ),
         );
@@ -801,11 +831,52 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
   }
 
   Widget _buildConfirmationPopup() {
-    return ConfirmationPopup(
-      show: true,
-      message:
-          "Radius set to ${_selectedRadius}km! You'll interact with alerts within this range.",
-      onComplete: _handleConfirmationComplete,
+    return Consumer(
+      builder: (context, ref, child) {
+        final selectedRadius = ref.watch(
+          providerOfOnboarding.select(
+            (value) => value.selectedRadius,
+          ),
+        );
+
+        return ConfirmationPopup(
+          show: true,
+          message:
+              "Radius set to ${selectedRadius}km! You'll interact with alerts within this range.",
+          onComplete: _handleConfirmationComplete,
+        );
+      },
+    );
+  }
+
+  void _handleConfirmationComplete() {
+    setState(() {
+      _showConfirmation = false;
+    });
+
+    final currentOnboardingStep = ref
+        .read(providerOfOnboarding)
+        .currentOnboardingStep;
+    context.push(currentOnboardingStep.route);
+  }
+
+  void _onNext() async {
+    final result = await ref
+        .read(providerOfOnboarding.notifier)
+        .setOnboardingRadius();
+    if (!mounted) return;
+
+    result.when(
+      (onboardingResponse) {
+        setState(() {
+          _showConfirmation = true;
+        });
+      },
+      (error) {
+        context.showErrorToast(
+          message: error.message,
+        );
+      },
     );
   }
 }

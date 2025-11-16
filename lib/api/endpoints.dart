@@ -31,6 +31,15 @@ const kUrlHazardCategoriesSub = '$kUrlHazardCategories/sub';
 const kUrlHazardVote = '$kUrlHazards/{hazardId}/vote';
 const kUrlHazardView = '$kUrlHazards/{hazardId}/view';
 
+// ---------------------------- ONBOARDING ----------------------------
+
+const kUrlOnboarding = '/onboarding';
+const kUrlOnboardingStart = '$kUrlOnboarding/start';
+const kUrlOnboardingLocation = '$kUrlOnboarding/location';
+const kUrlOnboardingRadius = '$kUrlOnboarding/radius';
+const kUrlOnboardingNotifications = '$kUrlOnboarding/notifications';
+const kUrlOnboardingAcceptTos = '$kUrlOnboarding/accept-tos';
+
 // ---------------------------- NOTIFICATION ----------------------------
 
 const kUrlNotifications = '/notifications';

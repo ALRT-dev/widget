@@ -7,6 +7,7 @@ import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/views/screens/home_screen.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:hazard_app/others/app_wrapper.dart';
 
 class OnboardingCompleteScreen extends ConsumerStatefulWidget {
   const OnboardingCompleteScreen({super.key});
@@ -250,18 +251,22 @@ class _OnboardingCompleteScreenState
 
   void _gotoMapScreen() {
     context.go(
-      HomeScreen.route,
-      extra: HomeScreenArgs(
-        initialTab: HomeTab.map,
+      AppWrapper.route,
+      extra: AppWrapperArgs(
+        homeScreenArgs: HomeScreenArgs(
+          initialTab: HomeTab.map,
+        ),
       ),
     );
   }
 
   void _gotoProfileScreen() {
     context.go(
-      HomeScreen.route,
-      extra: HomeScreenArgs(
-        initialTab: HomeTab.profile,
+      AppWrapper.route,
+      extra: AppWrapperArgs(
+        homeScreenArgs: HomeScreenArgs(
+          initialTab: HomeTab.profile,
+        ),
       ),
     );
   }

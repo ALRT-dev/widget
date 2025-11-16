@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_complete_screen.dart';
+import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/logo.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -179,19 +180,11 @@ class _OnboardingEmergencyScreenState
     super.dispose();
   }
 
-  void _handleAgree() {
-    _onNext();
-  }
-
   void _handleDecline() {
     setState(() {
       _showDeclineMessage = true;
     });
     _declineController.forward();
-  }
-
-  void _onNext() {
-    context.push(OnboardingCompleteScreen.route);
   }
 
   @override
@@ -654,6 +647,24 @@ class _OnboardingEmergencyScreenState
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void _handleAgree() async {
+    final result = await ref
+        .read(providerOfOnboarding.notifier)
+        .acceptOnboardingTermsOfService();
+    if (!mounted) return;
+
+    result.when(
+      (onboardingResponse) {
+        context.push(onboardingResponse.nextOnboardingStep.route);
+      },
+      (error) {
+        context.showErrorToast(
+          message: error.message,
         );
       },
     );

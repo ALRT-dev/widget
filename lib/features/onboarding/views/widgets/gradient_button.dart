@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class GradientButton extends ConsumerStatefulWidget {
@@ -8,12 +9,15 @@ class GradientButton extends ConsumerStatefulWidget {
     super.key,
     required this.title,
     this.icon,
+    this.isLoading = false,
     this.onPressed,
   });
 
   final String title;
 
   final Widget? icon;
+
+  final bool isLoading;
 
   final void Function()? onPressed;
 
@@ -49,25 +53,31 @@ class _GradientButtonState extends ConsumerState<GradientButton> {
         child: InkWell(
           borderRadius: BorderRadius.circular(100.spMin),
           onTap: widget.onPressed,
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 15.spMin),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  widget.title,
-                  style: TextStyle(
-                    fontSize: 16.spMin,
-                    fontWeight: FontWeight.w600,
+          child: SizedBox(
+            height: 54.spMin,
+            child: widget.isLoading
+                ? Spinner(
                     color: AppColors.white,
+                    size: 20.spMin,
+                    strokeWidth: 2.0,
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.title,
+                        style: TextStyle(
+                          fontSize: 16.spMin,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.white,
+                        ),
+                      ),
+                      if (widget.icon != null) ...[
+                        SizedBox(width: 5.spMin),
+                        widget.icon!,
+                      ],
+                    ],
                   ),
-                ),
-                if (widget.icon != null) ...[
-                  SizedBox(width: 5.spMin),
-                  widget.icon!,
-                ],
-              ],
-            ),
           ),
         ),
       ),

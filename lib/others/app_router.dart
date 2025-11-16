@@ -32,7 +32,9 @@ class AppRouter {
         GoRoute(
           path: AppWrapper.route,
           builder: (context, state) {
-            return const AppWrapper();
+            return AppWrapper(
+              args: (state.extra as AppWrapperArgs?) ?? const AppWrapperArgs(),
+            );
           },
         ),
         GoRoute(
