@@ -67,8 +67,8 @@ class _AppWrapperState extends ConsumerState<AppWrapper> {
   /// Checks which screen to navigate to based on the authentication state.
   void _checkAuthState() async {
     // create a fake delay to simulate loading
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
+    // await Future.delayed(const Duration(seconds: 2));
+    // if (!mounted) return;
 
     final loggedInUser = ref.read(providerOfLoggedInUser);
     if (loggedInUser != null) {
