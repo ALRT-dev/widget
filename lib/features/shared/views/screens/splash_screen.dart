@@ -184,7 +184,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       child: TweenAnimationBuilder<double>(
         key: const ValueKey('progress_bar'),
         tween: Tween(begin: 0, end: 1),
-        duration: const Duration(seconds: 2),
+        duration: const Duration(seconds: 1),
         curve: Curves.easeInOut,
         builder: (context, v, _) {
           return Container(

@@ -250,28 +250,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 110.hSizedBox,
 
                 // Icon - Centered in white circle
-                Container(
-                  width: 80.spMin,
-                  height: 80.spMin,
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.black,
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.shadowColor,
-                        blurRadius: 15.spMin,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: _iconBuilder(),
-                ),
+                _iconBuilder(),
 
-                16.hSizedBox,
+                20.hSizedBox,
 
                 // Pills Row - Centered
                 Wrap(
@@ -284,10 +265,13 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                       _buildPill(severityTitle),
 
                     // Category Pill (Official/AWS/User)
-                    _buildPill(_getCategoryLabel(isUserAlert, isAwsCompliant)),
+                    _buildPill(
+                      _getCategoryLabel(isUserAlert, isAwsCompliant),
+                      2,
+                    ),
 
                     // Alert Type
-                    if (categoryName != null) _buildPill(categoryName),
+                    if (categoryName != null) _buildPill(categoryName, 2),
                   ],
                 ),
 
@@ -345,7 +329,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   ],
                 ),
               ],
-            ).pX(24.0),
+            ),
             if (severity == HazardSeverity.unknown && !isUserAlert)
               Divider().pT(11.0),
           ],
@@ -354,26 +338,30 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
-  Widget _buildPill(String label) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 16.spMin,
-        vertical: 6.spMin,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20.spMin),
-        border: Border.all(
-          color: AppColors.black,
-          width: 2,
+  Widget _buildPill(String label, [final int flex = 1]) {
+    return Flexible(
+      flex: flex,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: 16.spMin,
+          vertical: 6.spMin,
         ),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 14.spMin,
-          color: AppColors.black,
-          fontWeight: FontWeight.w500,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20.spMin),
+          border: Border.all(
+            color: AppColors.black,
+            width: 2,
+          ),
+        ),
+        child: Text(
+          label,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 14.spMin,
+            color: AppColors.black,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );
@@ -425,6 +413,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         return Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
+            color: AppColors.white,
+            border: Border.all(
+              color: AppColors.black,
+              width: 2.0,
+            ),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadowColor,
@@ -437,7 +430,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             iconPath,
             width: 80.spMin,
             height: 80.spMin,
-            fit: BoxFit.contain,
+            fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) => Image.asset(
               fallbackIconPath,
               width: 80.spMin,
@@ -494,11 +487,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
         // What We Know Section
         _buildWhatWeKnowSection(),
-        24.hSizedBox,
 
         // What To Do Section
         _buildWhatToDoSection(),
-        24.hSizedBox,
 
         // Source Section
         _buildSourceSectionNew(),
@@ -695,7 +686,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               ),
             ],
           ),
-        );
+        ).pB(24.0);
       },
     );
   }
@@ -754,7 +745,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               ),
             ],
           ),
-        );
+        ).pB(24.0);
       },
     );
   }
