@@ -15,6 +15,7 @@ import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
+import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -28,6 +29,7 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
     this.showTrustMeter = true,
     this.showSourceHeader = true,
     this.horizontalPadding = 10.0,
+    this.isInfoWindow = false,
   });
 
   /// The hazard to display in this list item.
@@ -47,6 +49,9 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
 
   /// The horizontal padding around the list item.
   final double horizontalPadding;
+
+  /// Whether this list item is being shown inside an InfoWindow.
+  final bool isInfoWindow;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -84,7 +89,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     }
 
     return InkWell(
-      onTap: _gotoViewHazard,
+      onTap: widget.isInfoWindow ? null : _gotoViewHazard,
       borderRadius: BorderRadius.circular(12.spMin),
       child: Container(
         decoration: BoxDecoration(
@@ -116,28 +121,34 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               ),
               15.hSizedBox,
             ],
-            Padding(
-              padding: EdgeInsets.all(16.0.spMin),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _iconBuilder(),
-                  12.wSizedBox,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _titleBuilder(),
-                        4.hSizedBox,
-                        _locationBuilder(),
+            Row(
+              crossAxisAlignment: !widget.isInfoWindow
+                  ? CrossAxisAlignment.start
+                  : CrossAxisAlignment.center,
+              children: [
+                _iconBuilder(),
+                12.wSizedBox,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _titleBuilder(),
+                      4.hSizedBox,
+                      _locationBuilder(),
+                      if (!widget.isInfoWindow) ...[
                         4.hSizedBox,
                         _shortDescriptionBuilder(),
                       ],
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              ],
+            ).pX(16.0).pT(16.0),
+            if (widget.isInfoWindow) ...[
+              8.hSizedBox,
+              _shortDescriptionBuilder().pX(16.0),
+            ],
+            16.hSizedBox,
             if (widget.showTrustMeter && widget.hazard.source == null) ...[
               Padding(
                 padding: EdgeInsets.fromLTRB(
@@ -147,6 +158,17 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   16.0.spMin,
                 ),
                 child: _trustMeterBuilder(),
+              ),
+            ],
+            if (widget.isInfoWindow) ...[
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  16.0.spMin,
+                  0.0,
+                  16.0.spMin,
+                  16.0.spMin,
+                ),
+                child: _viewDetailsButtonBuilder(),
               ),
             ],
           ],
@@ -416,7 +438,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     ? '$locationName · $distanceText'
                     : distanceText,
                 style: TextStyle(
-                  fontSize: 14.spMin,
+                  fontSize: 12.spMin,
                   color: AppColors.grey,
                 ),
                 maxLines: 1,
@@ -487,6 +509,22 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           onVotePressed: _voteOnHazard,
         );
       },
+    );
+  }
+
+  Widget _viewDetailsButtonBuilder() {
+    return Button.filled(
+      value: 'View Details',
+      padding: EdgeInsets.symmetric(
+        vertical: 12.spMin,
+      ),
+      isIconLeft: false,
+      icon: Icon(
+        Icons.arrow_forward_ios_rounded,
+        size: 16.spMin,
+        color: AppColors.white,
+      ),
+      onPressed: _gotoViewHazard,
     );
   }
 

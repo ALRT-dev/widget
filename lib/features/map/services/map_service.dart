@@ -301,4 +301,17 @@ class MapService {
       return hazards.length * 1.0;
     }
   }
+
+  /// Gets the screen coordinate for a given [latLng] position on the map.
+  Future<ScreenCoordinate?> getScreenCoordinate(LatLng latLng) async {
+    try {
+      if (_googleMapController == null) return null;
+      return await _googleMapController!.getScreenCoordinate(latLng);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Gets the map controller if it's initialized.
+  GoogleMapController? get mapController => _googleMapController;
 }

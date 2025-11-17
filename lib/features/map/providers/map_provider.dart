@@ -819,7 +819,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
             hazard.id ?? '${hazard.latitude},${hazard.longitude}',
           ),
           position: LatLng(hazard.latitude!, hazard.longitude!),
-          onTap: () => updateSelectedHazard(hazard),
+          onTap: () => _onIndividualMarkerTap(hazard),
+          consumeTapEvents: true,
           icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
         ),
       );
@@ -970,7 +971,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
           hazard.id ?? '${hazard.latitude},${hazard.longitude}',
         ),
         position: LatLng(hazard.latitude!, hazard.longitude!),
-        onTap: () => updateSelectedHazard(hazard),
+        onTap: () => _onIndividualMarkerTap(hazard),
+        consumeTapEvents: true,
         icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
       );
       return individualMarker;
@@ -1144,6 +1146,34 @@ class MapProvider extends StateNotifier<MapProviderState> {
       logicalSize: const Size(size, size),
       imageSize: const Size(size * 2, size * 2),
     );
+  }
+
+  void _onIndividualMarkerTap(final Hazard hazard) {
+    updateSelectedHazard(hazard);
+
+    // Calculate position with offset to create top padding effect
+    final markerPosition = LatLng(hazard.latitude!, hazard.longitude!);
+
+    // Calculate consistent visual offset based on zoom level
+    // This ensures the marker appears in the same relative position on screen
+    // regardless of zoom level (e.g., 30% from the top of the screen)
+    final currentZoom = state.cameraPosition.zoom;
+
+    // Calculate latitude degrees per pixel at current zoom level
+    // At zoom level z, each tile is 256 pixels and represents 360/(2^z) degrees
+    final degreesPerPixel = 360.0 / (256.0 * pow(2, currentZoom));
+
+    // Offset by approximately 150 pixels (adjust this value to fine-tune positioning)
+    // This will consistently place the marker about 150 pixels from the top
+    final pixelOffset = 120.0;
+    final latOffset = degreesPerPixel * pixelOffset;
+
+    final targetPosition = LatLng(
+      markerPosition.latitude + latOffset,
+      markerPosition.longitude,
+    );
+
+    animateTo(position: targetPosition, zoom: currentZoom + 0.01);
   }
 
   /// Updates [MapProviderState.isMapReady] to the given [isMapReady].

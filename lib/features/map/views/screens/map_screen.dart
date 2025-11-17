@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
-import 'package:hazard_app/features/map/views/widgets/map_hazard_preview.dart';
+import 'package:hazard_app/features/map/views/widgets/map_hazard_info_window.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
 import 'package:hazard_app/features/map/views/widgets/route_planning.dart';
 import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
@@ -59,9 +59,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   .init(googleMapController: controller);
             },
             onCameraMove: _handleMapMoved,
-            onTap: (_) => context.unfocusInputs(),
+            onTap: (_) {
+              context.unfocusInputs();
+              ref.read(providerOfMap.notifier).updateSelectedHazard(null);
+            },
           ),
           _overlayedContentsBuilder(),
+          const MapHazardInfoWindow(),
         ],
       ),
     );
@@ -97,15 +101,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
           Consumer(
             builder: (context, ref, child) {
-              final isHazardSelected = ref.watch(
-                providerOfMap.select(
-                  (value) => value.selectedHazard != null,
-                ),
-              );
-              if (isHazardSelected) {
-                return MapHazardPreview().pB(20.0);
-              }
-
               final isRoutePresent = ref.watch(
                 providerOfMap.select(
                   (value) => value.currentRoutePlan != null,

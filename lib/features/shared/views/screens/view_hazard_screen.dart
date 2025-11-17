@@ -339,29 +339,26 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   }
 
   Widget _buildPill(String label, [final int flex = 1]) {
-    return Flexible(
-      flex: flex,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: 16.spMin,
-          vertical: 6.spMin,
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 16.spMin,
+        vertical: 6.spMin,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20.spMin),
+        border: Border.all(
+          color: AppColors.black,
+          width: 2,
         ),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20.spMin),
-          border: Border.all(
-            color: AppColors.black,
-            width: 2,
-          ),
-        ),
-        child: Text(
-          label,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: 14.spMin,
-            color: AppColors.black,
-            fontWeight: FontWeight.w500,
-          ),
+      ),
+      child: Text(
+        label,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: 14.spMin,
+          color: AppColors.black,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
@@ -411,6 +408,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         }
 
         return Container(
+          height: 80.spMin,
+          width: 80.spMin,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: AppColors.white,
@@ -426,20 +425,15 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               ),
             ],
           ),
+          padding: EdgeInsets.all(12.spMin),
           child: Image.asset(
             iconPath,
-            width: 80.spMin,
-            height: 80.spMin,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) => Image.asset(
               fallbackIconPath,
-              width: 80.spMin,
-              height: 80.spMin,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Image.asset(
                 fallbackIconPath2,
-                width: 80.spMin,
-                height: 80.spMin,
                 fit: BoxFit.contain,
               ),
             ),
