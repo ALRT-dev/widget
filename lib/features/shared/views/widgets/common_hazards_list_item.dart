@@ -65,9 +65,11 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final isHazardNull = ref.read(provider).hazard == null;
-      if (isHazardNull) {
-        ref.read(provider.notifier).updateHazard(widget.hazard);
+      if (mounted) {
+        final isHazardNull = ref.read(provider).hazard == null;
+        if (isHazardNull) {
+          ref.read(provider.notifier).updateHazard(widget.hazard);
+        }
       }
     });
   }
