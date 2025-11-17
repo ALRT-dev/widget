@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
+import 'package:hazard_app/features/onboarding/providers/states/onboarding_provider_state.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -9,15 +11,12 @@ class GradientButton extends ConsumerStatefulWidget {
     super.key,
     required this.title,
     this.icon,
-    this.isLoading = false,
     this.onPressed,
   });
 
   final String title;
 
   final Widget? icon;
-
-  final bool isLoading;
 
   final void Function()? onPressed;
 
@@ -28,6 +27,15 @@ class GradientButton extends ConsumerStatefulWidget {
 class _GradientButtonState extends ConsumerState<GradientButton> {
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(
+      providerOfOnboarding.select(
+        (value) => value.continueOnboarding.maybeWhen(
+          loading: () => true,
+          orElse: () => false,
+        ),
+      ),
+    );
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -55,7 +63,7 @@ class _GradientButtonState extends ConsumerState<GradientButton> {
           onTap: widget.onPressed,
           child: SizedBox(
             height: 54.spMin,
-            child: widget.isLoading
+            child: isLoading
                 ? Spinner(
                     color: AppColors.white,
                     size: 20.spMin,

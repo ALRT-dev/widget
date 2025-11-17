@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:hazard_app/features/map/providers/location_provider.dart';
+import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/providers/service_providers.dart';
+import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/onboarding/enums/push_notification_preference_types.dart';
 import 'package:hazard_app/features/onboarding/providers/service_providers.dart';
 import 'package:hazard_app/features/onboarding/providers/states/onboarding_provider_state.dart';
@@ -27,25 +29,26 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
        super(initialState);
 
   final Ref _ref;
-  LocationProvider get _locationProvider =>
-      _ref.read(providerOfLocation.notifier);
+  LocationService get _locationService => _ref.read(providerOfLocationService);
   OnboardingService get _onboardingService =>
       _ref.read(providerOfOnboardingService);
 
-  /// Gets the user's current location.
-  Future<void> getUserLocation() {
-    return _locationProvider.getLocation();
+  /// Opens the device's location settings.
+  Future<void> openLocationSettings() async {
+    await _locationService.openLocationSettings();
   }
 
   /// Sets the user's location during onboarding.
-  Future<Either<void, AppError>> setOnboardingLocation() async {
+  Future<Either<void, AppError>> setOnboardingLocation({
+    required final AlrtLocation location,
+  }) async {
     state = state.copyWith(
       continueOnboarding: const ContinueOnboarding.loading(),
     );
 
-    final latitude = _locationProvider.state.location.latitude;
-    final longitude = _locationProvider.state.location.longitude;
-    final address = _locationProvider.state.location.address;
+    final latitude = location.latitude;
+    final longitude = location.longitude;
+    final address = location.address;
 
     final result = await _onboardingService.setOnboardingLocation(
       latitude: latitude,

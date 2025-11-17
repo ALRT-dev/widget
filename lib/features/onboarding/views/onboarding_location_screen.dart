@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/providers/location_provider.dart';
+import 'package:hazard_app/features/map/providers/states/location_permission_provider_state.dart';
 import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/gradient_button.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/logo.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/confirmation_popup.dart';
+import 'package:hazard_app/features/onboarding/views/widgets/manual_location_popup.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -19,6 +23,8 @@ class OnboardingLocationScreen extends ConsumerStatefulWidget {
   const OnboardingLocationScreen({super.key});
 
   static const route = '/onboarding/location';
+
+  static const placesSearchKey = 'OnboardingLocationScreen_placesSearchKey';
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -38,8 +44,8 @@ class _OnboardingLocationScreenState
 
   LocationOption _selectedOption = LocationOption.none;
   bool _showConfirmation = false;
-  bool _showSkipPopup = false;
   bool _showDenyPopup = false;
+  bool _showManualLocationPopup = false;
 
   @override
   void initState() {
@@ -127,40 +133,10 @@ class _OnboardingLocationScreenState
     });
   }
 
-  void _handleNext() {
-    if (_selectedOption == LocationOption.skip) {
-      setState(() {
-        _showSkipPopup = true;
-      });
-    } else if (_selectedOption != LocationOption.none) {
-      setState(() {
-        _showConfirmation = true;
-      });
-    }
-  }
-
-  void _handleDeny() {
-    setState(() {
-      _showDenyPopup = true;
-    });
-  }
-
-  void _handleSkipConfirm() {
-    setState(() {
-      _showSkipPopup = false;
-    });
-    _onNext();
-  }
-
-  void _handleConfirmationComplete() {
-    setState(() {
-      _showConfirmation = false;
-    });
-    _onNext();
-  }
-
   @override
   Widget build(BuildContext context) {
+    _listenToGetLocationState();
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -190,8 +166,8 @@ class _OnboardingLocationScreenState
               ),
             ),
             if (_showConfirmation) _buildConfirmationPopup(),
-            if (_showSkipPopup) _buildSkipPopup(),
             if (_showDenyPopup) _buildDenyPopup(),
+            if (_showManualLocationPopup) _buildManualLocationPopup(),
           ],
         ),
       ),
@@ -440,28 +416,8 @@ class _OnboardingLocationScreenState
                     size: 20.spMin,
                     color: AppColors.white,
                   ),
-                  onPressed: _selectedOption != LocationOption.none
-                      ? _handleNext
-                      : null,
+                  onPressed: _onNext,
                 ),
-              ),
-              12.hSizedBox,
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildOutlineButton(
-                      title: "Don't Allow",
-                      onPressed: _handleDeny,
-                    ),
-                  ),
-                  12.wSizedBox,
-                  Expanded(
-                    child: _buildOutlineButton(
-                      title: "Skip for now",
-                      onPressed: () => _handleSelectOption(LocationOption.skip),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
@@ -470,117 +426,11 @@ class _OnboardingLocationScreenState
     );
   }
 
-  Widget _buildOutlineButton({
-    required String title,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: AppColors.lightGrey,
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(100.spMin),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(100.spMin),
-          onTap: onPressed,
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 12.spMin),
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 14.spMin,
-                fontWeight: FontWeight.w600,
-                color: AppColors.grey,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildConfirmationPopup() {
     return ConfirmationPopup(
       show: true,
       message: "Location set! You can now receive alerts for your area.",
       onComplete: _handleConfirmationComplete,
-    );
-  }
-
-  Widget _buildSkipPopup() {
-    return _buildPopupOverlay(
-      child: Container(
-        padding: EdgeInsets.all(32.spMin),
-        margin: EdgeInsets.symmetric(horizontal: 16.spMin),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(30.spMin),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowColor,
-              blurRadius: 20.spMin,
-              offset: const Offset(0, 10),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 64.spMin,
-              height: 64.spMin,
-              decoration: BoxDecoration(
-                color: AppColors.orange.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(32.spMin),
-              ),
-              child: Icon(
-                Icons.location_pin,
-                size: 32.spMin,
-                color: AppColors.orange,
-              ),
-            ),
-            24.hSizedBox,
-            Text(
-              'Limited Features Without Location',
-              style: TextStyle(
-                fontSize: 20.spMin,
-                fontWeight: FontWeight.w600,
-                color: AppColors.black,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            12.hSizedBox,
-            Text(
-              'Without a location, you won\'t be able to post alerts or receive area-specific notifications. You can browse alerts in view-only mode.',
-              style: TextStyle(
-                fontSize: 14.spMin,
-                color: AppColors.grey,
-                height: 1.4,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            32.hSizedBox,
-            GradientButton(
-              title: "Go Back",
-              onPressed: () {
-                setState(() {
-                  _showSkipPopup = false;
-                });
-              },
-            ),
-            12.hSizedBox,
-            _buildOutlineButton(
-              title: "Continue Anyway",
-              onPressed: _handleSkipConfirm,
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -699,8 +549,14 @@ class _OnboardingLocationScreenState
               _buildIconButton(
                 title: "Open Device Settings",
                 icon: Icons.settings,
-                onPressed: () {
-                  // Handle opening device settings
+                onPressed: () async {
+                  await ref
+                      .read(providerOfOnboarding.notifier)
+                      .openLocationSettings();
+                  if (!mounted) return;
+                  setState(() {
+                    _showDenyPopup = false;
+                  });
                 },
               ),
               12.hSizedBox,
@@ -712,18 +568,6 @@ class _OnboardingLocationScreenState
                     _showDenyPopup = false;
                     _selectedOption = LocationOption.manual;
                   });
-                },
-                isOutline: true,
-              ),
-              12.hSizedBox,
-              _buildIconButton(
-                title: "View-only Mode",
-                icon: Icons.visibility,
-                onPressed: () {
-                  setState(() {
-                    _showDenyPopup = false;
-                  });
-                  _onNext();
                 },
                 isOutline: true,
               ),
@@ -852,20 +696,82 @@ class _OnboardingLocationScreenState
     );
   }
 
+  void _listenToGetLocationState() {
+    ref.listen(
+      providerOfLocation.select(
+        (value) => value.getLocationState,
+      ),
+      (previous, next) {
+        next.maybeWhen(
+          success: _onLocationReceived,
+          error: (error) {
+            setState(() {
+              _showDenyPopup = true;
+            });
+          },
+          orElse: () {},
+        );
+      },
+    );
+  }
+
+  void _handleConfirmationComplete() {
+    setState(() {
+      _showConfirmation = false;
+    });
+
+    context.push(OnboardingStep.location.nextStep.route);
+  }
+
   void _onNext() async {
+    if (_selectedOption == LocationOption.none) {
+      context.showErrorToast(
+        message: 'Please select a location option to proceed.',
+      );
+      return;
+    }
+
+    if (_selectedOption == LocationOption.current) {
+      ref.read(providerOfLocation.notifier).getLocation();
+    } else {
+      setState(() {
+        _showManualLocationPopup = true;
+      });
+    }
+  }
+
+  void _onLocationReceived(final AlrtLocation location) async {
     final result = await ref
         .read(providerOfOnboarding.notifier)
-        .setOnboardingLocation();
+        .setOnboardingLocation(location: location);
     if (!mounted) return;
 
     result.when(
       (onboardingResponse) {
-        context.push(OnboardingStep.location.nextStep.route);
+        setState(() {
+          _showConfirmation = true;
+        });
       },
       (error) {
         context.showErrorToast(
           message: error.message,
         );
+      },
+    );
+  }
+
+  Widget _buildManualLocationPopup() {
+    return ManualLocationPopup(
+      onCancel: () {
+        setState(() {
+          _showManualLocationPopup = false;
+        });
+      },
+      onConfirm: (place) {
+        setState(() {
+          _showManualLocationPopup = false;
+        });
+        _onLocationReceived(place.toAlrtLocation);
       },
     );
   }

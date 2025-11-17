@@ -8,14 +8,16 @@ import 'package:hazard_app/features/shared/providers/instance_providers.dart';
 /// Provider of [MapRepository].
 final providerOfMapRepository =
     Provider.family<MapRepository, GoogleMapController>(
-  (ref, googleMapController) => MapRepositoryImpl(
-    googleMapController: googleMapController,
-    dio: ref.watch(providerOfDioInstance(true)),
-    polylinePoints: ref.watch(providerOfPolylinePointsInstance),
-  ),
-);
+      (ref, googleMapController) => MapRepositoryImpl(
+        googleMapController: googleMapController,
+        dio: ref.watch(providerOfDioInstance(true)),
+        polylinePoints: ref.watch(providerOfPolylinePointsInstance),
+      ),
+    );
 
 /// Provider of [LocationRepository].
 final providerOfLocationRepository = Provider<LocationRepository>(
-  (ref) => LocationRepositoryImpl(),
+  (ref) => LocationRepositoryImpl(
+    dio: ref.watch(providerOfDioInstance(true)),
+  ),
 );
