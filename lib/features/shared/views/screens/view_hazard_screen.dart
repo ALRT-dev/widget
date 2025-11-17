@@ -485,6 +485,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         // What To Do Section
         _buildWhatToDoSection(),
 
+        // Official Description Section
+        _buildOfficialDescriptionSection(),
+
         // Source Section
         _buildSourceSectionNew(),
         40.hSizedBox,
@@ -658,23 +661,29 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             ),
           ),
           padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 8.spMin, 16.spMin),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text(
-                'What We Know',
-                style: TextStyle(
-                  color: AppColors.black,
-                  fontSize: 16.spMin,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              12.spMin.hSizedBox,
-              Text(
-                aiSummary!,
-                style: TextStyle(
-                  fontSize: 14.spMin,
-                  height: 1.5,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'What We Know',
+                      style: TextStyle(
+                        color: AppColors.black,
+                        fontSize: 16.spMin,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    12.spMin.hSizedBox,
+                    Text(
+                      aiSummary!,
+                      style: TextStyle(
+                        fontSize: 14.spMin,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -716,24 +725,83 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             ),
           ),
           padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 8.spMin, 16.spMin),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Text(
-                'What To Do',
-                style: TextStyle(
-                  color: AppColors.black,
-                  fontSize: 16.spMin,
-                  fontWeight: FontWeight.w600,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'What To Do',
+                      style: TextStyle(
+                        color: AppColors.black,
+                        fontSize: 16.spMin,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    12.spMin.hSizedBox,
+                    Text(
+                      callToAction!,
+                      style: TextStyle(
+                        color: AppColors.black.withValues(alpha: 0.9),
+                        fontSize: 14.spMin,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              12.spMin.hSizedBox,
-              Text(
-                callToAction!,
-                style: TextStyle(
-                  color: AppColors.black.withValues(alpha: 0.9),
-                  fontSize: 14.spMin,
-                  height: 1.5,
+            ],
+          ),
+        ).pB(24.0);
+      },
+    );
+  }
+
+  Widget _buildOfficialDescriptionSection() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final description = ref.watch(
+          provider.select((value) => value.hazard?.description),
+        );
+
+        if (description?.isEmpty ?? true) return const SizedBox.shrink();
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.blue.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(12.spMin),
+            border: Border(
+              left: BorderSide(
+                color: AppColors.blue,
+                width: 4,
+              ),
+            ),
+          ),
+          padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 8.spMin, 16.spMin),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Official Description',
+                      style: TextStyle(
+                        color: AppColors.black,
+                        fontSize: 16.spMin,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    12.spMin.hSizedBox,
+                    Text(
+                      description!,
+                      style: TextStyle(
+                        fontSize: 14.spMin,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
