@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 extension DateTimeExt on DateTime {
   /// Returns a formatted string representation of the DateTime object.
   ///
-  /// Eg. 5th June 2023, 14:30
+  /// Eg. 5th June 2023 at 5:30pm
   String get formattedWithTime {
     final dayWithSuffix = _getDayWithOrdinalSuffix(day);
 
@@ -18,19 +18,17 @@ extension DateTimeExt on DateTime {
         DateTime.now().day - 1 == day;
 
     if (isToday) {
-      return 'Today, ${DateFormat('HH:mm').format(this)}';
+      return 'Today at ${DateFormat('h:mma').format(this).toLowerCase()}';
     }
 
     if (isYesterday) {
-      return 'Yesterday, ${DateFormat('HH:mm').format(this)}';
+      return 'Yesterday at ${DateFormat('h:mma').format(this).toLowerCase()}';
     }
 
-    return DateFormat('MMMM yyyy, HH:mm')
-        .format(this)
-        .replaceFirst(
-          DateFormat('MMMM').format(this),
-          '$dayWithSuffix ${DateFormat('MMMM').format(this)}',
-        );
+    return '${DateFormat('MMMM yyyy').format(this).replaceFirst(
+      DateFormat('MMMM').format(this),
+      '$dayWithSuffix ${DateFormat('MMMM').format(this)}',
+    )} at ${DateFormat('h:mma').format(this)}';
   }
 
   /// Returns a formatted string representation of the DateTime object.

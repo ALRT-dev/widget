@@ -8,6 +8,7 @@ import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/video_priority_types.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
+import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -22,7 +23,6 @@ import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'dart:math' as math;
 
 class ViewHazardScreenArgs {
@@ -626,9 +626,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                       ),
                       8.spMin.wSizedBox,
                       Text(
-                        timeago.format(
-                          occurredAt ?? createdAt ?? DateTime.now(),
-                        ),
+                        (occurredAt ?? createdAt ?? DateTime.now())
+                            .formattedWithTime,
                         style: TextStyle(
                           fontSize: 14.spMin,
                         ),

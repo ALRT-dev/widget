@@ -16,10 +16,8 @@ import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dar
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
-import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_expiry_timer.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class CommonHazardsListItem extends ConsumerStatefulWidget {
   const CommonHazardsListItem({
@@ -87,14 +85,22 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
 
     return InkWell(
       onTap: _gotoViewHazard,
-      borderRadius: BorderRadius.circular(18.spMin),
+      borderRadius: BorderRadius.circular(12.spMin),
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-            color: AppColors.lightGrey,
+            color: AppColors.black,
+            width: 2.0,
           ),
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(18.spMin),
+          borderRadius: BorderRadius.circular(12.spMin),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.1),
+              blurRadius: 8.0,
+              offset: const Offset(0.0, 4.0),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,36 +108,47 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             if (widget.showSourceHeader) ...[
               _headerBuilder(),
             ],
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (widget.hazard.processedMedias.isNotEmpty) ...[
-                  3.hSizedBox,
-                  HazardMediasCarousel(
-                    id: widget.hazard.id!,
-                    medias: widget.hazard.processedMedias,
-                  ),
-                  15.hSizedBox,
-                ],
-                Row(
-                  children: [
-                    _iconBuilder(),
-                    10.wSizedBox,
-                    Expanded(
-                      child: _titleBuilder(),
+            if (widget.hazard.processedMedias.isNotEmpty) ...[
+              3.hSizedBox,
+              HazardMediasCarousel(
+                id: widget.hazard.id!,
+                medias: widget.hazard.processedMedias,
+              ),
+              15.hSizedBox,
+            ],
+            Padding(
+              padding: EdgeInsets.all(16.0.spMin),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _iconBuilder(),
+                  12.wSizedBox,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _titleBuilder(),
+                        4.hSizedBox,
+                        _locationBuilder(),
+                        4.hSizedBox,
+                        _shortDescriptionBuilder(),
+                      ],
                     ),
-                  ],
-                ),
-                6.hSizedBox,
-                _shortDescriptionBuilder(),
-                8.hSizedBox,
-                _footerBuilder(),
-                if (widget.showTrustMeter && widget.hazard.source == null) ...[
-                  12.hSizedBox,
-                  _trustMeterBuilder(),
+                  ),
                 ],
-              ],
-            ).pad(10.0),
+              ),
+            ),
+            if (widget.showTrustMeter && widget.hazard.source == null) ...[
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  16.0.spMin,
+                  0.0,
+                  16.0.spMin,
+                  16.0.spMin,
+                ),
+                child: _trustMeterBuilder(),
+              ),
+            ],
           ],
         ),
       ),
@@ -141,6 +158,16 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
   Widget _headerBuilder() {
     return Consumer(
       builder: (context, ref, child) {
+        final isUserReported = ref.watch(
+          provider.select(
+            (value) => value.hazard!.isUserReported,
+          ),
+        );
+        final isAwsCompliant = ref.watch(
+          provider.select(
+            (value) => value.hazard!.isAwsCompliant ?? false,
+          ),
+        );
         final hazardColor = ref.watch(
           provider.select(
             (value) => value.hazard!.color,
@@ -162,9 +189,12 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           ),
         );
 
-        final foregroundColor = hazardColor.isLight
-            ? AppColors.black
-            : AppColors.white;
+        final isVerified = source != null;
+        final categoryLabel = isUserReported
+            ? 'USER'
+            : isAwsCompliant
+            ? 'OFFICIAL AWS'
+            : 'OFFICIAL';
 
         return Stack(
           children: [
@@ -172,107 +202,69 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               decoration: BoxDecoration(
                 color: hazardColor,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(16.spMin),
-                  topRight: Radius.circular(16.spMin),
+                  topLeft: Radius.circular(10.spMin),
+                  topRight: Radius.circular(10.spMin),
                 ),
-                border: severity != HazardSeverity.unknown
-                    ? null
-                    : Border(
+                border: hazardColor == AppColors.transparent
+                    ? Border(
                         bottom: BorderSide(
-                          color: AppColors.lightGrey,
-                          width: 1,
+                          color: AppColors.black,
+                          width: 2.0,
                         ),
-                      ),
+                      )
+                    : null,
               ),
               padding: EdgeInsets.symmetric(
-                horizontal: 15.spMin,
-                vertical: 15.spMin,
+                horizontal: 16.spMin,
+                vertical: 8.spMin,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                spacing: 5.spMin,
                 children: [
-                  Expanded(
-                    child: Row(
-                      spacing: 6.spMin,
-                      children: [
-                        Flexible(
-                          flex: 6,
-                          child: Text(
-                            source?.name ?? 'Crowd Sourced',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12.spMin,
-                              fontWeight: FontWeight.w600,
-                              color: foregroundColor,
-                            ),
-                          ),
-                        ),
-                        if (source != null)
-                          Flexible(
-                            flex: 4,
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.circle,
-                                  size: 4,
-                                  color: foregroundColor,
-                                ),
-                                6.wSizedBox,
-                                Text(
-                                  'Verified',
-                                  style: TextStyle(
-                                    fontSize: 12.spMin,
-                                    fontWeight: FontWeight.w500,
-                                    color: foregroundColor,
-                                  ),
-                                ),
-                                4.wSizedBox,
-                                Icon(
-                                  Icons.verified_rounded,
-                                  size: 16.spMin,
-                                  color: hazardColor.isLight
-                                      ? AppColors.blue
-                                      : AppColors.white,
-                                ),
-                                // if (confidenceScore != null && !kDebugMode) ...[
-                                //   4.wSizedBox,
-                                //   Icon(
-                                //     Icons.circle,
-                                //     size: 4,
-                                //     color: foregroundColor,
-                                //   ),
-                                //   6.wSizedBox,
-                                //   Flexible(
-                                //     child: Text(
-                                //       'ACS: $confidenceScore',
-                                //       style: TextStyle(
-                                //         fontSize: 12.spMin,
-                                //         fontWeight: FontWeight.w500,
-                                //         color: foregroundColor,
-                                //       ),
-                                //     ),
-                                //   ),
-                                // ],
-                              ],
-                            ),
-                          ),
-                      ],
+                  // Category Pill
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.spMin,
+                      vertical: 4.spMin,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(20.spMin),
+                      border: Border.all(
+                        color: AppColors.black,
+                        width: 1.6,
+                      ),
+                    ),
+                    child: Text(
+                      categoryLabel,
+                      style: TextStyle(
+                        fontSize: 10.spMin,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.black,
+                      ),
                     ),
                   ),
+                  // Severity/Category Text
                   if (severity != HazardSeverity.unknown)
                     Text(
                       severityTitle,
                       style: TextStyle(
                         fontSize: 12.spMin,
                         fontWeight: FontWeight.w600,
-                        color: foregroundColor,
+                        color: hazardColor.isLight
+                            ? AppColors.black
+                            : AppColors.white,
                       ),
                     ),
-                  if (widget.showCloseButton &&
-                      widget.onClosePressed != null) ...[
-                    30.wSizedBox,
-                  ],
+                  // Verification Badge
+                  if (isVerified)
+                    Icon(
+                      Icons.verified_rounded,
+                      size: 20.spMin,
+                      color: hazardColor.isLight
+                          ? AppColors.blue
+                          : AppColors.white,
+                    ),
                 ],
               ),
             ),
@@ -317,31 +309,28 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         );
 
         return Container(
+          width: 48.spMin,
+          height: 48.spMin,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColor,
-                blurRadius: 10,
-                offset: const Offset(0.0, 0.0),
-              ),
-            ],
+            color: AppColors.white,
+            border: Border.all(
+              color: AppColors.black,
+              width: 2.0,
+            ),
           ),
-          child: Image.asset(
-            iconPath,
-            width: 30.spMin,
-            height: 30.spMin,
-            fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => Image.asset(
-              fallbackIconPath,
-              width: 30.spMin,
-              height: 30.spMin,
+          child: Padding(
+            padding: EdgeInsets.all(8.0.spMin),
+            child: Image.asset(
+              iconPath,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Image.asset(
-                fallbackIconPath2,
-                width: 30.spMin,
-                height: 30.spMin,
+                fallbackIconPath,
                 fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Image.asset(
+                  fallbackIconPath2,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
@@ -358,49 +347,83 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard!.title ?? 'Unknown Hazard',
           ),
         );
-        final createdAt = ref.watch(
+
+        return Text(
+          title,
+          style: TextStyle(
+            fontSize: 16.spMin,
+            fontWeight: FontWeight.w600,
+            color: AppColors.black,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        );
+      },
+    );
+  }
+
+  Widget _locationBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final otherLatitude = ref.watch(
           provider.select(
-            (value) => value.hazard!.createdAt,
+            (value) => value.hazard!.latitude,
           ),
         );
-        return RichText(
-          overflow: TextOverflow.ellipsis,
-          maxLines: 2,
-          text: TextSpan(
-            style: DefaultTextStyle.of(context).style,
-            children: [
-              TextSpan(
-                text: title,
-                style: TextStyle(
-                  fontSize: 15.spMin,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-              if (createdAt != null) ...[
-                TextSpan(
-                  text: ' • ',
-                  style: TextStyle(
-                    fontSize: 12.spMin,
-                    color: AppColors.grey,
-                  ),
-                ),
-                TextSpan(
-                  text: timeago
-                      .format(
-                        createdAt,
-                        locale: 'en_short',
-                      )
-                      .replaceAll('~', ''),
-                  style: TextStyle(
-                    fontSize: 10.spMin,
-                    color: AppColors.grey,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ],
+        final otherLongitude = ref.watch(
+          provider.select(
+            (value) => value.hazard!.longitude,
           ),
+        );
+        final locationName = ref.watch(
+          provider.select(
+            (value) => value.hazard!.locationName?.trim(),
+          ),
+        );
+
+        if (otherLatitude == null || otherLongitude == null) {
+          return const SizedBox.shrink();
+        }
+
+        final distance = ref.watch(
+          providerOfLoggedInUser.select(
+            (value) => value?.distanceTo(
+              otherLatitude,
+              otherLongitude,
+            ),
+          ),
+        );
+
+        if (distance == null) {
+          return const SizedBox.shrink();
+        }
+
+        final distanceText = distance < 1000
+            ? '${distance.toStringAsFixed(1)} m away'
+            : '${(distance / 1000).toStringAsFixed(1)} km away';
+
+        return Row(
+          children: [
+            Icon(
+              Icons.location_on_outlined,
+              size: 16.spMin,
+              color: AppColors.grey,
+            ),
+            4.wSizedBox,
+            Expanded(
+              child: Text(
+                locationName?.isNotEmpty ?? false
+                    ? '$locationName · $distanceText'
+                    : distanceText,
+                style: TextStyle(
+                  fontSize: 14.spMin,
+                  color: AppColors.grey,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         );
       },
     );
@@ -429,95 +452,18 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           if (callToAction?.isNotEmpty ?? false) callToAction!,
         ].join(' ');
 
+        if (text.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
         return Text(
           text,
           style: TextStyle(
-            color: Colors.grey[600],
+            fontSize: 12.spMin,
+            color: AppColors.grey,
           ),
         );
       },
-    );
-  }
-
-  Widget _footerBuilder() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Consumer(
-          builder: (context, ref, child) {
-            final otherLatitude = ref.watch(
-              provider.select(
-                (value) => value.hazard!.latitude,
-              ),
-            );
-            final otherLongitude = ref.watch(
-              provider.select(
-                (value) => value.hazard!.longitude,
-              ),
-            );
-            if (otherLatitude == null || otherLongitude == null) {
-              return const SizedBox.shrink();
-            }
-
-            final distance = ref.watch(
-              providerOfLoggedInUser.select(
-                (value) => value?.distanceTo(
-                  otherLatitude,
-                  otherLongitude,
-                ),
-              ),
-            );
-            if (distance == null) {
-              return const SizedBox.shrink();
-            }
-
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.location_on_outlined,
-                  size: 14.spMin,
-                  color: AppColors.grey,
-                ),
-                4.wSizedBox,
-                Text(
-                  '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} away',
-                  style: TextStyle(
-                    fontSize: 11.spMin,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.grey,
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-        Consumer(
-          builder: (context, ref, child) {
-            final expiresAt = ref.watch(
-              provider.select(
-                (value) => value.hazard!.expiresAt,
-              ),
-            );
-
-            // Only show expiry timer if the hazard has an expiry date
-            if (expiresAt == null) {
-              return const SizedBox.shrink();
-            }
-
-            return HazardExpiryTimer(
-              expiryDateTime: expiresAt,
-              activeColor: AppColors.grey,
-              style: TextStyle(
-                fontSize: 11.spMin,
-                fontWeight: FontWeight.w500,
-              ),
-              iconData: Icons.timer_outlined,
-              iconSize: 12.0,
-            );
-          },
-        ),
-      ],
     );
   }
 
