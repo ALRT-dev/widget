@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_maps_cluster_manager_2/google_maps_cluster_manager_2.dart'
     as cluster_manager;
@@ -37,9 +36,6 @@ abstract class MapProviderState with _$MapProviderState {
 
     /// The current route plan, including travel mode and route responses.
     final RoutePlan? currentRoutePlan,
-
-    /// Cancel token for fetching map hazards.
-    required final CancelToken getMapHazardsCancelToken,
 
     /// The state of fetching route.
     @Default(GetRouteState.initial()) final GetRouteState getRouteState,

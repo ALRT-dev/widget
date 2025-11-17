@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/views/screens/auth_screen.dart';
@@ -111,9 +110,7 @@ class AppRouter {
                 providerOfMap.overrideWith(
                   (ref) => MapProvider(
                     ref: ref,
-                    state: MapProviderState(
-                      getMapHazardsCancelToken: CancelToken(),
-                    ),
+                    state: MapProviderState(),
                   ),
                 ),
               ],
