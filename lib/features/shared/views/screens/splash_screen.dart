@@ -150,7 +150,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             _buildLogo(),
             _BouncyIcons(progress: t),
             30.hSizedBox,
-            _buildProgressBar(),
+            // _buildProgressBar(),
             _buildTagline(),
           ],
         ),
@@ -178,6 +178,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   /// Creates the animated progress bar widget
+  // ignore: unused_element
   Widget _buildProgressBar() {
     return Padding(
       padding: const EdgeInsets.only(top: 8),
