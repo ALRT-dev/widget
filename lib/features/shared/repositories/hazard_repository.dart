@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
@@ -16,6 +17,7 @@ import 'package:hazard_app/features/shared/utils/either.dart';
 abstract class HazardRepository {
   Future<Either<List<Hazard>, AppError>> getHazards({
     required final HazardSearchParams searchParams,
+    final CancelToken? cancelToken,
   });
 
   Future<Either<GetHazardsWithSubscriptionIdResponse, AppError>>
@@ -26,6 +28,7 @@ abstract class HazardRepository {
   Future<Either<HazardFilters, AppError>> getHazardFilters({
     required final HazardSearchParams searchParams,
     final bool includeSubscribed = false,
+    final CancelToken? cancelToken,
   });
 
   Future<Either<List<HazardCategory>, AppError>> getAllHazardCategories();
@@ -69,12 +72,14 @@ class HazardRepositoryImpl extends HazardRepository {
   @override
   Future<Either<List<Hazard>, AppError>> getHazards({
     required final HazardSearchParams searchParams,
+    final CancelToken? cancelToken,
   }) {
     return runAsyncCall(
       name: 'getHazards',
       future: () async {
         final result = await _restClient.getHazards(
           searchParams: searchParams,
+          cancelToken: cancelToken,
         );
         return Success(result);
       },
@@ -103,6 +108,7 @@ class HazardRepositoryImpl extends HazardRepository {
   Future<Either<HazardFilters, AppError>> getHazardFilters({
     required HazardSearchParams searchParams,
     bool includeSubscribed = false,
+    final CancelToken? cancelToken,
   }) {
     return runAsyncCall(
       name: 'getHazardFilters',
@@ -110,6 +116,7 @@ class HazardRepositoryImpl extends HazardRepository {
         final result = await _restClient.getHazardFilters(
           searchParams: searchParams,
           includeSubscribed: includeSubscribed,
+          cancelToken: cancelToken,
         );
         return Success(result);
       },

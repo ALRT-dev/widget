@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart' show ImageConfiguration, Size;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,9 +31,11 @@ class HazardService {
   /// Fetches the list of hazards from the server.
   Future<Either<List<Hazard>, AppError>> getHazards({
     required final HazardSearchParams searchParams,
+    final CancelToken? cancelToken,
   }) async {
     final result = await _hazardRepository.getHazards(
       searchParams: searchParams,
+      cancelToken: cancelToken,
     );
 
     final success = await result.whenSuccess(
@@ -48,6 +51,7 @@ class HazardService {
   Future<Either<List<Hazard>, AppError>> getAllHazards({
     final int numberOfParallelRequests = 10,
     required final HazardSearchParams searchParams,
+    final CancelToken? cancelToken,
   }) async {
     final allHazards = <Hazard>[];
     final pageSize = searchParams.pageSize;
@@ -66,6 +70,7 @@ class HazardService {
         batchFutures.add(
           getHazards(
             searchParams: pageSearchParams,
+            cancelToken: cancelToken,
           ),
         );
       }
@@ -116,6 +121,7 @@ class HazardService {
   getAllHazardsWithFilters({
     final int numberOfParallelRequests = 10,
     required final HazardSearchParams searchParams,
+    final CancelToken? cancelToken,
   }) async {
     final allHazards = <Hazard>[];
 
@@ -134,13 +140,22 @@ class HazardService {
           page: currentPage + i,
         );
 
-        batchFutures.add(getHazards(searchParams: pageSearchParams));
+        batchFutures.add(
+          getHazards(
+            searchParams: pageSearchParams,
+            cancelToken: cancelToken,
+          ),
+        );
       }
 
       // Wait for this batch to complete
       final results = await Future.wait([
         Future.wait(batchFutures),
-        if (filtersResult == null) getHazardFilters(searchParams: searchParams),
+        if (filtersResult == null)
+          getHazardFilters(
+            searchParams: searchParams,
+            cancelToken: cancelToken,
+          ),
       ]);
       final batchResults = results[0] as List<Either<List<Hazard>, AppError>>;
       filtersResult ??= results[1] as Either<HazardFilters, AppError>?;
@@ -251,10 +266,12 @@ class HazardService {
   Future<Either<HazardFilters, AppError>> getHazardFilters({
     required final HazardSearchParams searchParams,
     final bool includeSubscribed = false,
-  }) async {
-    return await _hazardRepository.getHazardFilters(
+    final CancelToken? cancelToken,
+  }) {
+    return _hazardRepository.getHazardFilters(
       searchParams: searchParams,
       includeSubscribed: includeSubscribed,
+      cancelToken: cancelToken,
     );
   }
 

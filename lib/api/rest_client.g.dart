@@ -409,10 +409,12 @@ class _RestClient implements RestClient {
   @override
   Future<List<Hazard>> getHazards({
     required HazardSearchParams searchParams,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.addAll(searchParams.toJson());
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<List<Hazard>>(
@@ -422,6 +424,7 @@ class _RestClient implements RestClient {
             '/hazards',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -472,12 +475,14 @@ class _RestClient implements RestClient {
   Future<HazardFilters> getHazardFilters({
     required HazardSearchParams searchParams,
     bool includeSubscribed = false,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'includeSubscribed': includeSubscribed,
     };
     queryParameters.addAll(searchParams.toJson());
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HazardFilters>(
@@ -487,6 +492,7 @@ class _RestClient implements RestClient {
             '/hazards/filters',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );

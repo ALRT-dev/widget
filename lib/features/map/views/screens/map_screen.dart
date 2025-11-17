@@ -152,14 +152,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     EasyDebounce.debounce(
       'map-debouncer',
-      const Duration(milliseconds: 300),
+      const Duration(milliseconds: 100),
       () {
         if (!mounted) return;
-        ref.read(providerOfMap.notifier)
-          // Get the hazards for the new map position
-          ..getMapHazards()
-          // If route planning is active, update the hazards to avoid for the route
-          ..getRoutePlanHazardsToAvoid();
+
+        // Get the hazards for the new map position
+        ref.read(providerOfMap.notifier).getMapHazards();
+
+        // If route planning is active, update the hazards to avoid for the route
+        ref.read(providerOfMap.notifier).getRoutePlanHazardsToAvoid();
       },
     );
   }

@@ -3,6 +3,7 @@ import 'dart:math' hide log;
 import 'dart:developer';
 
 import 'package:collection/collection.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,7 +38,9 @@ final providerOfMap =
     StateNotifierProvider.autoDispose<MapProvider, MapProviderState>(
       (ref) => MapProvider(
         ref: ref,
-        state: MapProviderState(),
+        state: MapProviderState(
+          getMapHazardsCancelToken: CancelToken(),
+        ),
       ),
     );
 
@@ -139,6 +142,14 @@ class MapProvider extends StateNotifier<MapProviderState> {
         .selectedFilters
         .severityFiltersNonAws;
 
+    // cancel the old requests before making new requests
+    if (state.getMapHazardsCancelToken.requestOptions != null) {
+      state.getMapHazardsCancelToken.cancel();
+      state = state.copyWith(
+        getMapHazardsCancelToken: CancelToken(),
+      );
+    }
+
     final result = await _hazardService.getAllHazardsWithFilters(
       searchParams: HazardSearchParams(
         categoryIds: selectedCategories.map((e) => e.id).toList(),
@@ -152,6 +163,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
         southwestLng: visibleBounds.southwest.longitude,
         pageSize: 100,
       ),
+      cancelToken: state.getMapHazardsCancelToken,
     );
     if (!mounted) return;
 

@@ -104,6 +104,7 @@ abstract class RestClient {
   @GET(kUrlHazards)
   Future<List<Hazard>> getHazards({
     @Queries() required final HazardSearchParams searchParams,
+    @CancelRequest() final CancelToken? cancelToken,
   });
 
   @GET(kUrlHazardsWithSubscriptionId)
@@ -115,6 +116,7 @@ abstract class RestClient {
   Future<HazardFilters> getHazardFilters({
     @Queries() required final HazardSearchParams searchParams,
     @Query('includeSubscribed') final bool includeSubscribed = false,
+    @CancelRequest() final CancelToken? cancelToken,
   });
 
   @GET(kUrlHazardCategories)
