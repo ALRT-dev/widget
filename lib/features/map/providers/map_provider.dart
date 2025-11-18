@@ -1023,8 +1023,6 @@ class MapProvider extends StateNotifier<MapProviderState> {
     // Higher zoom = smaller distance (more, smaller clusters)
     // More granular levels to ensure clusters break apart smoothly
     if (zoomLevel <= 3) return 5000.0; // 5000km - continental level
-    if (zoomLevel <= 4) return 2000.0; // 2000km - country level
-    if (zoomLevel <= 5) return 1000.0; // 1000km - region level
     if (zoomLevel <= 6) return 500.0; // 500km - state level
     if (zoomLevel <= 7) return 200.0; // 200km - large city level
     if (zoomLevel <= 8) return 100.0; // 100km - city level
