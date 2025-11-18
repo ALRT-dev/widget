@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/notification/views/widgets/trust_meter.dart';
-import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -458,11 +457,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         );
         final callToAction = ref.watch(
           provider.select(
-            (value) =>
-                !value.hazard!.isUserReported &&
-                    value.hazard!.severity == HazardSeverity.unknown
-                ? null
-                : value.hazard!.callToAction?.trim(),
+            (value) => value.hazard!.callToAction?.trim(),
           ),
         );
 

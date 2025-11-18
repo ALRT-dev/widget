@@ -117,6 +117,9 @@ abstract class Hazard with _$Hazard {
     @Default(<AlrtMedia>[])
     final List<AlrtMedia> processedMedias,
 
+    /// The external link related to the hazard for more information.
+    final String? link,
+
     /// The date and time when the hazard occurred.
     @DateTimeConverter() final DateTime? occurredAt,
 

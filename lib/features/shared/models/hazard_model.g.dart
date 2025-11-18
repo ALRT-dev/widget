@@ -59,6 +59,7 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
           ?.map((e) => S3Media.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const <S3Media>[],
+  link: json['link'] as String?,
   occurredAt: _$JsonConverterFromJson<String, DateTime>(
     json['occurredAt'],
     const DateTimeConverter().fromJson,
@@ -108,6 +109,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'downvoteCount': instance.downvoteCount,
   'confidenceScore': ?instance.confidenceScore,
   'medias': instance.medias.map((e) => e.toJson()).toList(),
+  'link': ?instance.link,
   'occurredAt': ?_$JsonConverterToJson<String, DateTime>(
     instance.occurredAt,
     const DateTimeConverter().toJson,

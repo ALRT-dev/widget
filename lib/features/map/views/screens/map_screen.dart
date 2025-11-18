@@ -45,7 +45,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
             ),
             myLocationEnabled: true,
-            myLocationButtonEnabled: false,
+            myLocationButtonEnabled: true,
             compassEnabled: false,
             zoomControlsEnabled: false,
             buildingsEnabled: ref.watch(

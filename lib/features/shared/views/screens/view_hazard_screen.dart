@@ -529,6 +529,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           longitude,
         );
 
+        final isUserReported = ref.watch(
+          provider.select(
+            (value) => value.hazard?.isUserReported ?? false,
+          ),
+        );
+
         return Container(
           decoration: BoxDecoration(
             color: AppColors.extraLightGrey.withValues(alpha: 0.4),
@@ -589,7 +595,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                                 ),
                               ),
                               4.spMin.hSizedBox,
-                              if (distance != null)
+                              if (distance != null && !isUserReported)
                                 Text(
                                   '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} from your location',
                                   style: TextStyle(
@@ -598,7 +604,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                                   ),
                                 ),
                             ] else ...[
-                              if (distance != null)
+                              if (distance != null && !isUserReported)
                                 Text(
                                   '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} from your location',
                                   style: TextStyle(
@@ -699,17 +705,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         final callToAction = ref.watch(
           provider.select((value) => value.hazard?.callToAction),
         );
-        final isUserReported = ref.watch(
-          provider.select((value) => value.hazard?.isUserReported),
-        );
-        final severity = ref.watch(
-          provider.select((value) => value.hazard?.severity),
-        );
 
-        final shouldShow =
-            (isUserReported == true ||
-                (severity != null && severity != HazardSeverity.unknown)) &&
-            (callToAction?.isNotEmpty ?? false);
+        final shouldShow = (callToAction?.isNotEmpty ?? false);
 
         if (!shouldShow) return const SizedBox.shrink();
 
@@ -829,6 +826,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             (value) => value.hazard?.isUserReported ?? false,
           ),
         );
+        final link = ref.watch(
+          provider.select(
+            (value) => value.hazard?.link ?? value.hazard?.source?.url,
+          ),
+        );
 
         return Container(
           decoration: BoxDecoration(
@@ -854,8 +856,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               12.spMin.hSizedBox,
 
               GestureDetector(
-                onTap: source?.url != null
-                    ? () => openLink(context: context, link: source!.url!)
+                onTap: link != null
+                    ? () => openLink(context: context, link: link)
                     : null,
                 child: Container(
                   padding: EdgeInsets.all(12.spMin),
