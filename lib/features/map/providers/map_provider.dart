@@ -1002,21 +1002,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
             markerId: MarkerId(clusterMarkerId),
             position: clusterPosition,
             onTap: () {
-              // Zoom in to break the cluster further
-              _mapService.animateCamera(
-                cameraUpdate: CameraUpdate.newLatLngBounds(
-                  cluster
-                      .map(
-                        (hazard) => LatLng(
-                          hazard.latitude!,
-                          hazard.longitude!,
-                        ),
-                      )
-                      .toList()
-                      .toBounds(),
-                  100.0,
-                ),
-              );
+              _handleClusterTap(cluster);
             },
             icon: bitmapDescriptor,
           );
@@ -1030,44 +1016,77 @@ class MapProvider extends StateNotifier<MapProviderState> {
     // Distance in kilometers for clustering
     // Lower zoom = larger distance (fewer, bigger clusters)
     // Higher zoom = smaller distance (more, smaller clusters)
-    if (zoomLevel <= 3) return 5000.0; // 10000km clusters
-    if (zoomLevel <= 4) return 1000.0; // 900km clusters
-    if (zoomLevel <= 5) return 500.0; // 700km clusters
-    if (zoomLevel <= 6) return 200.0; // 100km clusters
-    if (zoomLevel <= 7) return 100.0; // 40km clusters
-    if (zoomLevel <= 8) return 100.0; // 20km clusters
-    if (zoomLevel <= 10) return 50.0; // 10km clusters
-    if (zoomLevel <= 12) return 20.0; // 5km clusters
-    return 2.0; // 2km clusters
+    // More granular levels to ensure clusters break apart smoothly
+    if (zoomLevel <= 3) return 5000.0; // 5000km - continental level
+    if (zoomLevel <= 4) return 2000.0; // 2000km - country level
+    if (zoomLevel <= 5) return 1000.0; // 1000km - region level
+    if (zoomLevel <= 6) return 500.0; // 500km - state level
+    if (zoomLevel <= 7) return 200.0; // 200km - large city level
+    if (zoomLevel <= 8) return 100.0; // 100km - city level
+    if (zoomLevel <= 9) return 50.0; // 50km - metro level
+    if (zoomLevel <= 10) return 25.0; // 25km - district level
+    if (zoomLevel <= 11) return 10.0; // 10km - neighborhood level
+    if (zoomLevel <= 12) return 5.0; // 5km - local area level
+    if (zoomLevel <= 13) return 2.0; // 2km - street level
+    if (zoomLevel <= 14) return 1.0; // 1km - block level
+    if (zoomLevel <= 15) return 0.5; // 500m - very close
+    return 0.2; // 200m - individual markers at highest zoom
   }
 
   /// Creates geographic clusters from a list of hazards based on distance
+  /// Uses a more sophisticated clustering algorithm to ensure proper grouping
   List<List<Hazard>> _createGeographicClusters(
     List<Hazard> hazards,
     double maxDistanceKm,
   ) {
+    if (hazards.isEmpty) return [];
+    if (hazards.length == 1) return [hazards];
+
     final clusters = <List<Hazard>>[];
     final unprocessed = List<Hazard>.from(hazards);
 
     while (unprocessed.isNotEmpty) {
+      // Start with the first unprocessed hazard as seed
       final seed = unprocessed.removeAt(0);
       final cluster = [seed];
 
-      // Find all hazards within clustering distance of the seed
-      for (int i = unprocessed.length - 1; i >= 0; i--) {
-        final hazard = unprocessed[i];
-        final distance =
-            calculateDistanceInMeters(
-              seed.latitude!,
-              seed.longitude!,
-              hazard.latitude!,
-              hazard.longitude!,
-            ) /
-            1000; // Convert to km
+      // Use iterative expansion to build the cluster
+      // This ensures we capture tightly connected components
+      bool foundNewMembers = true;
+      while (foundNewMembers) {
+        foundNewMembers = false;
 
-        if (distance <= maxDistanceKm) {
-          cluster.add(hazard);
-          unprocessed.removeAt(i);
+        // Check each unprocessed hazard against ALL current cluster members
+        for (int i = unprocessed.length - 1; i >= 0; i--) {
+          final candidate = unprocessed[i];
+          bool shouldJoinCluster = false;
+
+          // Check if candidate is close to ANY member of the current cluster
+          for (final clusterMember in cluster) {
+            final distance =
+                calculateDistanceInMeters(
+                  candidate.latitude!,
+                  candidate.longitude!,
+                  clusterMember.latitude!,
+                  clusterMember.longitude!,
+                ) /
+                1000; // Convert to km
+
+            if (distance <= maxDistanceKm) {
+              shouldJoinCluster = true;
+              break;
+            }
+          }
+
+          if (shouldJoinCluster) {
+            // Additional check: ensure adding this candidate doesn't make the cluster too large
+            final tempCluster = [...cluster, candidate];
+            if (_isClusterSizeReasonable(tempCluster, maxDistanceKm)) {
+              cluster.add(candidate);
+              unprocessed.removeAt(i);
+              foundNewMembers = true;
+            }
+          }
         }
       }
 
@@ -1075,6 +1094,27 @@ class MapProvider extends StateNotifier<MapProviderState> {
     }
 
     return clusters;
+  }
+
+  /// Checks if a cluster's geographic span is reasonable relative to the clustering distance
+  bool _isClusterSizeReasonable(List<Hazard> cluster, double maxDistanceKm) {
+    if (cluster.length <= 2)
+      return true; // Small clusters are always reasonable
+
+    final positions = cluster
+        .map((h) => LatLng(h.latitude!, h.longitude!))
+        .toList();
+
+    final bounds = positions.toBounds();
+    final latSpan = bounds.northeast.latitude - bounds.southwest.latitude;
+    final lngSpan = bounds.northeast.longitude - bounds.southwest.longitude;
+    final maxSpan = max(latSpan, lngSpan);
+
+    // Convert degrees to approximate km (rough approximation)
+    final spanKm = maxSpan * 111.0; // 1 degree ≈ 111km
+
+    // Allow cluster span to be at most 3x the clustering distance
+    return spanKm <= (maxDistanceKm * 3.0);
   }
 
   /// Creates a cluster marker icon with the first hazard's icon and count badge
@@ -1174,6 +1214,46 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
 
     animateTo(position: targetPosition, zoom: currentZoom + 0.01);
+  }
+
+  /// Handles cluster tap by fitting to the bounds of the cluster markers
+  void _handleClusterTap(List<Hazard> cluster) {
+    final clusterBounds = cluster
+        .map((hazard) => LatLng(hazard.latitude!, hazard.longitude!))
+        .toList()
+        .toBounds();
+
+    final currentZoom = state.cameraPosition.zoom;
+
+    // Calculate the span of the cluster bounds
+    final latSpan =
+        clusterBounds.northeast.latitude - clusterBounds.southwest.latitude;
+    final lngSpan =
+        clusterBounds.northeast.longitude - clusterBounds.southwest.longitude;
+    final maxSpan = max(latSpan, lngSpan);
+
+    // Calculate cluster center (same as cluster marker position)
+    double totalLat = 0;
+    double totalLng = 0;
+    for (final hazard in cluster) {
+      totalLat += hazard.latitude!;
+      totalLng += hazard.longitude!;
+    }
+    final centerLat = totalLat / cluster.length;
+    final centerLng = totalLng / cluster.length;
+    final clusterCenter = LatLng(centerLat, centerLng);
+
+    // If the cluster spans too large an area, don't zoom out too much
+    // Instead, zoom in to break the cluster gradually
+    if (maxSpan > 0.1) {
+      // If span > ~11km, it's too large to fit bounds
+      // Zoom in by at least 2 levels, but don't exceed zoom 16
+      final targetZoom = min(currentZoom + 2.0, 16.0);
+      animateTo(position: clusterCenter, zoom: targetZoom);
+    } else {
+      // For smaller clusters, fit to bounds normally
+      animateToBounds(bounds: clusterBounds, padding: 80.0);
+    }
   }
 
   /// Updates [MapProviderState.isMapReady] to the given [isMapReady].
