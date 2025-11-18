@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/fire_status_types.dart';
-import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -377,7 +377,7 @@ class HazardService {
   generateHazardMarkerBitmaps() async {
     final categoriesResult = await getAllSubHazardCategories();
     final categories = categoriesResult.whenSuccess((cats) => cats) ?? [];
-    final severities = HazardSeverity.values;
+    final severityBands = HazardSeverityBand.values;
 
     // Ensure the "other" category is included
     categories.add(HazardCategory(id: 'other'));
@@ -392,21 +392,21 @@ class HazardService {
 
     // Generate bitmaps for each category and severity combination
     for (final category in categories) {
-      for (final severity in severities) {
-        final keyAws = '${category.id}_${severity.name}_aws';
+      for (final severityBand in severityBands) {
+        final keyAws = '${category.id}_${severityBand.name}_aws';
         final futureAws = getBitmapDescriptorForHazard(
           categoryId: category.id,
           parentCategoryId: category.parentId,
-          severity: severity,
+          severityBand: severityBand,
           isAwsCompliant: true,
         ).then((bitmap) => {keyAws: bitmap});
         futures.add(futureAws);
 
-        final keyNonAws = '${category.id}_${severity.name}_non_aws';
+        final keyNonAws = '${category.id}_${severityBand.name}_non_aws';
         final futureNonAws = getBitmapDescriptorForHazard(
           categoryId: category.id,
           parentCategoryId: category.parentId,
-          severity: severity,
+          severityBand: severityBand,
           isAwsCompliant: false,
         ).then((bitmap) => {keyNonAws: bitmap});
         futures.add(futureNonAws);
@@ -429,12 +429,12 @@ class HazardService {
 
     // Generate bitmaps for parent categories
     for (final parentCategoryId in parentCategories) {
-      for (final severity in severities) {
+      for (final severity in severityBands) {
         final keyAws = '${parentCategoryId}_${severity.name}_aws';
         final futureAws = getBitmapDescriptorForHazard(
           categoryId: parentCategoryId,
           parentCategoryId: null,
-          severity: severity,
+          severityBand: severity,
           isAwsCompliant: true,
         ).then((bitmap) => {keyAws: bitmap});
         futures.add(futureAws);
@@ -443,7 +443,7 @@ class HazardService {
         final futureNonAws = getBitmapDescriptorForHazard(
           categoryId: parentCategoryId,
           parentCategoryId: null,
-          severity: severity,
+          severityBand: severity,
           isAwsCompliant: false,
         ).then((bitmap) => {keyNonAws: bitmap});
         futures.add(futureNonAws);
@@ -477,13 +477,13 @@ class HazardService {
   Future<BitmapDescriptor> getBitmapDescriptorForHazard({
     required final String categoryId,
     required final String? parentCategoryId,
-    required final HazardSeverity severity,
+    required final HazardSeverityBand severityBand,
     final bool isAwsCompliant = false,
     final Size size = const Size(40, 40),
   }) async {
     try {
       // Check for child category asset
-      final key = '${categoryId}_${severity.name}';
+      final key = '${categoryId}_${severityBand.name}';
       final assetPath =
           'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}$key.png';
 
@@ -497,7 +497,7 @@ class HazardService {
 
       // If child category asset doesn't exist, check for parent category asset
       if (parentCategoryId != null) {
-        final parentKey = '${parentCategoryId}_${severity.name}';
+        final parentKey = '${parentCategoryId}_${severityBand.name}';
         final parentAssetPath =
             'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}$parentKey.png';
         exists = await assetExists(assetPath: parentAssetPath);
@@ -512,12 +512,12 @@ class HazardService {
       // If neither exists, use the generic "other" asset for the severity
       exists = await assetExists(
         assetPath:
-            'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severity.name}.png',
+            'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
       );
       if (exists) {
         return BitmapDescriptor.asset(
           ImageConfiguration(size: size),
-          'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severity.name}.png',
+          'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
         );
       }
 

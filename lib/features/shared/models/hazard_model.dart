@@ -6,6 +6,7 @@ import 'package:hazard_app/features/shared/converters/date_time_converter.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/fire_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
@@ -37,6 +38,9 @@ abstract class Hazard with _$Hazard {
     /// The severity level of the hazard as per user input or source.
     final HazardSeverity? severity,
 
+    /// The severity band of the hazard.
+    final HazardSeverityBand? severityBand,
+
     /// The latitude of the hazard location.
     final double? latitude,
 
@@ -62,9 +66,6 @@ abstract class Hazard with _$Hazard {
 
     /// The AI-generated summary of the hazard.
     final String? aiSummary,
-
-    /// The AI-determined severity of the hazard.
-    final HazardSeverity? aiSeverity,
 
     /// The AI-determined confidence level of the hazard.
     final AIConfidence? aiConfidence,
@@ -156,8 +157,8 @@ abstract class Hazard with _$Hazard {
       return 'assets/images/hazards/non_aws/${categoryId}_user.png';
     }
 
-    final severityName = severity?.name ?? HazardSeverity.info.name;
-    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${categoryId}_$severityName.png';
+    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
+    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${categoryId}_$severityBandName.png';
   }
 
   /// The fallback file path for the hazard icon based on its severity.
@@ -166,12 +167,12 @@ abstract class Hazard with _$Hazard {
       return 'assets/images/hazards/non_aws/other_user.png';
     }
 
-    final severityName = severity?.name ?? HazardSeverity.info.name;
+    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
     final parentCategoryId = category?.parentId;
     if (parentCategoryId != null) {
-      return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${parentCategoryId}_$severityName.png';
+      return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${parentCategoryId}_$severityBandName.png';
     }
-    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityName.png';
+    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityBandName.png';
   }
 
   /// The second fallback file path for the hazard icon based on its severity.
@@ -180,8 +181,8 @@ abstract class Hazard with _$Hazard {
       return 'assets/images/hazards/non_aws/other_user.png';
     }
 
-    final severityName = severity?.name ?? HazardSeverity.info.name;
-    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityName.png';
+    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
+    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityBandName.png';
   }
 
   /// Gets the appropriate BitmapDescriptor for the hazard marker.
@@ -189,7 +190,7 @@ abstract class Hazard with _$Hazard {
     Map<String, BitmapDescriptor> bitmapMap,
   ) {
     var key =
-        '${categoryId}_${severity?.name ?? HazardSeverity.info.name}${isAwsCompliant == true ? '_aws' : '_non_aws'}';
+        '${categoryId}_${severityBand?.name ?? HazardSeverityBand.info.name}${isAwsCompliant == true ? '_aws' : '_non_aws'}';
 
     // Check for fire status override
     if (fireStatus != null) {
@@ -207,7 +208,7 @@ abstract class Hazard with _$Hazard {
     return bitmapMap[key];
   }
 
-  /// The color associated with the hazard's severity.
+  /// The color associated with the hazard's severity band.
   Color get color {
     // If the hazard is user-reported, use the user report status color
     if (reportedBy != null) {
@@ -217,11 +218,11 @@ abstract class Hazard with _$Hazard {
 
     // If the hazard follows AWS standards, use AWS colors
     if (isAwsCompliant == true) {
-      return severity?.colorAws ?? HazardSeverity.info.colorAws;
+      return severityBand?.colorAws ?? HazardSeverityBand.info.colorAws;
     }
 
     // Otherwise, use non-AWS colors
-    return severity?.colorNonAws ?? HazardSeverity.info.colorNonAws;
+    return severityBand?.colorNonAws ?? HazardSeverityBand.info.colorNonAws;
   }
 
   /// The title associated with the hazard's severity.

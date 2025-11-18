@@ -197,11 +197,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard!.color,
           ),
         );
-        final severity = ref.watch(
-          provider.select(
-            (value) => value.hazard!.severity,
-          ),
-        );
         final severityTitle = ref.watch(
           provider.select(
             (value) => value.hazard!.severityTitle,
@@ -217,7 +212,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         final categoryLabel = isUserReported
             ? 'USER'
             : isAwsCompliant
-            ? 'OFFICIAL AWS'
+            ? 'AWS'
             : 'OFFICIAL';
 
         return Stack(
@@ -269,7 +264,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     ),
                   ),
                   // Severity/Category Text
-                  if (severity != HazardSeverity.unknown)
+                  if (isAwsCompliant)
                     Text(
                       severityTitle,
                       style: TextStyle(
@@ -458,7 +453,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       builder: (context, ref, child) {
         final shortDescription = ref.watch(
           provider.select(
-            (value) => value.hazard!.shortDescription?.trim(),
+            (value) => value.hazard!.aiSummary?.trim(),
           ),
         );
         final callToAction = ref.watch(

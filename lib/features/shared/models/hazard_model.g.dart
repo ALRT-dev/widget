@@ -12,6 +12,10 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   description: json['description'] as String?,
   shortDescription: json['shortDescription'] as String?,
   severity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['severity']),
+  severityBand: $enumDecodeNullable(
+    _$HazardSeverityBandEnumMap,
+    json['severityBand'],
+  ),
   latitude: (json['latitude'] as num?)?.toDouble(),
   longitude: (json['longitude'] as num?)?.toDouble(),
   locationName: json['locationName'] as String?,
@@ -24,7 +28,6 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
       ? null
       : HazardSource.fromJson(json['source'] as Map<String, dynamic>),
   aiSummary: json['aiSummary'] as String?,
-  aiSeverity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['aiSeverity']),
   aiConfidence: $enumDecodeNullable(
     _$AIConfidenceEnumMap,
     json['aiConfidence'],
@@ -80,6 +83,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'description': ?instance.description,
   'shortDescription': ?instance.shortDescription,
   'severity': ?_$HazardSeverityEnumMap[instance.severity],
+  'severityBand': ?_$HazardSeverityBandEnumMap[instance.severityBand],
   'latitude': ?instance.latitude,
   'longitude': ?instance.longitude,
   'locationName': ?instance.locationName,
@@ -88,7 +92,6 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'fireStatus': ?_$FireStatusEnumMap[instance.fireStatus],
   'source': ?instance.source?.toJson(),
   'aiSummary': ?instance.aiSummary,
-  'aiSeverity': ?_$HazardSeverityEnumMap[instance.aiSeverity],
   'aiConfidence': ?_$AIConfidenceEnumMap[instance.aiConfidence],
   'callToAction': ?instance.callToAction,
   'isAwsCompliant': ?instance.isAwsCompliant,
@@ -129,6 +132,13 @@ const _$HazardSeverityEnumMap = {
   HazardSeverity.advice: 'advice',
   HazardSeverity.watchAndAct: 'watchAndAct',
   HazardSeverity.emergency: 'emergency',
+};
+
+const _$HazardSeverityBandEnumMap = {
+  HazardSeverityBand.info: 'info',
+  HazardSeverityBand.monitor: 'monitor',
+  HazardSeverityBand.action: 'action',
+  HazardSeverityBand.critical: 'critical',
 };
 
 const _$FireStatusEnumMap = {

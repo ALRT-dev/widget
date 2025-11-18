@@ -260,8 +260,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   spacing: 8.spMin,
                   runSpacing: 8.spMin,
                   children: [
-                    // Severity Pill (only for non-user alerts)
-                    if (!isUserAlert && severityTitle != null)
+                    // Severity Pill (only for AWS compliant alerts)
+                    if (isAwsCompliant && severityTitle != null)
                       _buildPill(severityTitle),
 
                     // Category Pill (Official/AWS/User)
@@ -372,7 +372,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       return 'User';
     }
     if (isAwsCompliant == true) {
-      return 'Official AWS';
+      return 'AWS';
     }
     return 'Official';
   }
