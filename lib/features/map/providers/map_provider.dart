@@ -23,6 +23,8 @@ import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/models/hazard_severity_filter_model.dart';
+import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
+import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
@@ -150,7 +152,10 @@ class MapProvider extends StateNotifier<MapProviderState> {
         northeastLng: visibleBounds.northeast.longitude,
         southwestLat: visibleBounds.southwest.latitude,
         southwestLng: visibleBounds.southwest.longitude,
-        pageSize: 100,
+        sortSettings: [
+          {SortCategory.createdAt: SortOrder.desc},
+        ],
+        pageSize: 20,
       ),
     );
     if (!mounted) return;
@@ -1098,8 +1103,10 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
   /// Checks if a cluster's geographic span is reasonable relative to the clustering distance
   bool _isClusterSizeReasonable(List<Hazard> cluster, double maxDistanceKm) {
-    if (cluster.length <= 2)
-      return true; // Small clusters are always reasonable
+    if (cluster.length <= 2) {
+      // Small clusters are always reasonable
+      return true;
+    }
 
     final positions = cluster
         .map((h) => LatLng(h.latitude!, h.longitude!))

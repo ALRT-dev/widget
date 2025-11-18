@@ -761,6 +761,13 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   Widget _buildOfficialDescriptionSection() {
     return Consumer(
       builder: (context, ref, child) {
+        final isUserReported = ref.watch(
+          provider.select(
+            (value) => value.hazard?.isUserReported ?? false,
+          ),
+        );
+        if (isUserReported) return const SizedBox.shrink();
+
         final description = ref.watch(
           provider.select((value) => value.hazard?.description),
         );
