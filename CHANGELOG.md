@@ -1,3 +1,9 @@
+## v1.0.0+9 - 2025/11/18
+* Onboarding Flow
+* Improved UI for Various Screens
+* Bug Fixes and Performance Improvements
+
+
 ## v1.0.0+8 - 2025/11/14
 * New UI for Auth and Onboarding flows
 
