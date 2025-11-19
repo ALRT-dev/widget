@@ -31,6 +31,7 @@ class _MapHazardPreviewState extends ConsumerState<MapHazardPreview> {
       showCloseButton: true,
       onClosePressed: _handleClosePressed,
       isInfoWindow: true,
+      showMediaCarousel: false,
     );
   }
 

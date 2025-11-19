@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
-import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/video_priority_types.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
@@ -219,9 +219,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             (value) => value.hazard?.isAwsCompliant ?? false,
           ),
         );
-        final severity = ref.watch(
+        final severityBand = ref.watch(
           provider.select(
-            (value) => value.hazard?.severity,
+            (value) => value.hazard?.severityBand,
           ),
         );
         final severityTitle = ref.watch(
@@ -330,7 +330,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 ),
               ],
             ),
-            if (severity == HazardSeverity.unknown && !isUserAlert)
+            if (severityBand == HazardSeverityBand.info && !isUserAlert)
               Divider().pT(11.0),
           ],
         );
@@ -407,25 +407,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           return const SizedBox.shrink();
         }
 
-        return Container(
+        return SizedBox(
           height: 80.spMin,
           width: 80.spMin,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.white,
-            border: Border.all(
-              color: AppColors.black,
-              width: 2.0,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColor,
-                blurRadius: 25,
-                offset: const Offset(0.0, 0.0),
-              ),
-            ],
-          ),
-          padding: EdgeInsets.all(12.spMin),
           child: Image.asset(
             iconPath,
             fit: BoxFit.contain,

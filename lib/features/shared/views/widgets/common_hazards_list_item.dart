@@ -18,6 +18,7 @@ import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class CommonHazardsListItem extends ConsumerStatefulWidget {
   const CommonHazardsListItem({
@@ -26,6 +27,7 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
     this.showCloseButton = false,
     this.onClosePressed,
     this.showTrustMeter = true,
+    this.showMediaCarousel = true,
     this.showSourceHeader = true,
     this.horizontalPadding = 10.0,
     this.isInfoWindow = false,
@@ -42,6 +44,9 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
 
   /// Whether to show the trust meter widget.
   final bool showTrustMeter;
+
+  /// Whether to show the media carousel.
+  final bool showMediaCarousel;
 
   /// Whether to show the source information in the header.
   final bool showSourceHeader;
@@ -114,7 +119,8 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             if (widget.showSourceHeader) ...[
               _headerBuilder(),
             ],
-            if (widget.hazard.processedMedias.isNotEmpty) ...[
+            if (widget.showMediaCarousel &&
+                widget.hazard.processedMedias.isNotEmpty) ...[
               3.hSizedBox,
               HazardMediasCarousel(
                 id: widget.hazard.id!,
@@ -135,7 +141,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     children: [
                       _titleBuilder(),
                       4.hSizedBox,
-                      _locationBuilder(),
+                      _dateAndDistanceBuilder(),
                       if (!widget.isInfoWindow) ...[
                         4.hSizedBox,
                         _shortDescriptionBuilder(),
@@ -149,12 +155,12 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               8.hSizedBox,
               _shortDescriptionBuilder().pX(16.0),
             ],
-            16.hSizedBox,
+            14.hSizedBox,
             if (widget.showTrustMeter && widget.hazard.source == null) ...[
               Padding(
                 padding: EdgeInsets.fromLTRB(
                   16.0.spMin,
-                  0.0,
+                  2.spMin,
                   16.0.spMin,
                   16.0.spMin,
                 ),
@@ -167,7 +173,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   16.0.spMin,
                   0.0,
                   16.0.spMin,
-                  16.0.spMin,
+                  14.0.spMin,
                 ),
                 child: _viewDetailsButtonBuilder(),
               ),
@@ -326,29 +332,18 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           ),
         );
 
-        return Container(
+        return SizedBox(
           width: 48.spMin,
           height: 48.spMin,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.white,
-            border: Border.all(
-              color: AppColors.black,
-              width: 2.0,
-            ),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(8.0.spMin),
-            child: Image.asset(
-              iconPath,
+          child: Image.asset(
+            iconPath,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => Image.asset(
+              fallbackIconPath,
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Image.asset(
-                fallbackIconPath,
+                fallbackIconPath2,
                 fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => Image.asset(
-                  fallbackIconPath2,
-                  fit: BoxFit.contain,
-                ),
               ),
             ),
           ),
@@ -380,9 +375,15 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     );
   }
 
-  Widget _locationBuilder() {
+  Widget _dateAndDistanceBuilder() {
     return Consumer(
       builder: (context, ref, child) {
+        final createdAt = ref.watch(
+          provider.select(
+            (value) => value.hazard!.createdAt,
+          ),
+        );
+
         final otherLatitude = ref.watch(
           provider.select(
             (value) => value.hazard!.latitude,
@@ -393,54 +394,61 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard!.longitude,
           ),
         );
-        final locationName = ref.watch(
-          provider.select(
-            (value) => value.hazard!.locationName?.trim(),
-          ),
-        );
-
-        if (otherLatitude == null || otherLongitude == null) {
-          return const SizedBox.shrink();
-        }
 
         final distance = ref.watch(
           providerOfLoggedInUser.select(
-            (value) => value?.distanceTo(
-              otherLatitude,
-              otherLongitude,
-            ),
+            (value) => otherLongitude == null || otherLatitude == null
+                ? null
+                : value?.distanceTo(otherLatitude, otherLongitude),
           ),
         );
 
-        if (distance == null) {
-          return const SizedBox.shrink();
-        }
-
-        final distanceText = distance < 1000
+        final distanceText = distance == null
+            ? null
+            : distance < 1000
             ? '${distance.toStringAsFixed(1)} m away'
             : '${(distance / 1000).toStringAsFixed(1)} km away';
 
         return Row(
+          spacing: 8.spMin,
           children: [
-            Icon(
-              Icons.location_on_outlined,
-              size: 16.spMin,
-              color: AppColors.grey,
-            ),
-            4.wSizedBox,
-            Expanded(
-              child: Text(
-                locationName?.isNotEmpty ?? false
-                    ? '$locationName · $distanceText'
-                    : distanceText,
-                style: TextStyle(
-                  fontSize: 12.spMin,
-                  color: AppColors.grey,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            if (createdAt != null)
+              Row(
+                children: [
+                  Icon(
+                    Icons.access_time_outlined,
+                    size: 14.spMin,
+                    color: AppColors.grey,
+                  ),
+                  4.wSizedBox,
+                  Text(
+                    timeago.format(createdAt),
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                ],
               ),
-            ),
+
+            if (distanceText != null)
+              Row(
+                children: [
+                  Icon(
+                    Icons.location_on_outlined,
+                    size: 14.spMin,
+                    color: AppColors.grey,
+                  ),
+                  4.wSizedBox,
+                  Text(
+                    distanceText,
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                ],
+              ),
           ],
         );
       },
@@ -508,12 +516,17 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     return Button.filled(
       value: 'View Details',
       padding: EdgeInsets.symmetric(
-        vertical: 12.spMin,
+        vertical: 8.spMin,
       ),
       isIconLeft: false,
+      valueStyle: TextStyle(
+        fontSize: 14.spMin,
+        fontWeight: FontWeight.w600,
+        color: AppColors.white,
+      ),
       icon: Icon(
         Icons.arrow_forward_ios_rounded,
-        size: 16.spMin,
+        size: 14.spMin,
         color: AppColors.white,
       ),
       onPressed: _gotoViewHazard,
