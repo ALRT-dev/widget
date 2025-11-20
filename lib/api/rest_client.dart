@@ -26,12 +26,19 @@ abstract class RestClient {
 
   @POST(kUrlOAuthGoogle)
   Future<AuthSuccess> verifyGoogleOAuth({
-    @Field() required String idToken,
+    @Field() required final String idToken,
+  });
+
+  @POST(kUrlOAuthApple)
+  Future<AuthSuccess> verifyAppleOAuth({
+    @Field() required final String identityToken,
+    @Field() final String? firstName,
+    @Field() final String? lastName,
   });
 
   @POST(kUrlRefreshToken)
   Future<AuthSuccess> refreshToken({
-    @Field() required String accessToken,
+    @Field() required final String accessToken,
   });
 
   // ---------------------------- ONBOARDING ----------------------------

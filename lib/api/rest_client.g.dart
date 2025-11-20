@@ -47,6 +47,43 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<AuthSuccess> verifyAppleOAuth({
+    required String identityToken,
+    String? firstName,
+    String? lastName,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'identityToken': identityToken,
+      'firstName': firstName,
+      'lastName': lastName,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _options = _setStreamType<AuthSuccess>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/auth/oauth/apple',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late AuthSuccess _value;
+    try {
+      _value = AuthSuccess.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<AuthSuccess> refreshToken({required String accessToken}) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};

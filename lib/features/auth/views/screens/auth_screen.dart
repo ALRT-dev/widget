@@ -201,8 +201,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         // 12.hSizedBox,
         Row(
           children: [
-            // Expanded(child: _buildAppleButton()),
-            // 12.wSizedBox,
+            Expanded(child: _buildAppleButton()),
+            12.wSizedBox,
             Expanded(child: _buildGoogleButton()),
           ],
         ),
@@ -240,30 +240,69 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
   }
 
-  // ignore: unused_element
   Widget _buildAppleButton() {
-    return OutlinedButton.icon(
-      style: OutlinedButton.styleFrom(
-        padding: EdgeInsets.symmetric(
-          vertical: 14.spMin,
-          horizontal: 12.spMin,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14.r),
-        ),
-        side: BorderSide(
-          color: AppColors.lightGrey,
-          width: 1.2.spMin,
-        ),
-      ),
-      onPressed: () => _handleAppleSignIn(),
-      icon: Icon(Icons.apple, size: 20.spMin),
-      label: Text(
-        'Apple',
-        style: TextStyle(
-          fontSize: 16.spMin,
-        ),
-      ),
+    return Consumer(
+      builder: (context, ref, child) {
+        final isLoading = ref.watch(
+          providerOfAuth.select(
+            (state) =>
+                state.signInWithAppleState is SignInWithAppleStateLoading,
+          ),
+        );
+
+        // Apple's guidelines: Use black background with white text and logo
+        return SizedBox(
+          height: 50.spMin,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(
+                vertical: 12.spMin,
+                horizontal: 16.spMin,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              elevation: 0,
+            ),
+            onPressed: isLoading ? null : _signInWithApple,
+            child: isLoading
+                ? SizedBox(
+                    width: 20.spMin,
+                    height: 20.spMin,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/logos/apple.svg',
+                        width: 18.spMin,
+                        height: 18.spMin,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      8.wSizedBox,
+                      Text(
+                        'Apple',
+                        style: TextStyle(
+                          fontSize: 15.spMin,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        );
+      },
     );
   }
 
@@ -276,15 +315,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
                 state.signInWithGoogleState is SignInWithGoogleStateLoading,
           ),
         );
-        return Button.bordered(
-          onPressed: _signInWithGoogle,
-          isLoading: isLoading,
-          icon: SvgPicture.asset(
-            'assets/logos/google.svg',
-            width: 20.spMin,
-            height: 20.spMin,
+        return SizedBox(
+          height: 50.spMin,
+          child: Button.bordered(
+            onPressed: _signInWithGoogle,
+            isLoading: isLoading,
+            padding: EdgeInsets.symmetric(
+              vertical: 12.spMin,
+              horizontal: 16.spMin,
+            ),
+            icon: SvgPicture.asset(
+              'assets/logos/google.svg',
+              width: 20.spMin,
+              height: 20.spMin,
+            ),
+            value: 'Google',
           ),
-          value: 'Google',
         );
       },
     );
@@ -385,6 +431,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         );
       },
     );
+
+    ref.listen<SignInWithAppleState>(
+      providerOfAuth.select(
+        (value) => value.signInWithAppleState,
+      ),
+      (previous, next) {
+        next.maybeWhen(
+          success: _gotoWrapper,
+          error: _handleError,
+          orElse: () {},
+        );
+      },
+    );
   }
 
   /// Handles errors by showing an error toast.
@@ -402,9 +461,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     context.showErrorToast(message: 'Email flow for role: $_selectedRole');
   }
 
-  /// Handles Apple sign-in flow.
-  void _handleAppleSignIn() {
-    context.showErrorToast(message: 'Apple sign-in ($_selectedRole)');
+  /// Signs in the user with Apple.
+  void _signInWithApple() {
+    ref.read(providerOfAuth.notifier).signInWithApple();
   }
 
   /// Handles guest mode flow.
