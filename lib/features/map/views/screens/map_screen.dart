@@ -1,9 +1,12 @@
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/map_hazard_info_window.dart';
+import 'package:hazard_app/features/map/views/widgets/map_hazards_list.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
 import 'package:hazard_app/features/map/views/widgets/route_planning.dart';
 import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
@@ -11,7 +14,9 @@ import 'package:hazard_app/features/map/views/widgets/selected_location_preview.
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
+import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
+import 'package:hazard_app/others/app_colors.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -66,6 +71,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
           _overlayedContentsBuilder(),
           const MapHazardInfoWindow(),
+          Positioned(
+            bottom: 10.spMin,
+            left: 0.0,
+            right: 0.0,
+            child: _viewListMapButtonBuilder(),
+          ),
         ],
       ),
     );
@@ -141,6 +152,89 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           onSeveritiesSelectionUpdated: (_) => _getMapHazards(),
         ).pL(10.0);
       },
+    );
+  }
+
+  Widget _viewListMapButtonBuilder({
+    final bool isViewList = true,
+  }) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final hasMapHazards = ref.watch(
+          providerOfMap.select(
+            (value) => value.hazards.isNotEmpty,
+          ),
+        );
+        if (isViewList && !hasMapHazards) {
+          return const SizedBox.shrink();
+        }
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 50.spMin,
+              width: 140.spMin,
+              child: Button.filled(
+                onPressed: () {
+                  if (isViewList) {
+                    _showFullScreenBottomSheet();
+                  } else {
+                    Navigator.of(context).pop();
+                  }
+                },
+                borderRadius: 50.0,
+                color: isViewList ? AppColors.white : const Color(0xFF3A3A3A),
+                icon: Icon(
+                  isViewList ? Icons.list_rounded : Icons.map_rounded,
+                  size: 22.0,
+                  color: isViewList ? AppColors.black : AppColors.white,
+                ),
+                value: isViewList ? 'View List' : 'View Map',
+                valueStyle: TextStyle(
+                  color: isViewList ? AppColors.black : AppColors.white,
+                ),
+                elevation: 3.0,
+                padding: EdgeInsets.zero,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFullScreenBottomSheet() {
+    showCupertinoModalPopup(
+      context: context,
+      // isScrollControlled: true,
+      builder: (context) => Material(
+        type: MaterialType.transparency,
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16.0),
+              topRight: Radius.circular(16.0),
+            ),
+          ),
+          child: Stack(
+            children: [
+              MapHazardsList(),
+              Positioned(
+                right: 0.0,
+                left: 0.0,
+                bottom: 80.spMin,
+                child: _viewListMapButtonBuilder(
+                  isViewList: false,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
