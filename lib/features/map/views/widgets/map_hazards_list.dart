@@ -65,7 +65,7 @@ class _MapHazardsListState extends ConsumerState<MapHazardsList> {
           ),
         ),
         Text(
-          'We are unable to load the alerts at the moment. Please try again later.',
+          'There are no alerts to display for the selected filters.',
           textAlign: TextAlign.center,
         ),
       ],
@@ -84,16 +84,20 @@ class _MapHazardsListState extends ConsumerState<MapHazardsList> {
           return _emptyBuilder();
         }
 
-        return ListView.separated(
-          itemCount: mapHazards.length,
-          itemBuilder: (context, index) {
-            final hazard = mapHazards[index];
-            return CommonHazardsListItem(
-              key: ValueKey(hazard.id),
-              hazard: hazard,
-            ).pB(index == mapHazards.length - 1 ? 120.0 : 0.0);
-          },
-          separatorBuilder: (context, index) => 15.hSizedBox,
+        return MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: ListView.separated(
+            itemCount: mapHazards.length,
+            itemBuilder: (context, index) {
+              final hazard = mapHazards[index];
+              return CommonHazardsListItem(
+                key: ValueKey(hazard.id),
+                hazard: hazard,
+              ).pB(index == mapHazards.length - 1 ? 120.0 : 0.0);
+            },
+            separatorBuilder: (context, index) => 15.hSizedBox,
+          ),
         );
       },
     );

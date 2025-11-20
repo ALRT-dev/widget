@@ -12,7 +12,10 @@ import 'package:hazard_app/features/map/views/widgets/route_planning.dart';
 import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
 import 'package:hazard_app/features/map/views/widgets/selected_location_preview.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
+import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
+import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -27,6 +30,19 @@ class MapScreen extends ConsumerStatefulWidget {
 }
 
 class _MapScreenState extends ConsumerState<MapScreen> {
+  var _safeAreaTopPadding = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      setState(() {
+        _safeAreaTopPadding = MediaQuery.of(context).padding.top;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -184,6 +200,73 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
+  Widget _listFiltersButtonBuilder() {
+    return Stack(
+      children: [
+        Button.filled(
+          width: 120.spMin,
+          onPressed: () {
+            showHazardFiltersBottomSheet(
+              context: context,
+              filtersKey: MapScreen.filtersKey,
+              onFiltersUpdated: () => _getMapHazards(),
+            );
+          },
+          borderRadius: 50.0,
+          color: AppColors.white,
+          icon: Icon(
+            Icons.filter_list,
+            size: 22.0,
+            color: AppColors.black,
+          ),
+          value: 'Filters',
+          valueStyle: TextStyle(
+            color: AppColors.black,
+          ),
+          elevation: 3.0,
+          padding: EdgeInsets.zero,
+        ),
+        Positioned(
+          right: 0,
+          child: _countBuilder(),
+        ),
+      ],
+    );
+  }
+
+  Widget _countBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final count = ref.watch(
+          providerOfHazardFiltersForMap.select(
+            (value) => value.unselectedFiltersCount,
+          ),
+        );
+        if (count == 0) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          width: 20.spMin,
+          height: 20.spMin,
+          decoration: BoxDecoration(
+            color: AppColors.red,
+            shape: BoxShape.circle,
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            count.toString(),
+            style: TextStyle(
+              fontSize: 12.spMin,
+              fontWeight: FontWeight.w600,
+              color: AppColors.white,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _showFullScreenBottomSheet() {
     showCupertinoModalPopup(
       context: context,
@@ -202,7 +285,22 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
           child: Stack(
             children: [
-              MapHazardsList(),
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      _listFiltersButtonBuilder()
+                          .pT(_safeAreaTopPadding)
+                          .pX(20.0),
+                    ],
+                  ),
+                  10.hSizedBox,
+                  Expanded(
+                    child: MapHazardsList(),
+                  ),
+                ],
+              ),
               Positioned(
                 right: 0.0,
                 left: 0.0,
