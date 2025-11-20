@@ -14,9 +14,13 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HazardFiltersProviderState {
 
-/// AWS Emergency Level Filters
- bool get isAwsEmergency; bool get isAwsWatchAndAct; bool get isAwsAdvice;/// Other Source Filters
- bool get isOfficialNonAws; bool get isUserReported;/// Category selection state
+/// Whether AWS Emergency level "Emergency" is selected.
+ bool get isAwsEmergency;/// Whether AWS Emergency level "Watch and Act" is selected.
+ bool get isAwsWatchAndAct;/// Whether AWS Emergency level "Advice" is selected.
+ bool get isAwsAdvice;/// Whether Official Non-AWS sources are selected.
+ bool get isOfficialNonAws;/// Whether User Reported sources are selected.
+ bool get isUserReported;/// All available category IDs.
+ Set<String> get allCategoryIds;/// Selected category IDs.
  Set<String> get selectedCategoryIds;
 /// Create a copy of HazardFiltersProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -28,16 +32,16 @@ $HazardFiltersProviderStateCopyWith<HazardFiltersProviderState> get copyWith => 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardFiltersProviderState&&(identical(other.isAwsEmergency, isAwsEmergency) || other.isAwsEmergency == isAwsEmergency)&&(identical(other.isAwsWatchAndAct, isAwsWatchAndAct) || other.isAwsWatchAndAct == isAwsWatchAndAct)&&(identical(other.isAwsAdvice, isAwsAdvice) || other.isAwsAdvice == isAwsAdvice)&&(identical(other.isOfficialNonAws, isOfficialNonAws) || other.isOfficialNonAws == isOfficialNonAws)&&(identical(other.isUserReported, isUserReported) || other.isUserReported == isUserReported)&&const DeepCollectionEquality().equals(other.selectedCategoryIds, selectedCategoryIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardFiltersProviderState&&(identical(other.isAwsEmergency, isAwsEmergency) || other.isAwsEmergency == isAwsEmergency)&&(identical(other.isAwsWatchAndAct, isAwsWatchAndAct) || other.isAwsWatchAndAct == isAwsWatchAndAct)&&(identical(other.isAwsAdvice, isAwsAdvice) || other.isAwsAdvice == isAwsAdvice)&&(identical(other.isOfficialNonAws, isOfficialNonAws) || other.isOfficialNonAws == isOfficialNonAws)&&(identical(other.isUserReported, isUserReported) || other.isUserReported == isUserReported)&&const DeepCollectionEquality().equals(other.allCategoryIds, allCategoryIds)&&const DeepCollectionEquality().equals(other.selectedCategoryIds, selectedCategoryIds));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isAwsEmergency,isAwsWatchAndAct,isAwsAdvice,isOfficialNonAws,isUserReported,const DeepCollectionEquality().hash(selectedCategoryIds));
+int get hashCode => Object.hash(runtimeType,isAwsEmergency,isAwsWatchAndAct,isAwsAdvice,isOfficialNonAws,isUserReported,const DeepCollectionEquality().hash(allCategoryIds),const DeepCollectionEquality().hash(selectedCategoryIds));
 
 @override
 String toString() {
-  return 'HazardFiltersProviderState(isAwsEmergency: $isAwsEmergency, isAwsWatchAndAct: $isAwsWatchAndAct, isAwsAdvice: $isAwsAdvice, isOfficialNonAws: $isOfficialNonAws, isUserReported: $isUserReported, selectedCategoryIds: $selectedCategoryIds)';
+  return 'HazardFiltersProviderState(isAwsEmergency: $isAwsEmergency, isAwsWatchAndAct: $isAwsWatchAndAct, isAwsAdvice: $isAwsAdvice, isOfficialNonAws: $isOfficialNonAws, isUserReported: $isUserReported, allCategoryIds: $allCategoryIds, selectedCategoryIds: $selectedCategoryIds)';
 }
 
 
@@ -48,7 +52,7 @@ abstract mixin class $HazardFiltersProviderStateCopyWith<$Res>  {
   factory $HazardFiltersProviderStateCopyWith(HazardFiltersProviderState value, $Res Function(HazardFiltersProviderState) _then) = _$HazardFiltersProviderStateCopyWithImpl;
 @useResult
 $Res call({
- bool isAwsEmergency, bool isAwsWatchAndAct, bool isAwsAdvice, bool isOfficialNonAws, bool isUserReported, Set<String> selectedCategoryIds
+ bool isAwsEmergency, bool isAwsWatchAndAct, bool isAwsAdvice, bool isOfficialNonAws, bool isUserReported, Set<String> allCategoryIds, Set<String> selectedCategoryIds
 });
 
 
@@ -65,14 +69,15 @@ class _$HazardFiltersProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HazardFiltersProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isAwsEmergency = null,Object? isAwsWatchAndAct = null,Object? isAwsAdvice = null,Object? isOfficialNonAws = null,Object? isUserReported = null,Object? selectedCategoryIds = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isAwsEmergency = null,Object? isAwsWatchAndAct = null,Object? isAwsAdvice = null,Object? isOfficialNonAws = null,Object? isUserReported = null,Object? allCategoryIds = null,Object? selectedCategoryIds = null,}) {
   return _then(_self.copyWith(
 isAwsEmergency: null == isAwsEmergency ? _self.isAwsEmergency : isAwsEmergency // ignore: cast_nullable_to_non_nullable
 as bool,isAwsWatchAndAct: null == isAwsWatchAndAct ? _self.isAwsWatchAndAct : isAwsWatchAndAct // ignore: cast_nullable_to_non_nullable
 as bool,isAwsAdvice: null == isAwsAdvice ? _self.isAwsAdvice : isAwsAdvice // ignore: cast_nullable_to_non_nullable
 as bool,isOfficialNonAws: null == isOfficialNonAws ? _self.isOfficialNonAws : isOfficialNonAws // ignore: cast_nullable_to_non_nullable
 as bool,isUserReported: null == isUserReported ? _self.isUserReported : isUserReported // ignore: cast_nullable_to_non_nullable
-as bool,selectedCategoryIds: null == selectedCategoryIds ? _self.selectedCategoryIds : selectedCategoryIds // ignore: cast_nullable_to_non_nullable
+as bool,allCategoryIds: null == allCategoryIds ? _self.allCategoryIds : allCategoryIds // ignore: cast_nullable_to_non_nullable
+as Set<String>,selectedCategoryIds: null == selectedCategoryIds ? _self.selectedCategoryIds : selectedCategoryIds // ignore: cast_nullable_to_non_nullable
 as Set<String>,
   ));
 }
@@ -158,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isAwsEmergency,  bool isAwsWatchAndAct,  bool isAwsAdvice,  bool isOfficialNonAws,  bool isUserReported,  Set<String> selectedCategoryIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isAwsEmergency,  bool isAwsWatchAndAct,  bool isAwsAdvice,  bool isOfficialNonAws,  bool isUserReported,  Set<String> allCategoryIds,  Set<String> selectedCategoryIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardFiltersProviderState() when $default != null:
-return $default(_that.isAwsEmergency,_that.isAwsWatchAndAct,_that.isAwsAdvice,_that.isOfficialNonAws,_that.isUserReported,_that.selectedCategoryIds);case _:
+return $default(_that.isAwsEmergency,_that.isAwsWatchAndAct,_that.isAwsAdvice,_that.isOfficialNonAws,_that.isUserReported,_that.allCategoryIds,_that.selectedCategoryIds);case _:
   return orElse();
 
 }
@@ -179,10 +184,10 @@ return $default(_that.isAwsEmergency,_that.isAwsWatchAndAct,_that.isAwsAdvice,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isAwsEmergency,  bool isAwsWatchAndAct,  bool isAwsAdvice,  bool isOfficialNonAws,  bool isUserReported,  Set<String> selectedCategoryIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isAwsEmergency,  bool isAwsWatchAndAct,  bool isAwsAdvice,  bool isOfficialNonAws,  bool isUserReported,  Set<String> allCategoryIds,  Set<String> selectedCategoryIds)  $default,) {final _that = this;
 switch (_that) {
 case _HazardFiltersProviderState():
-return $default(_that.isAwsEmergency,_that.isAwsWatchAndAct,_that.isAwsAdvice,_that.isOfficialNonAws,_that.isUserReported,_that.selectedCategoryIds);case _:
+return $default(_that.isAwsEmergency,_that.isAwsWatchAndAct,_that.isAwsAdvice,_that.isOfficialNonAws,_that.isUserReported,_that.allCategoryIds,_that.selectedCategoryIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +204,10 @@ return $default(_that.isAwsEmergency,_that.isAwsWatchAndAct,_that.isAwsAdvice,_t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isAwsEmergency,  bool isAwsWatchAndAct,  bool isAwsAdvice,  bool isOfficialNonAws,  bool isUserReported,  Set<String> selectedCategoryIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isAwsEmergency,  bool isAwsWatchAndAct,  bool isAwsAdvice,  bool isOfficialNonAws,  bool isUserReported,  Set<String> allCategoryIds,  Set<String> selectedCategoryIds)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardFiltersProviderState() when $default != null:
-return $default(_that.isAwsEmergency,_that.isAwsWatchAndAct,_that.isAwsAdvice,_that.isOfficialNonAws,_that.isUserReported,_that.selectedCategoryIds);case _:
+return $default(_that.isAwsEmergency,_that.isAwsWatchAndAct,_that.isAwsAdvice,_that.isOfficialNonAws,_that.isUserReported,_that.allCategoryIds,_that.selectedCategoryIds);case _:
   return null;
 
 }
@@ -214,19 +219,31 @@ return $default(_that.isAwsEmergency,_that.isAwsWatchAndAct,_that.isAwsAdvice,_t
 
 
 class _HazardFiltersProviderState extends HazardFiltersProviderState {
-  const _HazardFiltersProviderState({this.isAwsEmergency = false, this.isAwsWatchAndAct = false, this.isAwsAdvice = false, this.isOfficialNonAws = false, this.isUserReported = false, final  Set<String> selectedCategoryIds = const <String>{}}): _selectedCategoryIds = selectedCategoryIds,super._();
+  const _HazardFiltersProviderState({this.isAwsEmergency = true, this.isAwsWatchAndAct = true, this.isAwsAdvice = true, this.isOfficialNonAws = true, this.isUserReported = true, final  Set<String> allCategoryIds = const <String>{}, final  Set<String> selectedCategoryIds = const <String>{}}): _allCategoryIds = allCategoryIds,_selectedCategoryIds = selectedCategoryIds,super._();
   
 
-/// AWS Emergency Level Filters
+/// Whether AWS Emergency level "Emergency" is selected.
 @override@JsonKey() final  bool isAwsEmergency;
+/// Whether AWS Emergency level "Watch and Act" is selected.
 @override@JsonKey() final  bool isAwsWatchAndAct;
+/// Whether AWS Emergency level "Advice" is selected.
 @override@JsonKey() final  bool isAwsAdvice;
-/// Other Source Filters
+/// Whether Official Non-AWS sources are selected.
 @override@JsonKey() final  bool isOfficialNonAws;
+/// Whether User Reported sources are selected.
 @override@JsonKey() final  bool isUserReported;
-/// Category selection state
+/// All available category IDs.
+ final  Set<String> _allCategoryIds;
+/// All available category IDs.
+@override@JsonKey() Set<String> get allCategoryIds {
+  if (_allCategoryIds is EqualUnmodifiableSetView) return _allCategoryIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableSetView(_allCategoryIds);
+}
+
+/// Selected category IDs.
  final  Set<String> _selectedCategoryIds;
-/// Category selection state
+/// Selected category IDs.
 @override@JsonKey() Set<String> get selectedCategoryIds {
   if (_selectedCategoryIds is EqualUnmodifiableSetView) return _selectedCategoryIds;
   // ignore: implicit_dynamic_type
@@ -244,16 +261,16 @@ _$HazardFiltersProviderStateCopyWith<_HazardFiltersProviderState> get copyWith =
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardFiltersProviderState&&(identical(other.isAwsEmergency, isAwsEmergency) || other.isAwsEmergency == isAwsEmergency)&&(identical(other.isAwsWatchAndAct, isAwsWatchAndAct) || other.isAwsWatchAndAct == isAwsWatchAndAct)&&(identical(other.isAwsAdvice, isAwsAdvice) || other.isAwsAdvice == isAwsAdvice)&&(identical(other.isOfficialNonAws, isOfficialNonAws) || other.isOfficialNonAws == isOfficialNonAws)&&(identical(other.isUserReported, isUserReported) || other.isUserReported == isUserReported)&&const DeepCollectionEquality().equals(other._selectedCategoryIds, _selectedCategoryIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardFiltersProviderState&&(identical(other.isAwsEmergency, isAwsEmergency) || other.isAwsEmergency == isAwsEmergency)&&(identical(other.isAwsWatchAndAct, isAwsWatchAndAct) || other.isAwsWatchAndAct == isAwsWatchAndAct)&&(identical(other.isAwsAdvice, isAwsAdvice) || other.isAwsAdvice == isAwsAdvice)&&(identical(other.isOfficialNonAws, isOfficialNonAws) || other.isOfficialNonAws == isOfficialNonAws)&&(identical(other.isUserReported, isUserReported) || other.isUserReported == isUserReported)&&const DeepCollectionEquality().equals(other._allCategoryIds, _allCategoryIds)&&const DeepCollectionEquality().equals(other._selectedCategoryIds, _selectedCategoryIds));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isAwsEmergency,isAwsWatchAndAct,isAwsAdvice,isOfficialNonAws,isUserReported,const DeepCollectionEquality().hash(_selectedCategoryIds));
+int get hashCode => Object.hash(runtimeType,isAwsEmergency,isAwsWatchAndAct,isAwsAdvice,isOfficialNonAws,isUserReported,const DeepCollectionEquality().hash(_allCategoryIds),const DeepCollectionEquality().hash(_selectedCategoryIds));
 
 @override
 String toString() {
-  return 'HazardFiltersProviderState(isAwsEmergency: $isAwsEmergency, isAwsWatchAndAct: $isAwsWatchAndAct, isAwsAdvice: $isAwsAdvice, isOfficialNonAws: $isOfficialNonAws, isUserReported: $isUserReported, selectedCategoryIds: $selectedCategoryIds)';
+  return 'HazardFiltersProviderState(isAwsEmergency: $isAwsEmergency, isAwsWatchAndAct: $isAwsWatchAndAct, isAwsAdvice: $isAwsAdvice, isOfficialNonAws: $isOfficialNonAws, isUserReported: $isUserReported, allCategoryIds: $allCategoryIds, selectedCategoryIds: $selectedCategoryIds)';
 }
 
 
@@ -264,7 +281,7 @@ abstract mixin class _$HazardFiltersProviderStateCopyWith<$Res> implements $Haza
   factory _$HazardFiltersProviderStateCopyWith(_HazardFiltersProviderState value, $Res Function(_HazardFiltersProviderState) _then) = __$HazardFiltersProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool isAwsEmergency, bool isAwsWatchAndAct, bool isAwsAdvice, bool isOfficialNonAws, bool isUserReported, Set<String> selectedCategoryIds
+ bool isAwsEmergency, bool isAwsWatchAndAct, bool isAwsAdvice, bool isOfficialNonAws, bool isUserReported, Set<String> allCategoryIds, Set<String> selectedCategoryIds
 });
 
 
@@ -281,14 +298,15 @@ class __$HazardFiltersProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HazardFiltersProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? isAwsEmergency = null,Object? isAwsWatchAndAct = null,Object? isAwsAdvice = null,Object? isOfficialNonAws = null,Object? isUserReported = null,Object? selectedCategoryIds = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? isAwsEmergency = null,Object? isAwsWatchAndAct = null,Object? isAwsAdvice = null,Object? isOfficialNonAws = null,Object? isUserReported = null,Object? allCategoryIds = null,Object? selectedCategoryIds = null,}) {
   return _then(_HazardFiltersProviderState(
 isAwsEmergency: null == isAwsEmergency ? _self.isAwsEmergency : isAwsEmergency // ignore: cast_nullable_to_non_nullable
 as bool,isAwsWatchAndAct: null == isAwsWatchAndAct ? _self.isAwsWatchAndAct : isAwsWatchAndAct // ignore: cast_nullable_to_non_nullable
 as bool,isAwsAdvice: null == isAwsAdvice ? _self.isAwsAdvice : isAwsAdvice // ignore: cast_nullable_to_non_nullable
 as bool,isOfficialNonAws: null == isOfficialNonAws ? _self.isOfficialNonAws : isOfficialNonAws // ignore: cast_nullable_to_non_nullable
 as bool,isUserReported: null == isUserReported ? _self.isUserReported : isUserReported // ignore: cast_nullable_to_non_nullable
-as bool,selectedCategoryIds: null == selectedCategoryIds ? _self._selectedCategoryIds : selectedCategoryIds // ignore: cast_nullable_to_non_nullable
+as bool,allCategoryIds: null == allCategoryIds ? _self._allCategoryIds : allCategoryIds // ignore: cast_nullable_to_non_nullable
+as Set<String>,selectedCategoryIds: null == selectedCategoryIds ? _self._selectedCategoryIds : selectedCategoryIds // ignore: cast_nullable_to_non_nullable
 as Set<String>,
   ));
 }

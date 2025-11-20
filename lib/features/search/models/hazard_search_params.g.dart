@@ -14,11 +14,6 @@ _HazardSearchParams _$HazardSearchParamsFromJson(Map<String, dynamic> json) =>
               ?.map((e) => e as String)
               .toList() ??
           const <String>[],
-      severityFilter: json['severityFilter'] == null
-          ? null
-          : HazardSeverityFilter.fromJson(
-              json['severityFilter'] as Map<String, dynamic>,
-            ),
       reportedById: json['reportedById'] as String?,
       reviewStatus:
           $enumDecodeNullable(
@@ -31,6 +26,11 @@ _HazardSearchParams _$HazardSearchParamsFromJson(Map<String, dynamic> json) =>
       southwestLat: (json['southwestLat'] as num?)?.toDouble(),
       southwestLng: (json['southwestLng'] as num?)?.toDouble(),
       showExpired: json['showExpired'] as bool? ?? false,
+      awsEmergency: json['awsEmergency'] as bool? ?? true,
+      awsWatchAndAct: json['awsWatchAndAct'] as bool? ?? true,
+      awsAdvice: json['awsAdvice'] as bool? ?? true,
+      officialNonAws: json['officialNonAws'] as bool? ?? true,
+      userReported: json['userReported'] as bool? ?? true,
       sortSettings:
           (json['sortSettings'] as List<dynamic>?)
               ?.map(
@@ -56,7 +56,6 @@ Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
     <String, dynamic>{
       'searchString': ?instance.searchString,
       'categoryIds': instance.categoryIds,
-      'severityFilter': ?instance.severityFilter?.toJson(),
       'reportedById': ?instance.reportedById,
       'reviewStatus': _$HazardReviewStatusEnumMap[instance.reviewStatus]!,
       'northeastLat': ?instance.northeastLat,
@@ -64,6 +63,11 @@ Map<String, dynamic> _$HazardSearchParamsToJson(_HazardSearchParams instance) =>
       'southwestLat': ?instance.southwestLat,
       'southwestLng': ?instance.southwestLng,
       'showExpired': instance.showExpired,
+      'awsEmergency': instance.awsEmergency,
+      'awsWatchAndAct': instance.awsWatchAndAct,
+      'awsAdvice': instance.awsAdvice,
+      'officialNonAws': instance.officialNonAws,
+      'userReported': instance.userReported,
       'sortSettings': instance.sortSettings
           .map(
             (e) => e.map(

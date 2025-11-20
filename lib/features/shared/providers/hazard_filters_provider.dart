@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/map/views/screens/map_screen.dart';
 import 'package:hazard_app/features/notification/views/widgets/notifications_appbar.dart';
 import 'package:hazard_app/features/search/views/widgets/hazard_search_appbar.dart';
+import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_filters_provider_state.dart';
 import 'package:hazard_app/features/shared/views/widgets/categories_dropdown.dart';
 
@@ -31,7 +32,41 @@ class HazardFiltersProvider extends StateNotifier<HazardFiltersProviderState> {
   HazardFiltersProvider({
     required final Ref ref,
     required final HazardFiltersProviderState state,
-  }) : super(state);
+  }) : _ref = ref,
+       super(state) {
+    _onInit();
+  }
+
+  final Ref _ref;
+
+  void _onInit() {
+    // Initialize selected categories with all main categories if none are selected.
+    final allMainCategories = _ref
+        .read(providerOfMainCategories)
+        .mainCategories;
+    updateAllCategories(
+      allMainCategories.map((e) => e.id).toSet(),
+    );
+    updateSelectedCategories(
+      allMainCategories.map((e) => e.id).toSet(),
+    );
+    _ref.listen(
+      providerOfMainCategories.select(
+        (value) => value.mainCategories,
+      ),
+      (previous, next) {
+        if (previous != next && state.selectedCategoryIds.isEmpty) {
+          final allMainCategories = next;
+          updateAllCategories(
+            allMainCategories.map((e) => e.id).toSet(),
+          );
+          updateSelectedCategories(
+            allMainCategories.map((e) => e.id).toSet(),
+          );
+        }
+      },
+    );
+  }
 
   /// Updates the AWS Emergency filter state.
   void updateAwsEmergency(bool value) {
@@ -58,18 +93,28 @@ class HazardFiltersProvider extends StateNotifier<HazardFiltersProviderState> {
     state = state.copyWith(isUserReported: value);
   }
 
+  /// Updates all available category IDs.
+  void updateAllCategories(Set<String> categoryIds) {
+    state = state.copyWith(allCategoryIds: categoryIds);
+  }
+
+  /// Updates the selected category IDs.
+  void updateSelectedCategories(Set<String> categoryIds) {
+    state = state.copyWith(selectedCategoryIds: categoryIds);
+  }
+
   /// Adds a category ID to the selected categories.
   void addSelectedCategory(String categoryId) {
     final updatedSet = Set<String>.from(state.selectedCategoryIds);
     updatedSet.add(categoryId);
-    state = state.copyWith(selectedCategoryIds: updatedSet);
+    updateSelectedCategories(updatedSet);
   }
 
   /// Removes a category ID from the selected categories.
   void removeSelectedCategory(String categoryId) {
     final updatedSet = Set<String>.from(state.selectedCategoryIds);
     updatedSet.remove(categoryId);
-    state = state.copyWith(selectedCategoryIds: updatedSet);
+    updateSelectedCategories(updatedSet);
   }
 
   /// Toggles a category selection.

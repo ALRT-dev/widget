@@ -36,7 +36,7 @@ class _HazardFiltersBottomsheetContentState
     return BaseBottomsheet(
       safeAreaBottom: false,
       child: SizedBox(
-        height: 0.8.sh,
+        height: 0.85.sh,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -133,7 +133,7 @@ class _HazardFiltersBottomsheetContentState
       children: [
         Container(
           width: 3,
-          height: 16.h,
+          height: 16.spMin,
           decoration: BoxDecoration(
             color: AppColors.black,
             borderRadius: BorderRadius.circular(2),
@@ -281,12 +281,7 @@ class _HazardFiltersBottomsheetContentState
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16.r),
-          border: Border.all(
-            color: isEnabled
-                ? AppColors.black.withValues(alpha: 0.4)
-                : AppColors.transparent,
-            width: 2,
-          ),
+
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
@@ -333,7 +328,7 @@ class _HazardFiltersBottomsheetContentState
             _customToggleSwitch(
               isEnabled: isEnabled,
               onToggle: onToggle,
-              activeColor: AppColors.black,
+              activeColor: AppColors.green.withValues(alpha: 0.6),
             ),
           ],
         ),
@@ -350,8 +345,8 @@ class _HazardFiltersBottomsheetContentState
       onTap: () => onToggle(!isEnabled),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        width: 48.w,
-        height: 26.h,
+        width: 48.spMin,
+        height: 26.spMin,
         decoration: BoxDecoration(
           color: isEnabled ? activeColor : Colors.grey.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(13.r),
@@ -360,11 +355,11 @@ class _HazardFiltersBottomsheetContentState
           children: [
             AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
-              left: isEnabled ? 24.w : 2.w,
-              top: 2.h,
+              left: isEnabled ? 24.spMin : 2.spMin,
+              top: 2.spMin,
               child: Container(
-                width: 22.w,
-                height: 22.h,
+                width: 22.spMin,
+                height: 22.spMin,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(11.r),
@@ -448,7 +443,7 @@ class _HazardFiltersBottomsheetContentState
         final categoryColor = category.color ?? Colors.blue;
 
         return Padding(
-          padding: EdgeInsets.only(bottom: 12.h),
+          padding: EdgeInsets.only(bottom: 12.spMin),
           child: _filterToggleCard(
             title: category.name ?? 'Unknown Category',
             description: category.description ?? 'Hazard category',

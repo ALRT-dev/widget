@@ -7,16 +7,25 @@ abstract class HazardFiltersProviderState with _$HazardFiltersProviderState {
   const HazardFiltersProviderState._();
 
   const factory HazardFiltersProviderState({
-    /// AWS Emergency Level Filters
-    @Default(false) final bool isAwsEmergency,
-    @Default(false) final bool isAwsWatchAndAct,
-    @Default(false) final bool isAwsAdvice,
+    /// Whether AWS Emergency level "Emergency" is selected.
+    @Default(true) final bool isAwsEmergency,
 
-    /// Other Source Filters
-    @Default(false) final bool isOfficialNonAws,
-    @Default(false) final bool isUserReported,
+    /// Whether AWS Emergency level "Watch and Act" is selected.
+    @Default(true) final bool isAwsWatchAndAct,
 
-    /// Category selection state
+    /// Whether AWS Emergency level "Advice" is selected.
+    @Default(true) final bool isAwsAdvice,
+
+    /// Whether Official Non-AWS sources are selected.
+    @Default(true) final bool isOfficialNonAws,
+
+    /// Whether User Reported sources are selected.
+    @Default(true) final bool isUserReported,
+
+    /// All available category IDs.
+    @Default(<String>{}) final Set<String> allCategoryIds,
+
+    /// Selected category IDs.
     @Default(<String>{}) final Set<String> selectedCategoryIds,
   }) = _HazardFiltersProviderState;
 
@@ -29,15 +38,15 @@ abstract class HazardFiltersProviderState with _$HazardFiltersProviderState {
       isUserReported ||
       selectedCategoryIds.isNotEmpty;
 
-  /// Returns the total count of selected filters.
-  int get selectedFiltersCount {
+  /// Returns the total count of unselected filters.
+  int get unselectedFiltersCount {
     int count = 0;
-    if (isAwsEmergency) count++;
-    if (isAwsWatchAndAct) count++;
-    if (isAwsAdvice) count++;
-    if (isOfficialNonAws) count++;
-    if (isUserReported) count++;
-    count += selectedCategoryIds.length;
+    if (!isAwsEmergency) count++;
+    if (!isAwsWatchAndAct) count++;
+    if (!isAwsAdvice) count++;
+    if (!isOfficialNonAws) count++;
+    if (!isUserReported) count++;
+    count += allCategoryIds.length - selectedCategoryIds.length;
     return count;
   }
 }

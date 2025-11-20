@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:hazard_app/features/search/models/hazard_severity_filter_model.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
@@ -15,9 +14,6 @@ abstract class HazardSearchParams with _$HazardSearchParams {
 
     /// The list of category IDs to filter hazards.
     @Default(<String>[]) final List<String> categoryIds,
-
-    /// The severity filter to filter hazards.
-    final HazardSeverityFilter? severityFilter,
 
     /// The id of the user who reported the hazard to filter hazards.
     final String? reportedById,
@@ -41,6 +37,21 @@ abstract class HazardSearchParams with _$HazardSearchParams {
 
     /// Whether to show expired hazards or not.
     @Default(false) final bool showExpired,
+
+    /// Whether to include hazards reported by AWS Emergency level.
+    @Default(true) final bool awsEmergency,
+
+    /// Whether to include hazards reported by AWS Watch and Act level.
+    @Default(true) final bool awsWatchAndAct,
+
+    /// Whether to include hazards reported by AWS Advice level.
+    @Default(true) final bool awsAdvice,
+
+    /// Whether to include hazards reported by Official Non-AWS sources.
+    @Default(true) final bool officialNonAws,
+
+    /// Whether to include hazards reported by User.
+    @Default(true) final bool userReported,
 
     /// The list of sorting types to sort hazards.
     @Default(

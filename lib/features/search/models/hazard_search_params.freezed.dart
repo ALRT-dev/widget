@@ -17,8 +17,7 @@ mixin _$HazardSearchParams {
 
 /// The search string to filter hazards by their title or description.
  String? get searchString;/// The list of category IDs to filter hazards.
- List<String> get categoryIds;/// The severity filter to filter hazards.
- HazardSeverityFilter? get severityFilter;/// The id of the user who reported the hazard to filter hazards.
+ List<String> get categoryIds;/// The id of the user who reported the hazard to filter hazards.
  String? get reportedById;/// The review status to filter hazards.
 ///
 /// Defaults to [HazardReviewStatus.accepted] to show only accepted hazards.
@@ -27,7 +26,12 @@ mixin _$HazardSearchParams {
  double? get northeastLng;/// The bounds for location-based filtering.
  double? get southwestLat;/// The bounds for location-based filtering.
  double? get southwestLng;/// Whether to show expired hazards or not.
- bool get showExpired;/// The list of sorting types to sort hazards.
+ bool get showExpired;/// Whether to include hazards reported by AWS Emergency level.
+ bool get awsEmergency;/// Whether to include hazards reported by AWS Watch and Act level.
+ bool get awsWatchAndAct;/// Whether to include hazards reported by AWS Advice level.
+ bool get awsAdvice;/// Whether to include hazards reported by Official Non-AWS sources.
+ bool get officialNonAws;/// Whether to include hazards reported by User.
+ bool get userReported;/// The list of sorting types to sort hazards.
  List<Map<SortCategory, SortOrder>> get sortSettings;/// The page number for pagination.
  int get page;/// The number of items per page for pagination.
  int get pageSize;
@@ -43,16 +47,16 @@ $HazardSearchParamsCopyWith<HazardSearchParams> get copyWith => _$HazardSearchPa
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other.categoryIds, categoryIds)&&(identical(other.severityFilter, severityFilter) || other.severityFilter == severityFilter)&&(identical(other.reportedById, reportedById) || other.reportedById == reportedById)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.showExpired, showExpired) || other.showExpired == showExpired)&&const DeepCollectionEquality().equals(other.sortSettings, sortSettings)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other.categoryIds, categoryIds)&&(identical(other.reportedById, reportedById) || other.reportedById == reportedById)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.showExpired, showExpired) || other.showExpired == showExpired)&&(identical(other.awsEmergency, awsEmergency) || other.awsEmergency == awsEmergency)&&(identical(other.awsWatchAndAct, awsWatchAndAct) || other.awsWatchAndAct == awsWatchAndAct)&&(identical(other.awsAdvice, awsAdvice) || other.awsAdvice == awsAdvice)&&(identical(other.officialNonAws, officialNonAws) || other.officialNonAws == officialNonAws)&&(identical(other.userReported, userReported) || other.userReported == userReported)&&const DeepCollectionEquality().equals(other.sortSettings, sortSettings)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(categoryIds),severityFilter,reportedById,reviewStatus,northeastLat,northeastLng,southwestLat,southwestLng,showExpired,const DeepCollectionEquality().hash(sortSettings),page,pageSize);
+int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(categoryIds),reportedById,reviewStatus,northeastLat,northeastLng,southwestLat,southwestLng,showExpired,awsEmergency,awsWatchAndAct,awsAdvice,officialNonAws,userReported,const DeepCollectionEquality().hash(sortSettings),page,pageSize);
 
 @override
 String toString() {
-  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, severityFilter: $severityFilter, reportedById: $reportedById, reviewStatus: $reviewStatus, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, showExpired: $showExpired, sortSettings: $sortSettings, page: $page, pageSize: $pageSize)';
+  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, reportedById: $reportedById, reviewStatus: $reviewStatus, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, showExpired: $showExpired, awsEmergency: $awsEmergency, awsWatchAndAct: $awsWatchAndAct, awsAdvice: $awsAdvice, officialNonAws: $officialNonAws, userReported: $userReported, sortSettings: $sortSettings, page: $page, pageSize: $pageSize)';
 }
 
 
@@ -63,11 +67,11 @@ abstract mixin class $HazardSearchParamsCopyWith<$Res>  {
   factory $HazardSearchParamsCopyWith(HazardSearchParams value, $Res Function(HazardSearchParams) _then) = _$HazardSearchParamsCopyWithImpl;
 @useResult
 $Res call({
- String? searchString, List<String> categoryIds, HazardSeverityFilter? severityFilter, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool showExpired, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
+ String? searchString, List<String> categoryIds, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool showExpired, bool awsEmergency, bool awsWatchAndAct, bool awsAdvice, bool officialNonAws, bool userReported, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
 });
 
 
-$HazardSeverityFilterCopyWith<$Res>? get severityFilter;
+
 
 }
 /// @nodoc
@@ -80,37 +84,29 @@ class _$HazardSearchParamsCopyWithImpl<$Res>
 
 /// Create a copy of HazardSearchParams
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? severityFilter = freezed,Object? reportedById = freezed,Object? reviewStatus = null,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? showExpired = null,Object? sortSettings = null,Object? page = null,Object? pageSize = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? reportedById = freezed,Object? reviewStatus = null,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? showExpired = null,Object? awsEmergency = null,Object? awsWatchAndAct = null,Object? awsAdvice = null,Object? officialNonAws = null,Object? userReported = null,Object? sortSettings = null,Object? page = null,Object? pageSize = null,}) {
   return _then(_self.copyWith(
 searchString: freezed == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
 as String?,categoryIds: null == categoryIds ? _self.categoryIds : categoryIds // ignore: cast_nullable_to_non_nullable
-as List<String>,severityFilter: freezed == severityFilter ? _self.severityFilter : severityFilter // ignore: cast_nullable_to_non_nullable
-as HazardSeverityFilter?,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
+as List<String>,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
 as String?,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
 as HazardReviewStatus,northeastLat: freezed == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
 as double?,northeastLng: freezed == northeastLng ? _self.northeastLng : northeastLng // ignore: cast_nullable_to_non_nullable
 as double?,southwestLat: freezed == southwestLat ? _self.southwestLat : southwestLat // ignore: cast_nullable_to_non_nullable
 as double?,southwestLng: freezed == southwestLng ? _self.southwestLng : southwestLng // ignore: cast_nullable_to_non_nullable
 as double?,showExpired: null == showExpired ? _self.showExpired : showExpired // ignore: cast_nullable_to_non_nullable
+as bool,awsEmergency: null == awsEmergency ? _self.awsEmergency : awsEmergency // ignore: cast_nullable_to_non_nullable
+as bool,awsWatchAndAct: null == awsWatchAndAct ? _self.awsWatchAndAct : awsWatchAndAct // ignore: cast_nullable_to_non_nullable
+as bool,awsAdvice: null == awsAdvice ? _self.awsAdvice : awsAdvice // ignore: cast_nullable_to_non_nullable
+as bool,officialNonAws: null == officialNonAws ? _self.officialNonAws : officialNonAws // ignore: cast_nullable_to_non_nullable
+as bool,userReported: null == userReported ? _self.userReported : userReported // ignore: cast_nullable_to_non_nullable
 as bool,sortSettings: null == sortSettings ? _self.sortSettings : sortSettings // ignore: cast_nullable_to_non_nullable
 as List<Map<SortCategory, SortOrder>>,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
 as int,pageSize: null == pageSize ? _self.pageSize : pageSize // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
-/// Create a copy of HazardSearchParams
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$HazardSeverityFilterCopyWith<$Res>? get severityFilter {
-    if (_self.severityFilter == null) {
-    return null;
-  }
 
-  return $HazardSeverityFilterCopyWith<$Res>(_self.severityFilter!, (value) {
-    return _then(_self.copyWith(severityFilter: value));
-  });
-}
 }
 
 
@@ -192,10 +188,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  HazardSeverityFilter? severityFilter,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardSearchParams() when $default != null:
-return $default(_that.searchString,_that.categoryIds,_that.severityFilter,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.showExpired,_that.sortSettings,_that.page,_that.pageSize);case _:
+return $default(_that.searchString,_that.categoryIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.showExpired,_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.sortSettings,_that.page,_that.pageSize);case _:
   return orElse();
 
 }
@@ -213,10 +209,10 @@ return $default(_that.searchString,_that.categoryIds,_that.severityFilter,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  HazardSeverityFilter? severityFilter,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)  $default,) {final _that = this;
 switch (_that) {
 case _HazardSearchParams():
-return $default(_that.searchString,_that.categoryIds,_that.severityFilter,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.showExpired,_that.sortSettings,_that.page,_that.pageSize);case _:
+return $default(_that.searchString,_that.categoryIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.showExpired,_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.sortSettings,_that.page,_that.pageSize);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -233,10 +229,10 @@ return $default(_that.searchString,_that.categoryIds,_that.severityFilter,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? searchString,  List<String> categoryIds,  HazardSeverityFilter? severityFilter,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? searchString,  List<String> categoryIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool showExpired,  bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardSearchParams() when $default != null:
-return $default(_that.searchString,_that.categoryIds,_that.severityFilter,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.showExpired,_that.sortSettings,_that.page,_that.pageSize);case _:
+return $default(_that.searchString,_that.categoryIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.showExpired,_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.sortSettings,_that.page,_that.pageSize);case _:
   return null;
 
 }
@@ -248,7 +244,7 @@ return $default(_that.searchString,_that.categoryIds,_that.severityFilter,_that.
 @JsonSerializable()
 
 class _HazardSearchParams implements HazardSearchParams {
-  const _HazardSearchParams({this.searchString, final  List<String> categoryIds = const <String>[], this.severityFilter, this.reportedById, this.reviewStatus = HazardReviewStatus.accepted, this.northeastLat, this.northeastLng, this.southwestLat, this.southwestLng, this.showExpired = false, final  List<Map<SortCategory, SortOrder>> sortSettings = const <Map<SortCategory, SortOrder>>[{SortCategory.severity : SortOrder.desc}, {SortCategory.distance : SortOrder.asc}, {SortCategory.createdAt : SortOrder.desc}, {SortCategory.confidenceScore : SortOrder.desc}], this.page = 1, this.pageSize = 20}): _categoryIds = categoryIds,_sortSettings = sortSettings;
+  const _HazardSearchParams({this.searchString, final  List<String> categoryIds = const <String>[], this.reportedById, this.reviewStatus = HazardReviewStatus.accepted, this.northeastLat, this.northeastLng, this.southwestLat, this.southwestLng, this.showExpired = false, this.awsEmergency = true, this.awsWatchAndAct = true, this.awsAdvice = true, this.officialNonAws = true, this.userReported = true, final  List<Map<SortCategory, SortOrder>> sortSettings = const <Map<SortCategory, SortOrder>>[{SortCategory.severity : SortOrder.desc}, {SortCategory.distance : SortOrder.asc}, {SortCategory.createdAt : SortOrder.desc}, {SortCategory.confidenceScore : SortOrder.desc}], this.page = 1, this.pageSize = 20}): _categoryIds = categoryIds,_sortSettings = sortSettings;
   factory _HazardSearchParams.fromJson(Map<String, dynamic> json) => _$HazardSearchParamsFromJson(json);
 
 /// The search string to filter hazards by their title or description.
@@ -262,8 +258,6 @@ class _HazardSearchParams implements HazardSearchParams {
   return EqualUnmodifiableListView(_categoryIds);
 }
 
-/// The severity filter to filter hazards.
-@override final  HazardSeverityFilter? severityFilter;
 /// The id of the user who reported the hazard to filter hazards.
 @override final  String? reportedById;
 /// The review status to filter hazards.
@@ -280,6 +274,16 @@ class _HazardSearchParams implements HazardSearchParams {
 @override final  double? southwestLng;
 /// Whether to show expired hazards or not.
 @override@JsonKey() final  bool showExpired;
+/// Whether to include hazards reported by AWS Emergency level.
+@override@JsonKey() final  bool awsEmergency;
+/// Whether to include hazards reported by AWS Watch and Act level.
+@override@JsonKey() final  bool awsWatchAndAct;
+/// Whether to include hazards reported by AWS Advice level.
+@override@JsonKey() final  bool awsAdvice;
+/// Whether to include hazards reported by Official Non-AWS sources.
+@override@JsonKey() final  bool officialNonAws;
+/// Whether to include hazards reported by User.
+@override@JsonKey() final  bool userReported;
 /// The list of sorting types to sort hazards.
  final  List<Map<SortCategory, SortOrder>> _sortSettings;
 /// The list of sorting types to sort hazards.
@@ -307,16 +311,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other._categoryIds, _categoryIds)&&(identical(other.severityFilter, severityFilter) || other.severityFilter == severityFilter)&&(identical(other.reportedById, reportedById) || other.reportedById == reportedById)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.showExpired, showExpired) || other.showExpired == showExpired)&&const DeepCollectionEquality().equals(other._sortSettings, _sortSettings)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other._categoryIds, _categoryIds)&&(identical(other.reportedById, reportedById) || other.reportedById == reportedById)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.showExpired, showExpired) || other.showExpired == showExpired)&&(identical(other.awsEmergency, awsEmergency) || other.awsEmergency == awsEmergency)&&(identical(other.awsWatchAndAct, awsWatchAndAct) || other.awsWatchAndAct == awsWatchAndAct)&&(identical(other.awsAdvice, awsAdvice) || other.awsAdvice == awsAdvice)&&(identical(other.officialNonAws, officialNonAws) || other.officialNonAws == officialNonAws)&&(identical(other.userReported, userReported) || other.userReported == userReported)&&const DeepCollectionEquality().equals(other._sortSettings, _sortSettings)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(_categoryIds),severityFilter,reportedById,reviewStatus,northeastLat,northeastLng,southwestLat,southwestLng,showExpired,const DeepCollectionEquality().hash(_sortSettings),page,pageSize);
+int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(_categoryIds),reportedById,reviewStatus,northeastLat,northeastLng,southwestLat,southwestLng,showExpired,awsEmergency,awsWatchAndAct,awsAdvice,officialNonAws,userReported,const DeepCollectionEquality().hash(_sortSettings),page,pageSize);
 
 @override
 String toString() {
-  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, severityFilter: $severityFilter, reportedById: $reportedById, reviewStatus: $reviewStatus, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, showExpired: $showExpired, sortSettings: $sortSettings, page: $page, pageSize: $pageSize)';
+  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, reportedById: $reportedById, reviewStatus: $reviewStatus, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, showExpired: $showExpired, awsEmergency: $awsEmergency, awsWatchAndAct: $awsWatchAndAct, awsAdvice: $awsAdvice, officialNonAws: $officialNonAws, userReported: $userReported, sortSettings: $sortSettings, page: $page, pageSize: $pageSize)';
 }
 
 
@@ -327,11 +331,11 @@ abstract mixin class _$HazardSearchParamsCopyWith<$Res> implements $HazardSearch
   factory _$HazardSearchParamsCopyWith(_HazardSearchParams value, $Res Function(_HazardSearchParams) _then) = __$HazardSearchParamsCopyWithImpl;
 @override @useResult
 $Res call({
- String? searchString, List<String> categoryIds, HazardSeverityFilter? severityFilter, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool showExpired, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
+ String? searchString, List<String> categoryIds, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool showExpired, bool awsEmergency, bool awsWatchAndAct, bool awsAdvice, bool officialNonAws, bool userReported, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
 });
 
 
-@override $HazardSeverityFilterCopyWith<$Res>? get severityFilter;
+
 
 }
 /// @nodoc
@@ -344,18 +348,22 @@ class __$HazardSearchParamsCopyWithImpl<$Res>
 
 /// Create a copy of HazardSearchParams
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? severityFilter = freezed,Object? reportedById = freezed,Object? reviewStatus = null,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? showExpired = null,Object? sortSettings = null,Object? page = null,Object? pageSize = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? reportedById = freezed,Object? reviewStatus = null,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? showExpired = null,Object? awsEmergency = null,Object? awsWatchAndAct = null,Object? awsAdvice = null,Object? officialNonAws = null,Object? userReported = null,Object? sortSettings = null,Object? page = null,Object? pageSize = null,}) {
   return _then(_HazardSearchParams(
 searchString: freezed == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
 as String?,categoryIds: null == categoryIds ? _self._categoryIds : categoryIds // ignore: cast_nullable_to_non_nullable
-as List<String>,severityFilter: freezed == severityFilter ? _self.severityFilter : severityFilter // ignore: cast_nullable_to_non_nullable
-as HazardSeverityFilter?,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
+as List<String>,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
 as String?,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
 as HazardReviewStatus,northeastLat: freezed == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
 as double?,northeastLng: freezed == northeastLng ? _self.northeastLng : northeastLng // ignore: cast_nullable_to_non_nullable
 as double?,southwestLat: freezed == southwestLat ? _self.southwestLat : southwestLat // ignore: cast_nullable_to_non_nullable
 as double?,southwestLng: freezed == southwestLng ? _self.southwestLng : southwestLng // ignore: cast_nullable_to_non_nullable
 as double?,showExpired: null == showExpired ? _self.showExpired : showExpired // ignore: cast_nullable_to_non_nullable
+as bool,awsEmergency: null == awsEmergency ? _self.awsEmergency : awsEmergency // ignore: cast_nullable_to_non_nullable
+as bool,awsWatchAndAct: null == awsWatchAndAct ? _self.awsWatchAndAct : awsWatchAndAct // ignore: cast_nullable_to_non_nullable
+as bool,awsAdvice: null == awsAdvice ? _self.awsAdvice : awsAdvice // ignore: cast_nullable_to_non_nullable
+as bool,officialNonAws: null == officialNonAws ? _self.officialNonAws : officialNonAws // ignore: cast_nullable_to_non_nullable
+as bool,userReported: null == userReported ? _self.userReported : userReported // ignore: cast_nullable_to_non_nullable
 as bool,sortSettings: null == sortSettings ? _self._sortSettings : sortSettings // ignore: cast_nullable_to_non_nullable
 as List<Map<SortCategory, SortOrder>>,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
 as int,pageSize: null == pageSize ? _self.pageSize : pageSize // ignore: cast_nullable_to_non_nullable
@@ -363,19 +371,7 @@ as int,
   ));
 }
 
-/// Create a copy of HazardSearchParams
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$HazardSeverityFilterCopyWith<$Res>? get severityFilter {
-    if (_self.severityFilter == null) {
-    return null;
-  }
 
-  return $HazardSeverityFilterCopyWith<$Res>(_self.severityFilter!, (value) {
-    return _then(_self.copyWith(severityFilter: value));
-  });
-}
 }
 
 // dart format on

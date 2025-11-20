@@ -100,11 +100,29 @@ class NotificationsFeedProvider
         .read(providerOfHazardFiltersForNotifications)
         .selectedCategoryIds
         .toList();
+    final isAwsEmergency = _ref
+        .read(providerOfHazardFiltersForMap)
+        .isAwsEmergency;
+    final isAwsWatchAndAct = _ref
+        .read(providerOfHazardFiltersForMap)
+        .isAwsWatchAndAct;
+    final isAwsAdvice = _ref.read(providerOfHazardFiltersForMap).isAwsAdvice;
+    final isOfficialNonAws = _ref
+        .read(providerOfHazardFiltersForMap)
+        .isOfficialNonAws;
+    final isUserReported = _ref
+        .read(providerOfHazardFiltersForMap)
+        .isUserReported;
 
     final result = await _notificationService.getNotificationsFeedWithFilters(
       searchParams: HazardSearchParams(
         searchString: state.searchString,
         categoryIds: selectedCategoryIds,
+        awsEmergency: isAwsEmergency,
+        awsWatchAndAct: isAwsWatchAndAct,
+        awsAdvice: isAwsAdvice,
+        officialNonAws: isOfficialNonAws,
+        userReported: isUserReported,
       ),
     );
     if (!mounted) return;

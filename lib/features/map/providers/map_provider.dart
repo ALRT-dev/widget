@@ -131,10 +131,28 @@ class MapProvider extends StateNotifier<MapProviderState> {
         .read(providerOfHazardFiltersForMap)
         .selectedCategoryIds
         .toList();
+    final isAwsEmergency = _ref
+        .read(providerOfHazardFiltersForMap)
+        .isAwsEmergency;
+    final isAwsWatchAndAct = _ref
+        .read(providerOfHazardFiltersForMap)
+        .isAwsWatchAndAct;
+    final isAwsAdvice = _ref.read(providerOfHazardFiltersForMap).isAwsAdvice;
+    final isOfficialNonAws = _ref
+        .read(providerOfHazardFiltersForMap)
+        .isOfficialNonAws;
+    final isUserReported = _ref
+        .read(providerOfHazardFiltersForMap)
+        .isUserReported;
 
     final result = await _hazardService.getAllHazardsWithFilters(
       searchParams: HazardSearchParams(
         categoryIds: selectedCategoryIds,
+        awsEmergency: isAwsEmergency,
+        awsWatchAndAct: isAwsWatchAndAct,
+        awsAdvice: isAwsAdvice,
+        officialNonAws: isOfficialNonAws,
+        userReported: isUserReported,
         northeastLat: visibleBounds.northeast.latitude,
         northeastLng: visibleBounds.northeast.longitude,
         southwestLat: visibleBounds.southwest.latitude,
