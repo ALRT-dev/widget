@@ -5,7 +5,6 @@ import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
-import 'package:hazard_app/features/search/models/hazard_severity_filter_model.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
@@ -71,18 +70,10 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
       getHazardsByLocationState: const GetHazardsByLocationState.loading(),
     );
 
-    final selectedCategories = _ref
+    final selectedCategoryIds = _ref
         .read(providerOfHazardFiltersForSearch)
-        .selectedFilters
-        .categoryFilters;
-    final selectedSeveritiesAws = _ref
-        .read(providerOfHazardFiltersForSearch)
-        .selectedFilters
-        .severityFiltersAws;
-    final selectedSeveritiesNonAws = _ref
-        .read(providerOfHazardFiltersForSearch)
-        .selectedFilters
-        .severityFiltersNonAws;
+        .selectedCategoryIds
+        .toList();
 
     final result = await _hazardService.getHazardsWithSubscriptionIdAndFilters(
       searchParams: HazardSearchParams(
@@ -90,11 +81,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         northeastLng: location.bounds?.northeastLng,
         southwestLat: location.bounds?.southwestLat,
         southwestLng: location.bounds?.southwestLng,
-        categoryIds: selectedCategories.map((e) => e.id).toList(),
-        severityFilter: HazardSeverityFilter(
-          aws: selectedSeveritiesAws.map((e) => e.severity).toList(),
-          nonAws: selectedSeveritiesNonAws.map((e) => e.severity).toList(),
-        ),
+        categoryIds: selectedCategoryIds,
       ),
     );
     if (!mounted) return;
@@ -110,11 +97,6 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
 
         // update subscriptionId if there's an active subscription for this location
         updateSubscriptionId(response.$1.subscriptionId);
-
-        // update hazard filters in the filter provider
-        _ref
-            .read(providerOfHazardFiltersForSearch.notifier)
-            .updateFilters(response.$2);
       },
       (error) {
         state = state.copyWith(

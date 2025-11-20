@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/models/hazard_severity_with_count_model.dart';
 import 'package:hazard_app/features/shared/views/widgets/confirmation_sheet_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_bottomsheet_content.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -68,16 +66,13 @@ Future<void> showConfirmationSheet({
 Future<void> showHazardFiltersBottomSheet({
   required final BuildContext context,
   required final String filtersKey,
-  final void Function(List<HazardCategory>)? onCategoriesSelectionUpdated,
-  final void Function(List<HazardSeverityWithCount>)?
-  onSeveritiesSelectionUpdated,
+  final void Function()? onFiltersUpdated,
 }) {
   return showCustomCupertinoModalPopup(
     context: context,
     builder: (_) => HazardFiltersBottomsheetContent(
       filtersKey: filtersKey,
-      onCategoriesSelectionUpdated: onCategoriesSelectionUpdated,
-      onSeveritiesSelectionUpdated: onSeveritiesSelectionUpdated,
+      onFiltersUpdated: onFiltersUpdated,
     ),
   );
 }

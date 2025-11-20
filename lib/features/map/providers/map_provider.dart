@@ -22,7 +22,6 @@ import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
-import 'package:hazard_app/features/search/models/hazard_severity_filter_model.dart';
 import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -128,26 +127,14 @@ class MapProvider extends StateNotifier<MapProviderState> {
       return;
     }
 
-    final selectedCategories = _ref
+    final selectedCategoryIds = _ref
         .read(providerOfHazardFiltersForMap)
-        .selectedFilters
-        .categoryFilters;
-    final selectedSeveritiesAws = _ref
-        .read(providerOfHazardFiltersForMap)
-        .selectedFilters
-        .severityFiltersAws;
-    final selectedSeveritiesNonAws = _ref
-        .read(providerOfHazardFiltersForMap)
-        .selectedFilters
-        .severityFiltersNonAws;
+        .selectedCategoryIds
+        .toList();
 
     final result = await _hazardService.getAllHazardsWithFilters(
       searchParams: HazardSearchParams(
-        categoryIds: selectedCategories.map((e) => e.id).toList(),
-        severityFilter: HazardSeverityFilter(
-          aws: selectedSeveritiesAws.map((e) => e.severity).toList(),
-          nonAws: selectedSeveritiesNonAws.map((e) => e.severity).toList(),
-        ),
+        categoryIds: selectedCategoryIds,
         northeastLat: visibleBounds.northeast.latitude,
         northeastLng: visibleBounds.northeast.longitude,
         southwestLat: visibleBounds.southwest.latitude,
@@ -163,17 +150,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
     result.when(
       (response) {
         final hazards = response.$1;
-        final filters = response.$2;
 
         state = state.copyWith(
           getMapHazardsState: GetMapHazardsState.success(hazards),
           hazards: hazards,
         );
-
-        // Update hazard filters in the filter provider
-        _ref
-            .read(providerOfHazardFiltersForMap.notifier)
-            .updateFilters(filters);
 
         final selectedHazard = hazards.firstWhereOrNull(
           (hazard) => hazard.id == state.selectedHazard?.id,
@@ -189,7 +170,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
           _ref.read(hazardItemProvider.notifier).updateHazard(hazard);
         }
 
-        generateMarkers();
+        if (hazards.isEmpty) {
+          removeAllHazardMarkers();
+        } else {
+          generateMarkers();
+        }
       },
       (l) {
         state = state.copyWith(
@@ -821,7 +806,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
       individualMarkers.add(
         Marker(
           markerId: MarkerId(
-            hazard.id ?? '${hazard.latitude},${hazard.longitude}',
+            'hazard_${hazard.id ?? '${hazard.latitude},${hazard.longitude}'}',
           ),
           position: LatLng(hazard.latitude!, hazard.longitude!),
           onTap: () => _onIndividualMarkerTap(hazard),
@@ -973,7 +958,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
       final individualMarker = Marker(
         markerId: MarkerId(
-          hazard.id ?? '${hazard.latitude},${hazard.longitude}',
+          'hazard_${hazard.id ?? '${hazard.latitude},${hazard.longitude}'}',
         ),
         position: LatLng(hazard.latitude!, hazard.longitude!),
         onTap: () => _onIndividualMarkerTap(hazard),
@@ -1303,6 +1288,18 @@ class MapProvider extends StateNotifier<MapProviderState> {
     updateMarkers(
       {...state.markers, marker},
     );
+  }
+
+  /// Removes all hazard markers from the current set of markers.
+  void removeAllHazardMarkers() {
+    final updatedMarkers = state.markers
+        .where(
+          (marker) =>
+              !marker.markerId.value.startsWith('hazard_') &&
+              !marker.markerId.value.contains('_cluster_'),
+        )
+        .toSet();
+    updateMarkers(updatedMarkers);
   }
 
   /// Updates [MapProviderState.polylines] to the given [polylines].

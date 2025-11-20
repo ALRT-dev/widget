@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hazard_app/features/search/views/widgets/hazard_categories_list.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/models/hazard_severity_with_count_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/states/main_categories_provider_state.dart';
 import 'package:hazard_app/features/shared/views/widgets/base_bottomsheet.dart';
-import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_severity_filters_list.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -16,19 +15,14 @@ class HazardFiltersBottomsheetContent extends ConsumerStatefulWidget {
   const HazardFiltersBottomsheetContent({
     super.key,
     required this.filtersKey,
-    this.onCategoriesSelectionUpdated,
-    this.onSeveritiesSelectionUpdated,
+    this.onFiltersUpdated,
   });
 
   /// The key to identify the specific hazard filters instance.
   final String filtersKey;
 
-  /// Callback when the selected categories are updated.
-  final void Function(List<HazardCategory>)? onCategoriesSelectionUpdated;
-
-  /// Callback when the selected severities are updated.
-  final void Function(List<HazardSeverityWithCount>)?
-  onSeveritiesSelectionUpdated;
+  /// Callback when any filter is updated.
+  final void Function()? onFiltersUpdated;
 
   @override
   ConsumerState<HazardFiltersBottomsheetContent> createState() =>
@@ -40,16 +34,21 @@ class _HazardFiltersBottomsheetContentState
   @override
   Widget build(BuildContext context) {
     return BaseBottomsheet(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _headerBuilder().pX(20.0),
-          Divider().pY(5.0),
-          _categoryFiltersBuilder(),
-          20.hSizedBox,
-          _severityFiltersBuilder(),
-        ],
-      ).pY(13.0),
+      safeAreaBottom: false,
+      child: SizedBox(
+        height: 0.8.sh,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _headerBuilder().pX(20.0),
+            16.hSizedBox,
+            _dividerBuilder(),
+            Expanded(
+              child: _filtersContentBuilder(),
+            ),
+          ],
+        ).pY(16.0),
+      ),
     );
   }
 
@@ -63,6 +62,7 @@ class _HazardFiltersBottomsheetContentState
           icon: Icon(
             Icons.close_rounded,
             color: AppColors.black,
+            size: 20.sp,
           ),
         ),
       ],
@@ -70,45 +70,146 @@ class _HazardFiltersBottomsheetContentState
   }
 
   Widget _titleBuilder() {
-    return Text(
-      'Filters',
-      style: TextStyle(
-        fontSize: 20.spMin,
-        fontWeight: FontWeight.w600,
-        color: AppColors.black,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Alrt Filters',
+          style: TextStyle(
+            fontSize: 22.spMin,
+            fontWeight: FontWeight.w700,
+            color: AppColors.black,
+            height: 1.2,
+          ),
+        ),
+        2.hSizedBox,
+        Text(
+          'Customize your filter visibility',
+          style: TextStyle(
+            fontSize: 13.spMin,
+            fontWeight: FontWeight.w400,
+            color: AppColors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _dividerBuilder() {
+    return Container(
+      height: 1,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            AppColors.grey.withValues(alpha: 0.3),
+            Colors.transparent,
+          ],
+        ),
       ),
     );
   }
 
-  Widget _categoryFiltersBuilder() {
+  Widget _filtersContentBuilder() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          16.hSizedBox,
+          _awsEmergencySection(),
+          12.hSizedBox,
+          _otherSourcesSection(),
+          24.hSizedBox,
+          _categoriesSection(),
+          24.hSizedBox,
+        ],
+      ).pX(20.0),
+    );
+  }
+
+  Widget _sectionTitleBuilder(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 3,
+          height: 16.h,
+          decoration: BoxDecoration(
+            color: AppColors.black,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        8.wSizedBox,
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16.spMin,
+            fontWeight: FontWeight.w600,
+            color: AppColors.black,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _awsEmergencySection() {
     return Consumer(
       builder: (context, ref, child) {
-        final hasCategories = ref.watch(
-          providerOfHazardFilters(widget.filtersKey).select(
-            (value) => value.filters.categoryFilters.isNotEmpty,
-          ),
+        final isAwsEmergency = ref.watch(
+          providerOfHazardFilters(
+            widget.filtersKey,
+          ).select((s) => s.isAwsEmergency),
         );
-        if (!hasCategories) {
-          return const SizedBox.shrink();
-        }
+        final isAwsWatchAndAct = ref.watch(
+          providerOfHazardFilters(
+            widget.filtersKey,
+          ).select((s) => s.isAwsWatchAndAct),
+        );
+        final isAwsAdvice = ref.watch(
+          providerOfHazardFilters(
+            widget.filtersKey,
+          ).select((s) => s.isAwsAdvice),
+        );
+        final filterProvider = ref.read(
+          providerOfHazardFilters(widget.filtersKey).notifier,
+        );
 
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Categories',
-              style: TextStyle(
-                fontSize: 14.spMin,
-                fontWeight: FontWeight.w600,
-                color: AppColors.black,
-              ),
-            ).pL(20.0),
-            8.hSizedBox,
-            HazardCategoriesList(
-              filtersKey: widget.filtersKey,
-              isSmall: true,
-              separatorWidth: 5.0,
-              onCategoriesSelectionUpdated: widget.onCategoriesSelectionUpdated,
+            _filterToggleCard(
+              title: 'Emergency',
+              description: 'Immediate threat to life and property',
+              isEnabled: isAwsEmergency,
+              onToggle: (value) {
+                filterProvider.updateAwsEmergency(value);
+                widget.onFiltersUpdated?.call();
+              },
+              color: Colors.red,
+              icon: Icons.warning_rounded,
+            ),
+            12.hSizedBox,
+            _filterToggleCard(
+              title: 'Watch and Act',
+              description: 'Conditions are changing - prepare now',
+              isEnabled: isAwsWatchAndAct,
+              onToggle: (value) {
+                filterProvider.updateAwsWatchAndAct(value);
+                widget.onFiltersUpdated?.call();
+              },
+              color: Colors.orange,
+              icon: Icons.visibility_rounded,
+            ),
+            12.hSizedBox,
+            _filterToggleCard(
+              title: 'Advice',
+              description: 'Stay informed and monitor conditions',
+              isEnabled: isAwsAdvice,
+              onToggle: (value) {
+                filterProvider.updateAwsAdvice(value);
+                widget.onFiltersUpdated?.call();
+              },
+              color: Colors.amber,
+              icon: Icons.info_outline_rounded,
             ),
           ],
         );
@@ -116,82 +217,248 @@ class _HazardFiltersBottomsheetContentState
     );
   }
 
-  Widget _severityFiltersBuilder() {
+  Widget _otherSourcesSection() {
     return Consumer(
       builder: (context, ref, child) {
-        final hasAwsSeverities = ref.watch(
-          providerOfHazardFilters(widget.filtersKey).select(
-            (value) => value.filters.severityFiltersAws.isNotEmpty,
-          ),
+        final isOfficialNonAws = ref.watch(
+          providerOfHazardFilters(
+            widget.filtersKey,
+          ).select((s) => s.isOfficialNonAws),
         );
-        final hasNonAwsSeverities = ref.watch(
-          providerOfHazardFilters(widget.filtersKey).select(
-            (value) => value.filters.severityFiltersNonAws.isNotEmpty,
+        final isUserReported = ref.watch(
+          providerOfHazardFilters(
+            widget.filtersKey,
+          ).select((s) => s.isUserReported),
+        );
+        final filterProvider = ref.read(
+          providerOfHazardFilters(widget.filtersKey).notifier,
+        );
+
+        return Column(
+          children: [
+            _filterToggleCard(
+              title: 'Official Non-AWS',
+              description: 'Official sources other than AWS',
+              isEnabled: isOfficialNonAws,
+              onToggle: (value) {
+                filterProvider.updateOfficialNonAws(value);
+                widget.onFiltersUpdated?.call();
+              },
+              color: Colors.blue,
+              icon: Icons.account_balance_rounded,
+            ),
+            12.hSizedBox,
+            _filterToggleCard(
+              title: 'User Reported',
+              description: 'Community and user submissions',
+              isEnabled: isUserReported,
+              onToggle: (value) {
+                filterProvider.updateUserReported(value);
+                widget.onFiltersUpdated?.call();
+              },
+              color: Colors.green,
+              icon: Icons.group_rounded,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _filterToggleCard({
+    required final String title,
+    required final String description,
+    required final bool isEnabled,
+    required final ValueChanged<bool> onToggle,
+    required final Color color,
+    final IconData? icon,
+  }) {
+    return GestureDetector(
+      onTap: () => onToggle(!isEnabled),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: EdgeInsets.all(18.spMin),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(
+            color: isEnabled
+                ? AppColors.black.withValues(alpha: 0.4)
+                : AppColors.transparent,
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+              spreadRadius: 1,
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                      height: 1.2,
+                    ),
+                  ),
+                  4.hSizedBox,
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 13.spMin,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.grey,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            _customToggleSwitch(
+              isEnabled: isEnabled,
+              onToggle: onToggle,
+              activeColor: AppColors.black,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _customToggleSwitch({
+    required bool isEnabled,
+    required ValueChanged<bool> onToggle,
+    required Color activeColor,
+  }) {
+    return GestureDetector(
+      onTap: () => onToggle(!isEnabled),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 48.w,
+        height: 26.h,
+        decoration: BoxDecoration(
+          color: isEnabled ? activeColor : Colors.grey.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(13.r),
+        ),
+        child: Stack(
+          children: [
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 200),
+              left: isEnabled ? 24.w : 2.w,
+              top: 2.h,
+              child: Container(
+                width: 22.w,
+                height: 22.h,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(11.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _categoriesSection() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final categoriesState = ref.watch(
+          providerOfMainCategories.select(
+            (value) => value.getMainCategoriesState,
           ),
         );
 
-        if (!hasAwsSeverities && !hasNonAwsSeverities) {
-          return const SizedBox.shrink();
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Severities',
-              style: TextStyle(
-                fontSize: 14.spMin,
-                fontWeight: FontWeight.w600,
-                color: AppColors.black,
-              ),
-            ).pL(20.0),
-            5.hSizedBox,
-            if (hasAwsSeverities)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    Text(
-                      'AWS:',
-                      style: TextStyle(
-                        fontSize: 12.spMin,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.grey,
+        return categoriesState.when(
+          initial: () => const SizedBox.shrink(),
+          loading: () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _sectionTitleBuilder('Categories'),
+              16.hSizedBox,
+              SizedBox(
+                height: 50.spMin,
+                child: Center(
+                  child: SizedBox(
+                    width: 20.spMin,
+                    height: 20.spMin,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.black,
                       ),
-                    ).pL(20.0).pR(10.0),
-                    HazardSeverityFiltersList(
-                      filtersKey: widget.filtersKey,
-                      isAws: true,
-                      separatorWidth: 5.0,
-                      onSeveritiesSelectionUpdated:
-                          widget.onSeveritiesSelectionUpdated,
                     ),
-                  ],
-                ),
-              ).pB(6.0),
-            if (hasNonAwsSeverities)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    Text(
-                      'Non-AWS:',
-                      style: TextStyle(
-                        fontSize: 12.spMin,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.grey,
-                      ),
-                    ).pL(20.0).pR(10.0),
-                    HazardSeverityFiltersList(
-                      filtersKey: widget.filtersKey,
-                      isAws: false,
-                      separatorWidth: 5.0,
-                      onSeveritiesSelectionUpdated:
-                          widget.onSeveritiesSelectionUpdated,
-                    ),
-                  ],
+                  ),
                 ),
               ),
-          ],
+            ],
+          ),
+          success: (cats) {
+            if (cats.isEmpty) return const SizedBox.shrink();
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _sectionTitleBuilder('Categories'),
+                12.hSizedBox,
+                ...cats.map((category) => _categoryToggleCard(category)),
+              ],
+            );
+          },
+          error: (error) => const SizedBox.shrink(),
+        );
+      },
+    );
+  }
+
+  Widget _categoryToggleCard(HazardCategory category) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isSelected = ref.watch(
+          providerOfHazardFilters(
+            widget.filtersKey,
+          ).select((s) => s.selectedCategoryIds.contains(category.id)),
+        );
+        final filterProvider = ref.read(
+          providerOfHazardFilters(widget.filtersKey).notifier,
+        );
+        final categoryColor = category.color ?? Colors.blue;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: 12.h),
+          child: _filterToggleCard(
+            title: category.name ?? 'Unknown Category',
+            description: category.description ?? 'Hazard category',
+            isEnabled: isSelected,
+            onToggle: (value) {
+              filterProvider.toggleCategory(category.id);
+              widget.onFiltersUpdated?.call();
+            },
+            color: categoryColor,
+          ),
         );
       },
     );

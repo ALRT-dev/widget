@@ -32,6 +32,7 @@ import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
+import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
 import 'package:hazard_app/features/shared/providers/user_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 
@@ -93,7 +94,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfMainSearch.select((value) => null));
     ref.watch(providerOfNotificationsFeed.select((value) => null));
     ref.watch(providerOfHazardFiltersForMap.select((value) => null));
-    ref.watch(providerOfHazardFiltersForDropdown.select((value) => null));
     ref.watch(providerOfHazardFiltersForSearch.select((value) => null));
     ref.watch(
       providerOfHazardFiltersForNotifications.select((value) => null),
@@ -102,6 +102,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfHazardSocketManager.select((value) => null));
     ref.watch(providerOfUserSocketManager.select((value) => null));
     ref.watch(providerOfManageNotifications.select((value) => null));
+    ref.watch(providerOfMainCategories.select((value) => null));
 
     _listenToHomeTabStateChanges();
     _listenToCreateReportState();
@@ -177,11 +178,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   void _onInit() {
     ref.read(providerOfHomeTab.notifier).state = widget.args.initialTab;
-
-    // fetch hazard categories for dropdowns
-    ref
-        .read(providerOfHazardFiltersForDropdown.notifier)
-        .getAllParentHazardCategories();
   }
 
   /// Listens to the message received from the push notification.

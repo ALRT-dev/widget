@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
-import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/models/hazard_severity_with_count_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -19,8 +17,7 @@ class HazardFiltersButton extends ConsumerStatefulWidget {
         offset: Offset(0, 0.0),
       ),
     ],
-    this.onCategoriesSelectionUpdated,
-    this.onSeveritiesSelectionUpdated,
+    this.onFiltersUpdated,
   });
 
   /// The key to identify the specific hazard filters instance.
@@ -29,12 +26,8 @@ class HazardFiltersButton extends ConsumerStatefulWidget {
   /// The box shadow to apply to the dropdown button.
   final List<BoxShadow> buttonShadow;
 
-  /// Callback when the selected categories are updated.
-  final void Function(List<HazardCategory>)? onCategoriesSelectionUpdated;
-
-  /// Callback when the selected severities are updated.
-  final void Function(List<HazardSeverityWithCount>)?
-  onSeveritiesSelectionUpdated;
+  /// Callback when the filters are updated.
+  final void Function()? onFiltersUpdated;
 
   @override
   ConsumerState<HazardFiltersButton> createState() =>
@@ -113,8 +106,7 @@ class _HazardFiltersButtonState extends ConsumerState<HazardFiltersButton> {
     showHazardFiltersBottomSheet(
       context: context,
       filtersKey: widget.filtersKey,
-      onCategoriesSelectionUpdated: widget.onCategoriesSelectionUpdated,
-      onSeveritiesSelectionUpdated: widget.onSeveritiesSelectionUpdated,
+      onFiltersUpdated: widget.onFiltersUpdated,
     );
   }
 }

@@ -13,7 +13,6 @@ import 'package:hazard_app/features/map/views/widgets/route_source_and_destinati
 import 'package:hazard_app/features/map/views/widgets/selected_location_preview.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
-import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -130,29 +129,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Widget _filtersButtonBuilder() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final isFiltersAvailable = ref.watch(
-          providerOfHazardFiltersForMap.select(
-            (value) => value.isFiltersAvailable,
-          ),
-        );
-        final isFilterSelected = ref.watch(
-          providerOfHazardFiltersForMap.select(
-            (value) => value.isFiltersSelected,
-          ),
-        );
-        if (!isFiltersAvailable && !isFilterSelected) {
-          return const SizedBox.shrink();
-        }
-
-        return HazardFiltersButton(
-          filtersKey: MapScreen.filtersKey,
-          onCategoriesSelectionUpdated: (_) => _getMapHazards(),
-          onSeveritiesSelectionUpdated: (_) => _getMapHazards(),
-        ).pL(10.0);
-      },
-    );
+    return HazardFiltersButton(
+      filtersKey: MapScreen.filtersKey,
+      onFiltersUpdated: () => _getMapHazards(),
+    ).pL(10.0);
   }
 
   Widget _viewListMapButtonBuilder({

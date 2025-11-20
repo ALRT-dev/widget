@@ -8,7 +8,6 @@ import 'package:hazard_app/features/notification/providers/states/notifications_
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
-import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -148,24 +147,11 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
   }
 
   Widget _filtersButtonBuilder() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final isFiltersAvailable = ref.watch(
-          providerOfHazardFiltersForNotifications.select(
-            (value) => value.isFiltersAvailable,
-          ),
-        );
-        if (!isFiltersAvailable) {
-          return const SizedBox.shrink();
-        }
-        return HazardFiltersButton(
-          filtersKey: NotificationsAppBar.filtersKey,
-          onCategoriesSelectionUpdated: (_) => _getHazards(),
-          onSeveritiesSelectionUpdated: (_) => _getHazards(),
-          buttonShadow: [],
-        ).pL(10.0);
-      },
-    );
+    return HazardFiltersButton(
+      filtersKey: NotificationsAppBar.filtersKey,
+      onFiltersUpdated: () => _getHazards(),
+      buttonShadow: [],
+    ).pL(10.0);
   }
 
   /// Updates the state with the given search string.

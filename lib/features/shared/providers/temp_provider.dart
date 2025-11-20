@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/shared/providers/states/temp_provider_state.dart';
 
-final providerOfTempProvider =
+final providerOfTemp =
     StateNotifierProvider.autoDispose<TempProvider, TempProviderState>(
       (ref) => TempProvider(
         ref: ref,
