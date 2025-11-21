@@ -48,6 +48,7 @@ class _CreateUpdateReportScreenState
     extends ConsumerState<CreateUpdateReportScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -62,6 +63,12 @@ class _CreateUpdateReportScreenState
         '';
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -107,6 +114,7 @@ class _CreateUpdateReportScreenState
 
   Widget _formBuilder() {
     return SingleChildScrollView(
+      controller: _scrollController,
       padding: EdgeInsets.all(20.spMin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +124,9 @@ class _CreateUpdateReportScreenState
             isRequired: true,
           ),
           10.hSizedBox,
-          CreateReportCategoriesList(),
+          CreateReportCategoriesList(
+            onCategorySelected: (_) => _scrollToEnd(),
+          ),
           24.hSizedBox,
           Consumer(
             builder: (context, ref, child) {
@@ -524,5 +534,19 @@ class _CreateUpdateReportScreenState
   /// Handles the action when user wants to submit another report.
   void _handleAnotherReport() {
     ref.read(providerOfCreateReport.notifier).updateReportSubmitted(false);
+  }
+
+  /// Scrolls to the end of the screen.
+  void _scrollToEnd() {
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (!mounted) return;
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 }

@@ -5,9 +5,16 @@ import 'package:hazard_app/features/report/providers/states/create_update_report
 import 'package:hazard_app/features/report/views/widgets/create_report_categories_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 
 class CreateReportCategoriesList extends ConsumerStatefulWidget {
-  const CreateReportCategoriesList({super.key});
+  const CreateReportCategoriesList({
+    super.key,
+    this.onCategorySelected,
+  });
+
+  /// Callback when a category is selected.
+  final void Function(HazardCategory)? onCategorySelected;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -91,6 +98,7 @@ class _CreateReportCategoriesListState
             final category = categories[index];
             return CreateReportCategoriesListItem(
               category: category,
+              onCategorySelected: widget.onCategorySelected,
             );
           },
           separatorBuilder: (context, index) => 12.hSizedBox,

@@ -11,10 +11,14 @@ class CreateReportCategoriesListItem extends ConsumerStatefulWidget {
   const CreateReportCategoriesListItem({
     super.key,
     required this.category,
+    this.onCategorySelected,
   });
 
   /// The category to display.
   final HazardCategory category;
+
+  /// Callback when the category is selected.
+  final void Function(HazardCategory)? onCategorySelected;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -102,5 +106,6 @@ class _CreateReportCategoriesListItemState
   /// Handles the selection of the category.
   void _handleSelection() {
     ref.read(providerOfCreateReport.notifier).updateCategory(widget.category);
+    widget.onCategorySelected?.call(widget.category);
   }
 }
