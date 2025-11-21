@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
@@ -40,6 +41,7 @@ class ViewHazardProvider extends StateNotifier<ViewHazardProviderState> {
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   MyHazardsProvider get _myHazardsProvider =>
       _ref.read(providerOfMyHazards.notifier);
+  MapProvider get _mapProvider => _ref.read(providerOfMap.notifier);
 
   /// Handles viewing the hazard.
   Future<void> viewHazard() async {
@@ -102,6 +104,9 @@ class ViewHazardProvider extends StateNotifier<ViewHazardProviderState> {
                 hazardsReportedCount: max(user.hazardsReportedCount - 1, 0),
               ),
             );
+
+        /// Remove the hazard from MapProvider
+        _mapProvider.removeFromHazards(_hazardId);
 
         // Remove the hazard from MyHazardsProvider
         _myHazardsProvider

@@ -88,7 +88,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           _overlayedContentsBuilder(),
           const MapHazardInfoWindow(),
           Positioned(
-            bottom: 20.spMin,
+            bottom: 10.spMin,
             right: 10.spMin,
             child: const CustomMyLocationButton(),
           ),

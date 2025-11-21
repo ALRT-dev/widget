@@ -1278,6 +1278,22 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
+  /// Removes a hazard by its [hazardId] from the state.
+  void removeFromHazards(final String hazardId) {
+    final updatedHazards = state.hazards
+        .where((hazard) => hazard.id != hazardId)
+        .toList();
+    updateHazards(updatedHazards);
+
+    // If the removed hazard was the selected one, clear selection
+    if (state.selectedHazard?.id == hazardId) {
+      updateSelectedHazard(null);
+    }
+
+    // Regenerate markers after removal
+    generateMarkers();
+  }
+
   /// Updates [MapProviderState.selectedHazard] to the given [hazard].
   void updateSelectedHazard(final Hazard? hazard) {
     state = state.copyWith(

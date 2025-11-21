@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
@@ -17,6 +18,7 @@ import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dar
 import 'package:hazard_app/features/shared/providers/states/view_hazard_provider_state.dart';
 import 'package:hazard_app/features/shared/providers/video_preview_lifecycle_provider.dart';
 import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
+import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/utils/open_link.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
@@ -150,6 +152,17 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             (value) => value.hazard?.isUserReported ?? false,
           ),
         );
+        final isMyReport = ref.watch(
+          provider.select(
+            (value) =>
+                value.hazard?.reportedBy?.id ==
+                ref.watch(
+                  providerOfLoggedInUser.select(
+                    (value) => value?.id,
+                  ),
+                ),
+          ),
+        );
 
         return SliverAppBar(
           pinned: true,
@@ -164,6 +177,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           actions: [
             if (isAwsCompliant) _buildPill('AWS'),
             if (!isUserReported) _buildBlueTick().pL(10.0),
+            if (isMyReport) _buildEditButton().pL(10.0),
+            if (isMyReport) _buildDeleteButton().pL(10.0),
             20.wSizedBox,
           ],
         );
@@ -186,6 +201,36 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         ),
         onPressed: () => context.pop(),
       ),
+    );
+  }
+
+  Widget _buildEditButton() {
+    return RoundButton(
+      icon: Icon(
+        Icons.edit_rounded,
+        color: AppColors.black,
+      ),
+      backgroundColor: AppColors.white,
+      borderSide: BorderSide(
+        color: AppColors.black,
+        width: 2,
+      ),
+      onPressed: _handleEditHazard,
+    );
+  }
+
+  Widget _buildDeleteButton() {
+    return RoundButton(
+      icon: Icon(
+        Icons.delete_outline_rounded,
+        color: AppColors.black,
+      ),
+      backgroundColor: AppColors.white,
+      borderSide: BorderSide(
+        color: AppColors.black,
+        width: 2,
+      ),
+      onPressed: _handleDeleteHazard,
     );
   }
 
@@ -1006,6 +1051,40 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   void _handleError(final AppError error) {
     context.showErrorToast(
       message: error.message,
+    );
+  }
+
+  /// Handle edit hazard action.
+  void _handleEditHazard() {
+    final isExpired = ref.read(
+      provider.select(
+        (value) => value.hazard?.isExpired == true,
+      ),
+    );
+    if (isExpired) {
+      context.showErrorToast(
+        message: 'Cannot edit an expired hazard report.',
+      );
+      return;
+    }
+
+    context.push(
+      CreateUpdateReportScreen.updateRoute,
+      extra: CreateUpdateReportScreenArgs(
+        hazardToUpdate: widget.args.hazard,
+      ),
+    );
+  }
+
+  /// Handle delete hazard action.
+  void _handleDeleteHazard() {
+    showConfirmationSheet(
+      context: context,
+      title: 'Delete Report',
+      description:
+          'Are you sure you want to delete this report? This action cannot be undone.',
+      onPressedConfirmAsync: (context, ref) =>
+          ref.read(provider.notifier).deleteHazard(),
     );
   }
 }

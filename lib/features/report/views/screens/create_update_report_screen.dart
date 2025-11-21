@@ -482,6 +482,7 @@ class _CreateUpdateReportScreenState
   /// Clears all the inputs and resets the state.
   void _clearAll() {
     context.unfocusInputs();
+    _titleController.clear();
     _descriptionController.clear();
     ref.read(providerOfCreateReport.notifier).resetAllFields();
   }
