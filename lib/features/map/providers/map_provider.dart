@@ -799,20 +799,34 @@ class MapProvider extends StateNotifier<MapProviderState> {
   /// Generates markers for all hazards in the state.
   void generateMarkers() async {
     final hazards = state.hazards;
+    final currentZoom = state.cameraPosition.zoom;
     final individualMarkers = <Marker>[];
+
+    // At low zoom levels (< 6.5), show small red dots instead of detailed icons
+    final useRedDotBitmap = currentZoom < 6.5;
+    final redDotBitmap = _hazardMarkerBitmapsProviderState.redDotBitmap;
 
     for (final hazard in hazards) {
       if (hazard.latitude == null || hazard.longitude == null) continue;
 
-      final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
-      final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(markerBitmaps);
+      BitmapDescriptor? bitmapDescriptor;
+      if (useRedDotBitmap && redDotBitmap != null) {
+        bitmapDescriptor = redDotBitmap;
+      } else {
+        final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
+        bitmapDescriptor = hazard.getMarkerBitmapDescriptor(markerBitmaps);
+      }
+
       individualMarkers.add(
         Marker(
           markerId: MarkerId(
             'hazard_${hazard.id ?? '${hazard.latitude},${hazard.longitude}'}',
           ),
           position: LatLng(hazard.latitude!, hazard.longitude!),
-          onTap: () => _onIndividualMarkerTap(hazard),
+          onTap: () => _onIndividualMarkerTap(
+            hazard: hazard,
+            isRedDot: useRedDotBitmap,
+          ),
           consumeTapEvents: true,
           icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
         ),
@@ -840,7 +854,19 @@ class MapProvider extends StateNotifier<MapProviderState> {
     updateMarkers(allMarkers);
   }
 
-  void _onIndividualMarkerTap(final Hazard hazard) {
+  void _onIndividualMarkerTap({
+    required final Hazard hazard,
+    final bool isRedDot = false,
+  }) {
+    if (isRedDot) {
+      // At low zoom levels, just zoom in closer to show detailed marker
+      animateTo(
+        position: LatLng(hazard.latitude!, hazard.longitude!),
+        zoom: 8.0,
+      );
+      return;
+    }
+
     updateSelectedHazard(hazard);
 
     // Calculate position with offset to create top padding effect
