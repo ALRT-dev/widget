@@ -2,8 +2,11 @@ import 'package:flutter/material.dart' hide DatePickerTheme;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/home/enums/home_tab_types.dart';
+import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_categories_list.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
@@ -152,7 +155,7 @@ class _CreateUpdateReportScreenState
         children: [
           Icon(
             Icons.check_circle_rounded,
-            color: AppColors.black,
+            color: AppColors.green,
             size: 80.spMin,
           ),
           10.hSizedBox,
@@ -174,6 +177,8 @@ class _CreateUpdateReportScreenState
           ),
           20.hSizedBox,
           _submitAnotherButtonBuilder(),
+          10.hSizedBox,
+          _seeActiveReportsButtonBuilder(),
         ],
       ).pX(20.0),
     );
@@ -368,11 +373,34 @@ class _CreateUpdateReportScreenState
         );
         if (isUpdating) return const SizedBox.shrink();
 
-        return Button.filled(
+        return Button.bordered(
           width: 300.0,
           value: 'Submit Another Report',
           icon: Icon(Icons.add_rounded),
           onPressed: _handleAnotherReport,
+        );
+      },
+    );
+  }
+
+  Widget _seeActiveReportsButtonBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isUpdating = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.hazardToCreateOrUpdate.id?.isNotEmpty ?? false,
+          ),
+        );
+        if (isUpdating) return const SizedBox.shrink();
+
+        return Button.bordered(
+          width: 300.0,
+          value: 'See My Active Reports',
+          icon: Icon(Icons.list_rounded),
+          onPressed: () {
+            ref.read(providerOfHomeTab.notifier).state = HomeTab.profile;
+            context.push(MyHazardsScreen.route);
+          },
         );
       },
     );
