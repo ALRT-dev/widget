@@ -254,6 +254,13 @@ class CreateReportProvider
     state = state.copyWith(medias: medias);
   }
 
+  /// Adds medias to [CreateUpdateReportProviderState.medias].
+  void addMedias(final List<AlrtMedia> medias) {
+    updateMedias(
+      [...state.medias, ...medias],
+    );
+  }
+
   /// Removes a media from [CreateUpdateReportProviderState.medias] with the given [mediaId].
   void removeMedia(final String mediaId) {
     updateMedias(

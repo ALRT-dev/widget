@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/views/widgets/confirmation_sheet_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_bottomsheet_content.dart';
+import 'package:hazard_app/features/shared/views/widgets/image_picker_bottomsheet.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 /// Displays a custom implementation of [showCupertinoModalPopup].
@@ -74,5 +76,15 @@ Future<void> showHazardFiltersBottomSheet({
       filtersKey: filtersKey,
       onFiltersUpdated: onFiltersUpdated,
     ),
+  );
+}
+
+/// Displays the image picker bottom sheet.
+Future<List<AlrtMedia>?> showImagePickerBottomSheet({
+  required final BuildContext context,
+}) {
+  return showCustomCupertinoModalPopup<List<AlrtMedia>?>(
+    context: context,
+    builder: (_) => ImagePickerBottomsheet(),
   );
 }
