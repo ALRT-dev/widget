@@ -8,6 +8,7 @@ import 'package:hazard_app/features/notification/providers/states/notifications_
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -49,6 +50,11 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
                 value.searchString.isNotEmpty ? true : value.hazards.isNotEmpty,
           ),
         );
+        final hasFiltersSelected = ref.watch(
+          providerOfHazardFiltersForNotifications.select(
+            (value) => value.hasFiltersSelected,
+          ),
+        );
         return SliverAppBar(
           backgroundColor: context.theme.scaffoldBackgroundColor,
           surfaceTintColor: AppColors.transparent,
@@ -63,7 +69,7 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
               color: AppColors.black,
             ),
           ),
-          bottom: !isHazardsPresent && !isHazardsLoading
+          bottom: !isHazardsPresent && !isHazardsLoading && !hasFiltersSelected
               ? PreferredSize(
                   preferredSize: Size.fromHeight(0),
                   child: Divider(

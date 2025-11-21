@@ -101,17 +101,19 @@ class NotificationsFeedProvider
         .selectedCategoryIds
         .toList();
     final isAwsEmergency = _ref
-        .read(providerOfHazardFiltersForMap)
+        .read(providerOfHazardFiltersForNotifications)
         .isAwsEmergency;
     final isAwsWatchAndAct = _ref
-        .read(providerOfHazardFiltersForMap)
+        .read(providerOfHazardFiltersForNotifications)
         .isAwsWatchAndAct;
-    final isAwsAdvice = _ref.read(providerOfHazardFiltersForMap).isAwsAdvice;
+    final isAwsAdvice = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .isAwsAdvice;
     final isOfficialNonAws = _ref
-        .read(providerOfHazardFiltersForMap)
+        .read(providerOfHazardFiltersForNotifications)
         .isOfficialNonAws;
     final isUserReported = _ref
-        .read(providerOfHazardFiltersForMap)
+        .read(providerOfHazardFiltersForNotifications)
         .isUserReported;
 
     final result = await _notificationService.getNotificationsFeedWithFilters(

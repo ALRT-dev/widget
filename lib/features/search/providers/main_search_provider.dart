@@ -75,17 +75,17 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         .selectedCategoryIds
         .toList();
     final isAwsEmergency = _ref
-        .read(providerOfHazardFiltersForMap)
+        .read(providerOfHazardFiltersForSearch)
         .isAwsEmergency;
     final isAwsWatchAndAct = _ref
-        .read(providerOfHazardFiltersForMap)
+        .read(providerOfHazardFiltersForSearch)
         .isAwsWatchAndAct;
-    final isAwsAdvice = _ref.read(providerOfHazardFiltersForMap).isAwsAdvice;
+    final isAwsAdvice = _ref.read(providerOfHazardFiltersForSearch).isAwsAdvice;
     final isOfficialNonAws = _ref
-        .read(providerOfHazardFiltersForMap)
+        .read(providerOfHazardFiltersForSearch)
         .isOfficialNonAws;
     final isUserReported = _ref
-        .read(providerOfHazardFiltersForMap)
+        .read(providerOfHazardFiltersForSearch)
         .isUserReported;
 
     final result = await _hazardService.getHazardsWithSubscriptionIdAndFilters(

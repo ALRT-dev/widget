@@ -32,9 +32,6 @@ abstract class Hazard with _$Hazard {
     /// The detailed description of the hazard.
     final String? description,
 
-    /// The short description of the hazard.
-    final String? shortDescription,
-
     /// The severity level of the hazard as per user input or source.
     final HazardSeverity? severity,
 

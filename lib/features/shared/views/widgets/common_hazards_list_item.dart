@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hazard_app/features/notification/views/widgets/trust_meter.dart';
+import 'package:hazard_app/features/notification/views/widgets/confirmation_buttons.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -96,7 +96,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
 
     return InkWell(
       onTap: widget.isInfoWindow ? null : _gotoViewHazard,
-      borderRadius: BorderRadius.circular(12.spMin),
+      borderRadius: BorderRadius.circular(14.spMin),
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
@@ -104,7 +104,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             width: 2.0,
           ),
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(12.spMin),
+          borderRadius: BorderRadius.circular(14.spMin),
           boxShadow: [
             BoxShadow(
               color: AppColors.black.withValues(alpha: 0.1),
@@ -129,34 +129,34 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               15.hSizedBox,
             ],
             Row(
-              crossAxisAlignment: !widget.isInfoWindow
-                  ? CrossAxisAlignment.start
-                  : CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _iconBuilder(),
                 12.wSizedBox,
                 Expanded(
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _titleBuilder(),
-                      4.hSizedBox,
-                      _dateAndDistanceBuilder(),
-                      if (!widget.isInfoWindow) ...[
-                        4.hSizedBox,
-                        _shortDescriptionBuilder(),
-                      ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _titleBuilder(),
+                            4.hSizedBox,
+                            _dateAndDistanceBuilder(),
+                          ],
+                        ),
+                      ),
+                      if (widget.hazard.isUserReported) _votesCountBuilder(),
                     ],
                   ),
                 ),
               ],
             ).pX(16.0).pT(16.0),
-            if (widget.isInfoWindow) ...[
-              8.hSizedBox,
-              _shortDescriptionBuilder().pX(16.0),
-            ],
+            8.hSizedBox,
+            _shortDescriptionBuilder().pX(16.0),
             14.hSizedBox,
-            if (widget.showTrustMeter && widget.hazard.source == null) ...[
+            if (widget.showTrustMeter && widget.hazard.isUserReported) ...[
               Padding(
                 padding: EdgeInsets.fromLTRB(
                   16.0.spMin,
@@ -164,7 +164,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   16.0.spMin,
                   16.0.spMin,
                 ),
-                child: _trustMeterBuilder(),
+                child: _confirmationButtonsBuilder(),
               ),
             ],
             if (widget.isInfoWindow) ...[
@@ -226,8 +226,8 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               decoration: BoxDecoration(
                 color: hazardColor,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10.spMin),
-                  topRight: Radius.circular(10.spMin),
+                  topLeft: Radius.circular(12.spMin),
+                  topRight: Radius.circular(12.spMin),
                 ),
                 border: hazardColor == AppColors.transparent
                     ? Border(
@@ -282,12 +282,25 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     ),
                   // Verification Badge
                   if (isVerified)
-                    Icon(
-                      Icons.verified_rounded,
-                      size: 20.spMin,
-                      color: hazardColor.isLight
-                          ? AppColors.blue
-                          : AppColors.white,
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppColors.white,
+                          ),
+                          child: Icon(
+                            Icons.verified_rounded,
+                            size: 20.spMin,
+                            color: hazardColor.isLight
+                                ? AppColors.blue
+                                : AppColors.white,
+                          ),
+                        ),
+                        if (widget.showCloseButton &&
+                            widget.onClosePressed != null)
+                          33.wSizedBox,
+                      ],
                     ),
                 ],
               ),
@@ -298,9 +311,14 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                 top: 0.0,
                 bottom: 0.0,
                 child: RoundButton(
+                  borderSide: BorderSide(
+                    color: AppColors.black,
+                    width: 1.5,
+                  ),
                   icon: Icon(
                     Icons.close_rounded,
                     size: 20.spMin,
+                    color: AppColors.black,
                   ),
                   size: 30.0,
                   backgroundColor: AppColors.white,
@@ -371,6 +389,52 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         );
+      },
+    );
+  }
+
+  Widget _votesCountBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final voteCount = ref.watch(
+          provider.select(
+            (value) => value.hazard!.voteCount,
+          ),
+        );
+        if (voteCount == 0) {
+          return const SizedBox.shrink();
+        }
+
+        return Container(
+          decoration: BoxDecoration(
+            color: voteCount > 0 ? AppColors.green : AppColors.red,
+            borderRadius: BorderRadius.circular(14.spMin),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 10.spMin,
+            vertical: 4.spMin,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                voteCount > 0
+                    ? Icons.thumb_up_alt_rounded
+                    : Icons.thumb_down_alt_rounded,
+                size: 14.spMin,
+                color: AppColors.white,
+              ),
+              4.wSizedBox,
+              Text(
+                '$voteCount',
+                style: TextStyle(
+                  fontSize: 12.spMin,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.white,
+                ),
+              ),
+            ],
+          ),
+        ).pL(5.0);
       },
     );
   }
@@ -458,7 +522,20 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
   Widget _shortDescriptionBuilder() {
     return Consumer(
       builder: (context, ref, child) {
+        final isUserReported = ref.watch(
+          provider.select(
+            (value) => value.hazard!.isUserReported,
+          ),
+        );
+
         final shortDescription = ref.watch(
+          provider.select(
+            (value) =>
+                '${value.hazard!.category?.name} alert reported near ${value.hazard!.locationName}.',
+          ),
+        );
+
+        final aiSummary = ref.watch(
           provider.select(
             (value) => value.hazard!.aiSummary?.trim(),
           ),
@@ -469,10 +546,15 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           ),
         );
 
-        final text = [
-          if (shortDescription?.isNotEmpty ?? false) shortDescription,
-          if (callToAction?.isNotEmpty ?? false) callToAction!,
-        ].join(' ');
+        final text = isUserReported
+            ? [
+                if (aiSummary?.isNotEmpty ?? false) aiSummary,
+                if (callToAction?.isNotEmpty ?? false) callToAction!,
+              ].join(' ')
+            : [
+                if (shortDescription.isNotEmpty) shortDescription,
+                if (callToAction?.isNotEmpty ?? false) callToAction!,
+              ].join(' ');
 
         if (text.isEmpty) {
           return const SizedBox.shrink();
@@ -489,7 +571,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     );
   }
 
-  Widget _trustMeterBuilder() {
+  Widget _confirmationButtonsBuilder() {
     return Consumer(
       builder: (context, ref, child) {
         final voteType = ref.watch(
@@ -502,11 +584,25 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           provider.select((value) => value.hazard!.isExpired),
         );
 
-        return TrustMeter(
-          updateOnPressed: !isExpired,
-          initialVoteType: voteType,
-          initialVoteCount: voteCount,
-          onVotePressed: _voteOnHazard,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 10.spMin,
+          children: [
+            Text(
+              'Is this alert still active?',
+              style: TextStyle(
+                fontSize: 14.spMin,
+                fontWeight: FontWeight.w600,
+                color: AppColors.black,
+              ),
+            ),
+            ConfirmationButtons(
+              updateOnPressed: !isExpired,
+              initialVoteType: voteType,
+              initialVoteCount: voteCount,
+              onVotePressed: _voteOnHazard,
+            ),
+          ],
         );
       },
     );
