@@ -48,6 +48,7 @@ class MyHazardsProvider extends StateNotifier<MyHazardsProviderState> {
       searchParams: HazardSearchParams(
         reportedById: _loggedInUser!.id,
         reviewStatus: HazardReviewStatus.accepted,
+        showExpired: true,
         sortSettings: [
           {SortCategory.createdAt: SortOrder.desc},
         ],

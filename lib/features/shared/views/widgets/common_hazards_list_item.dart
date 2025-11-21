@@ -473,6 +473,12 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             ? '${distance.toStringAsFixed(1)} m away'
             : '${(distance / 1000).toStringAsFixed(1)} km away';
 
+        final hasExpired = ref.watch(
+          provider.select(
+            (value) => value.hazard!.isExpired,
+          ),
+        );
+
         return Row(
           spacing: 8.spMin,
           children: [
@@ -482,14 +488,14 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   Icon(
                     Icons.access_time_outlined,
                     size: 14.spMin,
-                    color: AppColors.grey,
+                    color: hasExpired ? AppColors.red : AppColors.grey,
                   ),
                   4.wSizedBox,
                   Text(
-                    timeago.format(createdAt),
+                    hasExpired ? 'Expired' : timeago.format(createdAt),
                     style: TextStyle(
                       fontSize: 12.spMin,
-                      color: AppColors.grey,
+                      color: hasExpired ? AppColors.red : AppColors.grey,
                     ),
                   ),
                 ],
@@ -672,7 +678,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     final isExpired = ref.read(provider).hazard?.isExpired ?? false;
     if (isExpired) {
       context.showErrorToast(
-        message: 'Cannot vote on an expired hazard.',
+        message: 'Cannot confirm an expired alert.',
       );
       return;
     }

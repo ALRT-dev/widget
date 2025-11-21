@@ -1063,7 +1063,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
     if (isExpired) {
       context.showErrorToast(
-        message: 'Cannot edit an expired hazard report.',
+        message: 'Cannot edit an expired alert.',
       );
       return;
     }
