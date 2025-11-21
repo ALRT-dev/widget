@@ -75,7 +75,7 @@ class _MapHazardInfoWindowState extends ConsumerState<MapHazardInfoWindow> {
 
         // Position InfoWindow above the marker
         // Position above marker (adjust this value as needed)
-        final infoWindowTop = markerY - 180 - previewHalfHeight;
+        final infoWindowTop = markerY - 190 - previewHalfHeight;
         final infoWindowLeft =
             markerX -
             ((context.screenSize.width - 40) /
