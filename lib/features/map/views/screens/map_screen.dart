@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/views/widgets/custom_my_location_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_hazard_info_window.dart';
 import 'package:hazard_app/features/map/views/widgets/map_hazards_list.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
@@ -65,7 +66,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
             ),
             myLocationEnabled: true,
-            myLocationButtonEnabled: true,
+            myLocationButtonEnabled: false,
             compassEnabled: false,
             zoomControlsEnabled: false,
             buildingsEnabled: ref.watch(
@@ -86,6 +87,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
           _overlayedContentsBuilder(),
           const MapHazardInfoWindow(),
+          Positioned(
+            bottom: 20.spMin,
+            right: 10.spMin,
+            child: const CustomMyLocationButton(),
+          ),
           Positioned(
             bottom: 10.spMin,
             left: 0.0,
