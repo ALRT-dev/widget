@@ -127,11 +127,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         (value) => value?.email,
                       ),
                     );
-                    final userLocation = ref.watch(
-                      providerOfLoggedInUser.select(
-                        (value) => value?.locationName,
-                      ),
-                    );
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -148,26 +143,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               color: AppColors.black.withValues(alpha: 0.8),
                               fontWeight: FontWeight.w500,
                             ),
-                          ),
-                        if (userLocation != null) 6.hSizedBox,
-                        if (userLocation != null)
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                size: 13.spMin,
-                                color: AppColors.black.withValues(alpha: 0.8),
-                              ),
-                              3.wSizedBox,
-                              Text(
-                                userLocation,
-                                style: TextStyle(
-                                  fontSize: 12.spMin,
-                                  color: AppColors.black,
-                                ),
-                              ),
-                            ],
                           ),
                       ],
                     );
