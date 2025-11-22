@@ -5,10 +5,7 @@ import 'package:hazard_app/features/shared/providers/states/main_categories_prov
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 
 final providerOfMainCategories =
-    StateNotifierProvider.autoDispose<
-      MainCategoriesProvider,
-      MainCategoriesProviderState
-    >(
+    StateNotifierProvider<MainCategoriesProvider, MainCategoriesProviderState>(
       (ref) => MainCategoriesProvider(
         ref: ref,
         initialState: MainCategoriesProviderState(),
@@ -21,9 +18,7 @@ class MainCategoriesProvider
     required final Ref ref,
     required final MainCategoriesProviderState initialState,
   }) : _ref = ref,
-       super(initialState) {
-    getAllMainHazardCategories();
-  }
+       super(initialState);
 
   final Ref _ref;
   HazardService get _hazardService => _ref.read(providerOfHazardService);

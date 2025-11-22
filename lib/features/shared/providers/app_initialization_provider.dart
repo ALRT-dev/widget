@@ -4,6 +4,7 @@ import 'package:hazard_app/features/map/providers/hazard_markers_bitmaps_provide
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/shared/providers/instance_providers.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
+import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -36,6 +37,7 @@ class AppInitializationProvider extends Notifier<bool> {
     await Future.wait([
       _getCurrentUserLocation(),
       _generateMarkerBitmaps(),
+      _initializeMainCategories(),
     ]);
     if (!ref.mounted) return;
 
@@ -77,5 +79,11 @@ class AppInitializationProvider extends Notifier<bool> {
     return ref
         .read(providerOfHazardMarkerBitmaps.notifier)
         .generateMarkerBitmaps();
+  }
+
+  Future<void> _initializeMainCategories() {
+    return ref
+        .read(providerOfMainCategories.notifier)
+        .getAllMainHazardCategories();
   }
 }
