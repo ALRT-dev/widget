@@ -53,6 +53,20 @@ class HazardService {
     required final HazardSearchParams searchParams,
     final CancelToken? cancelToken,
   }) async {
+    // If no category IDs are provided, return an empty list immediately.
+    if (searchParams.categoryIds.isEmpty) {
+      return Success(<Hazard>[]);
+    }
+
+    // If all hazard source filters are false, return an empty list immediately.
+    if (!searchParams.awsEmergency &&
+        !searchParams.awsWatchAndAct &&
+        !searchParams.awsAdvice &&
+        !searchParams.officialNonAws &&
+        !searchParams.userReported) {
+      return Success(<Hazard>[]);
+    }
+
     final allHazards = <Hazard>[];
     final pageSize = searchParams.pageSize;
     int currentPage = searchParams.page;

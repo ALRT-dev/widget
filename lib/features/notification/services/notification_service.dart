@@ -25,6 +25,20 @@ class NotificationService {
   Future<Either<List<Hazard>, AppError>> getNotificationsFeed({
     final HazardSearchParams? searchParams,
   }) async {
+    // If no category IDs are provided, return an empty list immediately.
+    if (searchParams?.categoryIds.isEmpty ?? true) {
+      return Success(<Hazard>[]);
+    }
+
+    // If all hazard source filters are false, return an empty list immediately.
+    if (!(searchParams?.awsEmergency ?? false) &&
+        !(searchParams?.awsWatchAndAct ?? false) &&
+        !(searchParams?.awsAdvice ?? false) &&
+        !(searchParams?.officialNonAws ?? false) &&
+        !(searchParams?.userReported ?? false)) {
+      return Success(<Hazard>[]);
+    }
+
     final result = await _notificationRepository.getNotificationsFeed(
       searchParams: searchParams,
     );

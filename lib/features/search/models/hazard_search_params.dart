@@ -57,7 +57,7 @@ abstract class HazardSearchParams with _$HazardSearchParams {
     @Default(
       <Map<SortCategory, SortOrder>>[
         // More severe hazards first
-        {SortCategory.severity: SortOrder.desc},
+        {SortCategory.severityBand: SortOrder.desc},
 
         // Then, closer hazards first
         {SortCategory.distance: SortOrder.asc},

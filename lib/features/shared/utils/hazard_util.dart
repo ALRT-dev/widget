@@ -8,7 +8,7 @@ class HazardUtil {
   /// Sorts a list of hazards based on the provided sort settings.
   ///
   /// This method supports multi-level sorting with the following categories:
-  /// - [SortCategory.severity]: Sort by severity band (critical > action > monitor > info)
+  /// - [SortCategory.severityBand]: Sort by severity band (critical > action > monitor > info)
   /// - [SortCategory.distance]: Sort by distance from user's current location
   /// - [SortCategory.createdAt]: Sort by creation date
   /// - [SortCategory.confidenceScore]: Sort by AI confidence score
@@ -102,7 +102,7 @@ class HazardUtil {
       int result;
 
       switch (category) {
-        case SortCategory.severity:
+        case SortCategory.severityBand:
           final aSeverity = severityOrder[a.severityBand] ?? -1;
           final bSeverity = severityOrder[b.severityBand] ?? -1;
           result = aSeverity.compareTo(bSeverity);

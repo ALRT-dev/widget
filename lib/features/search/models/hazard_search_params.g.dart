@@ -43,7 +43,7 @@ _HazardSearchParams _$HazardSearchParamsFromJson(Map<String, dynamic> json) =>
               )
               .toList() ??
           const <Map<SortCategory, SortOrder>>[
-            {SortCategory.severity: SortOrder.desc},
+            {SortCategory.severityBand: SortOrder.desc},
             {SortCategory.distance: SortOrder.asc},
             {SortCategory.createdAt: SortOrder.desc},
             {SortCategory.confidenceScore: SortOrder.desc},
@@ -89,7 +89,7 @@ const _$HazardReviewStatusEnumMap = {
 const _$SortOrderEnumMap = {SortOrder.asc: 'asc', SortOrder.desc: 'desc'};
 
 const _$SortCategoryEnumMap = {
-  SortCategory.severity: 'severity',
+  SortCategory.severityBand: 'severityBand',
   SortCategory.distance: 'distance',
   SortCategory.createdAt: 'createdAt',
   SortCategory.confidenceScore: 'confidenceScore',
