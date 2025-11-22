@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_maps_cluster_manager_2/google_maps_cluster_manager_2.dart'
     as cluster_manager;
@@ -13,6 +14,9 @@ part 'map_provider_state.freezed.dart';
 @freezed
 abstract class MapProviderState with _$MapProviderState {
   const factory MapProviderState({
+    /// The cancel token for fetching map hazards.
+    required final CancelToken getMapHazardsCancelToken,
+
     /// The list of hazards displayed on the map.
     @Default(<Hazard>[]) final List<Hazard> hazards,
 

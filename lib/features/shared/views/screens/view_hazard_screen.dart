@@ -175,7 +175,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             child: _buildBackButton().pB(7.0),
           ),
           actions: [
-            if (isAwsCompliant) _buildPill('AWS'),
+            if (!isUserReported)
+              _buildPill(isAwsCompliant ? 'AWS' : 'Official'),
             if (!isUserReported) _buildBlueTick().pL(10.0),
             if (isMyReport) _buildEditButton().pL(10.0),
             if (isMyReport) _buildDeleteButton().pL(10.0),
