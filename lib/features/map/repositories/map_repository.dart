@@ -259,31 +259,36 @@ class MapRepositoryImpl implements MapRepository {
 
         if (getSubUrbOnly) {
           // Extract general area (suburb/locality) from address components
-          final addressComponents =
-              response.data['results'][0]['address_components'] as List?;
-          if (addressComponents != null) {
-            String? suburb;
-            String? locality;
-            String? administrativeArea;
+          final results = response.data['results'] as List?;
 
-            for (final component in addressComponents) {
-              final types = component['types'] as List?;
-              if (types != null) {
-                if (types.contains('sublocality') ||
-                    types.contains('sublocality_level_1')) {
-                  suburb = component['long_name'];
-                } else if (types.contains('locality')) {
-                  locality = component['long_name'];
-                } else if (types.contains('administrative_area_level_1')) {
-                  administrativeArea = component['long_name'];
+          if (results?.isNotEmpty ?? false) {
+            final addressComponents =
+                results![results.length == 1 ? 0 : 1]['address_components']
+                    as List?;
+            if (addressComponents != null) {
+              String? suburb;
+              String? locality;
+              String? administrativeArea;
+
+              for (final component in addressComponents) {
+                final types = component['types'] as List?;
+                if (types != null) {
+                  if (types.contains('sublocality') ||
+                      types.contains('sublocality_level_1')) {
+                    suburb = component['long_name'];
+                  } else if (types.contains('locality')) {
+                    locality = component['long_name'];
+                  } else if (types.contains('administrative_area_level_1')) {
+                    administrativeArea = component['long_name'];
+                  }
                 }
               }
-            }
 
-            // Return the most specific area available
-            final generalArea = suburb ?? locality ?? administrativeArea;
-            if (generalArea != null) {
-              return Success(generalArea);
+              // Return the most specific area available
+              final generalArea = suburb ?? locality ?? administrativeArea;
+              if (generalArea != null) {
+                return Success(generalArea);
+              }
             }
           }
         }
