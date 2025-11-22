@@ -100,43 +100,41 @@ class NotificationsFeedProvider
         .read(providerOfHazardFiltersForNotifications)
         .selectedCategoryIds
         .toList();
-    final isAwsEmergency = _ref
+    final awsEmergency = _ref
         .read(providerOfHazardFiltersForNotifications)
-        .isAwsEmergency;
-    final isAwsWatchAndAct = _ref
+        .awsEmergency;
+    final awsWatchAndAct = _ref
         .read(providerOfHazardFiltersForNotifications)
-        .isAwsWatchAndAct;
-    final isAwsAdvice = _ref
+        .awsWatchAndAct;
+    final awsAdvice = _ref
         .read(providerOfHazardFiltersForNotifications)
-        .isAwsAdvice;
-    final isOfficialNonAws = _ref
+        .awsAdvice;
+    final officialNonAws = _ref
         .read(providerOfHazardFiltersForNotifications)
-        .isOfficialNonAws;
-    final isUserReported = _ref
+        .officialNonAws;
+    final userReported = _ref
         .read(providerOfHazardFiltersForNotifications)
-        .isUserReported;
+        .userReported;
 
-    final result = await _notificationService.getNotificationsFeedWithFilters(
+    final result = await _notificationService.getNotificationsFeed(
       searchParams: HazardSearchParams(
         searchString: state.searchString,
         categoryIds: selectedCategoryIds,
-        awsEmergency: isAwsEmergency,
-        awsWatchAndAct: isAwsWatchAndAct,
-        awsAdvice: isAwsAdvice,
-        officialNonAws: isOfficialNonAws,
-        userReported: isUserReported,
+        awsEmergency: awsEmergency,
+        awsWatchAndAct: awsWatchAndAct,
+        awsAdvice: awsAdvice,
+        officialNonAws: officialNonAws,
+        userReported: userReported,
       ),
     );
     if (!mounted) return;
 
     result.when(
-      (response) {
+      (hazards) {
         state = state.copyWith(
-          getNotificationsFeed: GetNotificationsFeed.success(
-            response.$1,
-          ),
+          getNotificationsFeed: GetNotificationsFeed.success(hazards),
         );
-        updateHazards(response.$1);
+        updateHazards(hazards);
       },
       (error) {
         state = state.copyWith(

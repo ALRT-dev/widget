@@ -420,14 +420,14 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<HttpResponse<dynamic>> updatePushNotificationSettings({
-    required List<PushNotificationUpdateInput> updates,
+  Future<PushNotificationSettings> updatePushNotificationSettings({
+    required PushNotificationSettings pushNotificationSettings,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = {'updates': updates};
-    final _options = _setStreamType<HttpResponse<dynamic>>(
+    final _data = pushNotificationSettings;
+    final _options = _setStreamType<PushNotificationSettings>(
       Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -437,10 +437,15 @@ class _RestClient implements RestClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch(_options);
-    final _value = _result.data;
-    final httpResponse = HttpResponse(_value, _result);
-    return httpResponse;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late PushNotificationSettings _value;
+    try {
+      _value = PushNotificationSettings.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -501,42 +506,6 @@ class _RestClient implements RestClient {
     late GetHazardsWithSubscriptionIdResponse _value;
     try {
       _value = GetHazardsWithSubscriptionIdResponse.fromJson(_result.data!);
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    return _value;
-  }
-
-  @override
-  Future<HazardFilters> getHazardFilters({
-    required HazardSearchParams searchParams,
-    bool includeSubscribed = false,
-    CancelToken? cancelToken,
-  }) async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{
-      r'includeSubscribed': includeSubscribed,
-    };
-    queryParameters.addAll(searchParams.toJson());
-    queryParameters.removeWhere((k, v) => v == null);
-    final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<HazardFilters>(
-      Options(method: 'GET', headers: _headers, extra: _extra)
-          .compose(
-            _dio.options,
-            '/hazards/filters',
-            queryParameters: queryParameters,
-            data: _data,
-            cancelToken: cancelToken,
-          )
-          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
-    );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late HazardFilters _value;
-    try {
-      _value = HazardFilters.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

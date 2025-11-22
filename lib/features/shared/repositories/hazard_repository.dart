@@ -7,7 +7,6 @@ import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/models/hazard_filters.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
@@ -23,12 +22,6 @@ abstract class HazardRepository {
   Future<Either<GetHazardsWithSubscriptionIdResponse, AppError>>
   getGetHazardsWithSubscriptionId({
     required final HazardSearchParams searchParams,
-  });
-
-  Future<Either<HazardFilters, AppError>> getHazardFilters({
-    required final HazardSearchParams searchParams,
-    final bool includeSubscribed = false,
-    final CancelToken? cancelToken,
   });
 
   Future<Either<List<HazardCategory>, AppError>> getAllHazardCategories();
@@ -97,26 +90,6 @@ class HazardRepositoryImpl extends HazardRepository {
       future: () async {
         final result = await _restClient.getGetHazardsWithSubscriptionId(
           searchParams: searchParams,
-        );
-        return Success(result);
-      },
-      onError: Failure.new,
-    );
-  }
-
-  @override
-  Future<Either<HazardFilters, AppError>> getHazardFilters({
-    required HazardSearchParams searchParams,
-    bool includeSubscribed = false,
-    final CancelToken? cancelToken,
-  }) {
-    return runAsyncCall(
-      name: 'getHazardFilters',
-      future: () async {
-        final result = await _restClient.getHazardFilters(
-          searchParams: searchParams,
-          includeSubscribed: includeSubscribed,
-          cancelToken: cancelToken,
         );
         return Success(result);
       },

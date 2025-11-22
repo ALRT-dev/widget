@@ -155,20 +155,20 @@ class _HazardFiltersBottomsheetContentState
   Widget _awsEmergencySection() {
     return Consumer(
       builder: (context, ref, child) {
-        final isAwsEmergency = ref.watch(
+        final awsEmergency = ref.watch(
           providerOfHazardFilters(
             widget.filtersKey,
-          ).select((s) => s.isAwsEmergency),
+          ).select((s) => s.awsEmergency),
         );
-        final isAwsWatchAndAct = ref.watch(
+        final awsWatchAndAct = ref.watch(
           providerOfHazardFilters(
             widget.filtersKey,
-          ).select((s) => s.isAwsWatchAndAct),
+          ).select((s) => s.awsWatchAndAct),
         );
-        final isAwsAdvice = ref.watch(
+        final awsAdvice = ref.watch(
           providerOfHazardFilters(
             widget.filtersKey,
-          ).select((s) => s.isAwsAdvice),
+          ).select((s) => s.awsAdvice),
         );
         final filterProvider = ref.read(
           providerOfHazardFilters(widget.filtersKey).notifier,
@@ -179,7 +179,7 @@ class _HazardFiltersBottomsheetContentState
             _filterToggleCard(
               title: 'Emergency',
               description: 'Immediate threat to life and property',
-              isEnabled: isAwsEmergency,
+              isEnabled: awsEmergency,
               onToggle: (value) {
                 filterProvider.updateAwsEmergency(value);
                 widget.onFiltersUpdated?.call();
@@ -191,7 +191,7 @@ class _HazardFiltersBottomsheetContentState
             _filterToggleCard(
               title: 'Watch and Act',
               description: 'Conditions are changing - prepare now',
-              isEnabled: isAwsWatchAndAct,
+              isEnabled: awsWatchAndAct,
               onToggle: (value) {
                 filterProvider.updateAwsWatchAndAct(value);
                 widget.onFiltersUpdated?.call();
@@ -203,7 +203,7 @@ class _HazardFiltersBottomsheetContentState
             _filterToggleCard(
               title: 'Advice',
               description: 'Stay informed and monitor conditions',
-              isEnabled: isAwsAdvice,
+              isEnabled: awsAdvice,
               onToggle: (value) {
                 filterProvider.updateAwsAdvice(value);
                 widget.onFiltersUpdated?.call();
@@ -220,15 +220,15 @@ class _HazardFiltersBottomsheetContentState
   Widget _otherSourcesSection() {
     return Consumer(
       builder: (context, ref, child) {
-        final isOfficialNonAws = ref.watch(
+        final officialNonAws = ref.watch(
           providerOfHazardFilters(
             widget.filtersKey,
-          ).select((s) => s.isOfficialNonAws),
+          ).select((s) => s.officialNonAws),
         );
         final isUserReported = ref.watch(
           providerOfHazardFilters(
             widget.filtersKey,
-          ).select((s) => s.isUserReported),
+          ).select((s) => s.userReported),
         );
         final filterProvider = ref.read(
           providerOfHazardFilters(widget.filtersKey).notifier,
@@ -239,7 +239,7 @@ class _HazardFiltersBottomsheetContentState
             _filterToggleCard(
               title: 'Official Non-AWS',
               description: 'Official sources other than AWS',
-              isEnabled: isOfficialNonAws,
+              isEnabled: officialNonAws,
               onToggle: (value) {
                 filterProvider.updateOfficialNonAws(value);
                 widget.onFiltersUpdated?.call();

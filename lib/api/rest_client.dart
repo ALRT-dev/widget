@@ -5,11 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:hazard_app/api/endpoints.dart';
 import 'package:hazard_app/features/auth/models/auth_success_model.dart';
 import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
-import 'package:hazard_app/features/notification/models/push_notification_update_input_model.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/models/hazard_filters.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
@@ -102,8 +100,8 @@ abstract class RestClient {
   Future<PushNotificationSettings> getPushNotificationSettings();
 
   @PUT(kUrlPushNotificationSettings)
-  Future<HttpResponse> updatePushNotificationSettings({
-    @Field() required final List<PushNotificationUpdateInput> updates,
+  Future<PushNotificationSettings> updatePushNotificationSettings({
+    @Body() required final PushNotificationSettings pushNotificationSettings,
   });
 
   // ---------------------------- HAZARD ----------------------------
@@ -117,13 +115,6 @@ abstract class RestClient {
   @GET(kUrlHazardsWithSubscriptionId)
   Future<GetHazardsWithSubscriptionIdResponse> getGetHazardsWithSubscriptionId({
     @Queries() required final HazardSearchParams searchParams,
-  });
-
-  @GET(kUrlHazardFilters)
-  Future<HazardFilters> getHazardFilters({
-    @Queries() required final HazardSearchParams searchParams,
-    @Query('includeSubscribed') final bool includeSubscribed = false,
-    @CancelRequest() final CancelToken? cancelToken,
   });
 
   @GET(kUrlHazardCategories)

@@ -33,7 +33,6 @@ const kUrlPushNotificationSettings = '$kUrlUser/push-notification-settings';
 const kUrlHazards = '/hazards';
 const kUrlHazardsWithSubscriptionId =
     '$kUrlHazards/hazards-with-subscription-id';
-const kUrlHazardFilters = '$kUrlHazards/filters';
 const kUrlHazardCategories = '/hazard-categories';
 const kUrlHazardCategoriesParent = '$kUrlHazardCategories/parent';
 const kUrlHazardCategoriesSub = '$kUrlHazardCategories/sub';

@@ -123,11 +123,12 @@ class UserService {
   }
 
   /// Updates the push notification settings of the current user.
-  Future<Either<void, AppError>> updatePushNotificationSettings({
-    required final PushNotificationSettings settings,
+  Future<Either<PushNotificationSettings, AppError>>
+  updatePushNotificationSettings({
+    required final PushNotificationSettings pushNotificationSettings,
   }) {
     return _userRepository.updatePushNotificationSettings(
-      updates: settings.toUpdates(),
+      pushNotificationSettings: pushNotificationSettings,
     );
   }
 

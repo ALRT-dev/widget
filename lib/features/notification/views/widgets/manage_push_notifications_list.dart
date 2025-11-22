@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/notification/providers/manage_notifications_provider.dart';
-import 'package:hazard_app/features/notification/providers/states/manage_notifications_provider_state.dart';
-import 'package:hazard_app/features/notification/views/widgets/manage_push_notifications_list_item.dart';
-import 'package:hazard_app/features/shared/models/error_model.dart';
-import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
+import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
+import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/states/main_categories_provider_state.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class ManagePushNotificationsList extends ConsumerStatefulWidget {
@@ -19,102 +21,348 @@ class _ManagePushNotificationsListState
     extends ConsumerState<ManagePushNotificationsList> {
   @override
   Widget build(BuildContext context) {
-    final getPushNotificationSettingsState = ref.watch(
-      providerOfManageNotifications.select(
-        (value) => value.getPushNotificationSettingsState,
-      ),
-    );
-
-    return getPushNotificationSettingsState.maybeWhen(
-      loading: _loadingBuilder,
-      error: _errorBuilder,
-      success: (_) => _dataBuilder(),
-      orElse: () => const SizedBox.shrink(),
-    );
+    return _filtersContentBuilder();
   }
 
-  Widget _loadingBuilder() {
-    return Spinner();
-  }
-
-  Widget _errorBuilder(final AppError error) {
-    return Center(
-      child: Text(
-        'An error occurred. Please try again later.',
-        style: Theme.of(context).textTheme.bodyMedium,
-      ),
+  Widget _filtersContentBuilder() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          16.hSizedBox,
+          _awsEmergencySection(),
+          12.hSizedBox,
+          _otherSourcesSection(),
+          24.hSizedBox,
+          _categoriesSection(),
+          24.hSizedBox,
+        ],
+      ).pX(20.0),
     );
   }
 
-  Widget _dataBuilder() {
+  Widget _sectionTitleBuilder(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 3,
+          height: 16.spMin,
+          decoration: BoxDecoration(
+            color: AppColors.black,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        8.wSizedBox,
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16.spMin,
+            fontWeight: FontWeight.w600,
+            color: AppColors.black,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _awsEmergencySection() {
     return Consumer(
       builder: (context, ref, child) {
-        final serverityPushNotificationSettings = ref.watch(
+        final awsEmergency = ref.watch(
           providerOfManageNotifications.select(
-            (value) => value.pushNotificationSettings.severity,
+            (s) => s.pushNotificationSettings.awsEmergency,
           ),
         );
-        return ListView(
+        final awsWatchAndAct = ref.watch(
+          providerOfManageNotifications.select(
+            (s) => s.pushNotificationSettings.awsWatchAndAct,
+          ),
+        );
+        final awsAdvice = ref.watch(
+          providerOfManageNotifications.select(
+            (s) => s.pushNotificationSettings.awsAdvice,
+          ),
+        );
+        final filterProvider = ref.read(
+          providerOfManageNotifications.notifier,
+        );
+
+        return Column(
           children: [
-            ManagePushNotificationsListItem(
-              title: 'Emergency Warning',
-              subtitle: 'Immediate life-threatening situations',
-              color: AppColors.red,
-              emoji: '🔴',
-              isEnabled: serverityPushNotificationSettings.emergency,
-              onToggle: ref
-                  .read(providerOfManageNotifications.notifier)
-                  .updateIsEmergencyEnabled,
+            _filterToggleCard(
+              title: 'Emergency',
+              description: 'Immediate threat to life and property',
+              isEnabled: awsEmergency,
+              onToggle: (value) {
+                filterProvider.updateAwsEmergency(value);
+              },
+              color: Colors.red,
+              icon: Icons.warning_rounded,
             ),
-            ManagePushNotificationsListItem(
-              title: 'Watch & Act',
-              subtitle: 'Conditions are changing, stay alert',
-              color: AppColors.orange,
-              emoji: '🟠',
-              isEnabled: serverityPushNotificationSettings.watchAndAct,
-              onToggle: ref
-                  .read(providerOfManageNotifications.notifier)
-                  .updateIsWatchAndActEnabled,
+            12.hSizedBox,
+            _filterToggleCard(
+              title: 'Watch and Act',
+              description: 'Conditions are changing - prepare now',
+              isEnabled: awsWatchAndAct,
+              onToggle: (value) {
+                filterProvider.updateAwsWatchAndAct(value);
+              },
+              color: Colors.orange,
+              icon: Icons.visibility_rounded,
             ),
-            ManagePushNotificationsListItem(
+            12.hSizedBox,
+            _filterToggleCard(
               title: 'Advice',
-              subtitle: 'General information and updates',
-              color: AppColors.yellow,
-              isEnabled: serverityPushNotificationSettings.advice,
-              emoji: '🟡',
-              onToggle: ref
-                  .read(providerOfManageNotifications.notifier)
-                  .updateIsAdviceEnabled,
+              description: 'Stay informed and monitor conditions',
+              isEnabled: awsAdvice,
+              onToggle: (value) {
+                filterProvider.updateAwsAdvice(value);
+              },
+              color: Colors.amber,
+              icon: Icons.info_outline_rounded,
             ),
-            ManagePushNotificationsListItem(
-              title: 'Information',
-              subtitle: 'Non-urgent informational updates',
-              color: AppColors.blue,
-              emoji: '🔵',
-              isEnabled: serverityPushNotificationSettings.info,
-              onToggle: ref
-                  .read(providerOfManageNotifications.notifier)
-                  .updateIsInfoEnabled,
-            ),
-            // ManagePushNotificationsListItem(
-            //   title: 'Crowd Alert (Unconfirmed)',
-            //   subtitle: 'User-reported incidents awaiting verification',
-            //   color: AppColors.grey,
-            //   emoji: '⚪',
-            // ),
-            // ManagePushNotificationsListItem(
-            //   title: 'Crowd Alert (Emerging)',
-            //   subtitle: 'Reports under investigation',
-            //   color: Colors.brown,
-            //   emoji: '🟤',
-            // ),
-            // ManagePushNotificationsListItem(
-            //   title: 'Crowd Alert (Verified)',
-            //   subtitle: 'Confirmed community-reported incidents',
-            //   color: AppColors.green,
-            //   emoji: '🟢',
-            // ),
           ],
+        );
+      },
+    );
+  }
+
+  Widget _otherSourcesSection() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final officialNonAws = ref.watch(
+          providerOfManageNotifications.select(
+            (s) => s.pushNotificationSettings.officialNonAws,
+          ),
+        );
+        final isUserReported = ref.watch(
+          providerOfManageNotifications.select(
+            (s) => s.pushNotificationSettings.userReported,
+          ),
+        );
+
+        return Column(
+          children: [
+            _filterToggleCard(
+              title: 'Official Non-AWS',
+              description: 'Official sources other than AWS',
+              isEnabled: officialNonAws,
+              onToggle: (value) {
+                ref
+                    .read(providerOfManageNotifications.notifier)
+                    .updateOfficialNonAws(value);
+              },
+              color: Colors.blue,
+              icon: Icons.account_balance_rounded,
+            ),
+            12.hSizedBox,
+            _filterToggleCard(
+              title: 'User Reported',
+              description: 'Community and user submissions',
+              isEnabled: isUserReported,
+              onToggle: (value) {
+                ref
+                    .read(providerOfManageNotifications.notifier)
+                    .updateUserReported(value);
+              },
+              color: Colors.green,
+              icon: Icons.group_rounded,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _filterToggleCard({
+    required final String title,
+    required final String description,
+    required final bool isEnabled,
+    required final ValueChanged<bool> onToggle,
+    required final Color color,
+    final IconData? icon,
+  }) {
+    return GestureDetector(
+      onTap: () => onToggle(!isEnabled),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: EdgeInsets.all(18.spMin),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+              spreadRadius: 1,
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                      height: 1.2,
+                    ),
+                  ),
+                  4.hSizedBox,
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 13.spMin,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.grey,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            _customToggleSwitch(
+              isEnabled: isEnabled,
+              onToggle: onToggle,
+              activeColor: AppColors.green.withValues(alpha: 0.6),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _customToggleSwitch({
+    required bool isEnabled,
+    required ValueChanged<bool> onToggle,
+    required Color activeColor,
+  }) {
+    return GestureDetector(
+      onTap: () => onToggle(!isEnabled),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 48.spMin,
+        height: 26.spMin,
+        decoration: BoxDecoration(
+          color: isEnabled ? activeColor : Colors.grey.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(13.r),
+        ),
+        child: Stack(
+          children: [
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 200),
+              left: isEnabled ? 24.spMin : 2.spMin,
+              top: 2.spMin,
+              child: Container(
+                width: 22.spMin,
+                height: 22.spMin,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(11.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _categoriesSection() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final categoriesState = ref.watch(
+          providerOfMainCategories.select(
+            (value) => value.getMainCategoriesState,
+          ),
+        );
+
+        return categoriesState.when(
+          initial: () => const SizedBox.shrink(),
+          loading: () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _sectionTitleBuilder('Categories'),
+              16.hSizedBox,
+              SizedBox(
+                height: 50.spMin,
+                child: Center(
+                  child: SizedBox(
+                    width: 20.spMin,
+                    height: 20.spMin,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          success: (cats) {
+            if (cats.isEmpty) return const SizedBox.shrink();
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _sectionTitleBuilder('Categories'),
+                12.hSizedBox,
+                ...cats.map((category) => _categoryToggleCard(category)),
+              ],
+            );
+          },
+          error: (error) => const SizedBox.shrink(),
+        );
+      },
+    );
+  }
+
+  Widget _categoryToggleCard(final HazardCategory category) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isSelected = ref.watch(
+          providerOfManageNotifications.select(
+            (s) => s.pushNotificationSettings.subscribedCategoryIds.contains(
+              category.id,
+            ),
+          ),
+        );
+        final categoryColor = category.color ?? Colors.blue;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: 12.spMin),
+          child: _filterToggleCard(
+            title: category.name ?? 'Unknown Category',
+            description: category.description ?? 'Hazard category',
+            isEnabled: isSelected,
+            onToggle: (value) {
+              ref
+                  .read(providerOfManageNotifications.notifier)
+                  .toggleCategory(category.id);
+            },
+            color: categoryColor,
+          ),
         );
       },
     );

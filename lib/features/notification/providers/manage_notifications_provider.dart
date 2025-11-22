@@ -64,7 +64,7 @@ class ManageNotificationsProvider
     );
 
     final result = await _userService.updatePushNotificationSettings(
-      settings: state.pushNotificationSettings,
+      pushNotificationSettings: state.pushNotificationSettings,
     );
     if (!mounted) return;
 
@@ -93,47 +93,95 @@ class ManageNotificationsProvider
     updatePushNotificationSettingsInTheServer();
   }
 
-  /// Updates the emergency enabled status in [ManageNotificationsProviderState.pushNotificationSettings].
-  void updateIsEmergencyEnabled(final bool isEnabled) {
-    final currentSettings = state.pushNotificationSettings;
-    final updatedSettings = currentSettings.copyWith(
-      severity: currentSettings.severity.copyWith(
-        emergency: isEnabled,
+  /// Updates the AWS Emergency filter state.
+  void updateAwsEmergency(bool value) {
+    updatePushNotificationSettings(
+      state.pushNotificationSettings.copyWith(
+        awsEmergency: value,
       ),
     );
-    updatePushNotificationSettings(updatedSettings);
   }
 
-  /// Updates the watchAndAct enabled status in [ManageNotificationsProviderState.pushNotificationSettings].
-  void updateIsWatchAndActEnabled(final bool isEnabled) {
-    final currentSettings = state.pushNotificationSettings;
-    final updatedSettings = currentSettings.copyWith(
-      severity: currentSettings.severity.copyWith(
-        watchAndAct: isEnabled,
+  /// Updates the AWS Watch and Act filter state.
+  void updateAwsWatchAndAct(bool value) {
+    updatePushNotificationSettings(
+      state.pushNotificationSettings.copyWith(
+        awsWatchAndAct: value,
       ),
     );
-    updatePushNotificationSettings(updatedSettings);
   }
 
-  /// Updates the advice enabled status in [ManageNotificationsProviderState.pushNotificationSettings].
-  void updateIsAdviceEnabled(final bool isEnabled) {
-    final currentSettings = state.pushNotificationSettings;
-    final updatedSettings = currentSettings.copyWith(
-      severity: currentSettings.severity.copyWith(
-        advice: isEnabled,
+  /// Updates the AWS Advice filter state.
+  void updateAwsAdvice(bool value) {
+    updatePushNotificationSettings(
+      state.pushNotificationSettings.copyWith(
+        awsAdvice: value,
       ),
     );
-    updatePushNotificationSettings(updatedSettings);
   }
 
-  /// Updates the info enabled status in [ManageNotificationsProviderState.pushNotificationSettings].
-  void updateIsInfoEnabled(final bool isEnabled) {
-    final currentSettings = state.pushNotificationSettings;
-    final updatedSettings = currentSettings.copyWith(
-      severity: currentSettings.severity.copyWith(
-        info: isEnabled,
+  /// Updates the Official Non-AWS filter state.
+  void updateOfficialNonAws(bool value) {
+    updatePushNotificationSettings(
+      state.pushNotificationSettings.copyWith(
+        officialNonAws: value,
       ),
     );
-    updatePushNotificationSettings(updatedSettings);
+  }
+
+  /// Updates the User Reported filter state.
+  void updateUserReported(bool value) {
+    updatePushNotificationSettings(
+      state.pushNotificationSettings.copyWith(
+        userReported: value,
+      ),
+    );
+  }
+
+  /// Updates all available category IDs.
+  void updateAllCategories(Set<String> categoryIds) {
+    updatePushNotificationSettings(
+      state.pushNotificationSettings.copyWith(
+        subscribedCategoryIds: categoryIds,
+      ),
+    );
+  }
+
+  /// Updates the selected category IDs.
+  void updateSelectedCategories(Set<String> categoryIds) {
+    updatePushNotificationSettings(
+      state.pushNotificationSettings.copyWith(
+        subscribedCategoryIds: categoryIds,
+      ),
+    );
+  }
+
+  /// Adds a category ID to the selected categories.
+  void addSelectedCategory(String categoryId) {
+    final updatedSet = Set<String>.from(
+      state.pushNotificationSettings.subscribedCategoryIds,
+    );
+    updatedSet.add(categoryId);
+    updateSelectedCategories(updatedSet);
+  }
+
+  /// Removes a category ID from the selected categories.
+  void removeSelectedCategory(String categoryId) {
+    final updatedSet = Set<String>.from(
+      state.pushNotificationSettings.subscribedCategoryIds,
+    );
+    updatedSet.remove(categoryId);
+    updateSelectedCategories(updatedSet);
+  }
+
+  /// Toggles a category selection.
+  void toggleCategory(String categoryId) {
+    if (state.pushNotificationSettings.subscribedCategoryIds.contains(
+      categoryId,
+    )) {
+      removeSelectedCategory(categoryId);
+    } else {
+      addSelectedCategory(categoryId);
+    }
   }
 }

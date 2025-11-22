@@ -10,7 +10,6 @@ import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/models/hazard_filters.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
@@ -116,96 +115,6 @@ class HazardService {
     return Success(allHazards);
   }
 
-  /// Fetches all hazards along with filters from the server making multiple parallel requests.
-  Future<Either<(List<Hazard>, HazardFilters), AppError>>
-  getAllHazardsWithFilters({
-    final int numberOfParallelRequests = 10,
-    required final HazardSearchParams searchParams,
-    final CancelToken? cancelToken,
-  }) async {
-    final allHazards = <Hazard>[];
-
-    final pageSize = searchParams.pageSize;
-    int currentPage = searchParams.page;
-    bool hasMoreData = true;
-
-    Either<HazardFilters, AppError>? filtersResult;
-
-    while (hasMoreData) {
-      final batchFutures = <Future<Either<List<Hazard>, AppError>>>[];
-
-      // Create parallel requests for the current batch of pages
-      for (int i = 0; i < numberOfParallelRequests; i++) {
-        final pageSearchParams = searchParams.copyWith(
-          page: currentPage + i,
-        );
-
-        batchFutures.add(
-          getHazards(
-            searchParams: pageSearchParams,
-            cancelToken: cancelToken,
-          ),
-        );
-      }
-
-      // Wait for this batch to complete
-      final results = await Future.wait([
-        Future.wait(batchFutures),
-        if (filtersResult == null)
-          getHazardFilters(
-            searchParams: searchParams,
-            cancelToken: cancelToken,
-          ),
-      ]);
-      final batchResults = results[0] as List<Either<List<Hazard>, AppError>>;
-      filtersResult ??= results[1] as Either<HazardFilters, AppError>?;
-
-      // Process batch results
-      bool hasDataInThisBatch = false;
-      for (final result in batchResults) {
-        final error = result.when(
-          (hazards) {
-            if (hazards.isNotEmpty) {
-              allHazards.addAll(hazards);
-              hasDataInThisBatch = true;
-
-              // If this page has fewer items than page size, it's the last page
-              if (hazards.length < pageSize) {
-                hasMoreData = false;
-              }
-            }
-            return null; // Success case
-          },
-          (error) => error, // Return error
-        );
-
-        // If any request fails, return the error
-        if (error != null) {
-          return Failure(error);
-        }
-      }
-
-      // If no data was found in any of the parallel requests, we're done
-      if (!hasDataInThisBatch) {
-        hasMoreData = false;
-      }
-
-      // Move to the next batch of pages
-      currentPage += numberOfParallelRequests;
-    }
-
-    if (filtersResult?.isFailure ?? true) {
-      return Failure(
-        filtersResult?.failure ??
-            AppError(message: 'Failed to fetch hazard filters.'),
-      );
-    }
-    final filters = filtersResult!.success;
-
-    // Return the combined response with all hazards
-    return Success((allHazards, filters));
-  }
-
   /// Fetches hazards along with subscription ID from the server.
   Future<Either<GetHazardsWithSubscriptionIdResponse, AppError>>
   getHazardsWithSubscriptionId({
@@ -226,52 +135,6 @@ class HazardService {
 
     return result.copyWith(
       success: (_) => success,
-    );
-  }
-
-  /// Fetches hazards along with categories from the server.
-  Future<
-    Either<(GetHazardsWithSubscriptionIdResponse, HazardFilters), AppError>
-  >
-  getHazardsWithSubscriptionIdAndFilters({
-    required final HazardSearchParams searchParams,
-  }) async {
-    final hazardsFuture = getHazardsWithSubscriptionId(
-      searchParams: searchParams,
-    );
-    final filtersFuture = getHazardFilters(
-      searchParams: searchParams,
-    );
-
-    final results = await Future.wait([
-      hazardsFuture,
-      filtersFuture,
-    ]);
-
-    final hazardsResult =
-        results[0] as Either<GetHazardsWithSubscriptionIdResponse, AppError>;
-    final filtersResult = results[1] as Either<HazardFilters, AppError>;
-
-    if (hazardsResult.isFailure) {
-      return Failure(hazardsResult.failure);
-    }
-    if (filtersResult.isFailure) {
-      return Failure(filtersResult.failure);
-    }
-
-    return Success((hazardsResult.success, filtersResult.success));
-  }
-
-  /// Fetches hazard filters from the server.
-  Future<Either<HazardFilters, AppError>> getHazardFilters({
-    required final HazardSearchParams searchParams,
-    final bool includeSubscribed = false,
-    final CancelToken? cancelToken,
-  }) {
-    return _hazardRepository.getHazardFilters(
-      searchParams: searchParams,
-      includeSubscribed: includeSubscribed,
-      cancelToken: cancelToken,
     );
   }
 

@@ -74,32 +74,32 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         .read(providerOfHazardFiltersForSearch)
         .selectedCategoryIds
         .toList();
-    final isAwsEmergency = _ref
+    final awsEmergency = _ref
         .read(providerOfHazardFiltersForSearch)
-        .isAwsEmergency;
-    final isAwsWatchAndAct = _ref
+        .awsEmergency;
+    final awsWatchAndAct = _ref
         .read(providerOfHazardFiltersForSearch)
-        .isAwsWatchAndAct;
-    final isAwsAdvice = _ref.read(providerOfHazardFiltersForSearch).isAwsAdvice;
-    final isOfficialNonAws = _ref
+        .awsWatchAndAct;
+    final awsAdvice = _ref.read(providerOfHazardFiltersForSearch).awsAdvice;
+    final officialNonAws = _ref
         .read(providerOfHazardFiltersForSearch)
-        .isOfficialNonAws;
-    final isUserReported = _ref
+        .officialNonAws;
+    final userReported = _ref
         .read(providerOfHazardFiltersForSearch)
-        .isUserReported;
+        .userReported;
 
-    final result = await _hazardService.getHazardsWithSubscriptionIdAndFilters(
+    final result = await _hazardService.getHazardsWithSubscriptionId(
       searchParams: HazardSearchParams(
         northeastLat: location!.bounds?.northeastLat,
         northeastLng: location.bounds?.northeastLng,
         southwestLat: location.bounds?.southwestLat,
         southwestLng: location.bounds?.southwestLng,
         categoryIds: selectedCategoryIds,
-        awsEmergency: isAwsEmergency,
-        awsWatchAndAct: isAwsWatchAndAct,
-        awsAdvice: isAwsAdvice,
-        officialNonAws: isOfficialNonAws,
-        userReported: isUserReported,
+        awsEmergency: awsEmergency,
+        awsWatchAndAct: awsWatchAndAct,
+        awsAdvice: awsAdvice,
+        officialNonAws: officialNonAws,
+        userReported: userReported,
       ),
     );
     if (!mounted) return;
@@ -108,13 +108,13 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
       (response) {
         state = state.copyWith(
           getHazardsByLocationState: GetHazardsByLocationState.success(
-            response.$1.hazards,
+            response.hazards,
           ),
         );
-        updateHazards(response.$1.hazards);
+        updateHazards(response.hazards);
 
         // update subscriptionId if there's an active subscription for this location
-        updateSubscriptionId(response.$1.subscriptionId);
+        updateSubscriptionId(response.subscriptionId);
       },
       (error) {
         state = state.copyWith(

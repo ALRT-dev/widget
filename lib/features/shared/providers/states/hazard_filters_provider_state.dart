@@ -8,19 +8,19 @@ abstract class HazardFiltersProviderState with _$HazardFiltersProviderState {
 
   const factory HazardFiltersProviderState({
     /// Whether AWS Emergency level "Emergency" is selected.
-    @Default(true) final bool isAwsEmergency,
+    @Default(true) final bool awsEmergency,
 
     /// Whether AWS Emergency level "Watch and Act" is selected.
-    @Default(true) final bool isAwsWatchAndAct,
+    @Default(true) final bool awsWatchAndAct,
 
     /// Whether AWS Emergency level "Advice" is selected.
-    @Default(true) final bool isAwsAdvice,
+    @Default(true) final bool awsAdvice,
 
     /// Whether Official Non-AWS sources are selected.
-    @Default(true) final bool isOfficialNonAws,
+    @Default(true) final bool officialNonAws,
 
     /// Whether User Reported sources are selected.
-    @Default(true) final bool isUserReported,
+    @Default(true) final bool userReported,
 
     /// All available category IDs.
     @Default(<String>{}) final Set<String> allCategoryIds,
@@ -31,21 +31,21 @@ abstract class HazardFiltersProviderState with _$HazardFiltersProviderState {
 
   /// Indicates whether any filters are currently selected.
   bool get hasFiltersSelected =>
-      isAwsEmergency ||
-      isAwsWatchAndAct ||
-      isAwsAdvice ||
-      isOfficialNonAws ||
-      isUserReported ||
+      awsEmergency ||
+      awsWatchAndAct ||
+      awsAdvice ||
+      officialNonAws ||
+      userReported ||
       selectedCategoryIds.isNotEmpty;
 
   /// Returns the total count of unselected filters.
   int get unselectedFiltersCount {
     int count = 0;
-    if (!isAwsEmergency) count++;
-    if (!isAwsWatchAndAct) count++;
-    if (!isAwsAdvice) count++;
-    if (!isOfficialNonAws) count++;
-    if (!isUserReported) count++;
+    if (!awsEmergency) count++;
+    if (!awsWatchAndAct) count++;
+    if (!awsAdvice) count++;
+    if (!officialNonAws) count++;
+    if (!userReported) count++;
     count += allCategoryIds.length - selectedCategoryIds.length;
     return count;
   }

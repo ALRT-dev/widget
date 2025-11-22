@@ -131,28 +131,24 @@ class MapProvider extends StateNotifier<MapProviderState> {
         .read(providerOfHazardFiltersForMap)
         .selectedCategoryIds
         .toList();
-    final isAwsEmergency = _ref
+    final awsEmergency = _ref.read(providerOfHazardFiltersForMap).awsEmergency;
+    final awsWatchAndAct = _ref
         .read(providerOfHazardFiltersForMap)
-        .isAwsEmergency;
-    final isAwsWatchAndAct = _ref
+        .awsWatchAndAct;
+    final awsAdvice = _ref.read(providerOfHazardFiltersForMap).awsAdvice;
+    final officialNonAws = _ref
         .read(providerOfHazardFiltersForMap)
-        .isAwsWatchAndAct;
-    final isAwsAdvice = _ref.read(providerOfHazardFiltersForMap).isAwsAdvice;
-    final isOfficialNonAws = _ref
-        .read(providerOfHazardFiltersForMap)
-        .isOfficialNonAws;
-    final isUserReported = _ref
-        .read(providerOfHazardFiltersForMap)
-        .isUserReported;
+        .officialNonAws;
+    final userReported = _ref.read(providerOfHazardFiltersForMap).userReported;
 
-    final result = await _hazardService.getAllHazardsWithFilters(
+    final result = await _hazardService.getAllHazards(
       searchParams: HazardSearchParams(
         categoryIds: selectedCategoryIds,
-        awsEmergency: isAwsEmergency,
-        awsWatchAndAct: isAwsWatchAndAct,
-        awsAdvice: isAwsAdvice,
-        officialNonAws: isOfficialNonAws,
-        userReported: isUserReported,
+        awsEmergency: awsEmergency,
+        awsWatchAndAct: awsWatchAndAct,
+        awsAdvice: awsAdvice,
+        officialNonAws: officialNonAws,
+        userReported: userReported,
         northeastLat: visibleBounds.northeast.latitude,
         northeastLng: visibleBounds.northeast.longitude,
         southwestLat: visibleBounds.southwest.latitude,
@@ -166,9 +162,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
     if (!mounted) return;
 
     result.when(
-      (response) {
-        final hazards = response.$1;
-
+      (hazards) {
         state = state.copyWith(
           getMapHazardsState: GetMapHazardsState.success(hazards),
           hazards: hazards,

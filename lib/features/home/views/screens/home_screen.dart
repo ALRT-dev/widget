@@ -95,6 +95,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     ref.watch(providerOfNotificationsFeed.select((value) => null));
     ref.watch(providerOfHazardFiltersForMap.select((value) => null));
     ref.watch(providerOfHazardFiltersForSearch.select((value) => null));
+    ref.watch(providerOfHazardFiltersForSearch.select((value) => null));
     ref.watch(
       providerOfHazardFiltersForNotifications.select((value) => null),
     );

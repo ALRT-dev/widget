@@ -5,7 +5,6 @@ import 'package:hazard_app/features/notification/views/widgets/notifications_app
 import 'package:hazard_app/features/search/views/widgets/hazard_search_appbar.dart';
 import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_filters_provider_state.dart';
-import 'package:hazard_app/features/shared/views/widgets/categories_dropdown.dart';
 
 final providerOfHazardFiltersForMap = providerOfHazardFilters(
   MapScreen.filtersKey,
@@ -15,9 +14,6 @@ final providerOfHazardFiltersForSearch = providerOfHazardFilters(
 );
 final providerOfHazardFiltersForNotifications = providerOfHazardFilters(
   NotificationsAppBar.filtersKey,
-);
-final providerOfHazardFiltersForDropdown = providerOfHazardFilters(
-  CategoriesDropdown.filtersKey,
 );
 
 final providerOfHazardFilters = StateNotifierProvider.autoDispose
@@ -70,27 +66,27 @@ class HazardFiltersProvider extends StateNotifier<HazardFiltersProviderState> {
 
   /// Updates the AWS Emergency filter state.
   void updateAwsEmergency(bool value) {
-    state = state.copyWith(isAwsEmergency: value);
+    state = state.copyWith(awsEmergency: value);
   }
 
   /// Updates the AWS Watch and Act filter state.
   void updateAwsWatchAndAct(bool value) {
-    state = state.copyWith(isAwsWatchAndAct: value);
+    state = state.copyWith(awsWatchAndAct: value);
   }
 
   /// Updates the AWS Advice filter state.
   void updateAwsAdvice(bool value) {
-    state = state.copyWith(isAwsAdvice: value);
+    state = state.copyWith(awsAdvice: value);
   }
 
   /// Updates the Official Non-AWS filter state.
   void updateOfficialNonAws(bool value) {
-    state = state.copyWith(isOfficialNonAws: value);
+    state = state.copyWith(officialNonAws: value);
   }
 
   /// Updates the User Reported filter state.
   void updateUserReported(bool value) {
-    state = state.copyWith(isUserReported: value);
+    state = state.copyWith(userReported: value);
   }
 
   /// Updates all available category IDs.
