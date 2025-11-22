@@ -18,6 +18,7 @@ import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
+import 'package:hazard_app/features/shared/utils/hazard_util.dart';
 
 class HazardService {
   HazardService(final Ref ref) : _ref = ref;
@@ -112,7 +113,12 @@ class HazardService {
     }
 
     // Return the combined list of all hazards
-    return Success(allHazards);
+    return Success(
+      HazardUtil.sortHazards(
+        allHazards,
+        searchParams.sortSettings,
+      ),
+    );
   }
 
   /// Fetches hazards along with subscription ID from the server.
