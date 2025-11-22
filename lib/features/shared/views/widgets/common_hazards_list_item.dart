@@ -157,15 +157,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             _shortDescriptionBuilder().pX(16.0),
             14.hSizedBox,
             if (widget.showTrustMeter && widget.hazard.isUserReported) ...[
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  16.0.spMin,
-                  2.spMin,
-                  16.0.spMin,
-                  16.0.spMin,
-                ),
-                child: _confirmationButtonsBuilder(),
-              ),
+              _confirmationButtonsBuilder().pX(16.0),
             ],
             if (widget.isInfoWindow) ...[
               Padding(
@@ -590,6 +582,27 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           provider.select((value) => value.hazard!.isExpired),
         );
 
+        final otherLatitude = ref.watch(
+          provider.select(
+            (value) => value.hazard!.latitude,
+          ),
+        );
+        final otherLongitude = ref.watch(
+          provider.select(
+            (value) => value.hazard!.longitude,
+          ),
+        );
+        final distance = ref.watch(
+          providerOfLoggedInUser.select(
+            (value) => otherLongitude == null || otherLatitude == null
+                ? null
+                : value?.distanceTo(otherLatitude, otherLongitude),
+          ),
+        );
+        if (distance == null || distance > 1000) {
+          return const SizedBox.shrink();
+        }
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 10.spMin,
@@ -609,7 +622,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               onVotePressed: _voteOnHazard,
             ),
           ],
-        );
+        ).pT(2.0).pB(16.0);
       },
     );
   }
