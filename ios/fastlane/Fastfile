@@ -4,9 +4,7 @@ platform :ios do
   require 'date'
 
   my_release_note = <<~NOTE
-    * Onboarding Flow
-    * Improved UI for Various Screens
-    * Bug Fixes and Performance Improvements
+    * Bug Fixes and Improvements
   NOTE
 
   desc "Automatically increment the version name and version code. Also prepare the changelogs and release note from git commits."
