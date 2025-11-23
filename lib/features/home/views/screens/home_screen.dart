@@ -161,7 +161,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 } else if (hazard.reviewStatus == HazardReviewStatus.rejected) {
                   context.showErrorToast(
                     message:
-                        hazard.reviewFeedback ?? 'Your alrt report is invalid.',
+                        'Your alrt report has been reviewed and rejected. Please check your profile for feedback.',
+                    autoCloseDuration: Duration(seconds: 7),
                   );
                 }
               },

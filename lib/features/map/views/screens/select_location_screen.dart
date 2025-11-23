@@ -18,6 +18,7 @@ class SelectLocationScreenArgs {
   SelectLocationScreenArgs({
     this.initialLocation,
     this.getSubUrbOnly = false,
+    this.showYourLocationOption = true,
   });
 
   /// The initial location to be displayed on the map when the screen loads.
@@ -25,6 +26,9 @@ class SelectLocationScreenArgs {
 
   /// Whether to get only the suburb part of the address.
   final bool getSubUrbOnly;
+
+  /// Whether to show the "Your Location" option.
+  final bool showYourLocationOption;
 }
 
 class SelectLocationScreen extends ConsumerStatefulWidget {
@@ -73,7 +77,8 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
             child: _searchbarBuilder().pX(20.0),
           ).sliverBox,
           20.hSizedBox.sliverBox,
-          _yourLocationBuilder().sliverBox,
+          if (widget.args?.showYourLocationOption ?? true)
+            _yourLocationBuilder().sliverBox,
           _chooseOnTheMapBuilder().sliverBox,
           Divider().pX(20.0).sliverBox,
           PlaceSearchResultsList(
@@ -205,7 +210,9 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
       'location-search-debounce',
       const Duration(milliseconds: 500),
       () {
-        ref.read(providerOfPlacesForSelectLocation.notifier).getPlaces();
+        ref
+            .read(providerOfPlacesForSelectLocation.notifier)
+            .getPlaces(showOnlyCities: widget.args?.getSubUrbOnly ?? false);
       },
     );
   }

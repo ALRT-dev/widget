@@ -493,6 +493,7 @@ class _CreateUpdateReportScreenState
       extra: SelectLocationScreenArgs(
         initialLocation: selectedLocation,
         getSubUrbOnly: true,
+        showYourLocationOption: false,
       ),
     );
     if (!mounted) return;

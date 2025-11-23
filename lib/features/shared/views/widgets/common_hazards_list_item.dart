@@ -434,9 +434,12 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
   Widget _dateAndDistanceBuilder() {
     return Consumer(
       builder: (context, ref, child) {
-        final createdAt = ref.watch(
+        final dateTime = ref.watch(
           provider.select(
-            (value) => value.hazard!.createdAt,
+            (value) =>
+                value.hazard!.updatedAt ??
+                value.hazard!.occurredAt ??
+                value.hazard!.createdAt,
           ),
         );
 
@@ -474,7 +477,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         return Row(
           spacing: 8.spMin,
           children: [
-            if (createdAt != null)
+            if (dateTime != null)
               Row(
                 children: [
                   Icon(
@@ -484,7 +487,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   ),
                   4.wSizedBox,
                   Text(
-                    hasExpired ? 'Expired' : timeago.format(createdAt),
+                    hasExpired ? 'Expired' : timeago.format(dateTime),
                     style: TextStyle(
                       fontSize: 12.spMin,
                       color: hasExpired ? AppColors.red : AppColors.grey,
@@ -572,6 +575,20 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
   Widget _confirmationButtonsBuilder() {
     return Consumer(
       builder: (context, ref, child) {
+        final loggedinUserId = ref.watch(
+          providerOfLoggedInUser.select(
+            (value) => value?.id,
+          ),
+        );
+        final isOwnHazard = ref.watch(
+          provider.select(
+            (value) => value.hazard!.reportedBy?.id == loggedinUserId,
+          ),
+        );
+        if (isOwnHazard) {
+          return const SizedBox.shrink();
+        }
+
         final voteType = ref.watch(
           provider.select((value) => value.hazard!.userVoteType),
         );

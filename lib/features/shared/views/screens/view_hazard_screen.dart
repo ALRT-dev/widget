@@ -206,17 +206,26 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   }
 
   Widget _buildEditButton() {
-    return RoundButton(
-      icon: Icon(
-        Icons.edit_rounded,
-        color: AppColors.black,
-      ),
-      backgroundColor: AppColors.white,
-      borderSide: BorderSide(
-        color: AppColors.black,
-        width: 2,
-      ),
-      onPressed: _handleEditHazard,
+    return Consumer(
+      builder: (context, ref, child) {
+        final isExpired = ref.watch(
+          provider.select(
+            (value) => value.hazard?.isExpired ?? false,
+          ),
+        );
+        return RoundButton(
+          icon: Icon(
+            Icons.edit_rounded,
+            color: isExpired ? AppColors.grey : AppColors.black,
+          ),
+          backgroundColor: AppColors.white,
+          borderSide: BorderSide(
+            color: isExpired ? AppColors.grey : AppColors.black,
+            width: 2,
+          ),
+          onPressed: _handleEditHazard,
+        );
+      },
     );
   }
 
@@ -481,11 +490,13 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         final locationName = ref.watch(
           provider.select((value) => value.hazard?.locationName),
         );
-        final occurredAt = ref.watch(
-          provider.select((value) => value.hazard?.occurredAt),
-        );
-        final createdAt = ref.watch(
-          provider.select((value) => value.hazard?.createdAt),
+        final dateTime = ref.watch(
+          provider.select(
+            (value) =>
+                value.hazard?.updatedAt ??
+                value.hazard?.occurredAt ??
+                value.hazard?.createdAt,
+          ),
         );
         final hazard = ref.watch(
           provider.select((value) => value.hazard),
@@ -595,22 +606,22 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   12.spMin.hSizedBox,
 
                   // Time
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.access_time,
-                        size: 16.spMin,
-                      ),
-                      8.spMin.wSizedBox,
-                      Text(
-                        (occurredAt ?? createdAt ?? DateTime.now())
-                            .formattedWithTime,
-                        style: TextStyle(
-                          fontSize: 14.spMin,
+                  if (dateTime != null)
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          size: 16.spMin,
                         ),
-                      ),
-                    ],
-                  ),
+                        8.spMin.wSizedBox,
+                        Text(
+                          dateTime.formattedWithTime,
+                          style: TextStyle(
+                            fontSize: 14.spMin,
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ],
@@ -1064,7 +1075,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
     if (isExpired) {
       context.showErrorToast(
-        message: 'Cannot edit an expired alert.',
+        message:
+            'Cannot edit an expired alert. You can delete this and create a new one.',
       );
       return;
     }
