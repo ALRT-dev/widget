@@ -27,7 +27,7 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
     this.showCloseButton = false,
     this.onClosePressed,
     this.showTrustMeter = true,
-    this.showMediaCarousel = true,
+    this.showMediaCarousel = false,
     this.showSourceHeader = true,
     this.horizontalPadding = 10.0,
     this.isInfoWindow = false,

@@ -97,7 +97,7 @@ class NativeVideoPlayerState extends ConsumerState<NativeVideoPlayer> {
       key: Key('NativeVideoPlayer_${widget.videoMedia.id}'),
       onVisibilityChanged: (info) {
         if (info.visibleFraction == 1.0) {
-          if (mounted) {
+          if (mounted && widget.autoPlay) {
             _playVideoIfHighestPriority();
           }
         } else {

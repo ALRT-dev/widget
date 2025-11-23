@@ -22,6 +22,7 @@ import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/utils/open_link.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
+import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'dart:math' as math;
 
@@ -471,6 +472,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         // Official Description Section
         _buildOfficialDescriptionSection(),
 
+        // Medias Section
+        _buildMediasSection(),
+
         // Source Section
         _buildSourceSectionNew(),
         40.hSizedBox,
@@ -626,6 +630,44 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               ),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMediasSection() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final hazardId = ref.watch(
+          provider.select((value) => value.hazard?.id),
+        );
+        final processedMedias = ref.watch(
+          provider.select((value) => value.hazard?.processedMedias ?? []),
+        );
+
+        if (processedMedias.isEmpty || hazardId == null) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Uploaded Medias',
+              style: TextStyle(
+                fontSize: 16.spMin,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            12.spMin.hSizedBox,
+            HazardMediasCarousel(
+              id: hazardId,
+              medias: processedMedias,
+              videoPriority: VideoPriority.level1,
+              registerVideoLifecycle: true,
+            ),
+            24.hSizedBox,
+          ],
         );
       },
     );
@@ -1034,7 +1076,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         providerOfVideoPreviewLifecycle(
           VideoIdPriority(
             id: videoMedia.id,
-            priority: VideoPriority.level2,
+            priority: VideoPriority.level1,
           ),
         ).select((value) => null),
       );
