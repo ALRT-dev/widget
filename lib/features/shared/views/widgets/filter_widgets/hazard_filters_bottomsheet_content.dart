@@ -118,9 +118,7 @@ class _HazardFiltersBottomsheetContentState
         children: [
           16.hSizedBox,
           _awsEmergencySection(),
-          12.hSizedBox,
-          _otherSourcesSection(),
-          24.hSizedBox,
+          28.hSizedBox,
           _categoriesSection(),
           24.hSizedBox,
         ],
@@ -128,27 +126,41 @@ class _HazardFiltersBottomsheetContentState
     );
   }
 
-  Widget _sectionTitleBuilder(String title) {
-    return Row(
-      children: [
-        Container(
-          width: 3,
-          height: 16.spMin,
-          decoration: BoxDecoration(
-            color: AppColors.black,
-            borderRadius: BorderRadius.circular(2),
+  Widget _sectionTitleBuilder(
+    String title, {
+    required bool isEnabled,
+    required VoidCallback onToggle,
+  }) {
+    return GestureDetector(
+      onTap: onToggle,
+      child: Row(
+        children: [
+          Container(
+            width: 3,
+            height: 16.spMin,
+            decoration: BoxDecoration(
+              color: AppColors.black,
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-        ),
-        8.wSizedBox,
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 16.spMin,
-            fontWeight: FontWeight.w600,
-            color: AppColors.black,
+          8.wSizedBox,
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 16.spMin,
+                fontWeight: FontWeight.w600,
+                color: AppColors.black,
+              ),
+            ),
           ),
-        ),
-      ],
+          _customToggleSwitch(
+            isEnabled: isEnabled,
+            onToggle: (_) => onToggle(),
+            activeColor: AppColors.green.withValues(alpha: 0.6),
+          ),
+        ],
+      ),
     );
   }
 
@@ -170,12 +182,51 @@ class _HazardFiltersBottomsheetContentState
             widget.filtersKey,
           ).select((s) => s.awsAdvice),
         );
+        final officialNonAws = ref.watch(
+          providerOfHazardFilters(
+            widget.filtersKey,
+          ).select((s) => s.officialNonAws),
+        );
+        final isUserReported = ref.watch(
+          providerOfHazardFilters(
+            widget.filtersKey,
+          ).select((s) => s.userReported),
+        );
+
+        final isAnyAlertTypeEnabled =
+            awsEmergency ||
+            awsWatchAndAct ||
+            awsAdvice ||
+            officialNonAws ||
+            isUserReported;
+
         final filterProvider = ref.read(
           providerOfHazardFilters(widget.filtersKey).notifier,
         );
 
         return Column(
           children: [
+            _sectionTitleBuilder(
+              'Alert Types',
+              isEnabled: isAnyAlertTypeEnabled,
+              onToggle: () {
+                if (isAnyAlertTypeEnabled) {
+                  filterProvider.updateAwsEmergency(false);
+                  filterProvider.updateAwsWatchAndAct(false);
+                  filterProvider.updateAwsAdvice(false);
+                  filterProvider.updateOfficialNonAws(false);
+                  filterProvider.updateUserReported(false);
+                } else {
+                  filterProvider.updateAwsEmergency(true);
+                  filterProvider.updateAwsWatchAndAct(true);
+                  filterProvider.updateAwsAdvice(true);
+                  filterProvider.updateOfficialNonAws(true);
+                  filterProvider.updateUserReported(true);
+                }
+                widget.onFiltersUpdated?.call();
+              },
+            ),
+            16.hSizedBox,
             _filterToggleCard(
               title: 'Emergency',
               description: 'Immediate threat to life and property',
@@ -211,31 +262,7 @@ class _HazardFiltersBottomsheetContentState
               color: Colors.amber,
               icon: Icons.info_outline_rounded,
             ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _otherSourcesSection() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final officialNonAws = ref.watch(
-          providerOfHazardFilters(
-            widget.filtersKey,
-          ).select((s) => s.officialNonAws),
-        );
-        final isUserReported = ref.watch(
-          providerOfHazardFilters(
-            widget.filtersKey,
-          ).select((s) => s.userReported),
-        );
-        final filterProvider = ref.read(
-          providerOfHazardFilters(widget.filtersKey).notifier,
-        );
-
-        return Column(
-          children: [
+            12.hSizedBox,
             _filterToggleCard(
               title: 'Official Non-AWS',
               description: 'Official sources other than AWS',
@@ -388,12 +415,22 @@ class _HazardFiltersBottomsheetContentState
           ),
         );
 
+        final isAnyAlertTypeEnabled = ref.watch(
+          providerOfHazardFilters(
+            widget.filtersKey,
+          ).select((s) => s.selectedCategoryIds.isNotEmpty),
+        );
+
         return categoriesState.when(
           initial: () => const SizedBox.shrink(),
           loading: () => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _sectionTitleBuilder('Categories'),
+              _sectionTitleBuilder(
+                'Categories',
+                isEnabled: isAnyAlertTypeEnabled,
+                onToggle: () {},
+              ),
               16.hSizedBox,
               SizedBox(
                 height: 50.spMin,
@@ -414,11 +451,28 @@ class _HazardFiltersBottomsheetContentState
           ),
           success: (cats) {
             if (cats.isEmpty) return const SizedBox.shrink();
+            final filterProvider = ref.read(
+              providerOfHazardFilters(widget.filtersKey).notifier,
+            );
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _sectionTitleBuilder('Categories'),
-                12.hSizedBox,
+                _sectionTitleBuilder(
+                  'Categories',
+                  isEnabled: isAnyAlertTypeEnabled,
+                  onToggle: () {
+                    if (isAnyAlertTypeEnabled) {
+                      filterProvider.updateSelectedCategories({});
+                    } else {
+                      filterProvider.updateSelectedCategories(
+                        cats.map((e) => e.id).toSet(),
+                      );
+                    }
+                    widget.onFiltersUpdated?.call();
+                  },
+                ),
+                16.hSizedBox,
                 ...cats.map((category) => _categoryToggleCard(category)),
               ],
             );
