@@ -284,9 +284,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                           child: Icon(
                             Icons.verified_rounded,
                             size: 20.spMin,
-                            color: hazardColor.isLight
-                                ? AppColors.blue
-                                : AppColors.white,
+                            color: AppColors.blue,
                           ),
                         ),
                         if (widget.showCloseButton &&
