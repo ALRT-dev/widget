@@ -47,6 +47,18 @@ abstract class Hazard with _$Hazard {
     /// The human-readable name of the hazard location.
     final String? locationName,
 
+    /// The north-east latitude of the hazard bounding box.
+    final double? northeastLat,
+
+    /// The north-east longitude of the hazard bounding box.
+    final double? northeastLng,
+
+    /// The south-west latitude of the hazard bounding box.
+    final double? southwestLat,
+
+    /// The south-west longitude of the hazard bounding box.
+    final double? southwestLng,
+
     /// The id of the category the hazard belongs to.
     final String? categoryId,
 

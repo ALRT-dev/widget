@@ -18,6 +18,10 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   latitude: (json['latitude'] as num?)?.toDouble(),
   longitude: (json['longitude'] as num?)?.toDouble(),
   locationName: json['locationName'] as String?,
+  northeastLat: (json['northeastLat'] as num?)?.toDouble(),
+  northeastLng: (json['northeastLng'] as num?)?.toDouble(),
+  southwestLat: (json['southwestLat'] as num?)?.toDouble(),
+  southwestLng: (json['southwestLng'] as num?)?.toDouble(),
   categoryId: json['categoryId'] as String?,
   category: json['category'] == null
       ? null
@@ -86,6 +90,10 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'latitude': ?instance.latitude,
   'longitude': ?instance.longitude,
   'locationName': ?instance.locationName,
+  'northeastLat': ?instance.northeastLat,
+  'northeastLng': ?instance.northeastLng,
+  'southwestLat': ?instance.southwestLat,
+  'southwestLng': ?instance.southwestLng,
   'categoryId': ?instance.categoryId,
   'category': ?instance.category?.toJson(),
   'fireStatus': ?_$FireStatusEnumMap[instance.fireStatus],

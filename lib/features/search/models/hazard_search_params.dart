@@ -15,6 +15,9 @@ abstract class HazardSearchParams with _$HazardSearchParams {
     /// The list of category IDs to filter hazards.
     @Default(<String>[]) final List<String> categoryIds,
 
+    /// The list of source IDs to filter hazards.
+    @Default(<String>[]) final List<String> sourceIds,
+
     /// The id of the user who reported the hazard to filter hazards.
     final String? reportedById,
 
