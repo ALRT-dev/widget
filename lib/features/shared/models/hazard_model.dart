@@ -158,6 +158,12 @@ abstract class Hazard with _$Hazard {
 
   /// The file path for the hazard icon based on its category and severity.
   String get iconPath {
+    if (source?.id == 'smartraveller') {
+      final severityBandName =
+          severityBand?.name ?? HazardSeverityBand.info.name;
+      return 'assets/images/hazards/non_aws/other_$severityBandName.png';
+    }
+
     if (fireStatus != null) {
       if ((categoryId == "bushfire" && isAwsCompliant == false) ||
           categoryId == "otherFire") {
@@ -203,6 +209,12 @@ abstract class Hazard with _$Hazard {
   ) {
     var key =
         '${categoryId}_${severityBand?.name ?? HazardSeverityBand.info.name}${isAwsCompliant == true ? '_aws' : '_non_aws'}';
+
+    if (source?.id == 'smartraveller') {
+      final severityBandName =
+          severityBand?.name ?? HazardSeverityBand.info.name;
+      key = 'other_${severityBandName}_non_aws';
+    }
 
     // Check for fire status override
     if (fireStatus != null) {
