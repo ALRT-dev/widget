@@ -233,7 +233,7 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
         .read(providerOfLocationService)
         .getAddressFromCoordinates(
           coordinates: currentUserLocation.latLng,
-          getSubUrbOnly: true,
+          getSubUrbOnly: widget.args?.getSubUrbOnly ?? false,
         );
     if (!mounted) return;
 
