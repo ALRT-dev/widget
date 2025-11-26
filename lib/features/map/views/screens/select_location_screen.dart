@@ -7,8 +7,10 @@ import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
+import 'package:hazard_app/features/map/providers/service_providers.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_on_map_screen.dart';
 import 'package:hazard_app/features/map/views/widgets/place_search_results_list.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
@@ -225,9 +227,30 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
   }
 
   /// Fetches the user's current location from the [LocationProvider] and pops the screen with that location.
-  void _handleYourLocationPressed() {
+  void _handleYourLocationPressed() async {
     final currentUserLocation = ref.read(providerOfLocation).location;
-    context.pop(currentUserLocation);
+    final result = await ref
+        .read(providerOfLocationService)
+        .getAddressFromCoordinates(
+          coordinates: currentUserLocation.latLng,
+          getSubUrbOnly: true,
+        );
+    if (!mounted) return;
+
+    result.when(
+      (address) {
+        context.pop(
+          currentUserLocation.copyWith(
+            address: address,
+          ),
+        );
+      },
+      (error) {
+        context.showErrorToast(
+          message: 'Could not get your location. Please try again.',
+        );
+      },
+    );
   }
 
   /// Navigates to the [SelectLocationOnMapScreen] to allow the user to select a location on the map.

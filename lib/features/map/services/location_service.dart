@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/repository_providers.dart';
@@ -20,13 +21,13 @@ class LocationService {
   }
 
   /// Returns the address from the latitude and longitude.
-  Future<Either<String, AppError>> getAddressFromLatLng({
-    required final double latitude,
-    required final double longitude,
+  Future<Either<String, AppError>> getAddressFromCoordinates({
+    required final LatLng coordinates,
+    final bool getSubUrbOnly = false,
   }) {
-    return _locationRepository.getAddressFromLatLng(
-      latitude: latitude,
-      longitude: longitude,
+    return _locationRepository.getAddressFromCoordinates(
+      coordinates: coordinates,
+      getSubUrbOnly: getSubUrbOnly,
     );
   }
 

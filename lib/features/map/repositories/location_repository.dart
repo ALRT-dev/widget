@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -16,9 +17,9 @@ abstract class LocationRepository {
   Future<Either<AlrtLocation, AppError>> getCurrentLocation();
 
   /// Returns the address from the latitude and longitude.
-  Future<Either<String, AppError>> getAddressFromLatLng({
-    required final double latitude,
-    required final double longitude,
+  Future<Either<String, AppError>> getAddressFromCoordinates({
+    required final LatLng coordinates,
+    final bool getSubUrbOnly = false,
   });
 
   /// Returns true if the location permission is granted.
@@ -176,37 +177,75 @@ class LocationRepositoryImpl extends LocationRepository {
   }
 
   @override
-  Future<Either<String, AppError>> getAddressFromLatLng({
-    required double latitude,
-    required double longitude,
+  Future<Either<String, AppError>> getAddressFromCoordinates({
+    required LatLng coordinates,
+    bool getSubUrbOnly = false,
   }) {
     return runAsyncCall(
-      name: 'getAddress',
+      name: 'getAddressFromCoordinates',
       future: () async {
-        final placemarks = await placemarkFromCoordinates(
-          latitude,
-          longitude,
+        final response = await _dio.get(
+          'https://maps.googleapis.com/maps/api/geocode/json',
+          queryParameters: {
+            'latlng': '${coordinates.latitude},${coordinates.longitude}',
+            'key': Env.googleMapsApiKey,
+          },
         );
 
-        String? address;
-        if (placemarks.isNotEmpty) {
-          final place = placemarks.first;
-          final addresses = [
-            // if (place.street?.isNotEmpty ?? false) place.street,
-            // if (place.locality?.isNotEmpty ?? false) place.locality,
-            if (place.administrativeArea?.isNotEmpty ?? false)
-              place.administrativeArea,
-            if (place.country?.isNotEmpty ?? false) place.country,
-          ];
-          address = addresses.join(', ');
-        }
-
-        if (address == null) {
+        if (response.data['status'] != 'OK' ||
+            response.data['results'] == null ||
+            response.data['results'] is! List ||
+            (response.data['results'] as List).isEmpty) {
           throw AppError(
-            message: 'Could not get the address from lat/lng',
+            message:
+                response.data['error_message'] ??
+                'Failed to fetch address from coordinates',
           );
         }
 
+        if (response.data['results'][0]['formatted_address'] == null) {
+          throw AppError(
+            message: 'Failed to fetch address from coordinates',
+          );
+        }
+
+        if (getSubUrbOnly) {
+          // Extract general area (suburb/locality) from address components
+          final results = response.data['results'] as List?;
+
+          if (results?.isNotEmpty ?? false) {
+            final addressComponents =
+                results![results.length == 1 ? 0 : 1]['address_components']
+                    as List?;
+            if (addressComponents != null) {
+              String? suburb;
+              String? locality;
+              String? administrativeArea;
+
+              for (final component in addressComponents) {
+                final types = component['types'] as List?;
+                if (types != null) {
+                  if (types.contains('sublocality') ||
+                      types.contains('sublocality_level_1')) {
+                    suburb = component['long_name'];
+                  } else if (types.contains('locality')) {
+                    locality = component['long_name'];
+                  } else if (types.contains('administrative_area_level_1')) {
+                    administrativeArea = component['long_name'];
+                  }
+                }
+              }
+
+              // Return the most specific area available
+              final generalArea = suburb ?? locality ?? administrativeArea;
+              if (generalArea != null) {
+                return Success(generalArea);
+              }
+            }
+          }
+        }
+
+        final address = response.data['results'][0]['formatted_address'];
         return Success(address);
       },
       onError: Failure.new,
