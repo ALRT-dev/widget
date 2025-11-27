@@ -163,6 +163,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
         northeastLng: visibleBounds.northeast.longitude,
         southwestLat: visibleBounds.southwest.latitude,
         southwestLng: visibleBounds.southwest.longitude,
+        ignoreHazardLatLngBounds: true,
         sortSettings: [
           {SortCategory.severityBand: SortOrder.desc},
           {SortCategory.createdAt: SortOrder.desc},

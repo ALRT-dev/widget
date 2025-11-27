@@ -38,6 +38,9 @@ abstract class HazardSearchParams with _$HazardSearchParams {
     /// The bounds for location-based filtering.
     final double? southwestLng,
 
+    /// Whether to ignore the hazard bounds filter and only use lat/lng point.
+    @Default(false) final bool ignoreHazardLatLngBounds,
+
     /// Whether to show expired hazards or not.
     @Default(false) final bool showExpired,
 
