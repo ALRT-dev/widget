@@ -85,19 +85,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ref.read(providerOfMap.notifier).updateSelectedHazard(null);
             },
           ),
-          _overlayedContentsBuilder(),
+          Positioned.fill(
+            child: _overlayedContentsBuilder(),
+          ),
           const MapHazardInfoWindow(),
-          Positioned(
-            bottom: 10.spMin,
-            right: 10.spMin,
-            child: const CustomMyLocationButton(),
-          ),
-          Positioned(
-            bottom: 10.spMin,
-            left: 0.0,
-            right: 0.0,
-            child: _viewListMapButtonBuilder(),
-          ),
         ],
       ),
     );
@@ -131,20 +122,52 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ).pX(20.0),
             ],
           ),
-          Consumer(
-            builder: (context, ref, child) {
-              final isRoutePresent = ref.watch(
-                providerOfMap.select(
-                  (value) => value.currentRoutePlan != null,
-                ),
-              );
-              if (isRoutePresent) {
-                return RoutePlanning().pB(20.0);
-              }
+          Column(
+            children: [
+              Stack(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: 100.spMin,
+                  ),
+                  Positioned(
+                    right: 10.spMin,
+                    bottom: 10.spMin,
+                    child: CustomMyLocationButton(),
+                  ),
+                  Positioned(
+                    bottom: 10.spMin,
+                    left: 0.0,
+                    right: 0.0,
+                    child: _viewListMapButtonBuilder(),
+                  ),
+                ],
+              ),
+              Consumer(
+                builder: (context, ref, child) {
+                  final isRoutePresent = ref.watch(
+                    providerOfMap.select(
+                      (value) => value.currentRoutePlan != null,
+                    ),
+                  );
+                  if (isRoutePresent) {
+                    return RoutePlanning().pB(20.0);
+                  }
 
-              return SelectedLocationPreview().pB(20.0);
-            },
-          ).pX(20.0),
+                  final isSelectedLocationPresent = ref.watch(
+                    providerOfMap.select(
+                      (value) => value.selectedLocation != null,
+                    ),
+                  );
+                  if (isSelectedLocationPresent) {
+                    return SelectedLocationPreview().pB(20.0);
+                  }
+
+                  return const SizedBox();
+                },
+              ).pX(20.0),
+            ],
+          ),
         ],
       ),
     );
