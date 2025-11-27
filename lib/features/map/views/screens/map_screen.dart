@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/views/widgets/custom_compass_button.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_my_location_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_hazard_info_window.dart';
 import 'package:hazard_app/features/map/views/widgets/map_hazards_list.dart';
@@ -122,51 +123,58 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ).pX(20.0),
             ],
           ),
-          Column(
-            children: [
-              Stack(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    height: 100.spMin,
+          Expanded(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        right: 10.spMin,
+                        bottom: 10.spMin,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          spacing: 10.spMin,
+                          children: [
+                            CustomCompassButton(),
+                            CustomMyLocationButton(),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 10.spMin,
+                        left: 0.0,
+                        right: 0.0,
+                        child: _viewListMapButtonBuilder(),
+                      ),
+                    ],
                   ),
-                  Positioned(
-                    right: 10.spMin,
-                    bottom: 10.spMin,
-                    child: CustomMyLocationButton(),
-                  ),
-                  Positioned(
-                    bottom: 10.spMin,
-                    left: 0.0,
-                    right: 0.0,
-                    child: _viewListMapButtonBuilder(),
-                  ),
-                ],
-              ),
-              Consumer(
-                builder: (context, ref, child) {
-                  final isRoutePresent = ref.watch(
-                    providerOfMap.select(
-                      (value) => value.currentRoutePlan != null,
-                    ),
-                  );
-                  if (isRoutePresent) {
-                    return RoutePlanning().pB(20.0);
-                  }
+                ),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final isRoutePresent = ref.watch(
+                      providerOfMap.select(
+                        (value) => value.currentRoutePlan != null,
+                      ),
+                    );
+                    if (isRoutePresent) {
+                      return RoutePlanning().pB(20.0);
+                    }
 
-                  final isSelectedLocationPresent = ref.watch(
-                    providerOfMap.select(
-                      (value) => value.selectedLocation != null,
-                    ),
-                  );
-                  if (isSelectedLocationPresent) {
-                    return SelectedLocationPreview().pB(20.0);
-                  }
+                    final isSelectedLocationPresent = ref.watch(
+                      providerOfMap.select(
+                        (value) => value.selectedLocation != null,
+                      ),
+                    );
+                    if (isSelectedLocationPresent) {
+                      return SelectedLocationPreview().pB(20.0);
+                    }
 
-                  return const SizedBox();
-                },
-              ).pX(20.0),
-            ],
+                    return const SizedBox();
+                  },
+                ).pX(20.0),
+              ],
+            ),
           ),
         ],
       ),
