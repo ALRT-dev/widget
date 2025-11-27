@@ -14,6 +14,7 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -527,8 +528,27 @@ class _CreateUpdateReportScreenState
 
   /// Handles the submission of the report.
   void _handleSubmitReport() {
-    ref.read(providerOfCreateReport.notifier).createOrUpdateReport();
-    _clearAll();
+    final isUpdating = ref.read(
+      providerOfCreateReport.select(
+        (value) => value.hazardToCreateOrUpdate.id?.isNotEmpty ?? false,
+      ),
+    );
+
+    if (isUpdating) {
+      showConfirmationSheet(
+        context: context,
+        title: 'Update Report',
+        description:
+            'Are you sure you want to update this report? This will reset your votes that you have received in this alert and send the alert back for review.',
+        onPressedConfirm: (context, ref) {
+          ref.read(providerOfCreateReport.notifier).createOrUpdateReport();
+          _clearAll();
+        },
+      );
+    } else {
+      ref.read(providerOfCreateReport.notifier).createOrUpdateReport();
+      _clearAll();
+    }
   }
 
   /// Handles the action when user wants to submit another report.
