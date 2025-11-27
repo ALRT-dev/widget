@@ -101,55 +101,78 @@ class _AllLocationSubscriptionsListItemState
                     ),
                   ),
                   8.hSizedBox,
+
                   Row(
                     spacing: 10.spMin,
                     children: [
-                      if (!widget.subscription.isOwnLocation)
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final isLoading = ref.watch(
-                              providerOfMyLocationSubscriptions.select(
-                                (value) => value
-                                    .unsubscribeFromLocationStateWrappers
-                                    .any(
-                                      (wrapper) =>
-                                          wrapper.subscriptionId ==
-                                              widget.subscription.id &&
-                                          wrapper.unsubscribeFromLocationState
-                                              .maybeWhen(
-                                                orElse: () => false,
-                                                loading: () => true,
-                                              ),
-                                    ),
-                              ),
-                            );
+                      !widget.subscription.isOwnLocation
+                          ? Consumer(
+                              builder: (context, ref, child) {
+                                final isLoading = ref.watch(
+                                  providerOfMyLocationSubscriptions.select(
+                                    (value) => value
+                                        .unsubscribeFromLocationStateWrappers
+                                        .any(
+                                          (wrapper) =>
+                                              wrapper.subscriptionId ==
+                                                  widget.subscription.id &&
+                                              wrapper
+                                                  .unsubscribeFromLocationState
+                                                  .maybeWhen(
+                                                    orElse: () => false,
+                                                    loading: () => true,
+                                                  ),
+                                        ),
+                                  ),
+                                );
 
-                            return SizedBox(
+                                return SizedBox(
+                                  height: 30.spMin,
+                                  child: Button.filled(
+                                    width: 120.spMin,
+                                    onPressed: _handleUnsubscribe,
+                                    isLoading: isLoading,
+                                    padding: EdgeInsets.zero,
+                                    color: AppColors.red,
+                                    iconAndTextSpacing: 5.0,
+                                    icon: isLoading
+                                        ? null
+                                        : Icon(
+                                            Icons.notifications_off_rounded,
+                                            color: AppColors.white,
+                                            size: 16.spMin,
+                                          ),
+                                    borderRadius: 8.0,
+                                    value: isLoading ? null : 'Unsubscribe',
+                                    valueStyle: TextStyle(
+                                      fontSize: 12.spMin,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : SizedBox(
                               height: 30.spMin,
                               child: Button.filled(
                                 width: 120.spMin,
-                                onPressed: _handleUnsubscribe,
-                                isLoading: isLoading,
-                                padding: EdgeInsets.zero,
-                                color: AppColors.red,
+                                onPressed: _handleEditMyLocationTap,
                                 iconAndTextSpacing: 5.0,
-                                icon: isLoading
-                                    ? null
-                                    : Icon(
-                                        Icons.notifications_off_rounded,
-                                        color: AppColors.white,
-                                        size: 16.spMin,
-                                      ),
+                                padding: EdgeInsets.zero,
+                                color: AppColors.grey,
+                                icon: Icon(
+                                  Icons.edit_rounded,
+                                  color: AppColors.white,
+                                  size: 16.spMin,
+                                ),
                                 borderRadius: 8.0,
-                                value: isLoading ? null : 'Unsubscribe',
+                                value: 'Edit',
                                 valueStyle: TextStyle(
                                   fontSize: 12.spMin,
                                   color: AppColors.white,
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
                       SizedBox(
                         height: 30.spMin,
                         child: Button.filled(
@@ -179,6 +202,13 @@ class _AllLocationSubscriptionsListItemState
           ],
         ),
       ),
+    );
+  }
+
+  /// Handles the tap action when the edit action is pressed.
+  void _handleEditMyLocationTap() {
+    showChangeMyLocationSubscriptionBottomsheet(
+      context: context,
     );
   }
 

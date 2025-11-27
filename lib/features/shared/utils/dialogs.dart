@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hazard_app/features/notification/views/widgets/change_my_location_subscription_bottomsheet_content.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
+import 'package:hazard_app/features/shared/views/widgets/change_location_bottomsheet_content.dart';
+import 'package:hazard_app/features/shared/views/widgets/change_radius_bottomsheet_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/confirmation_sheet_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_bottomsheet_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/image_picker_bottomsheet.dart';
@@ -86,5 +89,38 @@ Future<List<AlrtMedia>?> showImagePickerBottomSheet({
   return showCustomCupertinoModalPopup<List<AlrtMedia>?>(
     context: context,
     builder: (_) => ImagePickerBottomsheet(),
+  );
+}
+
+/// Displays the my location options bottom sheet.
+Future<void> showChangeMyLocationSubscriptionBottomsheet({
+  required final BuildContext context,
+}) {
+  return showCustomCupertinoModalPopup(
+    context: context,
+    builder: (_) => ChangeMyLocationSubscriptionBottomsheetContent(),
+  );
+}
+
+/// Displays the change location bottom sheet.
+Future<void> showChangeLocationBottomsheet({
+  required final BuildContext context,
+}) {
+  return showCustomCupertinoModalPopup(
+    context: context,
+    builder: (_) => ChangeLocationBottomsheetContent(),
+  );
+}
+
+/// Displays change radius bottom sheet.
+Future<void> showChangeRadiusBottomsheet({
+  required final BuildContext context,
+  required final int initialRadius,
+}) {
+  return showCustomCupertinoModalPopup(
+    context: context,
+    builder: (_) => ChangeRadiusBottomsheetContent(
+      initialRadius: initialRadius,
+    ),
   );
 }
