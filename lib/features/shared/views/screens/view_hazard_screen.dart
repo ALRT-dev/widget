@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
@@ -505,17 +506,18 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         final hazard = ref.watch(
           provider.select((value) => value.hazard),
         );
-        final loggedInUser = ref.watch(
-          providerOfLoggedInUser.select((value) => value),
-        );
 
         if (latitude == null || longitude == null) {
           return const SizedBox.shrink();
         }
 
-        final distance = loggedInUser?.distanceTo(
-          latitude,
-          longitude,
+        final distance = ref.watch(
+          providerOfLocation.select(
+            (value) => value.distanceTo(
+              latitude,
+              longitude,
+            ),
+          ),
         );
 
         final isUserReported = ref.watch(
@@ -584,7 +586,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                                 ),
                               ),
                               4.spMin.hSizedBox,
-                              if (distance != null && !isUserReported)
+                              if (!isUserReported)
                                 Text(
                                   '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} from your location',
                                   style: TextStyle(
@@ -593,7 +595,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                                   ),
                                 ),
                             ] else ...[
-                              if (distance != null && !isUserReported)
+                              if (!isUserReported)
                                 Text(
                                   '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} from your location',
                                   style: TextStyle(

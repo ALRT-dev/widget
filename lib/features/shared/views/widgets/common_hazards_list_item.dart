@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/notification/views/widgets/confirmation_buttons.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/extensions/color_extension.dart';
@@ -441,22 +442,22 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           ),
         );
 
-        final otherLatitude = ref.watch(
+        final latitude = ref.watch(
           provider.select(
             (value) => value.hazard!.latitude,
           ),
         );
-        final otherLongitude = ref.watch(
+        final longitude = ref.watch(
           provider.select(
             (value) => value.hazard!.longitude,
           ),
         );
 
         final distance = ref.watch(
-          providerOfLoggedInUser.select(
-            (value) => otherLongitude == null || otherLatitude == null
+          providerOfLocation.select(
+            (value) => latitude == null || longitude == null
                 ? null
-                : value?.distanceTo(otherLatitude, otherLongitude),
+                : value.distanceTo(latitude, longitude),
           ),
         );
 
@@ -597,21 +598,21 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           provider.select((value) => value.hazard!.isExpired),
         );
 
-        final otherLatitude = ref.watch(
+        final latitude = ref.watch(
           provider.select(
             (value) => value.hazard!.latitude,
           ),
         );
-        final otherLongitude = ref.watch(
+        final longitude = ref.watch(
           provider.select(
             (value) => value.hazard!.longitude,
           ),
         );
         final distance = ref.watch(
-          providerOfLoggedInUser.select(
-            (value) => otherLongitude == null || otherLatitude == null
+          providerOfLocation.select(
+            (value) => latitude == null || longitude == null
                 ? null
-                : value?.distanceTo(otherLatitude, otherLongitude),
+                : value.distanceTo(latitude, longitude),
           ),
         );
         if (distance == null || distance > 1000) {

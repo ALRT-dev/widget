@@ -2,11 +2,14 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/utils/constants.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/utils/location_helper.dart';
 
 part 'location_permission_provider_state.freezed.dart';
 
 @freezed
 abstract class LocationProviderState with _$LocationProviderState {
+  const LocationProviderState._();
+
   const factory LocationProviderState({
     /// Current user's location.
     ///
@@ -21,6 +24,16 @@ abstract class LocationProviderState with _$LocationProviderState {
     @Default(GetLocationPremissionState.initial())
     final GetLocationPremissionState getLocationPremissionState,
   }) = _LocationProviderState;
+
+  /// Calculates the distance in meters from the user's location to another geographical point.
+  double distanceTo(double otherLatitude, double otherLongitude) {
+    return calculateDistanceInMeters(
+      location.latitude,
+      location.longitude,
+      otherLatitude,
+      otherLongitude,
+    );
+  }
 }
 
 @freezed

@@ -239,8 +239,8 @@ return $default(_that.location,_that.getLocationState,_that.getLocationPremissio
 /// @nodoc
 
 
-class _LocationProviderState implements LocationProviderState {
-  const _LocationProviderState({this.location = kDefaultUserLocation, this.getLocationState = const GetLocationState.initial(), this.getLocationPremissionState = const GetLocationPremissionState.initial()});
+class _LocationProviderState extends LocationProviderState {
+  const _LocationProviderState({this.location = kDefaultUserLocation, this.getLocationState = const GetLocationState.initial(), this.getLocationPremissionState = const GetLocationPremissionState.initial()}): super._();
   
 
 /// Current user's location.
