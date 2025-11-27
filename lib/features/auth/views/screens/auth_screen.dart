@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:easy_localization/easy_localization.dart';
@@ -200,9 +201,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         // _buildEmailButton(),
         // 12.hSizedBox,
         Row(
+          spacing: 12.spMin,
           children: [
-            Expanded(child: _buildAppleButton()),
-            12.wSizedBox,
+            if (Platform.isIOS) Expanded(child: _buildAppleButton()),
             Expanded(child: _buildGoogleButton()),
           ],
         ),
