@@ -305,45 +305,119 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return _buildSection(
       title: 'Performance Metrics',
       icon: Icons.trending_up_outlined,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final xpPoints = ref.watch(
+                      providerOfLoggedInUser.select(
+                        (value) => value?.xpPoints ?? 0,
+                      ),
+                    );
+                    return _buildScoreCard(
+                      'XP Score',
+                      xpPoints.toString(),
+                      Icons.star_outline,
+                      AppColors.orange,
+                      'Level 1 - Watcher',
+                    );
+                  },
+                ),
+              ),
+              16.wSizedBox,
+              Expanded(
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final reliabilityScore = ref.watch(
+                      providerOfLoggedInUser.select(
+                        (value) => (value?.reliabilityScore ?? 0.0) * 100,
+                      ),
+                    );
+
+                    return _buildScoreCard(
+                      'Reliability',
+                      '${reliabilityScore.toStringAsFixed(0)}%',
+                      Icons.shield_outlined,
+                      AppColors.green,
+                      _reliabilityDescription(reliabilityScore / 100),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          16.hSizedBox,
+          _buildBadgeCard(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBadgeCard() {
+    return Container(
+      padding: EdgeInsets.all(16.spMin),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.orange500.withValues(alpha: 0.8),
+            AppColors.orange500,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16.spMin),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.orange500.withValues(alpha: 0.1),
+            blurRadius: 15.spMin,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Row(
         children: [
-          Expanded(
-            child: Consumer(
-              builder: (context, ref, child) {
-                final xpPoints = ref.watch(
-                  providerOfLoggedInUser.select(
-                    (value) => value?.xpPoints ?? 0,
-                  ),
-                );
-                return _buildScoreCard(
-                  'XP Score',
-                  xpPoints.toString(),
-                  Icons.star_outline,
-                  AppColors.orange,
-                  'Level 1 - Watcher',
-                );
-              },
+          Container(
+            width: 48.spMin,
+            height: 48.spMin,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(12.spMin),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadowColor,
+                  blurRadius: 8.spMin,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                '🏅',
+                style: TextStyle(fontSize: 24.spMin),
+              ),
             ),
           ),
-          16.spMin.wSizedBox,
-          Expanded(
-            child: Consumer(
-              builder: (context, ref, child) {
-                final reliabilityScore = ref.watch(
-                  providerOfLoggedInUser.select(
-                    (value) => (value?.reliabilityScore ?? 0.0) * 100,
-                  ),
-                );
-
-                return _buildScoreCard(
-                  'Reliability',
-                  '${reliabilityScore.toStringAsFixed(0)}%',
-                  Icons.shield_outlined,
-                  AppColors.green,
-                  _reliabilityDescription(reliabilityScore / 100),
-                );
-              },
-            ),
+          16.wSizedBox,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'New Achievement',
+                style: TextStyle(
+                  fontSize: 12.spMin,
+                  color: AppColors.white,
+                ),
+              ),
+              Text(
+                'Safety Explorer',
+                style: TextStyle(
+                  fontSize: 16.spMin,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.white,
+                ),
+              ),
+            ],
           ),
         ],
       ),
