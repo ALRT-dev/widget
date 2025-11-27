@@ -68,6 +68,7 @@ dev_dependencies:
   freezed: ^3.2.3
   json_serializable: ^6.11.1
   retrofit_generator: ^10.0.5
+  flutter_launcher_icons: ^0.14.4
 
 dependency_overrides:
   build_runner: ^2.7.1
@@ -86,6 +87,7 @@ flutter:
     - assets/images/hazards/aws/
     - assets/images/hazards/non_aws/
     - assets/pins/
+    - assets/launcher_icons/
 
   fonts:
     - family: Poppins
