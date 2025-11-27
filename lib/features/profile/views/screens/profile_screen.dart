@@ -1134,9 +1134,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   /// Shows the update profile picture button.
   void _showUpdateProfilePictureButton() {
-    ref
-        .read(providerOfProfile.notifier)
-        .updateShowUpdateProfilePictureButton(true);
+    // ref
+    //     .read(providerOfProfile.notifier)
+    //     .updateShowUpdateProfilePictureButton(true);
   }
 
   /// Uploads a new profile picture.
