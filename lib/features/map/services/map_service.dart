@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/widgets.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -303,10 +306,32 @@ class MapService {
   }
 
   /// Gets the screen coordinate for a given [latLng] position on the map.
+  ///
+  /// On Android, the coordinates are adjusted for device pixel density to return
+  /// logical pixels that match Flutter's coordinate system.
   Future<ScreenCoordinate?> getScreenCoordinate(LatLng latLng) async {
     try {
       if (_googleMapController == null) return null;
-      return await _googleMapController!.getScreenCoordinate(latLng);
+      final screenCoordinate = await _googleMapController!.getScreenCoordinate(
+        latLng,
+      );
+
+      // On Android, getScreenCoordinate returns physical pixels
+      // We need to convert to logical pixels by dividing by device pixel ratio
+      if (Platform.isAndroid) {
+        final devicePixelRatio = WidgetsBinding
+            .instance
+            .platformDispatcher
+            .views
+            .first
+            .devicePixelRatio;
+        return ScreenCoordinate(
+          x: (screenCoordinate.x / devicePixelRatio).round(),
+          y: (screenCoordinate.y / devicePixelRatio).round(),
+        );
+      }
+
+      return screenCoordinate;
     } catch (e) {
       return null;
     }
