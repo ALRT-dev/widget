@@ -74,8 +74,8 @@ abstract class MapProviderState with _$MapProviderState {
     /// Whether the map controller is ready for operations
     @Default(false) final bool isMapReady,
 
-    /// Pending bounds to animate to when map becomes ready
-    final LatLngBounds? pendingAnimationBounds,
+    /// Pending camera update to apply when the map is ready
+    final CameraUpdate? pendingCameraUpdateToApply,
   }) = _MapProviderState;
 }
 

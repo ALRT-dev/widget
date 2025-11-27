@@ -83,7 +83,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
       if (mounted) {
         state = state.copyWith(
           isMapReady: false,
-          pendingAnimationBounds: null,
+          pendingCameraUpdateToApply: null,
         );
       }
     });
@@ -101,9 +101,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
     updateIsMapReady(true);
 
     // Execute any pending animation
-    final pendingBounds = state.pendingAnimationBounds;
-    if (pendingBounds != null) {
-      animateToBounds(bounds: pendingBounds);
+    final pendingCameraUpdateToApply = state.pendingCameraUpdateToApply;
+    if (pendingCameraUpdateToApply != null) {
+      animateToCameraUpdate(
+        cameraUpdate: pendingCameraUpdateToApply,
+      );
     }
   }
 
@@ -331,15 +333,16 @@ class MapProvider extends StateNotifier<MapProviderState> {
     required final LatLngBounds bounds,
     final double padding = 100.0,
   }) async {
+    final cameraUpdate = CameraUpdate.newLatLngBounds(bounds, padding);
     if (!state.isMapReady) {
       // If map is not ready, store the bounds for later execution
       state = state.copyWith(
-        pendingAnimationBounds: bounds,
+        pendingCameraUpdateToApply: cameraUpdate,
       );
     } else {
       // If map is ready, attempt to animate immediately
       final result = await _mapService.animateCamera(
-        cameraUpdate: CameraUpdate.newLatLngBounds(bounds, padding),
+        cameraUpdate: cameraUpdate,
       );
       if (!mounted) return;
 
@@ -347,13 +350,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
         (success) {
           // Animation succeeded, reset pending bounds
           state = state.copyWith(
-            pendingAnimationBounds: null,
+            pendingCameraUpdateToApply: null,
           );
         },
         (failure) {
           // If animation fails, queue it
           state = state.copyWith(
-            pendingAnimationBounds: bounds,
+            pendingCameraUpdateToApply: cameraUpdate,
           );
         },
       );

@@ -18,7 +18,9 @@ mixin _$MyLocationSubscriptionsProviderState {
  List<LocationSubscription> get locationSubscriptions;/// The state of getting location subscriptions.
  GetLocationSubscriptionsState get getLocationSubscriptionsState;/// The state of subscribing to a location.
  List<SubscribeToLocationStateWrapper> get subscribeToLocationStateWrappers;/// The state of unsubscribing from a location.
- List<UnsubscribeFromLocationStateWrapper> get unsubscribeFromLocationStateWrappers;
+ List<UnsubscribeFromLocationStateWrapper> get unsubscribeFromLocationStateWrappers;/// The state of updating a location subscription's location.
+ UpdateUserLocationSubscriptionLocationState get updateUserLocationSubscriptionLocationState;/// The state of updating a location subscription's radius.
+ UpdateUserLocationSubscriptionRadiusState get updateUserLocationSubscriptionRadiusState;
 /// Create a copy of MyLocationSubscriptionsProviderState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +31,16 @@ $MyLocationSubscriptionsProviderStateCopyWith<MyLocationSubscriptionsProviderSta
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MyLocationSubscriptionsProviderState&&const DeepCollectionEquality().equals(other.locationSubscriptions, locationSubscriptions)&&(identical(other.getLocationSubscriptionsState, getLocationSubscriptionsState) || other.getLocationSubscriptionsState == getLocationSubscriptionsState)&&const DeepCollectionEquality().equals(other.subscribeToLocationStateWrappers, subscribeToLocationStateWrappers)&&const DeepCollectionEquality().equals(other.unsubscribeFromLocationStateWrappers, unsubscribeFromLocationStateWrappers));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MyLocationSubscriptionsProviderState&&const DeepCollectionEquality().equals(other.locationSubscriptions, locationSubscriptions)&&(identical(other.getLocationSubscriptionsState, getLocationSubscriptionsState) || other.getLocationSubscriptionsState == getLocationSubscriptionsState)&&const DeepCollectionEquality().equals(other.subscribeToLocationStateWrappers, subscribeToLocationStateWrappers)&&const DeepCollectionEquality().equals(other.unsubscribeFromLocationStateWrappers, unsubscribeFromLocationStateWrappers)&&(identical(other.updateUserLocationSubscriptionLocationState, updateUserLocationSubscriptionLocationState) || other.updateUserLocationSubscriptionLocationState == updateUserLocationSubscriptionLocationState)&&(identical(other.updateUserLocationSubscriptionRadiusState, updateUserLocationSubscriptionRadiusState) || other.updateUserLocationSubscriptionRadiusState == updateUserLocationSubscriptionRadiusState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(locationSubscriptions),getLocationSubscriptionsState,const DeepCollectionEquality().hash(subscribeToLocationStateWrappers),const DeepCollectionEquality().hash(unsubscribeFromLocationStateWrappers));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(locationSubscriptions),getLocationSubscriptionsState,const DeepCollectionEquality().hash(subscribeToLocationStateWrappers),const DeepCollectionEquality().hash(unsubscribeFromLocationStateWrappers),updateUserLocationSubscriptionLocationState,updateUserLocationSubscriptionRadiusState);
 
 @override
 String toString() {
-  return 'MyLocationSubscriptionsProviderState(locationSubscriptions: $locationSubscriptions, getLocationSubscriptionsState: $getLocationSubscriptionsState, subscribeToLocationStateWrappers: $subscribeToLocationStateWrappers, unsubscribeFromLocationStateWrappers: $unsubscribeFromLocationStateWrappers)';
+  return 'MyLocationSubscriptionsProviderState(locationSubscriptions: $locationSubscriptions, getLocationSubscriptionsState: $getLocationSubscriptionsState, subscribeToLocationStateWrappers: $subscribeToLocationStateWrappers, unsubscribeFromLocationStateWrappers: $unsubscribeFromLocationStateWrappers, updateUserLocationSubscriptionLocationState: $updateUserLocationSubscriptionLocationState, updateUserLocationSubscriptionRadiusState: $updateUserLocationSubscriptionRadiusState)';
 }
 
 
@@ -49,11 +51,11 @@ abstract mixin class $MyLocationSubscriptionsProviderStateCopyWith<$Res>  {
   factory $MyLocationSubscriptionsProviderStateCopyWith(MyLocationSubscriptionsProviderState value, $Res Function(MyLocationSubscriptionsProviderState) _then) = _$MyLocationSubscriptionsProviderStateCopyWithImpl;
 @useResult
 $Res call({
- List<LocationSubscription> locationSubscriptions, GetLocationSubscriptionsState getLocationSubscriptionsState, List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers, List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers
+ List<LocationSubscription> locationSubscriptions, GetLocationSubscriptionsState getLocationSubscriptionsState, List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers, List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers, UpdateUserLocationSubscriptionLocationState updateUserLocationSubscriptionLocationState, UpdateUserLocationSubscriptionRadiusState updateUserLocationSubscriptionRadiusState
 });
 
 
-$GetLocationSubscriptionsStateCopyWith<$Res> get getLocationSubscriptionsState;
+$GetLocationSubscriptionsStateCopyWith<$Res> get getLocationSubscriptionsState;$UpdateUserLocationSubscriptionLocationStateCopyWith<$Res> get updateUserLocationSubscriptionLocationState;$UpdateUserLocationSubscriptionRadiusStateCopyWith<$Res> get updateUserLocationSubscriptionRadiusState;
 
 }
 /// @nodoc
@@ -66,13 +68,15 @@ class _$MyLocationSubscriptionsProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of MyLocationSubscriptionsProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? locationSubscriptions = null,Object? getLocationSubscriptionsState = null,Object? subscribeToLocationStateWrappers = null,Object? unsubscribeFromLocationStateWrappers = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? locationSubscriptions = null,Object? getLocationSubscriptionsState = null,Object? subscribeToLocationStateWrappers = null,Object? unsubscribeFromLocationStateWrappers = null,Object? updateUserLocationSubscriptionLocationState = null,Object? updateUserLocationSubscriptionRadiusState = null,}) {
   return _then(_self.copyWith(
 locationSubscriptions: null == locationSubscriptions ? _self.locationSubscriptions : locationSubscriptions // ignore: cast_nullable_to_non_nullable
 as List<LocationSubscription>,getLocationSubscriptionsState: null == getLocationSubscriptionsState ? _self.getLocationSubscriptionsState : getLocationSubscriptionsState // ignore: cast_nullable_to_non_nullable
 as GetLocationSubscriptionsState,subscribeToLocationStateWrappers: null == subscribeToLocationStateWrappers ? _self.subscribeToLocationStateWrappers : subscribeToLocationStateWrappers // ignore: cast_nullable_to_non_nullable
 as List<SubscribeToLocationStateWrapper>,unsubscribeFromLocationStateWrappers: null == unsubscribeFromLocationStateWrappers ? _self.unsubscribeFromLocationStateWrappers : unsubscribeFromLocationStateWrappers // ignore: cast_nullable_to_non_nullable
-as List<UnsubscribeFromLocationStateWrapper>,
+as List<UnsubscribeFromLocationStateWrapper>,updateUserLocationSubscriptionLocationState: null == updateUserLocationSubscriptionLocationState ? _self.updateUserLocationSubscriptionLocationState : updateUserLocationSubscriptionLocationState // ignore: cast_nullable_to_non_nullable
+as UpdateUserLocationSubscriptionLocationState,updateUserLocationSubscriptionRadiusState: null == updateUserLocationSubscriptionRadiusState ? _self.updateUserLocationSubscriptionRadiusState : updateUserLocationSubscriptionRadiusState // ignore: cast_nullable_to_non_nullable
+as UpdateUserLocationSubscriptionRadiusState,
   ));
 }
 /// Create a copy of MyLocationSubscriptionsProviderState
@@ -83,6 +87,24 @@ $GetLocationSubscriptionsStateCopyWith<$Res> get getLocationSubscriptionsState {
   
   return $GetLocationSubscriptionsStateCopyWith<$Res>(_self.getLocationSubscriptionsState, (value) {
     return _then(_self.copyWith(getLocationSubscriptionsState: value));
+  });
+}/// Create a copy of MyLocationSubscriptionsProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateUserLocationSubscriptionLocationStateCopyWith<$Res> get updateUserLocationSubscriptionLocationState {
+  
+  return $UpdateUserLocationSubscriptionLocationStateCopyWith<$Res>(_self.updateUserLocationSubscriptionLocationState, (value) {
+    return _then(_self.copyWith(updateUserLocationSubscriptionLocationState: value));
+  });
+}/// Create a copy of MyLocationSubscriptionsProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateUserLocationSubscriptionRadiusStateCopyWith<$Res> get updateUserLocationSubscriptionRadiusState {
+  
+  return $UpdateUserLocationSubscriptionRadiusStateCopyWith<$Res>(_self.updateUserLocationSubscriptionRadiusState, (value) {
+    return _then(_self.copyWith(updateUserLocationSubscriptionRadiusState: value));
   });
 }
 }
@@ -166,10 +188,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<LocationSubscription> locationSubscriptions,  GetLocationSubscriptionsState getLocationSubscriptionsState,  List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers,  List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<LocationSubscription> locationSubscriptions,  GetLocationSubscriptionsState getLocationSubscriptionsState,  List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers,  List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers,  UpdateUserLocationSubscriptionLocationState updateUserLocationSubscriptionLocationState,  UpdateUserLocationSubscriptionRadiusState updateUserLocationSubscriptionRadiusState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MyLocationSubscriptionsProviderState() when $default != null:
-return $default(_that.locationSubscriptions,_that.getLocationSubscriptionsState,_that.subscribeToLocationStateWrappers,_that.unsubscribeFromLocationStateWrappers);case _:
+return $default(_that.locationSubscriptions,_that.getLocationSubscriptionsState,_that.subscribeToLocationStateWrappers,_that.unsubscribeFromLocationStateWrappers,_that.updateUserLocationSubscriptionLocationState,_that.updateUserLocationSubscriptionRadiusState);case _:
   return orElse();
 
 }
@@ -187,10 +209,10 @@ return $default(_that.locationSubscriptions,_that.getLocationSubscriptionsState,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<LocationSubscription> locationSubscriptions,  GetLocationSubscriptionsState getLocationSubscriptionsState,  List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers,  List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<LocationSubscription> locationSubscriptions,  GetLocationSubscriptionsState getLocationSubscriptionsState,  List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers,  List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers,  UpdateUserLocationSubscriptionLocationState updateUserLocationSubscriptionLocationState,  UpdateUserLocationSubscriptionRadiusState updateUserLocationSubscriptionRadiusState)  $default,) {final _that = this;
 switch (_that) {
 case _MyLocationSubscriptionsProviderState():
-return $default(_that.locationSubscriptions,_that.getLocationSubscriptionsState,_that.subscribeToLocationStateWrappers,_that.unsubscribeFromLocationStateWrappers);case _:
+return $default(_that.locationSubscriptions,_that.getLocationSubscriptionsState,_that.subscribeToLocationStateWrappers,_that.unsubscribeFromLocationStateWrappers,_that.updateUserLocationSubscriptionLocationState,_that.updateUserLocationSubscriptionRadiusState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +229,10 @@ return $default(_that.locationSubscriptions,_that.getLocationSubscriptionsState,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<LocationSubscription> locationSubscriptions,  GetLocationSubscriptionsState getLocationSubscriptionsState,  List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers,  List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<LocationSubscription> locationSubscriptions,  GetLocationSubscriptionsState getLocationSubscriptionsState,  List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers,  List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers,  UpdateUserLocationSubscriptionLocationState updateUserLocationSubscriptionLocationState,  UpdateUserLocationSubscriptionRadiusState updateUserLocationSubscriptionRadiusState)?  $default,) {final _that = this;
 switch (_that) {
 case _MyLocationSubscriptionsProviderState() when $default != null:
-return $default(_that.locationSubscriptions,_that.getLocationSubscriptionsState,_that.subscribeToLocationStateWrappers,_that.unsubscribeFromLocationStateWrappers);case _:
+return $default(_that.locationSubscriptions,_that.getLocationSubscriptionsState,_that.subscribeToLocationStateWrappers,_that.unsubscribeFromLocationStateWrappers,_that.updateUserLocationSubscriptionLocationState,_that.updateUserLocationSubscriptionRadiusState);case _:
   return null;
 
 }
@@ -222,7 +244,7 @@ return $default(_that.locationSubscriptions,_that.getLocationSubscriptionsState,
 
 
 class _MyLocationSubscriptionsProviderState implements MyLocationSubscriptionsProviderState {
-  const _MyLocationSubscriptionsProviderState({final  List<LocationSubscription> locationSubscriptions = const <LocationSubscription>[], this.getLocationSubscriptionsState = const GetLocationSubscriptionsState.initial(), final  List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers = const <SubscribeToLocationStateWrapper>[], final  List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers = const <UnsubscribeFromLocationStateWrapper>[]}): _locationSubscriptions = locationSubscriptions,_subscribeToLocationStateWrappers = subscribeToLocationStateWrappers,_unsubscribeFromLocationStateWrappers = unsubscribeFromLocationStateWrappers;
+  const _MyLocationSubscriptionsProviderState({final  List<LocationSubscription> locationSubscriptions = const <LocationSubscription>[], this.getLocationSubscriptionsState = const GetLocationSubscriptionsState.initial(), final  List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers = const <SubscribeToLocationStateWrapper>[], final  List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers = const <UnsubscribeFromLocationStateWrapper>[], this.updateUserLocationSubscriptionLocationState = const UpdateUserLocationSubscriptionLocationState.initial(), this.updateUserLocationSubscriptionRadiusState = const UpdateUserLocationSubscriptionRadiusState.initial()}): _locationSubscriptions = locationSubscriptions,_subscribeToLocationStateWrappers = subscribeToLocationStateWrappers,_unsubscribeFromLocationStateWrappers = unsubscribeFromLocationStateWrappers;
   
 
 /// The list of location subscriptions of the user.
@@ -254,6 +276,10 @@ class _MyLocationSubscriptionsProviderState implements MyLocationSubscriptionsPr
   return EqualUnmodifiableListView(_unsubscribeFromLocationStateWrappers);
 }
 
+/// The state of updating a location subscription's location.
+@override@JsonKey() final  UpdateUserLocationSubscriptionLocationState updateUserLocationSubscriptionLocationState;
+/// The state of updating a location subscription's radius.
+@override@JsonKey() final  UpdateUserLocationSubscriptionRadiusState updateUserLocationSubscriptionRadiusState;
 
 /// Create a copy of MyLocationSubscriptionsProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -265,16 +291,16 @@ _$MyLocationSubscriptionsProviderStateCopyWith<_MyLocationSubscriptionsProviderS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MyLocationSubscriptionsProviderState&&const DeepCollectionEquality().equals(other._locationSubscriptions, _locationSubscriptions)&&(identical(other.getLocationSubscriptionsState, getLocationSubscriptionsState) || other.getLocationSubscriptionsState == getLocationSubscriptionsState)&&const DeepCollectionEquality().equals(other._subscribeToLocationStateWrappers, _subscribeToLocationStateWrappers)&&const DeepCollectionEquality().equals(other._unsubscribeFromLocationStateWrappers, _unsubscribeFromLocationStateWrappers));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MyLocationSubscriptionsProviderState&&const DeepCollectionEquality().equals(other._locationSubscriptions, _locationSubscriptions)&&(identical(other.getLocationSubscriptionsState, getLocationSubscriptionsState) || other.getLocationSubscriptionsState == getLocationSubscriptionsState)&&const DeepCollectionEquality().equals(other._subscribeToLocationStateWrappers, _subscribeToLocationStateWrappers)&&const DeepCollectionEquality().equals(other._unsubscribeFromLocationStateWrappers, _unsubscribeFromLocationStateWrappers)&&(identical(other.updateUserLocationSubscriptionLocationState, updateUserLocationSubscriptionLocationState) || other.updateUserLocationSubscriptionLocationState == updateUserLocationSubscriptionLocationState)&&(identical(other.updateUserLocationSubscriptionRadiusState, updateUserLocationSubscriptionRadiusState) || other.updateUserLocationSubscriptionRadiusState == updateUserLocationSubscriptionRadiusState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_locationSubscriptions),getLocationSubscriptionsState,const DeepCollectionEquality().hash(_subscribeToLocationStateWrappers),const DeepCollectionEquality().hash(_unsubscribeFromLocationStateWrappers));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_locationSubscriptions),getLocationSubscriptionsState,const DeepCollectionEquality().hash(_subscribeToLocationStateWrappers),const DeepCollectionEquality().hash(_unsubscribeFromLocationStateWrappers),updateUserLocationSubscriptionLocationState,updateUserLocationSubscriptionRadiusState);
 
 @override
 String toString() {
-  return 'MyLocationSubscriptionsProviderState(locationSubscriptions: $locationSubscriptions, getLocationSubscriptionsState: $getLocationSubscriptionsState, subscribeToLocationStateWrappers: $subscribeToLocationStateWrappers, unsubscribeFromLocationStateWrappers: $unsubscribeFromLocationStateWrappers)';
+  return 'MyLocationSubscriptionsProviderState(locationSubscriptions: $locationSubscriptions, getLocationSubscriptionsState: $getLocationSubscriptionsState, subscribeToLocationStateWrappers: $subscribeToLocationStateWrappers, unsubscribeFromLocationStateWrappers: $unsubscribeFromLocationStateWrappers, updateUserLocationSubscriptionLocationState: $updateUserLocationSubscriptionLocationState, updateUserLocationSubscriptionRadiusState: $updateUserLocationSubscriptionRadiusState)';
 }
 
 
@@ -285,11 +311,11 @@ abstract mixin class _$MyLocationSubscriptionsProviderStateCopyWith<$Res> implem
   factory _$MyLocationSubscriptionsProviderStateCopyWith(_MyLocationSubscriptionsProviderState value, $Res Function(_MyLocationSubscriptionsProviderState) _then) = __$MyLocationSubscriptionsProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<LocationSubscription> locationSubscriptions, GetLocationSubscriptionsState getLocationSubscriptionsState, List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers, List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers
+ List<LocationSubscription> locationSubscriptions, GetLocationSubscriptionsState getLocationSubscriptionsState, List<SubscribeToLocationStateWrapper> subscribeToLocationStateWrappers, List<UnsubscribeFromLocationStateWrapper> unsubscribeFromLocationStateWrappers, UpdateUserLocationSubscriptionLocationState updateUserLocationSubscriptionLocationState, UpdateUserLocationSubscriptionRadiusState updateUserLocationSubscriptionRadiusState
 });
 
 
-@override $GetLocationSubscriptionsStateCopyWith<$Res> get getLocationSubscriptionsState;
+@override $GetLocationSubscriptionsStateCopyWith<$Res> get getLocationSubscriptionsState;@override $UpdateUserLocationSubscriptionLocationStateCopyWith<$Res> get updateUserLocationSubscriptionLocationState;@override $UpdateUserLocationSubscriptionRadiusStateCopyWith<$Res> get updateUserLocationSubscriptionRadiusState;
 
 }
 /// @nodoc
@@ -302,13 +328,15 @@ class __$MyLocationSubscriptionsProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of MyLocationSubscriptionsProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? locationSubscriptions = null,Object? getLocationSubscriptionsState = null,Object? subscribeToLocationStateWrappers = null,Object? unsubscribeFromLocationStateWrappers = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? locationSubscriptions = null,Object? getLocationSubscriptionsState = null,Object? subscribeToLocationStateWrappers = null,Object? unsubscribeFromLocationStateWrappers = null,Object? updateUserLocationSubscriptionLocationState = null,Object? updateUserLocationSubscriptionRadiusState = null,}) {
   return _then(_MyLocationSubscriptionsProviderState(
 locationSubscriptions: null == locationSubscriptions ? _self._locationSubscriptions : locationSubscriptions // ignore: cast_nullable_to_non_nullable
 as List<LocationSubscription>,getLocationSubscriptionsState: null == getLocationSubscriptionsState ? _self.getLocationSubscriptionsState : getLocationSubscriptionsState // ignore: cast_nullable_to_non_nullable
 as GetLocationSubscriptionsState,subscribeToLocationStateWrappers: null == subscribeToLocationStateWrappers ? _self._subscribeToLocationStateWrappers : subscribeToLocationStateWrappers // ignore: cast_nullable_to_non_nullable
 as List<SubscribeToLocationStateWrapper>,unsubscribeFromLocationStateWrappers: null == unsubscribeFromLocationStateWrappers ? _self._unsubscribeFromLocationStateWrappers : unsubscribeFromLocationStateWrappers // ignore: cast_nullable_to_non_nullable
-as List<UnsubscribeFromLocationStateWrapper>,
+as List<UnsubscribeFromLocationStateWrapper>,updateUserLocationSubscriptionLocationState: null == updateUserLocationSubscriptionLocationState ? _self.updateUserLocationSubscriptionLocationState : updateUserLocationSubscriptionLocationState // ignore: cast_nullable_to_non_nullable
+as UpdateUserLocationSubscriptionLocationState,updateUserLocationSubscriptionRadiusState: null == updateUserLocationSubscriptionRadiusState ? _self.updateUserLocationSubscriptionRadiusState : updateUserLocationSubscriptionRadiusState // ignore: cast_nullable_to_non_nullable
+as UpdateUserLocationSubscriptionRadiusState,
   ));
 }
 
@@ -320,6 +348,24 @@ $GetLocationSubscriptionsStateCopyWith<$Res> get getLocationSubscriptionsState {
   
   return $GetLocationSubscriptionsStateCopyWith<$Res>(_self.getLocationSubscriptionsState, (value) {
     return _then(_self.copyWith(getLocationSubscriptionsState: value));
+  });
+}/// Create a copy of MyLocationSubscriptionsProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateUserLocationSubscriptionLocationStateCopyWith<$Res> get updateUserLocationSubscriptionLocationState {
+  
+  return $UpdateUserLocationSubscriptionLocationStateCopyWith<$Res>(_self.updateUserLocationSubscriptionLocationState, (value) {
+    return _then(_self.copyWith(updateUserLocationSubscriptionLocationState: value));
+  });
+}/// Create a copy of MyLocationSubscriptionsProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$UpdateUserLocationSubscriptionRadiusStateCopyWith<$Res> get updateUserLocationSubscriptionRadiusState {
+  
+  return $UpdateUserLocationSubscriptionRadiusStateCopyWith<$Res>(_self.updateUserLocationSubscriptionRadiusState, (value) {
+    return _then(_self.copyWith(updateUserLocationSubscriptionRadiusState: value));
   });
 }
 }
@@ -1904,6 +1950,704 @@ as AppError,
 }
 
 /// Create a copy of UnsubscribeFromLocationState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppErrorCopyWith<$Res> get error {
+  
+  return $AppErrorCopyWith<$Res>(_self.error, (value) {
+    return _then(_self.copyWith(error: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$UpdateUserLocationSubscriptionLocationState {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateUserLocationSubscriptionLocationState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationSubscriptionLocationState()';
+}
+
+
+}
+
+/// @nodoc
+class $UpdateUserLocationSubscriptionLocationStateCopyWith<$Res>  {
+$UpdateUserLocationSubscriptionLocationStateCopyWith(UpdateUserLocationSubscriptionLocationState _, $Res Function(UpdateUserLocationSubscriptionLocationState) __);
+}
+
+
+/// Adds pattern-matching-related methods to [UpdateUserLocationSubscriptionLocationState].
+extension UpdateUserLocationSubscriptionLocationStatePatterns on UpdateUserLocationSubscriptionLocationState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _UpdateUserLocationSubscriptionLocationStateInitial value)?  initial,TResult Function( _UpdateUserLocationSubscriptionLocationStateLoading value)?  loading,TResult Function( _UpdateUserLocationSubscriptionLocationStateSuccess value)?  success,TResult Function( _UpdateUserLocationSubscriptionLocationStateError value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionLocationStateInitial() when initial != null:
+return initial(_that);case _UpdateUserLocationSubscriptionLocationStateLoading() when loading != null:
+return loading(_that);case _UpdateUserLocationSubscriptionLocationStateSuccess() when success != null:
+return success(_that);case _UpdateUserLocationSubscriptionLocationStateError() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _UpdateUserLocationSubscriptionLocationStateInitial value)  initial,required TResult Function( _UpdateUserLocationSubscriptionLocationStateLoading value)  loading,required TResult Function( _UpdateUserLocationSubscriptionLocationStateSuccess value)  success,required TResult Function( _UpdateUserLocationSubscriptionLocationStateError value)  error,}){
+final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionLocationStateInitial():
+return initial(_that);case _UpdateUserLocationSubscriptionLocationStateLoading():
+return loading(_that);case _UpdateUserLocationSubscriptionLocationStateSuccess():
+return success(_that);case _UpdateUserLocationSubscriptionLocationStateError():
+return error(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _UpdateUserLocationSubscriptionLocationStateInitial value)?  initial,TResult? Function( _UpdateUserLocationSubscriptionLocationStateLoading value)?  loading,TResult? Function( _UpdateUserLocationSubscriptionLocationStateSuccess value)?  success,TResult? Function( _UpdateUserLocationSubscriptionLocationStateError value)?  error,}){
+final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionLocationStateInitial() when initial != null:
+return initial(_that);case _UpdateUserLocationSubscriptionLocationStateLoading() when loading != null:
+return loading(_that);case _UpdateUserLocationSubscriptionLocationStateSuccess() when success != null:
+return success(_that);case _UpdateUserLocationSubscriptionLocationStateError() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  success,TResult Function( AppError error)?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionLocationStateInitial() when initial != null:
+return initial();case _UpdateUserLocationSubscriptionLocationStateLoading() when loading != null:
+return loading();case _UpdateUserLocationSubscriptionLocationStateSuccess() when success != null:
+return success();case _UpdateUserLocationSubscriptionLocationStateError() when error != null:
+return error(_that.error);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  success,required TResult Function( AppError error)  error,}) {final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionLocationStateInitial():
+return initial();case _UpdateUserLocationSubscriptionLocationStateLoading():
+return loading();case _UpdateUserLocationSubscriptionLocationStateSuccess():
+return success();case _UpdateUserLocationSubscriptionLocationStateError():
+return error(_that.error);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  success,TResult? Function( AppError error)?  error,}) {final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionLocationStateInitial() when initial != null:
+return initial();case _UpdateUserLocationSubscriptionLocationStateLoading() when loading != null:
+return loading();case _UpdateUserLocationSubscriptionLocationStateSuccess() when success != null:
+return success();case _UpdateUserLocationSubscriptionLocationStateError() when error != null:
+return error(_that.error);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _UpdateUserLocationSubscriptionLocationStateInitial implements UpdateUserLocationSubscriptionLocationState {
+  const _UpdateUserLocationSubscriptionLocationStateInitial();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateUserLocationSubscriptionLocationStateInitial);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationSubscriptionLocationState.initial()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _UpdateUserLocationSubscriptionLocationStateLoading implements UpdateUserLocationSubscriptionLocationState {
+  const _UpdateUserLocationSubscriptionLocationStateLoading();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateUserLocationSubscriptionLocationStateLoading);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationSubscriptionLocationState.loading()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _UpdateUserLocationSubscriptionLocationStateSuccess implements UpdateUserLocationSubscriptionLocationState {
+  const _UpdateUserLocationSubscriptionLocationStateSuccess();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateUserLocationSubscriptionLocationStateSuccess);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationSubscriptionLocationState.success()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _UpdateUserLocationSubscriptionLocationStateError implements UpdateUserLocationSubscriptionLocationState {
+  const _UpdateUserLocationSubscriptionLocationStateError(this.error);
+  
+
+ final  AppError error;
+
+/// Create a copy of UpdateUserLocationSubscriptionLocationState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdateUserLocationSubscriptionLocationStateErrorCopyWith<_UpdateUserLocationSubscriptionLocationStateError> get copyWith => __$UpdateUserLocationSubscriptionLocationStateErrorCopyWithImpl<_UpdateUserLocationSubscriptionLocationStateError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateUserLocationSubscriptionLocationStateError&&(identical(other.error, error) || other.error == error));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,error);
+
+@override
+String toString() {
+  return 'UpdateUserLocationSubscriptionLocationState.error(error: $error)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdateUserLocationSubscriptionLocationStateErrorCopyWith<$Res> implements $UpdateUserLocationSubscriptionLocationStateCopyWith<$Res> {
+  factory _$UpdateUserLocationSubscriptionLocationStateErrorCopyWith(_UpdateUserLocationSubscriptionLocationStateError value, $Res Function(_UpdateUserLocationSubscriptionLocationStateError) _then) = __$UpdateUserLocationSubscriptionLocationStateErrorCopyWithImpl;
+@useResult
+$Res call({
+ AppError error
+});
+
+
+$AppErrorCopyWith<$Res> get error;
+
+}
+/// @nodoc
+class __$UpdateUserLocationSubscriptionLocationStateErrorCopyWithImpl<$Res>
+    implements _$UpdateUserLocationSubscriptionLocationStateErrorCopyWith<$Res> {
+  __$UpdateUserLocationSubscriptionLocationStateErrorCopyWithImpl(this._self, this._then);
+
+  final _UpdateUserLocationSubscriptionLocationStateError _self;
+  final $Res Function(_UpdateUserLocationSubscriptionLocationStateError) _then;
+
+/// Create a copy of UpdateUserLocationSubscriptionLocationState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
+  return _then(_UpdateUserLocationSubscriptionLocationStateError(
+null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as AppError,
+  ));
+}
+
+/// Create a copy of UpdateUserLocationSubscriptionLocationState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppErrorCopyWith<$Res> get error {
+  
+  return $AppErrorCopyWith<$Res>(_self.error, (value) {
+    return _then(_self.copyWith(error: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$UpdateUserLocationSubscriptionRadiusState {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateUserLocationSubscriptionRadiusState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationSubscriptionRadiusState()';
+}
+
+
+}
+
+/// @nodoc
+class $UpdateUserLocationSubscriptionRadiusStateCopyWith<$Res>  {
+$UpdateUserLocationSubscriptionRadiusStateCopyWith(UpdateUserLocationSubscriptionRadiusState _, $Res Function(UpdateUserLocationSubscriptionRadiusState) __);
+}
+
+
+/// Adds pattern-matching-related methods to [UpdateUserLocationSubscriptionRadiusState].
+extension UpdateUserLocationSubscriptionRadiusStatePatterns on UpdateUserLocationSubscriptionRadiusState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _UpdateUserLocationSubscriptionRadiusStateInitial value)?  initial,TResult Function( _UpdateUserLocationSubscriptionRadiusStateLoading value)?  loading,TResult Function( _UpdateUserLocationSubscriptionRadiusStateSuccess value)?  success,TResult Function( _UpdateUserLocationSubscriptionRadiusStateError value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionRadiusStateInitial() when initial != null:
+return initial(_that);case _UpdateUserLocationSubscriptionRadiusStateLoading() when loading != null:
+return loading(_that);case _UpdateUserLocationSubscriptionRadiusStateSuccess() when success != null:
+return success(_that);case _UpdateUserLocationSubscriptionRadiusStateError() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _UpdateUserLocationSubscriptionRadiusStateInitial value)  initial,required TResult Function( _UpdateUserLocationSubscriptionRadiusStateLoading value)  loading,required TResult Function( _UpdateUserLocationSubscriptionRadiusStateSuccess value)  success,required TResult Function( _UpdateUserLocationSubscriptionRadiusStateError value)  error,}){
+final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionRadiusStateInitial():
+return initial(_that);case _UpdateUserLocationSubscriptionRadiusStateLoading():
+return loading(_that);case _UpdateUserLocationSubscriptionRadiusStateSuccess():
+return success(_that);case _UpdateUserLocationSubscriptionRadiusStateError():
+return error(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _UpdateUserLocationSubscriptionRadiusStateInitial value)?  initial,TResult? Function( _UpdateUserLocationSubscriptionRadiusStateLoading value)?  loading,TResult? Function( _UpdateUserLocationSubscriptionRadiusStateSuccess value)?  success,TResult? Function( _UpdateUserLocationSubscriptionRadiusStateError value)?  error,}){
+final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionRadiusStateInitial() when initial != null:
+return initial(_that);case _UpdateUserLocationSubscriptionRadiusStateLoading() when loading != null:
+return loading(_that);case _UpdateUserLocationSubscriptionRadiusStateSuccess() when success != null:
+return success(_that);case _UpdateUserLocationSubscriptionRadiusStateError() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  success,TResult Function( AppError error)?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionRadiusStateInitial() when initial != null:
+return initial();case _UpdateUserLocationSubscriptionRadiusStateLoading() when loading != null:
+return loading();case _UpdateUserLocationSubscriptionRadiusStateSuccess() when success != null:
+return success();case _UpdateUserLocationSubscriptionRadiusStateError() when error != null:
+return error(_that.error);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  success,required TResult Function( AppError error)  error,}) {final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionRadiusStateInitial():
+return initial();case _UpdateUserLocationSubscriptionRadiusStateLoading():
+return loading();case _UpdateUserLocationSubscriptionRadiusStateSuccess():
+return success();case _UpdateUserLocationSubscriptionRadiusStateError():
+return error(_that.error);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  success,TResult? Function( AppError error)?  error,}) {final _that = this;
+switch (_that) {
+case _UpdateUserLocationSubscriptionRadiusStateInitial() when initial != null:
+return initial();case _UpdateUserLocationSubscriptionRadiusStateLoading() when loading != null:
+return loading();case _UpdateUserLocationSubscriptionRadiusStateSuccess() when success != null:
+return success();case _UpdateUserLocationSubscriptionRadiusStateError() when error != null:
+return error(_that.error);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _UpdateUserLocationSubscriptionRadiusStateInitial implements UpdateUserLocationSubscriptionRadiusState {
+  const _UpdateUserLocationSubscriptionRadiusStateInitial();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateUserLocationSubscriptionRadiusStateInitial);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationSubscriptionRadiusState.initial()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _UpdateUserLocationSubscriptionRadiusStateLoading implements UpdateUserLocationSubscriptionRadiusState {
+  const _UpdateUserLocationSubscriptionRadiusStateLoading();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateUserLocationSubscriptionRadiusStateLoading);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationSubscriptionRadiusState.loading()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _UpdateUserLocationSubscriptionRadiusStateSuccess implements UpdateUserLocationSubscriptionRadiusState {
+  const _UpdateUserLocationSubscriptionRadiusStateSuccess();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateUserLocationSubscriptionRadiusStateSuccess);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'UpdateUserLocationSubscriptionRadiusState.success()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _UpdateUserLocationSubscriptionRadiusStateError implements UpdateUserLocationSubscriptionRadiusState {
+  const _UpdateUserLocationSubscriptionRadiusStateError(this.error);
+  
+
+ final  AppError error;
+
+/// Create a copy of UpdateUserLocationSubscriptionRadiusState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$UpdateUserLocationSubscriptionRadiusStateErrorCopyWith<_UpdateUserLocationSubscriptionRadiusStateError> get copyWith => __$UpdateUserLocationSubscriptionRadiusStateErrorCopyWithImpl<_UpdateUserLocationSubscriptionRadiusStateError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateUserLocationSubscriptionRadiusStateError&&(identical(other.error, error) || other.error == error));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,error);
+
+@override
+String toString() {
+  return 'UpdateUserLocationSubscriptionRadiusState.error(error: $error)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$UpdateUserLocationSubscriptionRadiusStateErrorCopyWith<$Res> implements $UpdateUserLocationSubscriptionRadiusStateCopyWith<$Res> {
+  factory _$UpdateUserLocationSubscriptionRadiusStateErrorCopyWith(_UpdateUserLocationSubscriptionRadiusStateError value, $Res Function(_UpdateUserLocationSubscriptionRadiusStateError) _then) = __$UpdateUserLocationSubscriptionRadiusStateErrorCopyWithImpl;
+@useResult
+$Res call({
+ AppError error
+});
+
+
+$AppErrorCopyWith<$Res> get error;
+
+}
+/// @nodoc
+class __$UpdateUserLocationSubscriptionRadiusStateErrorCopyWithImpl<$Res>
+    implements _$UpdateUserLocationSubscriptionRadiusStateErrorCopyWith<$Res> {
+  __$UpdateUserLocationSubscriptionRadiusStateErrorCopyWithImpl(this._self, this._then);
+
+  final _UpdateUserLocationSubscriptionRadiusStateError _self;
+  final $Res Function(_UpdateUserLocationSubscriptionRadiusStateError) _then;
+
+/// Create a copy of UpdateUserLocationSubscriptionRadiusState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
+  return _then(_UpdateUserLocationSubscriptionRadiusStateError(
+null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as AppError,
+  ));
+}
+
+/// Create a copy of UpdateUserLocationSubscriptionRadiusState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')

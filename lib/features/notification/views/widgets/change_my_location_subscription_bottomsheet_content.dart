@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/base_bottomsheet.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -12,7 +13,12 @@ enum MyLocationOption {
 
 class ChangeMyLocationSubscriptionBottomsheetContent
     extends ConsumerStatefulWidget {
-  const ChangeMyLocationSubscriptionBottomsheetContent({super.key});
+  const ChangeMyLocationSubscriptionBottomsheetContent({
+    super.key,
+    required this.locationSubscription,
+  });
+
+  final LocationSubscription locationSubscription;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -138,7 +144,7 @@ class _MyLocationOptionsBottomsheetState
     } else if (option == MyLocationOption.changeRadius) {
       showChangeRadiusBottomsheet(
         context: context,
-        initialRadius: 4,
+        initialRadius: widget.locationSubscription.radiusInKm.toInt(),
       );
     }
   }

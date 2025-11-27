@@ -166,7 +166,7 @@ class _AllLocationSubscriptionsListItemState
                                   size: 16.spMin,
                                 ),
                                 borderRadius: 8.0,
-                                value: 'Edit',
+                                value: 'Edit Radius',
                                 valueStyle: TextStyle(
                                   fontSize: 12.spMin,
                                   color: AppColors.white,
@@ -207,8 +207,9 @@ class _AllLocationSubscriptionsListItemState
 
   /// Handles the tap action when the edit action is pressed.
   void _handleEditMyLocationTap() {
-    showChangeMyLocationSubscriptionBottomsheet(
+    showChangeRadiusBottomsheet(
       context: context,
+      initialRadius: widget.subscription.radiusInKm.round(),
     );
   }
 
@@ -233,6 +234,6 @@ class _AllLocationSubscriptionsListItemState
     ref.read(providerOfHomeTab.notifier).state = HomeTab.map;
     ref
         .read(providerOfMap.notifier)
-        .animateToBounds(bounds: widget.subscription.bounds);
+        .animateToBounds(bounds: widget.subscription.bounds, padding: 0.0);
   }
 }

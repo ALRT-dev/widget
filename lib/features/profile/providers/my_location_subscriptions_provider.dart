@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
+import 'package:hazard_app/features/onboarding/providers/service_providers.dart';
+import 'package:hazard_app/features/onboarding/services/onboarding_service.dart';
 import 'package:hazard_app/features/profile/providers/states/my_location_subscriptions_provider_state.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
@@ -33,6 +35,9 @@ class MyLocationSubscriptionsProvider
   UserService get _userService => _ref.read(providerOfUserService);
   NotificationsFeedProvider get _notificationsFeedProvider =>
       _ref.read(providerOfNotificationsFeed.notifier);
+
+  OnboardingService get _onboardingService =>
+      _ref.read(providerOfOnboardingService);
 
   /// Fetches the location subscriptions for the current user.
   Future<void> getLocationSubscriptions() async {
@@ -200,6 +205,79 @@ class MyLocationSubscriptionsProvider
                 return wrapper;
               })
               .toList(),
+        );
+      },
+    );
+  }
+
+  /// Updates the location subscription's location.
+  Future<void> updateLocationSubscriptionLocation({
+    required final AlrtLocation newLocation,
+  }) async {
+    state = state.copyWith(
+      updateUserLocationSubscriptionLocationState:
+          const UpdateUserLocationSubscriptionLocationState.loading(),
+    );
+
+    final result = await _onboardingService.setOnboardingLocation(
+      latitude: newLocation.latitude,
+      longitude: newLocation.longitude,
+      locationName: newLocation.name,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (_) {
+        state = state.copyWith(
+          updateUserLocationSubscriptionLocationState:
+              const UpdateUserLocationSubscriptionLocationState.success(),
+        );
+
+        // Refresh the location subscriptions
+        getLocationSubscriptions();
+
+        // after updating a location subscription, refresh the notifications feed
+        _notificationsFeedProvider.getNotificationsFeed();
+      },
+      (error) {
+        state = state.copyWith(
+          updateUserLocationSubscriptionLocationState:
+              UpdateUserLocationSubscriptionLocationState.error(error),
+        );
+      },
+    );
+  }
+
+  /// Updates the location subscription's radius.
+  Future<void> updateLocationSubscriptionRadius({
+    required final double newRadiusInKm,
+  }) async {
+    state = state.copyWith(
+      updateUserLocationSubscriptionRadiusState:
+          const UpdateUserLocationSubscriptionRadiusState.loading(),
+    );
+    final result = await _onboardingService.setOnboardingRadius(
+      radiusInKm: newRadiusInKm,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (_) {
+        state = state.copyWith(
+          updateUserLocationSubscriptionRadiusState:
+              const UpdateUserLocationSubscriptionRadiusState.success(),
+        );
+
+        // Refresh the location subscriptions
+        getLocationSubscriptions();
+
+        // after updating a location subscription, refresh the notifications feed
+        _notificationsFeedProvider.getNotificationsFeed();
+      },
+      (error) {
+        state = state.copyWith(
+          updateUserLocationSubscriptionRadiusState:
+              UpdateUserLocationSubscriptionRadiusState.error(error),
         );
       },
     );

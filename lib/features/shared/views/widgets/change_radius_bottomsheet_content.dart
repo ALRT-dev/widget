@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
+import 'package:hazard_app/features/profile/providers/states/my_location_subscriptions_provider_state.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/base_bottomsheet.dart';
+import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class RadiusOption {
@@ -33,7 +37,7 @@ class ChangeRadiusBottomsheetContent extends ConsumerStatefulWidget {
 
 class _ChangeRadiusBottomsheetContentState
     extends ConsumerState<ChangeRadiusBottomsheetContent> {
-  late int _selectedRadius = widget.initialRadius;
+  late int _selectedRadius = widget.initialRadius.clamp(1, 5);
 
   final List<RadiusOption> _radiusOptions = const [
     RadiusOption(value: 1, label: '1 km', description: 'Immediate vicinity'),
@@ -45,8 +49,18 @@ class _ChangeRadiusBottomsheetContentState
 
   @override
   Widget build(BuildContext context) {
+    _listenToRadiusUpdateState();
+
     return BaseBottomsheet(
       safeAreaBottom: false,
+      canPop: (ref) => ref.watch(
+        providerOfMyLocationSubscriptions.select(
+          (value) => value.updateUserLocationSubscriptionRadiusState.maybeWhen(
+            orElse: () => true,
+            loading: () => false,
+          ),
+        ),
+      ),
       child: Padding(
         padding: EdgeInsets.all(20.spMin),
         child: SizedBox(
@@ -318,39 +332,87 @@ class _ChangeRadiusBottomsheetContentState
   }
 
   Widget _buildNextButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () => context.pop(_selectedRadius),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.orange,
-          disabledBackgroundColor: AppColors.lightGrey,
-          padding: EdgeInsets.symmetric(vertical: 14.spMin),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100.spMin),
+    return Consumer(
+      builder: (context, ref, child) {
+        final isLoading = ref.watch(
+          providerOfMyLocationSubscriptions.select(
+            (value) =>
+                value.updateUserLocationSubscriptionRadiusState.maybeWhen(
+                  orElse: () => false,
+                  loading: () => true,
+                ),
           ),
-          elevation: 0,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Save',
-              style: TextStyle(
-                fontSize: 16.spMin,
-                fontWeight: FontWeight.w600,
-                color: AppColors.white,
+        );
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _onSavePressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.orange,
+              disabledBackgroundColor: AppColors.lightGrey,
+              padding: EdgeInsets.symmetric(vertical: 14.spMin),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(100.spMin),
               ),
+              elevation: 0,
             ),
-            8.wSizedBox,
-            Icon(
-              Icons.check,
-              size: 20.spMin,
-              color: AppColors.white,
-            ),
-          ],
-        ),
-      ),
+            child: isLoading
+                ? Spinner(
+                    color: AppColors.white,
+                    size: 23.spMin,
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Save',
+                        style: TextStyle(
+                          fontSize: 16.spMin,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.white,
+                        ),
+                      ),
+                      8.wSizedBox,
+                      Icon(
+                        Icons.check,
+                        size: 20.spMin,
+                        color: AppColors.white,
+                      ),
+                    ],
+                  ),
+          ),
+        );
+      },
     );
+  }
+
+  void _listenToRadiusUpdateState() {
+    ref.listen(
+      providerOfMyLocationSubscriptions.select(
+        (value) => value.updateUserLocationSubscriptionRadiusState,
+      ),
+      (previous, next) {
+        next.maybeWhen(
+          orElse: () {},
+          success: () {
+            context.pop();
+          },
+          error: (error) {
+            context.showErrorToast(
+              message: error.message,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// Handles the save button press action.
+  void _onSavePressed() {
+    ref
+        .read(providerOfMyLocationSubscriptions.notifier)
+        .updateLocationSubscriptionRadius(
+          newRadiusInKm: _selectedRadius.toDouble(),
+        );
   }
 }
