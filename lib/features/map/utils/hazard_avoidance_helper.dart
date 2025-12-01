@@ -109,7 +109,7 @@ class HazardAvoidanceHelper {
   static RouteHazardSummary analyzeRouteHazards({
     required List<Hazard> hazards,
     required List<LatLng> routePoints,
-    double bufferKm = 0.1, // 100m buffer around route
+    double bufferKm = 2.5, // 2.5km buffer around route
   }) {
     // First, get only hazards that are relevant to this route
     final relevantHazards = getRelevantHazardsForPolyline(

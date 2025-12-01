@@ -226,9 +226,13 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<AppUser> updateCurrentUser({required AppUser user}) async {
+  Future<AppUser> updateCurrentUser({
+    required AppUser user,
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = user;
     final _options = _setStreamType<AppUser>(
@@ -238,6 +242,7 @@ class _RestClient implements RestClient {
             '/user',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -385,6 +390,72 @@ class _RestClient implements RestClient {
                 LocationSubscription.fromJson(i as Map<String, dynamic>),
           )
           .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<LocationSubscription> updateOwnLocationSubscription({
+    required double latitude,
+    required double longitude,
+    String? locationName,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'latitude': latitude,
+      'longitude': longitude,
+      'locationName': locationName,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _options = _setStreamType<LocationSubscription>(
+      Options(method: 'PUT', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/user/own-location-subscription',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late LocationSubscription _value;
+    try {
+      _value = LocationSubscription.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<LocationSubscription> updateOwnLocationSubscriptionRadius({
+    required double radiusKm,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = {'radiusKm': radiusKm};
+    final _options = _setStreamType<LocationSubscription>(
+      Options(method: 'PUT', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/user/own-location-subscription-radius',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late LocationSubscription _value;
+    try {
+      _value = LocationSubscription.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

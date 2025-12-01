@@ -258,13 +258,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
         .toBounds();
 
     final result = await _hazardService.getAllHazards(
-      numberOfParallelRequests: 5,
       searchParams: HazardSearchParams(
         northeastLat: bounds.northeast.latitude,
         northeastLng: bounds.northeast.longitude,
         southwestLat: bounds.southwest.latitude,
         southwestLng: bounds.southwest.longitude,
-        pageSize: 100,
+        ignoreHazardLatLngBounds: true,
+        pageSize: 20,
       ),
     );
 

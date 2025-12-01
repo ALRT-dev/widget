@@ -20,6 +20,8 @@ _AppUser _$AppUserFromJson(Map<String, dynamic> json) => _AppUser(
   hazardsViewedCount: (json['hazardsViewedCount'] as num?)?.toInt() ?? 0,
   hazardsReportedCount: (json['hazardsReportedCount'] as num?)?.toInt() ?? 0,
   upvotesReceivedCount: (json['upvotesReceivedCount'] as num?)?.toInt() ?? 0,
+  ownLocationSubscriptionRadiusKm:
+      (json['ownLocationSubscriptionRadiusKm'] as num?)?.toInt() ?? 5,
   reportsStatus:
       $enumDecodeNullable(_$UserReportsStatusEnumMap, json['reportsStatus']) ??
       UserReportsStatus.unverified,
@@ -42,6 +44,7 @@ Map<String, dynamic> _$AppUserToJson(_AppUser instance) => <String, dynamic>{
   'hazardsViewedCount': instance.hazardsViewedCount,
   'hazardsReportedCount': instance.hazardsReportedCount,
   'upvotesReceivedCount': instance.upvotesReceivedCount,
+  'ownLocationSubscriptionRadiusKm': instance.ownLocationSubscriptionRadiusKm,
   'reportsStatus': _$UserReportsStatusEnumMap[instance.reportsStatus]!,
   'createdAt': ?instance.createdAt?.toIso8601String(),
 };

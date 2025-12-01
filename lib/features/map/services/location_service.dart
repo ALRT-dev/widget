@@ -84,4 +84,15 @@ class LocationService {
       placeId: placeId,
     );
   }
+
+  /// Fetches the address from coordinates using a plugin.
+  Future<Either<String, AppError>> getAddressFromCoordinatesPlugin({
+    required LatLng coordinates,
+    bool getSubUrbOnly = false,
+  }) {
+    return _locationRepository.getAddressFromCoordinatesPlugin(
+      coordinates: coordinates,
+      getSubUrbOnly: getSubUrbOnly,
+    );
+  }
 }

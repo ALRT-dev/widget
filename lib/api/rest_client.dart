@@ -68,7 +68,8 @@ abstract class RestClient {
 
   @PUT(kUrlUser)
   Future<AppUser> updateCurrentUser({
-    @Body() required AppUser user,
+    @Body() required final AppUser user,
+    @CancelRequest() final CancelToken? cancelToken,
   });
 
   @PUT(kUrlUserProfilePicture)
@@ -95,6 +96,18 @@ abstract class RestClient {
 
   @GET(kUrlUserLocationSubscriptions)
   Future<List<LocationSubscription>> getLocationSubscriptions();
+
+  @PUT(kUrlOwnLocationSubscription)
+  Future<LocationSubscription> updateOwnLocationSubscription({
+    @Field() required final double latitude,
+    @Field() required final double longitude,
+    @Field() final String? locationName,
+  });
+
+  @PUT(kUrlOwnLocationSubscriptionRadius)
+  Future<LocationSubscription> updateOwnLocationSubscriptionRadius({
+    @Field() required final double radiusKm,
+  });
 
   @GET(kUrlPushNotificationSettings)
   Future<PushNotificationSettings> getPushNotificationSettings();

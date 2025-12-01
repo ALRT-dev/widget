@@ -56,6 +56,9 @@ abstract class AppUser with _$AppUser {
     /// The number of upvotes the user has received on their reports.
     @Default(0) final int upvotesReceivedCount,
 
+    /// The radius in kilometers for the user's own location subscriptions.
+    @Default(5) final int ownLocationSubscriptionRadiusKm,
+
     /// The user's report verification status.
     @Default(UserReportsStatus.unverified)
     final UserReportsStatus reportsStatus,

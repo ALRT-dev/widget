@@ -22,6 +22,11 @@ abstract class LocationRepository {
     final bool getSubUrbOnly = false,
   });
 
+  Future<Either<String, AppError>> getAddressFromCoordinatesPlugin({
+    required LatLng coordinates,
+    bool getSubUrbOnly = false,
+  });
+
   /// Returns true if the location permission is granted.
   Future<Either<bool, AppError>> isLocationPermissionGranted();
 
@@ -372,6 +377,54 @@ class LocationRepositoryImpl extends LocationRepository {
         return Success(
           response.data['result'] as Map<String, dynamic>,
         );
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<String, AppError>> getAddressFromCoordinatesPlugin({
+    required LatLng coordinates,
+    bool getSubUrbOnly = false,
+  }) {
+    return runAsyncCall(
+      name: 'getAddressFromCoordinatesPlugin',
+      future: () async {
+        final placemarks = await placemarkFromCoordinates(
+          coordinates.latitude,
+          coordinates.longitude,
+        );
+
+        if (placemarks.isEmpty) {
+          throw AppError(
+            message: 'Failed to fetch address from coordinates',
+          );
+        }
+
+        if (getSubUrbOnly) {
+          final place = placemarks.first;
+          final generalArea =
+              place.subLocality ?? place.locality ?? place.administrativeArea;
+          if (generalArea != null && generalArea.isNotEmpty) {
+            return Success(generalArea);
+          } else {
+            throw AppError(
+              message: 'Failed to fetch general area from coordinates',
+            );
+          }
+        }
+
+        final place = placemarks.first;
+        final addresses = [
+          if (place.street?.isNotEmpty ?? false) place.street,
+          if (place.locality?.isNotEmpty ?? false) place.locality,
+          if (place.administrativeArea?.isNotEmpty ?? false)
+            place.administrativeArea,
+          if (place.country?.isNotEmpty ?? false) place.country,
+        ];
+        final address = addresses.join(', ');
+
+        return Success(address);
       },
       onError: Failure.new,
     );

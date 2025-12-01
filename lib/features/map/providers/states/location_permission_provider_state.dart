@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/utils/constants.dart';
+import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/utils/location_helper.dart';
 
@@ -16,6 +18,12 @@ abstract class LocationProviderState with _$LocationProviderState {
     /// Defaults to [kDefaultUserLocation].
     @Default(kDefaultUserLocation) final AlrtLocation location,
 
+    /// Whether the app is using the device's location.
+    @Default(false) final bool isUsingDeviceLocation,
+
+    /// Cancel token for updating the user's location.
+    required final CancelToken updateLocationCancelToken,
+
     /// The state of getting the current user's location.
     @Default(GetLocationState.initial())
     final GetLocationState getLocationState,
@@ -23,6 +31,10 @@ abstract class LocationProviderState with _$LocationProviderState {
     /// The state of getting the location permission of the device.
     @Default(GetLocationPremissionState.initial())
     final GetLocationPremissionState getLocationPremissionState,
+
+    /// The state of updating the user's location.
+    @Default(UpdateUserLocationState.initial())
+    final UpdateUserLocationState updateUserLocationState,
   }) = _LocationProviderState;
 
   /// Calculates the distance in meters from the user's location to another geographical point.
@@ -59,4 +71,18 @@ class GetLocationPremissionState with _$GetLocationPremissionState {
   const factory GetLocationPremissionState.error(
     final AppError error,
   ) = GetLocationPremissionStateError;
+}
+
+@freezed
+class UpdateUserLocationState with _$UpdateUserLocationState {
+  const factory UpdateUserLocationState.initial() =
+      UpdateUserLocationStateInitial;
+  const factory UpdateUserLocationState.loading() =
+      UpdateUserLocationStateLoading;
+  const factory UpdateUserLocationState.success(
+    final AppUser updatedUser,
+  ) = UpdateUserLocationStateSuccess;
+  const factory UpdateUserLocationState.error(
+    final AppError error,
+  ) = UpdateUserLocationStateError;
 }

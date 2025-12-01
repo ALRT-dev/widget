@@ -1,6 +1,6 @@
 const kUrlBase = 'http://3.26.195.127/api';
 // const kUrlBase = 'http://192.168.1.65:9000/api';
-const kUrlBaseDev = 'http://192.168.1.65:9000/api';
+const kUrlBaseDev = 'http://192.168.1.68:9000/api';
 
 // ---------------------------- AUTH ----------------------------
 
@@ -25,6 +25,9 @@ const kUrlUserProfilePicture = '$kUrlUser/profile-picture';
 const kUrlSubscribeLocation = '$kUrlUser/subscribe-location';
 const kUrlUnsubscribeLocation = '$kUrlUser/unsubscribe-location';
 const kUrlUserLocationSubscriptions = '$kUrlUser/location-subscriptions';
+const kUrlOwnLocationSubscription = '$kUrlUser/own-location-subscription';
+const kUrlOwnLocationSubscriptionRadius =
+    '$kUrlUser/own-location-subscription-radius';
 
 const kUrlPushNotificationSettings = '$kUrlUser/push-notification-settings';
 

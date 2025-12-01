@@ -11,6 +11,7 @@ import 'package:hazard_app/features/shared/extensions/context_navigation_extensi
 import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -207,9 +208,11 @@ class _AllLocationSubscriptionsListItemState
 
   /// Handles the tap action when the edit action is pressed.
   void _handleEditMyLocationTap() {
+    final ownLocationRadiusKm =
+        ref.read(providerOfLoggedInUser)?.ownLocationSubscriptionRadiusKm ?? 5;
     showChangeRadiusBottomsheet(
       context: context,
-      initialRadius: widget.subscription.radiusInKm.round(),
+      initialRadius: ownLocationRadiusKm,
     );
   }
 
