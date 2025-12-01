@@ -14,7 +14,9 @@ class HazardAvoidanceHelper {
   static List<Hazard> getRelevantHazardsForPolyline(
     List<Hazard> allHazards,
     List<LatLng> routePoints, {
-    double bufferKm = 5.0, // Default 5km buffer around route
+    double bushfireBufferKm =
+        5.0, // Default 5km buffer around route (used for bushfire)
+    double otherHazardsBufferKm = 2.5, // Buffer for non-bushfire hazards
   }) {
     if (routePoints.isEmpty) {
       log('Warning: Empty route points provided');
@@ -35,7 +37,12 @@ class HazardAvoidanceHelper {
         routePoints,
       );
 
-      final bufferMeters = bufferKm * 1000;
+      // Use different buffer distances based on hazard type
+      final isBushfire = hazard.categoryId == 'bushfire';
+      final effectiveBufferKm = isBushfire
+          ? bushfireBufferKm
+          : otherHazardsBufferKm;
+      final bufferMeters = effectiveBufferKm * 1000;
       final isRelevant = distanceToRoute <= bufferMeters;
 
       // log(
@@ -110,13 +117,15 @@ class HazardAvoidanceHelper {
   static RouteHazardSummary analyzeRouteHazards({
     required List<Hazard> hazards,
     required List<LatLng> routePoints,
-    double bufferKm = 2.5, // 2.5km buffer around route
+    double bushfireBufferKm = 5.0, // 5km buffer for bushfire hazards
+    double otherHazardsBufferKm = 2.5, // 2.5km buffer for other hazards
   }) {
     // First, get only hazards that are relevant to this route
     final relevantHazards = getRelevantHazardsForPolyline(
       hazards,
       routePoints,
-      bufferKm: bufferKm,
+      bushfireBufferKm: bushfireBufferKm,
+      otherHazardsBufferKm: otherHazardsBufferKm,
     );
 
     // Debug: log the filtering results
