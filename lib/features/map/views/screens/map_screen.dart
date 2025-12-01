@@ -111,7 +111,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   );
 
                   if (isRoutePresent) {
-                    return RouteSourceAndDestination();
+                    return Column(
+                      children: [
+                        RouteSourceAndDestination(),
+                        10.hSizedBox,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            _filtersButtonBuilder(),
+                          ],
+                        ),
+                      ],
+                    );
                   }
                   return Row(
                     children: [
@@ -377,5 +388,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   /// Fetches the hazards for the current map view.
   void _getMapHazards() {
     ref.read(providerOfMap.notifier).getMapHazards();
+
+    // also update the hazards to avoid for the route if route planning is active
+    ref.read(providerOfMap.notifier).getRoutePlanHazardsToAvoid();
   }
 }

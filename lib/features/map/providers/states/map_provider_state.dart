@@ -17,6 +17,9 @@ abstract class MapProviderState with _$MapProviderState {
     /// The cancel token for fetching map hazards.
     required final CancelToken getMapHazardsCancelToken,
 
+    /// The cancel token for fetching hazards to avoid.
+    required final CancelToken getHazardsToAvoidCancelToken,
+
     /// The list of hazards displayed on the map.
     @Default(<Hazard>[]) final List<Hazard> hazards,
 

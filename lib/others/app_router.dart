@@ -113,6 +113,7 @@ class AppRouter {
                     ref: ref,
                     state: MapProviderState(
                       getMapHazardsCancelToken: CancelToken(),
+                      getHazardsToAvoidCancelToken: CancelToken(),
                     ),
                   ),
                 ),

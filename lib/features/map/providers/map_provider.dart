@@ -41,6 +41,7 @@ final providerOfMap =
         ref: ref,
         state: MapProviderState(
           getMapHazardsCancelToken: CancelToken(),
+          getHazardsToAvoidCancelToken: CancelToken(),
         ),
       ),
     );
@@ -257,13 +258,26 @@ class MapProvider extends StateNotifier<MapProviderState> {
         .toList()
         .toBounds();
 
+    // cancel the old requests before making new requests
+    if (state.getHazardsToAvoidCancelToken.requestOptions != null) {
+      state.getHazardsToAvoidCancelToken.cancel();
+      state = state.copyWith(getHazardsToAvoidCancelToken: CancelToken());
+    }
+
     final result = await _hazardService.getAllHazards(
+      cancelToken: state.getHazardsToAvoidCancelToken,
+      allowEmptyCategoryIds: true,
+      allowAllSourceFiltersFalse: true,
       searchParams: HazardSearchParams(
         northeastLat: bounds.northeast.latitude,
         northeastLng: bounds.northeast.longitude,
         southwestLat: bounds.southwest.latitude,
         southwestLng: bounds.southwest.longitude,
         ignoreHazardLatLngBounds: true,
+        sortSettings: [
+          {SortCategory.severityBand: SortOrder.desc},
+          {SortCategory.createdAt: SortOrder.desc},
+        ],
         pageSize: 20,
       ),
     );

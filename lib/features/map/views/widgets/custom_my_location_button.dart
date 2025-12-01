@@ -42,6 +42,6 @@ class _CustomMyLocationButtonState
     final location = ref.read(providerOfLocation).location;
     ref
         .read(providerOfMap.notifier)
-        .animateTo(position: location.latLng, zoom: 16.0);
+        .animateTo(position: location.latLng, zoom: 14.0);
   }
 }

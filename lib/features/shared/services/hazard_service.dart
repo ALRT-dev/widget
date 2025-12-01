@@ -51,10 +51,12 @@ class HazardService {
   Future<Either<List<Hazard>, AppError>> getAllHazards({
     final int numberOfParallelRequests = 10,
     required final HazardSearchParams searchParams,
+    final bool allowEmptyCategoryIds = false,
+    final bool allowAllSourceFiltersFalse = false,
     final CancelToken? cancelToken,
   }) async {
     // If no category IDs are provided, return an empty list immediately.
-    if (searchParams.categoryIds.isEmpty) {
+    if (searchParams.categoryIds.isEmpty && !allowEmptyCategoryIds) {
       return Success(<Hazard>[]);
     }
 
@@ -63,7 +65,8 @@ class HazardService {
         !searchParams.awsWatchAndAct &&
         !searchParams.awsAdvice &&
         !searchParams.officialNonAws &&
-        !searchParams.userReported) {
+        !searchParams.userReported &&
+        !allowAllSourceFiltersFalse) {
       return Success(<Hazard>[]);
     }
 

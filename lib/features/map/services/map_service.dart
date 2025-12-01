@@ -13,6 +13,8 @@ import 'package:hazard_app/features/map/providers/repository_providers.dart';
 import 'package:hazard_app/features/map/repositories/map_repository.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
+import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
@@ -139,13 +141,19 @@ class MapService {
         .toBounds();
 
     final hazardsToAvoidResult = await _hazardService.getAllHazards(
-      numberOfParallelRequests: 5,
+      allowEmptyCategoryIds: true,
+      allowAllSourceFiltersFalse: true,
       searchParams: HazardSearchParams(
         northeastLat: bounds.northeast.latitude,
         northeastLng: bounds.northeast.longitude,
         southwestLat: bounds.southwest.latitude,
         southwestLng: bounds.southwest.longitude,
-        pageSize: 100,
+        ignoreHazardLatLngBounds: true,
+        sortSettings: [
+          {SortCategory.severityBand: SortOrder.desc},
+          {SortCategory.createdAt: SortOrder.desc},
+        ],
+        pageSize: 20,
       ),
     );
 

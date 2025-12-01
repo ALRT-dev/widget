@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 import 'dart:math' as math;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/utils/location_helper.dart';
@@ -131,21 +132,21 @@ class HazardAvoidanceHelper {
     //   );
     // }
 
-    // Count hazards by severity
+    // Count hazards by severity band
     final emergencyCount = relevantHazards
-        .where((h) => h.severity == HazardSeverity.emergency)
+        .where((h) => h.severityBand == HazardSeverityBand.critical)
         .length;
 
     final highRiskCount = relevantHazards
-        .where((h) => h.severity == HazardSeverity.watchAndAct)
+        .where((h) => h.severityBand == HazardSeverityBand.action)
         .length;
 
     final mediumRiskCount = relevantHazards
-        .where((h) => h.severity == HazardSeverity.advice)
+        .where((h) => h.severityBand == HazardSeverityBand.monitor)
         .length;
 
     final lowRiskCount = relevantHazards
-        .where((h) => h.severity == HazardSeverity.info)
+        .where((h) => h.severityBand == HazardSeverityBand.info)
         .length;
 
     // Debug: log the counts
@@ -285,28 +286,28 @@ class RouteHazardSummary {
   /// Gets a human-readable summary message
   String get summaryMessage {
     if (totalHazards == 0) {
-      return 'No hazards detected on this route. Safe to proceed.';
+      return 'No alerts detected on this route. Safe to proceed.';
     }
 
     final messages = <String>[];
     if (emergencyHazards > 0) {
       messages.add(
-        '$emergencyHazards emergency hazard${emergencyHazards == 1 ? '' : 's'}',
+        '$emergencyHazards critical alert${emergencyHazards == 1 ? '' : 's'}',
       );
     }
     if (highRiskHazards > 0) {
       messages.add(
-        '$highRiskHazards high risk hazard${highRiskHazards == 1 ? '' : 's'}',
+        '$highRiskHazards high risk alert${highRiskHazards == 1 ? '' : 's'}',
       );
     }
     if (mediumRiskHazards > 0) {
       messages.add(
-        '$mediumRiskHazards medium risk hazard${mediumRiskHazards == 1 ? '' : 's'}',
+        '$mediumRiskHazards medium risk alert${mediumRiskHazards == 1 ? '' : 's'}',
       );
     }
     if (lowRiskHazards > 0) {
       messages.add(
-        '$lowRiskHazards info hazard${lowRiskHazards == 1 ? '' : 's'}',
+        '$lowRiskHazards low risk alert${lowRiskHazards == 1 ? '' : 's'}',
       );
     }
 
@@ -314,11 +315,11 @@ class RouteHazardSummary {
 
     switch (riskLevel) {
       case RouteRiskLevel.emergency:
-        return 'CAUTION: Route contains $hazardText. Consider alternative route.';
+        return 'CRITICAL: Route contains $hazardText. Consider alternative route.';
       case RouteRiskLevel.high:
-        return 'WARNING: Route contains $hazardText. Exercise caution.';
+        return 'ACTION: Route contains $hazardText. Exercise caution.';
       case RouteRiskLevel.medium:
-        return 'NOTICE: Route contains $hazardText. Stay alert.';
+        return 'MONITOR: Route contains $hazardText. Stay alert.';
       case RouteRiskLevel.low:
         return 'INFO: Route contains $hazardText.';
       case RouteRiskLevel.safe:
