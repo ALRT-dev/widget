@@ -686,7 +686,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.white,
+            color: AppColors.red.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12.spMin),
             border: Border(
               left: BorderSide(
