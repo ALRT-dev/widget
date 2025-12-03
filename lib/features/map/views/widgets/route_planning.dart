@@ -205,7 +205,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
       ),
       decoration: BoxDecoration(
         color: severity.colorAws.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(8.spMin),
         border: Border.all(
           color: (textColor ?? severity.colorAws).withValues(alpha: 0.5),
         ),

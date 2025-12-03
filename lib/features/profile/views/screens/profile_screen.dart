@@ -114,7 +114,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.orange.withValues(alpha: 0.85),
+                    AppColors.orange.withValues(alpha: 0.8),
                     AppColors.orange,
                   ],
                 ),
@@ -131,9 +131,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         40.hSizedBox,
-                        _buildUserAvatar(),
+                        _buildUserAvatar(
+                          borderColor: AppColors.white.withValues(alpha: 0.7),
+                        ),
                         12.hSizedBox,
-                        _buildUserName(),
+                        _buildUserName(
+                          color: AppColors.white.withValues(alpha: 0.9),
+                        ),
                         if (userEmail != null) 2.hSizedBox,
                         if (userEmail != null)
                           Text(
@@ -966,7 +970,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               text,
               style: TextStyle(
                 fontSize: 14.spMin,
-                color: AppColors.blue,
+                color: AppColors.orange,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -974,7 +978,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Icon(
               Icons.arrow_forward_ios,
               size: 12.spMin,
-              color: AppColors.blue,
+              color: AppColors.orange,
             ),
           ],
         ),
