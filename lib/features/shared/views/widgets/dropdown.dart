@@ -191,7 +191,7 @@ class _AlrtDropdownState extends ConsumerState<AlrtDropdown> {
                       height: widget.dropdownHeight,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20.r),
+                        borderRadius: BorderRadius.circular(14.spMin),
                         border: Border.all(
                           color: AppColors.lightGrey,
                         ),

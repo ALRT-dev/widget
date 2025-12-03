@@ -79,7 +79,7 @@ class _HazardSearchResultsListState
                   Text(
                     isSearchActive
                         ? selectedLocation != null
-                              ? 'No hazards around "${selectedLocation.displayName}"'
+                              ? 'No alerts around "${selectedLocation.displayName}"'
                               : 'Nothing to show'
                         : 'Subscribe to a location',
                     textAlign: TextAlign.center,
@@ -95,7 +95,7 @@ class _HazardSearchResultsListState
                                     ? 'You have already subscribed to get instant alerts and updates around ${selectedLocation.displayName}.'
                                     : 'You can subscribe to get instant alerts and updates around ${selectedLocation.displayName}.'
                               : 'No results found for your search. Please try changing it.'
-                        : 'Please use the search bar to search for a location to see hazards around it and subscribe to it.',
+                        : 'Please use the search bar to search for a location to see alerts around it and subscribe to it.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.spMin,

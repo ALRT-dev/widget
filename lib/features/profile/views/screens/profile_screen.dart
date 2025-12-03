@@ -114,8 +114,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.yellow.withValues(alpha: 0.85),
-                    AppColors.yellow,
+                    AppColors.orange.withValues(alpha: 0.85),
+                    AppColors.orange,
                   ],
                 ),
               ),
@@ -140,7 +140,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             userEmail,
                             style: TextStyle(
                               fontSize: 16.spMin,
-                              color: AppColors.black.withValues(alpha: 0.8),
+                              color: AppColors.white.withValues(alpha: 0.8),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -158,7 +158,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildUserName({
     final double fontSize = 24.0,
-    final Color color = AppColors.black,
+    final Color color = AppColors.white,
   }) {
     return Consumer(
       builder: (context, ref, child) {
@@ -183,7 +183,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final double size = 80.0,
     final Color? backgroundColor,
     final Color foregroundColor = AppColors.white,
-    final Color borderColor = AppColors.black,
+    final Color borderColor = AppColors.white,
     final double borderWidth = 3,
     final double uploadProgressPadding = 20.0,
   }) {
@@ -658,12 +658,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   width: 48.spMin,
                   height: 48.spMin,
                   decoration: BoxDecoration(
-                    color: AppColors.blue.withValues(alpha: 0.1),
+                    color: AppColors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.spMin),
                   ),
                   child: Icon(
                     Icons.notifications_active_outlined,
-                    color: AppColors.blue,
+                    color: AppColors.orange,
                     size: 24.spMin,
                   ),
                 ),
@@ -851,7 +851,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         Icon(
           icon,
           size: 20.spMin,
-          color: AppColors.blue,
+          color: AppColors.orange,
         ),
         4.spMin.hSizedBox,
         Text(

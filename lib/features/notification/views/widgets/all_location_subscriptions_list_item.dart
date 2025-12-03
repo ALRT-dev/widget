@@ -181,7 +181,7 @@ class _AllLocationSubscriptionsListItemState
                           onPressed: _handleViewOnMap,
                           iconAndTextSpacing: 5.0,
                           padding: EdgeInsets.zero,
-                          color: AppColors.blue,
+                          color: AppColors.orange,
                           icon: Icon(
                             Icons.map_rounded,
                             color: AppColors.white,

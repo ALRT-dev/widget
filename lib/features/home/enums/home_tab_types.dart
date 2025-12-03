@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
 enum HomeTab {
   map,
   search,
@@ -5,33 +8,35 @@ enum HomeTab {
   notifications,
   profile;
 
-  String get unselectedIconPath {
+  /// The title of the tab.
+  String get title {
     switch (this) {
       case HomeTab.map:
-        return 'assets/icons/map_tab_unselected.svg';
+        return 'Map';
       case HomeTab.search:
-        return 'assets/icons/search_tab_unselected.svg';
+        return 'Search';
       case HomeTab.list:
-        return 'assets/logos/alrt_logo.png';
+        return 'ALRT';
       case HomeTab.notifications:
-        return 'assets/icons/notifications_tab_unselected.svg';
+        return 'Notifications';
       case HomeTab.profile:
-        return '';
+        return 'Profile';
     }
   }
 
-  String get selectedIconPath {
+  /// The icon data for the tab.
+  IconData get iconData {
     switch (this) {
       case HomeTab.map:
-        return 'assets/icons/map_tab_selected.svg';
+        return LucideIcons.mapPin;
       case HomeTab.search:
-        return 'assets/icons/search_tab_selected.svg';
+        return LucideIcons.search;
       case HomeTab.list:
-        return 'assets/logos/alrt_logo.png';
+        return LucideIcons.list;
       case HomeTab.notifications:
-        return 'assets/icons/notifications_tab_selected.svg';
+        return LucideIcons.bell;
       case HomeTab.profile:
-        return '';
+        return LucideIcons.user;
     }
   }
 }

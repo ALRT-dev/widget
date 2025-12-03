@@ -70,7 +70,7 @@ class _CreateReportMediasListItemState
       width: 100.spMin,
       decoration: BoxDecoration(
         color: AppColors.lightGrey,
-        borderRadius: BorderRadius.circular(20.spMin),
+        borderRadius: BorderRadius.circular(14.spMin),
         image: widget.media.type != AlrtMediaType.image
             ? null
             : DecorationImage(
@@ -88,7 +88,7 @@ class _CreateReportMediasListItemState
 
   Widget _videoBuilder() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(20.spMin),
+      borderRadius: BorderRadius.circular(14.spMin),
       child: VideoThumbnail(
         videoMedia: widget.media,
         playIconSize: 35.0,

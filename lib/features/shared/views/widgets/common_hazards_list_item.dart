@@ -649,6 +649,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       padding: EdgeInsets.symmetric(
         vertical: 8.spMin,
       ),
+      color: AppColors.primary,
       isIconLeft: false,
       valueStyle: TextStyle(
         fontSize: 14.spMin,

@@ -5,6 +5,7 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class HazardFiltersButton extends ConsumerStatefulWidget {
   const HazardFiltersButton({
@@ -48,15 +49,15 @@ class _HazardFiltersButtonState extends ConsumerState<HazardFiltersButton> {
           height: 48.spMin,
           decoration: BoxDecoration(
             color: AppColors.white,
-            shape: BoxShape.circle,
+            borderRadius: BorderRadius.circular(14.spMin),
             border: Border.all(
               color: AppColors.lightGrey,
             ),
             boxShadow: widget.buttonShadow,
           ),
           child: Icon(
-            Icons.filter_list,
-            size: 22.spMin,
+            LucideIcons.slidersHorizontal,
+            size: 20.spMin,
             color: AppColors.black,
           ),
         ),

@@ -34,7 +34,7 @@ class _SelectedLocationPreviewState
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(20.spMin),
+        borderRadius: BorderRadius.circular(14.spMin),
         border: Border.all(
           color: AppColors.lightGrey,
         ),
@@ -133,7 +133,7 @@ class _SelectedLocationPreviewState
     final bool isLoading = false,
   }) {
     return SizedBox(
-      height: 34.h,
+      height: 34.spMin,
       child: Button.filled(
         value: value,
         isLoading: isLoading,

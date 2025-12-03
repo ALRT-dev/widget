@@ -8,7 +8,7 @@ class AppTheme {
   /// The default theme settings of the app.
   static ThemeData get _defaultTheme {
     final inputBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20.r),
+      borderRadius: BorderRadius.circular(14.spMin),
     );
 
     return ThemeData(
@@ -17,10 +17,10 @@ class AppTheme {
       splashColor: AppColors.primary.withValues(alpha: 0.1),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.orange,
           padding: EdgeInsets.all(15.spMin),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(12.spMin),
           ),
           elevation: 0.0,
           disabledBackgroundColor: AppColors.lightGrey,
@@ -253,12 +253,14 @@ class AppTheme {
         ),
         focusedBorder: inputBorder.copyWith(
           borderSide: BorderSide(
-            color: AppColors.black,
+            color: AppColors.orange,
+            width: 2.0,
           ),
         ),
         focusedErrorBorder: inputBorder.copyWith(
           borderSide: BorderSide(
-            color: AppColors.black,
+            color: AppColors.orange,
+            width: 2.0,
           ),
         ),
         contentPadding: EdgeInsets.symmetric(
