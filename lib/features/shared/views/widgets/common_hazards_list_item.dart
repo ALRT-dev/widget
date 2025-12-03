@@ -16,8 +16,6 @@ import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dar
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
-import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
-import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -28,7 +26,6 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
     this.showCloseButton = false,
     this.onClosePressed,
     this.showTrustMeter = true,
-    this.showMediaCarousel = false,
     this.showSourceHeader = true,
     this.horizontalPadding = 10.0,
     this.isInfoWindow = false,
@@ -45,9 +42,6 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
 
   /// Whether to show the trust meter widget.
   final bool showTrustMeter;
-
-  /// Whether to show the media carousel.
-  final bool showMediaCarousel;
 
   /// Whether to show the source information in the header.
   final bool showSourceHeader;
@@ -95,15 +89,17 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       return const SizedBox.shrink();
     }
 
+    final hazardColor = ref.watch(
+      provider.select(
+        (value) => value.hazard?.color ?? AppColors.black,
+      ),
+    );
+
     return InkWell(
       onTap: widget.isInfoWindow ? null : _gotoViewHazard,
       borderRadius: BorderRadius.circular(14.spMin),
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(
-            color: AppColors.black,
-            width: 2.0,
-          ),
           color: AppColors.white,
           borderRadius: BorderRadius.circular(14.spMin),
           boxShadow: [
@@ -114,64 +110,89 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (widget.showSourceHeader) ...[
-              _headerBuilder(),
-            ],
-            if (widget.showMediaCarousel &&
-                widget.hazard.processedMedias.isNotEmpty) ...[
-              3.hSizedBox,
-              HazardMediasCarousel(
-                id: widget.hazard.id!,
-                medias: widget.hazard.processedMedias,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(14.spMin),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14.spMin),
+              border: Border(
+                left: BorderSide(
+                  color: hazardColor == AppColors.transparent
+                      ? AppColors.black
+                      : hazardColor,
+                  width: 4.0,
+                ),
+                top: BorderSide(
+                  color: hazardColor == AppColors.transparent
+                      ? AppColors.black
+                      : hazardColor,
+                  width: 1.0,
+                ),
+                right: BorderSide(
+                  color: hazardColor == AppColors.transparent
+                      ? AppColors.black
+                      : hazardColor,
+                  width: 1.0,
+                ),
+                bottom: BorderSide(
+                  color: hazardColor == AppColors.transparent
+                      ? AppColors.black
+                      : hazardColor,
+                  width: 1.0,
+                ),
               ),
-              15.hSizedBox,
-            ],
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _iconBuilder(),
-                12.wSizedBox,
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _titleBuilder(),
-                            4.hSizedBox,
-                            _dateAndDistanceBuilder(),
-                          ],
-                        ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _iconBuilder(),
+                    12.wSizedBox,
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _headerBuilder(),
+                                8.hSizedBox,
+                                _titleBuilder(),
+                                4.hSizedBox,
+                                _dateAndDistanceBuilder(),
+                              ],
+                            ),
+                          ),
+                          if (widget.hazard.isUserReported)
+                            _votesCountBuilder(),
+                        ],
                       ),
-                      if (widget.hazard.isUserReported) _votesCountBuilder(),
-                    ],
+                    ),
+                  ],
+                ).pX(16.0).pT(16.0),
+                8.hSizedBox,
+                _shortDescriptionBuilder().pX(16.0),
+                14.hSizedBox,
+                if (widget.showTrustMeter && widget.hazard.isUserReported) ...[
+                  _confirmationButtonsBuilder().pX(16.0),
+                ],
+                if (widget.isInfoWindow) ...[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      16.0.spMin,
+                      0.0,
+                      16.0.spMin,
+                      14.0.spMin,
+                    ),
+                    child: _viewDetailsButtonBuilder(),
                   ),
-                ),
+                ],
               ],
-            ).pX(16.0).pT(16.0),
-            8.hSizedBox,
-            _shortDescriptionBuilder().pX(16.0),
-            14.hSizedBox,
-            if (widget.showTrustMeter && widget.hazard.isUserReported) ...[
-              _confirmationButtonsBuilder().pX(16.0),
-            ],
-            if (widget.isInfoWindow) ...[
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  16.0.spMin,
-                  0.0,
-                  16.0.spMin,
-                  14.0.spMin,
-                ),
-                child: _viewDetailsButtonBuilder(),
-              ),
-            ],
-          ],
+            ),
+          ),
         ),
       ),
     ).pX(widget.horizontalPadding);
@@ -207,114 +228,83 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         );
 
         final isVerified = source != null;
+
         final categoryLabel = isUserReported
             ? 'USER'
             : isAwsCompliant
             ? 'AWS'
             : 'OFFICIAL';
 
-        return Stack(
+        return Row(
+          spacing: 8.spMin,
           children: [
+            // Category Pill
             Container(
-              decoration: BoxDecoration(
-                color: hazardColor,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12.spMin),
-                  topRight: Radius.circular(12.spMin),
-                ),
-                border: hazardColor == AppColors.transparent
-                    ? Border(
-                        bottom: BorderSide(
-                          color: AppColors.black,
-                          width: 2.0,
-                        ),
-                      )
-                    : null,
-              ),
               padding: EdgeInsets.symmetric(
-                horizontal: 16.spMin,
-                vertical: 8.spMin,
+                horizontal: 12.spMin,
+                vertical: 4.spMin,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Category Pill
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.spMin,
-                      vertical: 4.spMin,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(20.spMin),
-                      border: Border.all(
-                        color: AppColors.black,
-                        width: 1.6,
-                      ),
-                    ),
-                    child: Text(
-                      categoryLabel,
-                      style: TextStyle(
-                        fontSize: 10.spMin,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.black,
-                      ),
-                    ),
-                  ),
-                  // Severity/Category Text
-                  if (isAwsCompliant)
-                    Text(
-                      severityTitle,
-                      style: TextStyle(
-                        fontSize: 12.spMin,
-                        fontWeight: FontWeight.w600,
-                        color: hazardColor.isLight
-                            ? AppColors.black
-                            : AppColors.white,
-                      ),
-                    ),
-                  // Verification Badge
-                  if (isVerified)
-                    Row(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.white,
-                          ),
-                          child: Icon(
-                            Icons.verified_rounded,
-                            size: 20.spMin,
-                            color: AppColors.blue,
-                          ),
-                        ),
-                        if (widget.showCloseButton &&
-                            widget.onClosePressed != null)
-                          33.wSizedBox,
-                      ],
-                    ),
-                ],
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(20.spMin),
+                border: Border.all(
+                  color: AppColors.lightGrey,
+                  width: 1.0,
+                ),
+              ),
+              child: Text(
+                categoryLabel,
+                style: TextStyle(
+                  fontSize: 10.spMin,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.black,
+                ),
               ),
             ),
-            if (widget.showCloseButton && widget.onClosePressed != null)
-              Positioned(
-                right: 10.0,
-                top: 0.0,
-                bottom: 0.0,
-                child: RoundButton(
-                  borderSide: BorderSide(
-                    color: AppColors.black,
-                    width: 1.5,
-                  ),
-                  icon: Icon(
-                    Icons.close_rounded,
-                    size: 20.spMin,
-                    color: AppColors.black,
-                  ),
-                  size: 30.0,
-                  backgroundColor: AppColors.white,
-                  onPressed: widget.onClosePressed,
+            // Severity/Category Text
+            if (isAwsCompliant)
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.spMin,
+                  vertical: 4.spMin,
                 ),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(20.spMin),
+                  border: Border.all(
+                    color: AppColors.lightGrey,
+                    width: 1.0,
+                  ),
+                ),
+                child: Text(
+                  severityTitle,
+                  style: TextStyle(
+                    fontSize: 10.spMin,
+                    fontWeight: FontWeight.w600,
+                    color: hazardColor.isLight
+                        ? AppColors.black
+                        : AppColors.white,
+                  ),
+                ),
+              ),
+            // Verification Badge
+            if (isVerified)
+              Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.white,
+                    ),
+                    child: Icon(
+                      Icons.verified_rounded,
+                      size: 18.spMin,
+                      color: AppColors.blue,
+                    ),
+                  ),
+                  if (widget.showCloseButton && widget.onClosePressed != null)
+                    33.wSizedBox,
+                ],
               ),
           ],
         );
@@ -374,7 +364,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           title,
           style: TextStyle(
             fontSize: 16.spMin,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
             color: AppColors.black,
           ),
           maxLines: 2,
