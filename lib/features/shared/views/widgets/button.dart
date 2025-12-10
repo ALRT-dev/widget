@@ -18,6 +18,7 @@ class Button extends StatelessWidget {
     this.splashColor,
     this.icon,
     this.isIconLeft = true,
+    this.iconAndTextSpacing = 10.0,
     this.width,
     this.borderRadius,
     this.padding,
@@ -25,8 +26,8 @@ class Button extends StatelessWidget {
     this.isLoading = false,
     this.loader,
     this.onPressed,
-  })  : _type = _Type.filled,
-        borderSide = null;
+  }) : _type = _Type.filled,
+       borderSide = null;
 
   /// A customizable button widget that is bordered.
   const Button.bordered({
@@ -37,6 +38,7 @@ class Button extends StatelessWidget {
     this.splashColor,
     this.icon,
     this.isIconLeft = true,
+    this.iconAndTextSpacing = 10.0,
     this.width,
     this.borderRadius,
     this.padding,
@@ -44,8 +46,8 @@ class Button extends StatelessWidget {
     this.isLoading = false,
     this.loader,
     this.onPressed,
-  })  : _type = _Type.bordered,
-        color = null;
+  }) : _type = _Type.bordered,
+       color = null;
 
   /// The type of the button.
   final _Type _type;
@@ -72,6 +74,9 @@ class Button extends StatelessWidget {
   ///
   /// This is only applicable when [icon] is not null.
   final bool isIconLeft;
+
+  /// The spacing between the icon and the text.
+  final double iconAndTextSpacing;
 
   /// The width of the button.
   final double? width;
@@ -133,7 +138,7 @@ class Button extends StatelessWidget {
             if (isIconLeft)
               if (icon != null && value != null)
                 SizedBox(
-                  width: 10.spMin,
+                  width: iconAndTextSpacing.spMin,
                 ),
             if (value != null)
               Text(
@@ -143,7 +148,7 @@ class Button extends StatelessWidget {
             if (!isIconLeft)
               if (value != null)
                 SizedBox(
-                  width: 10.spMin,
+                  width: iconAndTextSpacing.spMin,
                 ),
             if (!isIconLeft)
               if (icon != null) icon ?? Container(),
@@ -165,7 +170,7 @@ class Button extends StatelessWidget {
                         color: AppColors.white,
                       ),
                 ],
-              )
+              ),
           ],
         ),
       ),

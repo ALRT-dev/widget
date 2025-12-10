@@ -1,0 +1,6 @@
+# flutter pub run flutter_launcher_icons -f flutter_launcher_icons-prod.yaml
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/launcher_icons/alrt.png"
+  remove_alpha_ios: true

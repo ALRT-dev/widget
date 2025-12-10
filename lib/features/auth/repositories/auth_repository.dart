@@ -4,21 +4,27 @@ import 'package:hazard_app/features/auth/models/auth_success_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
+import 'package:hazard_app/others/env.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 abstract class AuthRepository {
   Future<Either<void, AppError>> initializeGoogleSignIn();
+
   Future<Either<AuthSuccess, AppError>> signInWithGoogle();
+
   Future<Either<AuthSuccess, AppError>> signInWithGoogleUser({
     required GoogleSignInAccount googleUser,
   });
+
+  Future<Either<AuthSuccess, AppError>> signInWithApple();
 }
 
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({
     required final RestClient restClient,
     required final GoogleSignIn googleSignIn,
-  })  : _restClient = restClient,
-        _googleSignIn = googleSignIn;
+  }) : _restClient = restClient,
+       _googleSignIn = googleSignIn;
 
   final RestClient _restClient;
   final GoogleSignIn _googleSignIn;
@@ -28,7 +34,9 @@ class AuthRepositoryImpl implements AuthRepository {
     return runAsyncCall(
       name: 'initializeGoogleSignIn',
       future: () async {
-        await _googleSignIn.initialize();
+        await _googleSignIn.initialize(
+          serverClientId: Env.googleAuthServerClientId,
+        );
         return const Success(null);
       },
       onError: Failure.new,
@@ -72,6 +80,61 @@ class AuthRepositoryImpl implements AuthRepository {
           idToken: googleAuth.idToken!,
         );
         return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<AuthSuccess, AppError>> signInWithApple() {
+    return runAsyncCall(
+      name: 'signInWithApple',
+      future: () async {
+        final credential = await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+        );
+
+        final identityToken = credential.identityToken;
+        if (identityToken == null) {
+          throw AppError(message: 'Failed to get identity token from Apple');
+        }
+
+        final result = await _restClient.verifyAppleOAuth(
+          identityToken: identityToken,
+          firstName: credential.givenName,
+          lastName: credential.familyName,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+}
+
+class MockAuthRepository extends AuthRepositoryImpl {
+  MockAuthRepository({
+    required super.restClient,
+    required super.googleSignIn,
+  });
+
+  @override
+  Future<Either<AuthSuccess, AppError>> signInWithGoogle() {
+    return runAsyncCall(
+      name: 'signInWithGoogle',
+      future: () async {
+        final json = {
+          "accessToken":
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MzBhNzE1Zi01ZGIzLTQ1ODItODM4ZS1kZWZhMmQxMWFlNDIiLCJpYXQiOjE3NjA0Mzk3NTYsImV4cCI6MTc2MDQ0MzM1Nn0.SgKcnPFCfZ0MK4yeX7bX9XpCAzKuGUhYNBrzI5UB9_Y",
+          "refreshToken":
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MzBhNzE1Zi01ZGIzLTQ1ODItODM4ZS1kZWZhMmQxMWFlNDIiLCJpYXQiOjE3NjA0Mzk3NTYsImV4cCI6MTc2NTYyMzc1Nn0.SJGb3mjaZ_QRThfzyI8eebnuh2eUsolcwsUUUPyD4dA",
+        };
+
+        return Success(
+          AuthSuccess.fromJson(json),
+        );
       },
       onError: Failure.new,
     );

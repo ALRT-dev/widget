@@ -27,6 +27,7 @@ class Spinner extends StatelessWidget {
         child: CircularProgressIndicator(
           color: color,
           strokeWidth: strokeWidth,
+          strokeCap: StrokeCap.round,
         ),
       ),
     );

@@ -81,9 +81,31 @@ class AuthService {
     return result;
   }
 
+  /// Signs in the user with Apple.
+  Future<Either<AuthSuccess, AppError>> signInWithApple() async {
+    final result = await _authRepository.signInWithApple();
+
+    await result.whenSuccess((response) {
+      log('Access Token ::  ${response.accessToken}');
+      log('Refresh Token ::  ${response.refreshToken}');
+      return Future.wait([
+        _saveAuthMethod(
+          authMethod: AuthMethod.apple,
+        ),
+        _saveAuthTokens(
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        ),
+      ]);
+    });
+
+    return result;
+  }
+
   /// Logs out the user by deleting the access token from local storage.
-  Future<void> logOut() async {
-    return _deleteAccessToken();
+  Future<Either<void, AppError>> logout() async {
+    await _deleteAccessToken();
+    return Success(null);
   }
 
   // --------------------------------------- LOCAL STORAGE --------------------------------------- //

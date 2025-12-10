@@ -7,16 +7,20 @@ class AppTheme {
 
   /// The default theme settings of the app.
   static ThemeData get _defaultTheme {
+    final inputBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14.spMin),
+    );
+
     return ThemeData(
       scaffoldBackgroundColor: AppColors.white,
       fontFamily: defaultFontFamily,
       splashColor: AppColors.primary.withValues(alpha: 0.1),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.orange,
           padding: EdgeInsets.all(15.spMin),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(12.spMin),
           ),
           elevation: 0.0,
           disabledBackgroundColor: AppColors.lightGrey,
@@ -38,7 +42,7 @@ class AppTheme {
             color: AppColors.primary,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(100.spMin),
+            borderRadius: BorderRadius.circular(12.spMin),
           ),
           foregroundColor: AppColors.black,
           textStyle: TextStyle(
@@ -85,53 +89,58 @@ class AppTheme {
           ),
         ),
       ),
-      textTheme: TextTheme(
-        displayLarge: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        displayMedium: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        displaySmall: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        headlineLarge: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        headlineMedium: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        headlineSmall: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        titleLarge: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        titleMedium: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        titleSmall: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        bodyLarge: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        bodyMedium: TextStyle(
-          letterSpacing: 0.0,
-        ),
-        bodySmall: TextStyle(
-          letterSpacing: 0.0,
-        ),
-      ).apply(
-        fontFamily: defaultFontFamily,
-      ),
+      textTheme:
+          TextTheme(
+            displayLarge: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            displayMedium: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            displaySmall: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            headlineLarge: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            headlineMedium: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            headlineSmall: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            titleLarge: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            titleMedium: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            titleSmall: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            bodyLarge: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            bodyMedium: TextStyle(
+              letterSpacing: 0.0,
+            ),
+            bodySmall: TextStyle(
+              letterSpacing: 0.0,
+            ),
+          ).apply(
+            fontFamily: defaultFontFamily,
+          ),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        backgroundColor: AppColors.white,
+        foregroundColor: AppColors.black,
+        elevation: 0.4,
+        scrolledUnderElevation: 1.5,
+        shadowColor: AppColors.lightGrey.withValues(alpha: 0.5),
+        surfaceTintColor: AppColors.white,
         titleTextStyle: TextStyle(
           fontSize: 20.spMin,
           fontWeight: FontWeight.w600,
-          color: AppColors.white,
+          color: AppColors.black,
           fontFamily: defaultFontFamily,
           letterSpacing: 0.0,
         ),
@@ -194,8 +203,8 @@ class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        backgroundColor: AppColors.lightGrey.withValues(alpha: 0.7),
+        foregroundColor: AppColors.black,
         elevation: 0.0,
       ),
       iconButtonTheme: IconButtonThemeData(
@@ -205,6 +214,13 @@ class AppTheme {
       ),
       tabBarTheme: TabBarThemeData(
         splashBorderRadius: BorderRadius.circular(10.spMin),
+        labelColor: AppColors.primary,
+        unselectedLabelColor: AppColors.grey,
+        indicatorColor: AppColors.primary,
+        overlayColor: WidgetStateProperty.all(
+          AppColors.primary.withValues(alpha: 0.1),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: AppColors.primary,
@@ -227,6 +243,59 @@ class AppTheme {
           width: 2.0,
         ),
         shape: CircleBorder(),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        border: inputBorder,
+        enabledBorder: inputBorder.copyWith(
+          borderSide: BorderSide(
+            color: AppColors.lightGrey,
+          ),
+        ),
+        focusedBorder: inputBorder.copyWith(
+          borderSide: BorderSide(
+            color: AppColors.orange,
+            width: 2.0,
+          ),
+        ),
+        focusedErrorBorder: inputBorder.copyWith(
+          borderSide: BorderSide(
+            color: AppColors.orange,
+            width: 2.0,
+          ),
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          vertical: 10.spMin,
+          horizontal: 20.spMin,
+        ),
+      ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: TextStyle(
+          fontSize: 14.sp,
+          fontFamily: defaultFontFamily,
+          fontWeight: FontWeight.w500,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: inputBorder,
+          enabledBorder: inputBorder.copyWith(
+            borderSide: BorderSide(
+              color: AppColors.lightGrey,
+            ),
+          ),
+          focusedBorder: inputBorder.copyWith(
+            borderSide: BorderSide(
+              color: AppColors.black,
+            ),
+          ),
+          focusedErrorBorder: inputBorder.copyWith(
+            borderSide: BorderSide(
+              color: AppColors.black,
+            ),
+          ),
+          contentPadding: EdgeInsets.symmetric(
+            vertical: 10.spMin,
+            horizontal: 20.spMin,
+          ),
+        ),
       ),
     );
   }

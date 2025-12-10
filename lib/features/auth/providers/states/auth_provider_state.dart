@@ -9,6 +9,10 @@ abstract class AuthProviderState with _$AuthProviderState {
     /// The state of signing in with Google.
     @Default(SignInWithGoogleState.initial())
     SignInWithGoogleState signInWithGoogleState,
+
+    /// The state of signing in with Apple.
+    @Default(SignInWithAppleState.initial())
+    SignInWithAppleState signInWithAppleState,
   }) = _AuthProviderState;
 }
 
@@ -20,4 +24,14 @@ class SignInWithGoogleState with _$SignInWithGoogleState {
   const factory SignInWithGoogleState.error(
     final AppError error,
   ) = SignInWithGoogleStateError;
+}
+
+@freezed
+class SignInWithAppleState with _$SignInWithAppleState {
+  const factory SignInWithAppleState.initial() = SignInWithAppleStateInitial;
+  const factory SignInWithAppleState.loading() = SignInWithAppleStateLoading;
+  const factory SignInWithAppleState.success() = SignInWithAppleStateSuccess;
+  const factory SignInWithAppleState.error(
+    final AppError error,
+  ) = SignInWithAppleStateError;
 }

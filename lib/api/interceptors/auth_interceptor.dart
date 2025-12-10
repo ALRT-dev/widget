@@ -11,8 +11,8 @@ class AuthInterceptor implements Interceptor {
   AuthInterceptor({
     required final Dio dio,
     required final SharedPreferencesRepository sharedPreferencesRepository,
-  })  : _dio = dio,
-        _sharedPreferencesRepository = sharedPreferencesRepository;
+  }) : _dio = dio,
+       _sharedPreferencesRepository = sharedPreferencesRepository;
 
   final Dio _dio;
   final SharedPreferencesRepository _sharedPreferencesRepository;
@@ -114,7 +114,7 @@ class AuthInterceptor implements Interceptor {
     return accessToken;
   }
 
-  /// Calls the API to generate new accessToken using the refreshToken.
+  /// Calls the API to generate new accessToken using the old refreshToken.
   Future<Either<String, AppError>> _generateNewAccessToken() {
     return runAsyncCall(
       name: 'generateNewAccessToken',
@@ -140,14 +140,14 @@ class AuthInterceptor implements Interceptor {
         );
 
         final data = request.data;
-        if (data?['data'] == null || data?['data'] is! String) {
+        if (data?['accessToken'] == null || data?['accessToken'] is! String) {
           throw AppError(
             message: 'accessToken could not be generated',
           );
         }
 
-        final accessToken = data!['data'] as String;
-        return Success(accessToken);
+        final newAccessToken = data!['accessToken'] as String;
+        return Success(newAccessToken);
       },
       onError: Failure.new,
     );

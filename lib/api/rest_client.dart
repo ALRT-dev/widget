@@ -1,7 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:hazard_app/api/endpoints.dart';
 import 'package:hazard_app/features/auth/models/auth_success_model.dart';
+import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
+import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
+import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
+import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'rest_client.g.dart';
@@ -14,16 +24,162 @@ abstract class RestClient {
 
   @POST(kUrlOAuthGoogle)
   Future<AuthSuccess> verifyGoogleOAuth({
-    @Field() required String idToken,
+    @Field() required final String idToken,
+  });
+
+  @POST(kUrlOAuthApple)
+  Future<AuthSuccess> verifyAppleOAuth({
+    @Field() required final String identityToken,
+    @Field() final String? firstName,
+    @Field() final String? lastName,
   });
 
   @POST(kUrlRefreshToken)
   Future<AuthSuccess> refreshToken({
-    @Field() required String accessToken,
+    @Field() required final String accessToken,
   });
+
+  // ---------------------------- ONBOARDING ----------------------------
+
+  @POST(kUrlOnboardingLocation)
+  Future<void> setOnboardingLocation({
+    @Field() required final double latitude,
+    @Field() required final double longitude,
+    @Field() final String? locationName,
+  });
+
+  @POST(kUrlOnboardingRadius)
+  Future<void> setOnboardingRadius({
+    @Field() required final double radiusInKm,
+  });
+
+  @POST(kUrlOnboardingNotifications)
+  Future<void> setOnboardingNotificationPreferences({
+    @Field() required final String pushNotificationPreference,
+  });
+
+  @POST(kUrlOnboardingAcceptTos)
+  Future<void> acceptOnboardingTermsOfService();
 
   // ---------------------------- USER ----------------------------
 
   @GET(kUrlUser)
   Future<AppUser> getCurrentUser();
+
+  @PUT(kUrlUser)
+  Future<AppUser> updateCurrentUser({
+    @Body() required final AppUser user,
+    @CancelRequest() final CancelToken? cancelToken,
+  });
+
+  @PUT(kUrlUserProfilePicture)
+  @MultiPart()
+  Future<AppUser> updateUserProfilePicture({
+    @Part() required final File profilePictureFile,
+    @SendProgress() final void Function(int, int)? onSendProgress,
+  });
+
+  @POST(kUrlSubscribeLocation)
+  Future<LocationSubscription> subscribeToLocation({
+    @Field() required final double northeastLat,
+    @Field() required final double northeastLng,
+    @Field() required final double southwestLat,
+    @Field() required final double southwestLng,
+    @Field() final String? name,
+    @Field() final String? address,
+  });
+
+  @DELETE('$kUrlUnsubscribeLocation/{subscriptionId}')
+  Future<void> unsubscribeFromLocation({
+    @Path() required String subscriptionId,
+  });
+
+  @GET(kUrlUserLocationSubscriptions)
+  Future<List<LocationSubscription>> getLocationSubscriptions();
+
+  @PUT(kUrlOwnLocationSubscription)
+  Future<LocationSubscription> updateOwnLocationSubscription({
+    @Field() required final double latitude,
+    @Field() required final double longitude,
+    @Field() final String? locationName,
+  });
+
+  @PUT(kUrlOwnLocationSubscriptionRadius)
+  Future<LocationSubscription> updateOwnLocationSubscriptionRadius({
+    @Field() required final double radiusKm,
+  });
+
+  @GET(kUrlPushNotificationSettings)
+  Future<PushNotificationSettings> getPushNotificationSettings();
+
+  @PUT(kUrlPushNotificationSettings)
+  Future<PushNotificationSettings> updatePushNotificationSettings({
+    @Body() required final PushNotificationSettings pushNotificationSettings,
+  });
+
+  // ---------------------------- HAZARD ----------------------------
+
+  @GET(kUrlHazards)
+  Future<List<Hazard>> getHazards({
+    @Queries() required final HazardSearchParams searchParams,
+    @CancelRequest() final CancelToken? cancelToken,
+  });
+
+  @GET(kUrlHazardsWithSubscriptionId)
+  Future<GetHazardsWithSubscriptionIdResponse> getGetHazardsWithSubscriptionId({
+    @Queries() required final HazardSearchParams searchParams,
+  });
+
+  @GET(kUrlHazardCategories)
+  Future<List<HazardCategory>> getAllHazardCategories();
+
+  @GET(kUrlHazardCategoriesParent)
+  Future<List<HazardCategory>> getAllParentHazardCategories();
+
+  @GET(kUrlHazardCategoriesSub)
+  Future<List<HazardCategory>> getAllSubHazardCategories();
+
+  @POST(kUrlHazards)
+  @MultiPart()
+  Future<Hazard> createHazardReport({
+    @Part() required final Map<String, dynamic> hazard,
+    @Part() final List<File>? mediaFiles,
+  });
+
+  @PUT('$kUrlHazards/{hazardId}')
+  @MultiPart()
+  Future<Hazard> updateHazardReport({
+    @Path() required final String hazardId,
+    @Part() required final Map<String, dynamic> hazard,
+    @Part() final List<File>? mediaFiles,
+    @Part() final List<String>? removedMediaIds,
+  });
+
+  @DELETE('$kUrlHazards/{hazardId}')
+  Future<void> deleteHazardReport({
+    @Path() required final String hazardId,
+  });
+
+  @POST(kUrlHazardVote)
+  Future<HttpResponse> voteHazard({
+    @Path() required final String hazardId,
+    @Field() required final String voteType,
+  });
+
+  @POST(kUrlHazardView)
+  Future<ViewHazardResponse> viewHazard({
+    @Path() required final String hazardId,
+  });
+
+  // ---------------------------- NOTIFICATION ----------------------------
+
+  @GET(kUrlNotificationsFeed)
+  Future<List<Hazard>> getNotificationsFeed({
+    @Queries() final HazardSearchParams? searchParams,
+  });
+
+  @POST(kUrlNotificationsPushNotificationToken)
+  Future<HttpResponse> sendPushNotificationToken({
+    @Field() required final String token,
+  });
 }

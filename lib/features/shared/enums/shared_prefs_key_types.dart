@@ -7,4 +7,7 @@ enum SharedPrefsKey {
 
   /// The key for the refresh token.
   refreshToken,
+
+  /// The key for storing whether the video is muted.
+  isVideoMuted,
 }
