@@ -244,6 +244,7 @@ class _SelectLocationOnMapScreenState
         context.showErrorToast(
           message:
               'You can only select locations within $radiusInKm km. Selected location is $distanceText away.',
+          autoCloseDuration: Duration(seconds: 6),
         );
         return;
       }
