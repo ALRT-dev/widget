@@ -356,7 +356,9 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       builder: (context, ref, child) {
         final title = ref.watch(
           provider.select(
-            (value) => value.hazard!.title ?? 'Unknown Hazard',
+            (value) => value.hazard?.isUserReported ?? false
+                ? value.hazard?.category?.name ?? 'Alert Report'
+                : value.hazard!.title ?? 'Alert',
           ),
         );
 

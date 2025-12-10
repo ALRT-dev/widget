@@ -145,7 +145,7 @@ class _CreateUpdateReportScreenState
                     spacing: 24.spMin,
                     children: [
                       _locationBuilder(),
-                      _titleBuilder(),
+                      // _titleBuilder(),
                       _descriptionBuilder(),
                       _mediaBuilder(),
                     ],
@@ -262,6 +262,7 @@ class _CreateUpdateReportScreenState
     ).onPressed(onPressed);
   }
 
+  // ignore: unused_element
   Widget _titleBuilder() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

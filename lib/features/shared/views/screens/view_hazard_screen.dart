@@ -251,7 +251,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       builder: (context, ref, child) {
         final title = ref.watch(
           provider.select(
-            (value) => value.hazard?.title ?? 'Alert Report',
+            (value) => value.hazard?.isUserReported ?? false
+                ? value.hazard?.category?.name ?? 'Alert Report'
+                : value.hazard?.title ?? 'Alert',
           ),
         );
         final categoryName = ref.watch(
