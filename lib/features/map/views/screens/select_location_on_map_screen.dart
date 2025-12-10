@@ -9,13 +9,17 @@ import 'package:hazard_app/features/map/providers/states/map_provider_state.dart
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/utils/location_helper.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
+import 'package:hazard_app/others/app_colors.dart';
 
 class SelectLocationOnMapScreenArgs {
   SelectLocationOnMapScreenArgs({
     this.initialLocation,
     this.getSubUrbOnly = false,
+    this.centerLocation,
+    this.radiusInMeters,
   });
 
   /// The initial location to center the map on.
@@ -23,6 +27,18 @@ class SelectLocationOnMapScreenArgs {
 
   /// Whether to get only the suburb part of the address.
   final bool getSubUrbOnly;
+
+  /// The center location for radius constraint.
+  /// If provided with [radiusInMeters], only locations within the radius can be selected.
+  final AlrtLocation? centerLocation;
+
+  /// The radius in meters for location selection constraint.
+  /// If provided with [centerLocation], only locations within this radius can be selected.
+  final double? radiusInMeters;
+
+  /// Whether radius constraint is enabled.
+  bool get hasRadiusConstraint =>
+      centerLocation != null && radiusInMeters != null;
 }
 
 class SelectLocationOnMapScreen extends ConsumerStatefulWidget {
@@ -65,6 +81,21 @@ class _SelectLocationOnMapScreenState
             (value) => value.markers,
           ),
         ),
+        circles: widget.args?.hasRadiusConstraint ?? false
+            ? {
+                Circle(
+                  circleId: const CircleId('radius-constraint'),
+                  center: LatLng(
+                    widget.args!.centerLocation!.latitude,
+                    widget.args!.centerLocation!.longitude,
+                  ),
+                  radius: widget.args!.radiusInMeters!,
+                  fillColor: AppColors.blue.withValues(alpha: 0.1),
+                  strokeColor: AppColors.blue.withValues(alpha: 0.5),
+                  strokeWidth: 2,
+                ),
+              }
+            : {},
         myLocationEnabled: true,
         onMapCreated: (controller) {
           ref
@@ -98,6 +129,30 @@ class _SelectLocationOnMapScreenState
                   (marker) => marker.markerId.value == 'selected-location',
                 );
             final position = marker.position;
+
+            // Validate radius constraint
+            if (widget.args?.hasRadiusConstraint ?? false) {
+              final distance = calculateDistanceInMeters(
+                widget.args!.centerLocation!.latitude,
+                widget.args!.centerLocation!.longitude,
+                position.latitude,
+                position.longitude,
+              );
+
+              if (distance > widget.args!.radiusInMeters!) {
+                final radiusInKm = (widget.args!.radiusInMeters! / 1000)
+                    .toStringAsFixed(1);
+                final distanceText = distance < 1000
+                    ? '${distance.toStringAsFixed(0)} m'
+                    : '${(distance / 1000).toStringAsFixed(1)} km';
+                context.showErrorToast(
+                  message:
+                      'Selected location is $distanceText away. Please select within $radiusInKm km.',
+                );
+                return;
+              }
+            }
+
             ref
                 .read(providerOfMap.notifier)
                 .getAddressFromCoordinates(
@@ -170,6 +225,29 @@ class _SelectLocationOnMapScreenState
       ),
     );
     if (isLoading) return;
+
+    // Validate radius constraint
+    if (widget.args?.hasRadiusConstraint ?? false) {
+      final distance = calculateDistanceInMeters(
+        widget.args!.centerLocation!.latitude,
+        widget.args!.centerLocation!.longitude,
+        position.latitude,
+        position.longitude,
+      );
+
+      if (distance > widget.args!.radiusInMeters!) {
+        final radiusInKm = (widget.args!.radiusInMeters! / 1000)
+            .toStringAsFixed(1);
+        final distanceText = distance < 1000
+            ? '${distance.toStringAsFixed(0)} m'
+            : '${(distance / 1000).toStringAsFixed(1)} km';
+        context.showErrorToast(
+          message:
+              'You can only select locations within $radiusInKm km. Selected location is $distanceText away.',
+        );
+        return;
+      }
+    }
 
     ref.read(providerOfMap.notifier).updateMarkers({
       Marker(

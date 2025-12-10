@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
@@ -489,12 +490,19 @@ class _CreateUpdateReportScreenState
               ),
       ),
     );
+    final userLocation = ref.read(
+      providerOfLocation.select(
+        (value) => value.location,
+      ),
+    );
 
     final location = await context.push(
       SelectLocationScreen.route,
       extra: SelectLocationScreenArgs(
         initialLocation: selectedLocation,
         getSubUrbOnly: true,
+        centerLocation: userLocation,
+        radiusInMeters: 5000,
       ),
     );
     if (!mounted) return;

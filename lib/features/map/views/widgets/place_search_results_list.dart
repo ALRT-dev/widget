@@ -13,11 +13,16 @@ class PlaceSearchResultsList extends ConsumerStatefulWidget {
     super.key,
     required this.placesSearchKey,
     this.onPlaceSelected,
+    this.radiusFilter,
   });
 
   final void Function(GooglePlace)? onPlaceSelected;
 
   final String placesSearchKey;
+
+  /// Optional filter function to check if a place is within radius.
+  /// Returns true if the place should be included in results.
+  final bool Function(double? latitude, double? longitude)? radiusFilter;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -105,25 +110,35 @@ class _PlaceSearchResultsListState
   }
 
   Widget _dataBuilder() {
-    return Consumer(builder: (context, ref, child) {
-      final places = ref.watch(
-        providerOfPlaces(widget.placesSearchKey).select(
-          (value) => value.places,
-        ),
-      );
-      if (places.isEmpty) {
-        return _emptyBuilder();
-      }
+    return Consumer(
+      builder: (context, ref, child) {
+        final places = ref.watch(
+          providerOfPlaces(widget.placesSearchKey).select(
+            (value) => value.places,
+          ),
+        );
 
-      return SliverList.builder(
-        itemCount: places.length,
-        itemBuilder: (context, index) {
-          return PlaceSearchResultsListItem(
-            place: places[index],
-            onSelected: widget.onPlaceSelected,
-          );
-        },
-      );
-    });
+        // Apply radius filter if provided
+        final filteredPlaces = widget.radiusFilter != null
+            ? places.where((place) {
+                return widget.radiusFilter!(place.latitude, place.longitude);
+              }).toList()
+            : places;
+
+        if (filteredPlaces.isEmpty) {
+          return _emptyBuilder();
+        }
+
+        return SliverList.builder(
+          itemCount: filteredPlaces.length,
+          itemBuilder: (context, index) {
+            return PlaceSearchResultsListItem(
+              place: filteredPlaces[index],
+              onSelected: widget.onPlaceSelected,
+            );
+          },
+        );
+      },
+    );
   }
 }
