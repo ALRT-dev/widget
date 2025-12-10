@@ -15,10 +15,14 @@ import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
 class SelectLocationOnMapScreenArgs {
   SelectLocationOnMapScreenArgs({
     this.initialLocation,
+    this.getSubUrbOnly = false,
   });
 
   /// The initial location to center the map on.
   final AlrtLocation? initialLocation;
+
+  /// Whether to get only the suburb part of the address.
+  final bool getSubUrbOnly;
 }
 
 class SelectLocationOnMapScreen extends ConsumerStatefulWidget {
@@ -87,12 +91,19 @@ class _SelectLocationOnMapScreenState
         return RoundButton(
           icon: isLoading ? Spinner(size: 15.0) : Icon(Icons.check_rounded),
           onPressed: () {
-            final marker = ref.read(providerOfMap).markers.firstWhere(
-                (marker) => marker.markerId.value == 'selected-location');
+            final marker = ref
+                .read(providerOfMap)
+                .markers
+                .firstWhere(
+                  (marker) => marker.markerId.value == 'selected-location',
+                );
             final position = marker.position;
             ref
                 .read(providerOfMap.notifier)
-                .getAddressFromCoordinates(coordinates: position);
+                .getAddressFromCoordinates(
+                  coordinates: position,
+                  getSubUrbOnly: widget.args?.getSubUrbOnly ?? false,
+                );
           },
         );
       },
@@ -101,13 +112,16 @@ class _SelectLocationOnMapScreenState
 
   void _onInit() {
     final currentLocation = ref.read(providerOfLocation).location;
-    final initialLocation = widget.args?.initialLocation ??
+    final initialLocation =
+        widget.args?.initialLocation ??
         AlrtLocation(
           latitude: currentLocation.latitude,
           longitude: currentLocation.longitude,
         );
 
-    ref.read(providerOfMap.notifier).animateTo(
+    ref
+        .read(providerOfMap.notifier)
+        .animateTo(
           position: LatLng(
             initialLocation.latitude,
             initialLocation.longitude,

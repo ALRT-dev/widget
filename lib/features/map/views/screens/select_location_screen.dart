@@ -10,6 +10,7 @@ import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_on_map_screen.dart';
 import 'package:hazard_app/features/map/views/widgets/place_search_results_list.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
@@ -18,10 +19,18 @@ import 'package:hazard_app/others/app_colors.dart';
 class SelectLocationScreenArgs {
   SelectLocationScreenArgs({
     this.initialLocation,
+    this.getSubUrbOnly = false,
+    this.showYourLocationOption = true,
   });
 
   /// The initial location to be displayed on the map when the screen loads.
   final AlrtLocation? initialLocation;
+
+  /// Whether to get only the suburb part of the address.
+  final bool getSubUrbOnly;
+
+  /// Whether to show the "Your Location" option.
+  final bool showYourLocationOption;
 }
 
 class SelectLocationScreen extends ConsumerStatefulWidget {
@@ -48,7 +57,8 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
   @override
   void initState() {
     super.initState();
-    _searchController.text = widget.args?.initialLocation?.name ??
+    _searchController.text =
+        widget.args?.initialLocation?.name ??
         widget.args?.initialLocation?.address ??
         '';
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -69,7 +79,8 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
             child: _searchbarBuilder().pX(20.0),
           ).sliverBox,
           20.hSizedBox.sliverBox,
-          _yourLocationBuilder().sliverBox,
+          if (widget.args?.showYourLocationOption ?? true)
+            _yourLocationBuilder().sliverBox,
           _chooseOnTheMapBuilder().sliverBox,
           Divider().pX(20.0).sliverBox,
           PlaceSearchResultsList(
@@ -201,7 +212,9 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
       'location-search-debounce',
       const Duration(milliseconds: 500),
       () {
-        ref.read(providerOfPlacesForSelectLocation.notifier).getPlaces();
+        ref
+            .read(providerOfPlacesForSelectLocation.notifier)
+            .getPlaces(showOnlyCities: widget.args?.getSubUrbOnly ?? false);
       },
     );
   }
@@ -214,9 +227,30 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
   }
 
   /// Fetches the user's current location from the [LocationProvider] and pops the screen with that location.
-  void _handleYourLocationPressed() {
+  void _handleYourLocationPressed() async {
     final currentUserLocation = ref.read(providerOfLocation).location;
-    context.pop(currentUserLocation);
+    final result = await ref
+        .read(providerOfLocationService)
+        .getAddressFromCoordinates(
+          coordinates: currentUserLocation.latLng,
+          getSubUrbOnly: widget.args?.getSubUrbOnly ?? false,
+        );
+    if (!mounted) return;
+
+    result.when(
+      (address) {
+        context.pop(
+          currentUserLocation.copyWith(
+            address: address,
+          ),
+        );
+      },
+      (error) {
+        context.showErrorToast(
+          message: 'Could not get your location. Please try again.',
+        );
+      },
+    );
   }
 
   /// Navigates to the [SelectLocationOnMapScreen] to allow the user to select a location on the map.
@@ -225,14 +259,12 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
       SelectLocationOnMapScreen.route,
       extra: SelectLocationOnMapScreenArgs(
         initialLocation: widget.args?.initialLocation,
+        getSubUrbOnly: widget.args?.getSubUrbOnly ?? false,
       ),
     );
     if (!mounted) return;
 
     if (location != null && location is AlrtLocation) {
-      ref
-          .read(providerOfMapService)
-          .getAddressFromCoordinates(coordinates: location.latLng);
       context.pop(location);
     }
   }

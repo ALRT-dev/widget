@@ -4,13 +4,19 @@ import 'package:hazard_app/features/auth/models/auth_success_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
+import 'package:hazard_app/others/env.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 abstract class AuthRepository {
   Future<Either<void, AppError>> initializeGoogleSignIn();
+
   Future<Either<AuthSuccess, AppError>> signInWithGoogle();
+
   Future<Either<AuthSuccess, AppError>> signInWithGoogleUser({
     required GoogleSignInAccount googleUser,
   });
+
+  Future<Either<AuthSuccess, AppError>> signInWithApple();
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -28,7 +34,9 @@ class AuthRepositoryImpl implements AuthRepository {
     return runAsyncCall(
       name: 'initializeGoogleSignIn',
       future: () async {
-        await _googleSignIn.initialize();
+        await _googleSignIn.initialize(
+          serverClientId: Env.googleAuthServerClientId,
+        );
         return const Success(null);
       },
       onError: Failure.new,
@@ -70,6 +78,34 @@ class AuthRepositoryImpl implements AuthRepository {
 
         final result = await _restClient.verifyGoogleOAuth(
           idToken: googleAuth.idToken!,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<AuthSuccess, AppError>> signInWithApple() {
+    return runAsyncCall(
+      name: 'signInWithApple',
+      future: () async {
+        final credential = await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+        );
+
+        final identityToken = credential.identityToken;
+        if (identityToken == null) {
+          throw AppError(message: 'Failed to get identity token from Apple');
+        }
+
+        final result = await _restClient.verifyAppleOAuth(
+          identityToken: identityToken,
+          firstName: credential.givenName,
+          lastName: credential.familyName,
         );
         return Success(result);
       },

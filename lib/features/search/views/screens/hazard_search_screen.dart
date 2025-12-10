@@ -56,7 +56,6 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 10.spMin,
           children: [
             RichText(
               text: TextSpan(
@@ -64,17 +63,24 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
                 children: [
                   TextSpan(
                     text: 'Showing results for ',
+                    style: TextStyle(
+                      color: AppColors.grey.withValues(alpha: 0.8),
+                    ),
                   ),
                   TextSpan(
                     text: '"$selectedLocationName"',
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   TextSpan(
-                    text: '. Subscribe to get instant alerts and updates. ',
+                    text: '\nSubscribe to get instant alerts and updates.',
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                    ),
                   ),
                 ],
               ),
             ),
+            20.hSizedBox,
             _subscribeButtonBuilder(),
           ],
         ).pX(20.0);
@@ -104,12 +110,13 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
           ),
         );
         return SizedBox(
-          height: 30.spMin,
+          height: 48.spMin,
           child: Button.filled(
-            width: 120.spMin,
             onPressed: _handleSubscribePressed,
             isLoading: isLoading,
-            padding: EdgeInsets.zero,
+            padding: EdgeInsets.symmetric(
+              vertical: 12.spMin,
+            ),
             color: isSubscribed ? AppColors.grey : null,
             icon: isLoading
                 ? null
@@ -117,18 +124,14 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
                     isSubscribed
                         ? Icons.notifications_off_rounded
                         : Icons.notifications_active_rounded,
-                    size: 16,
                   ),
-            borderRadius: 8.0,
-            iconAndTextSpacing: 5.0,
+            iconAndTextSpacing: 8.0,
             value: isLoading
                 ? null
                 : isSubscribed
                 ? 'Unsubscribe'
                 : 'Subscribe',
-            valueStyle: const TextStyle(
-              fontSize: 12,
-            ),
+            valueStyle: const TextStyle(),
           ),
         );
       },

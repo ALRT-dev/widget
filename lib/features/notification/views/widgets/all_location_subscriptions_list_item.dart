@@ -11,6 +11,7 @@ import 'package:hazard_app/features/shared/extensions/context_navigation_extensi
 import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -101,55 +102,78 @@ class _AllLocationSubscriptionsListItemState
                     ),
                   ),
                   8.hSizedBox,
+
                   Row(
                     spacing: 10.spMin,
                     children: [
-                      if (!widget.subscription.isOwnLocation)
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final isLoading = ref.watch(
-                              providerOfMyLocationSubscriptions.select(
-                                (value) => value
-                                    .unsubscribeFromLocationStateWrappers
-                                    .any(
-                                      (wrapper) =>
-                                          wrapper.subscriptionId ==
-                                              widget.subscription.id &&
-                                          wrapper.unsubscribeFromLocationState
-                                              .maybeWhen(
-                                                orElse: () => false,
-                                                loading: () => true,
-                                              ),
-                                    ),
-                              ),
-                            );
+                      !widget.subscription.isOwnLocation
+                          ? Consumer(
+                              builder: (context, ref, child) {
+                                final isLoading = ref.watch(
+                                  providerOfMyLocationSubscriptions.select(
+                                    (value) => value
+                                        .unsubscribeFromLocationStateWrappers
+                                        .any(
+                                          (wrapper) =>
+                                              wrapper.subscriptionId ==
+                                                  widget.subscription.id &&
+                                              wrapper
+                                                  .unsubscribeFromLocationState
+                                                  .maybeWhen(
+                                                    orElse: () => false,
+                                                    loading: () => true,
+                                                  ),
+                                        ),
+                                  ),
+                                );
 
-                            return SizedBox(
+                                return SizedBox(
+                                  height: 30.spMin,
+                                  child: Button.filled(
+                                    width: 120.spMin,
+                                    onPressed: _handleUnsubscribe,
+                                    isLoading: isLoading,
+                                    padding: EdgeInsets.zero,
+                                    color: AppColors.red,
+                                    iconAndTextSpacing: 5.0,
+                                    icon: isLoading
+                                        ? null
+                                        : Icon(
+                                            Icons.notifications_off_rounded,
+                                            color: AppColors.white,
+                                            size: 16.spMin,
+                                          ),
+                                    borderRadius: 8.0,
+                                    value: isLoading ? null : 'Unsubscribe',
+                                    valueStyle: TextStyle(
+                                      fontSize: 12.spMin,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : SizedBox(
                               height: 30.spMin,
                               child: Button.filled(
                                 width: 120.spMin,
-                                onPressed: _handleUnsubscribe,
-                                isLoading: isLoading,
-                                padding: EdgeInsets.zero,
-                                color: AppColors.red,
+                                onPressed: _handleEditMyLocationTap,
                                 iconAndTextSpacing: 5.0,
-                                icon: isLoading
-                                    ? null
-                                    : Icon(
-                                        Icons.notifications_off_rounded,
-                                        color: AppColors.white,
-                                        size: 16.spMin,
-                                      ),
+                                padding: EdgeInsets.zero,
+                                color: AppColors.grey,
+                                icon: Icon(
+                                  Icons.edit_rounded,
+                                  color: AppColors.white,
+                                  size: 16.spMin,
+                                ),
                                 borderRadius: 8.0,
-                                value: isLoading ? null : 'Unsubscribe',
+                                value: 'Edit Radius',
                                 valueStyle: TextStyle(
                                   fontSize: 12.spMin,
                                   color: AppColors.white,
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
                       SizedBox(
                         height: 30.spMin,
                         child: Button.filled(
@@ -157,7 +181,7 @@ class _AllLocationSubscriptionsListItemState
                           onPressed: _handleViewOnMap,
                           iconAndTextSpacing: 5.0,
                           padding: EdgeInsets.zero,
-                          color: AppColors.blue,
+                          color: AppColors.orange,
                           icon: Icon(
                             Icons.map_rounded,
                             color: AppColors.white,
@@ -182,6 +206,16 @@ class _AllLocationSubscriptionsListItemState
     );
   }
 
+  /// Handles the tap action when the edit action is pressed.
+  void _handleEditMyLocationTap() {
+    final ownLocationRadiusKm =
+        ref.read(providerOfLoggedInUser)?.ownLocationSubscriptionRadiusKm ?? 5;
+    showChangeRadiusBottomsheet(
+      context: context,
+      initialRadius: ownLocationRadiusKm,
+    );
+  }
+
   /// Handles the unsubscribe action when the "Unsubscribe" button is pressed.
   void _handleUnsubscribe() {
     if (widget.subscription.id == null) return;
@@ -203,6 +237,6 @@ class _AllLocationSubscriptionsListItemState
     ref.read(providerOfHomeTab.notifier).state = HomeTab.map;
     ref
         .read(providerOfMap.notifier)
-        .animateToBounds(bounds: widget.subscription.bounds);
+        .animateToBounds(bounds: widget.subscription.bounds, padding: 0.0);
   }
 }

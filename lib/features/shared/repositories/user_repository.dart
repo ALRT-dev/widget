@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
-import 'package:hazard_app/features/notification/models/push_notification_update_input_model.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_source_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
@@ -16,6 +16,7 @@ abstract class UserRepository {
 
   Future<Either<AppUser, AppError>> updateCurrentUser({
     required final AppUser user,
+    final CancelToken? cancelToken,
   });
 
   Future<Either<AppUser, AppError>> updateUserProfilePicture({
@@ -39,11 +40,23 @@ abstract class UserRepository {
   Future<Either<List<LocationSubscription>, AppError>>
   getLocationSubscriptions();
 
+  Future<Either<LocationSubscription, AppError>> updateOwnLocationSubscription({
+    required final double latitude,
+    required final double longitude,
+    final String? locationName,
+  });
+
+  Future<Either<LocationSubscription, AppError>>
+  updateOwnLocationSubscriptionRadius({
+    required final double radiusKm,
+  });
+
   Future<Either<PushNotificationSettings, AppError>>
   getPushNotificationSettings();
 
-  Future<Either<void, AppError>> updatePushNotificationSettings({
-    required final List<PushNotificationUpdateInput> updates,
+  Future<Either<PushNotificationSettings, AppError>>
+  updatePushNotificationSettings({
+    required final PushNotificationSettings pushNotificationSettings,
   });
 }
 
@@ -69,12 +82,14 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Either<AppUser, AppError>> updateCurrentUser({
     required AppUser user,
+    CancelToken? cancelToken,
   }) {
     return runAsyncCall(
       name: 'updateCurrentUser',
       future: () async {
         final result = await _restClient.updateCurrentUser(
           user: user,
+          cancelToken: cancelToken,
         );
         return Success(result);
       },
@@ -175,16 +190,52 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<Either<void, AppError>> updatePushNotificationSettings({
-    required List<PushNotificationUpdateInput> updates,
+  Future<Either<PushNotificationSettings, AppError>>
+  updatePushNotificationSettings({
+    required PushNotificationSettings pushNotificationSettings,
   }) {
     return runAsyncCall(
       name: 'updatePushNotificationSettings',
       future: () async {
-        await _restClient.updatePushNotificationSettings(
-          updates: updates,
+        final result = await _restClient.updatePushNotificationSettings(
+          pushNotificationSettings: pushNotificationSettings,
         );
-        return Success(null);
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<LocationSubscription, AppError>> updateOwnLocationSubscription({
+    required double latitude,
+    required double longitude,
+    String? locationName,
+  }) {
+    return runAsyncCall(
+      name: 'updateOwnLocationSubscription',
+      future: () async {
+        final result = await _restClient.updateOwnLocationSubscription(
+          latitude: latitude,
+          longitude: longitude,
+          locationName: locationName,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<LocationSubscription, AppError>>
+  updateOwnLocationSubscriptionRadius({required double radiusKm}) {
+    return runAsyncCall(
+      name: 'updateOwnLocationSubscriptionRadius',
+      future: () async {
+        final result = await _restClient.updateOwnLocationSubscriptionRadius(
+          radiusKm: radiusKm,
+        );
+        return Success(result);
       },
       onError: Failure.new,
     );

@@ -11,6 +11,9 @@ abstract class HazardMarkersBitmapsProviderState
     /// The map of hazard (severity and category emoji) to their corresponding marker bitmaps.
     @Default({}) final Map<String, BitmapDescriptor> markerBitmaps,
 
+    /// Bitmap for small red dot icon used at low zoom levels.
+    final BitmapDescriptor? redDotBitmap,
+
     /// The state of generating marker bitmaps.
     @Default(GenerateMarkerBitmaps.initial())
     final GenerateMarkerBitmaps generateMarkerBitmaps,

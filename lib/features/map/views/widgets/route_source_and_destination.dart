@@ -26,7 +26,7 @@ class _RouteSourceAndDestinationState
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.lightGrey),
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(14.spMin),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadowColor,

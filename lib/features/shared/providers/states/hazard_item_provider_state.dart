@@ -8,7 +8,7 @@ part 'hazard_item_provider_state.freezed.dart';
 abstract class HazardItemProviderState with _$HazardItemProviderState {
   const factory HazardItemProviderState({
     /// The hazard item being managed.
-    required final Hazard hazard,
+    final Hazard? hazard,
 
     /// The state of voting on the hazard.
     @Default(VoteHazardState.initial()) final VoteHazardState voteState,

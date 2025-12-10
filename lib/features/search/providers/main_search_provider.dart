@@ -6,9 +6,8 @@ import 'package:hazard_app/features/notification/providers/notifications_feed_pr
 import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
-import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
@@ -38,8 +37,6 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
 
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   UserService get _userService => _ref.read(providerOfUserService);
-  HazardCategoriesProvider get _hazardCategoriesProvider =>
-      _ref.read(providerOfHazardCategoriesForSearch.notifier);
   NotificationsFeedProvider get _notificationsFeedProvider =>
       _ref.read(providerOfNotificationsFeed.notifier);
   MyLocationSubscriptionsProvider get _myLocationSubscriptionsProvider =>
@@ -73,33 +70,51 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
       getHazardsByLocationState: const GetHazardsByLocationState.loading(),
     );
 
-    final result = await _hazardService.getHazardsWithCategories(
+    final selectedCategoryIds = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .selectedCategoryIds
+        .toList();
+    final awsEmergency = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .awsEmergency;
+    final awsWatchAndAct = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .awsWatchAndAct;
+    final awsAdvice = _ref.read(providerOfHazardFiltersForSearch).awsAdvice;
+    final officialNonAws = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .officialNonAws;
+    final userReported = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .userReported;
+
+    final result = await _hazardService.getHazardsWithSubscriptionId(
       searchParams: HazardSearchParams(
         northeastLat: location!.bounds?.northeastLat,
         northeastLng: location.bounds?.northeastLng,
         southwestLat: location.bounds?.southwestLat,
         southwestLng: location.bounds?.southwestLng,
-        categoryIds: state.selectedCategories.map((e) => e.id).toList(),
+        categoryIds: selectedCategoryIds,
+        awsEmergency: awsEmergency,
+        awsWatchAndAct: awsWatchAndAct,
+        awsAdvice: awsAdvice,
+        officialNonAws: officialNonAws,
+        userReported: userReported,
       ),
     );
     if (!mounted) return;
 
     result.when(
-      (hazardsWithCategories) {
+      (response) {
         state = state.copyWith(
           getHazardsByLocationState: GetHazardsByLocationState.success(
-            hazardsWithCategories.hazards,
+            response.hazards,
           ),
         );
-        updateHazards(hazardsWithCategories.hazards);
-
-        // add categories to the hazard categories provider
-        _hazardCategoriesProvider.updateHazardCategories(
-          hazardsWithCategories.categoryFilters,
-        );
+        updateHazards(response.hazards);
 
         // update subscriptionId if there's an active subscription for this location
-        updateSubscriptionId(hazardsWithCategories.subscriptionId);
+        updateSubscriptionId(response.subscriptionId);
       },
       (error) {
         state = state.copyWith(
@@ -213,13 +228,6 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
 
     // every time the searched location is updated, reset the subscriptionId
     updateSubscriptionId(null);
-  }
-
-  /// Updates [MainSearchProviderState.selectedCategories] with the given [categories].
-  void updateSelectedCategories(final List<HazardCategory> categories) {
-    state = state.copyWith(
-      selectedCategories: categories,
-    );
   }
 
   /// Updates [MainSearchProviderState.hazards] with the given [hazards].

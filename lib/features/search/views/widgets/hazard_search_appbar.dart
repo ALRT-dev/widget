@@ -7,20 +7,18 @@ import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/places_search_results_menu_content.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
-import 'package:hazard_app/features/search/views/widgets/hazard_categories_list.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
-import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
+import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class HazardSearchAppBar extends ConsumerStatefulWidget {
   const HazardSearchAppBar({super.key});
 
   static const placesSearchKey = 'HazardSearchAppBar';
-  static const categoriesKey = 'HazardSearchAppBar';
+  static const filtersKey = 'HazardSearchAppBarFilters';
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -45,57 +43,47 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final isCategoriesPresent = ref.watch(
-          providerOfHazardCategoriesForSearch.select(
-            (value) => value.hazardCategories.isNotEmpty,
-          ),
-        );
-
-        return SliverAppBar(
-          backgroundColor: context.theme.scaffoldBackgroundColor,
-          surfaceTintColor: AppColors.transparent,
-          floating: true,
-          pinned: true,
-          leading: const SizedBox(),
-          leadingWidth: 0.0,
-          toolbarHeight: 50.spMin,
-          title: Text(
-            'ALRT Intelligent Search',
-            style: TextStyle(
-              color: AppColors.black,
-            ),
-          ),
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(
-              isCategoriesPresent ? 118.spMin : 63.spMin,
-            ),
-            child: Column(
+    return SliverAppBar(
+      backgroundColor: context.theme.scaffoldBackgroundColor,
+      surfaceTintColor: AppColors.transparent,
+      floating: true,
+      pinned: true,
+      leading: const SizedBox(),
+      leadingWidth: 0.0,
+      toolbarHeight: 50.spMin,
+      title: Text(
+        'ALRT Intelligent Search',
+        style: TextStyle(
+          color: AppColors.black,
+        ),
+      ),
+      bottom: PreferredSize(
+        preferredSize: Size.fromHeight(63.spMin),
+        child: Column(
+          children: [
+            Row(
               children: [
-                _searchbarBuilder().pX(20.0),
-                15.hSizedBox,
-                HazardCategoriesList(
-                  categoriesKey: HazardSearchAppBar.categoriesKey,
-                  onCategoriesSelectionUpdated: _handleCategorySelectionChanged,
+                Expanded(
+                  child: _searchbarBuilder(),
                 ),
-                if (isCategoriesPresent) 15.hSizedBox,
-                Divider(
-                  height: 0.0,
-                  color: AppColors.lightGrey.withValues(alpha: 0.5),
-                ),
+                _filtersButtonBuilder(),
               ],
+            ).pX(20.0),
+            15.hSizedBox,
+            Divider(
+              height: 0.0,
+              color: AppColors.lightGrey.withValues(alpha: 0.5),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 
   Widget _searchbarBuilder() {
     return AlrtDropdown(
       controller: _dropdownController,
-      button: Consumer(
+      button: (context, isOpen) => Consumer(
         builder: (context, ref, child) {
           final isSearchActive = ref.watch(
             providerOfPlacesForSearch.select(
@@ -153,6 +141,14 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
     );
   }
 
+  Widget _filtersButtonBuilder() {
+    return HazardFiltersButton(
+      filtersKey: HazardSearchAppBar.filtersKey,
+      onFiltersUpdated: () => _getHazards(),
+      buttonShadow: [],
+    ).pL(10.0);
+  }
+
   /// Updates the state with the given search string.
   void _handleSearchChanged(String value) {
     if (value.trim().isEmpty) {
@@ -203,12 +199,8 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
       ..getHazards();
   }
 
-  /// Handles the event when the category selection changes.
-  void _handleCategorySelectionChanged(
-    final List<HazardCategory> selectedCategories,
-  ) {
-    ref.read(providerOfMainSearch.notifier)
-      ..updateSelectedCategories(selectedCategories)
-      ..getHazards();
+  /// Fetches the hazards for the current search parameters.
+  void _getHazards() {
+    ref.read(providerOfMainSearch.notifier).getHazards();
   }
 }

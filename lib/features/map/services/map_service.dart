@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/widgets.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,6 +13,8 @@ import 'package:hazard_app/features/map/providers/repository_providers.dart';
 import 'package:hazard_app/features/map/repositories/map_repository.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
+import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
@@ -80,9 +85,11 @@ class MapService {
 
   Future<Either<String, AppError>> getAddressFromCoordinates({
     required final LatLng coordinates,
+    final bool getSubUrbOnly = false,
   }) {
     return _mapRepository.getAddressFromCoordinates(
       coordinates: coordinates,
+      getSubUrbOnly: getSubUrbOnly,
     );
   }
 
@@ -134,13 +141,19 @@ class MapService {
         .toBounds();
 
     final hazardsToAvoidResult = await _hazardService.getAllHazards(
-      numberOfParallelRequests: 5,
+      allowEmptyCategoryIds: true,
+      allowAllSourceFiltersFalse: true,
       searchParams: HazardSearchParams(
         northeastLat: bounds.northeast.latitude,
         northeastLng: bounds.northeast.longitude,
         southwestLat: bounds.southwest.latitude,
         southwestLng: bounds.southwest.longitude,
-        pageSize: 100,
+        ignoreHazardLatLngBounds: true,
+        sortSettings: [
+          {SortCategory.severityBand: SortOrder.desc},
+          {SortCategory.createdAt: SortOrder.desc},
+        ],
+        pageSize: 20,
       ),
     );
 
@@ -299,4 +312,39 @@ class MapService {
       return hazards.length * 1.0;
     }
   }
+
+  /// Gets the screen coordinate for a given [latLng] position on the map.
+  ///
+  /// On Android, the coordinates are adjusted for device pixel density to return
+  /// logical pixels that match Flutter's coordinate system.
+  Future<ScreenCoordinate?> getScreenCoordinate(LatLng latLng) async {
+    try {
+      if (_googleMapController == null) return null;
+      final screenCoordinate = await _googleMapController!.getScreenCoordinate(
+        latLng,
+      );
+
+      // On Android, getScreenCoordinate returns physical pixels
+      // We need to convert to logical pixels by dividing by device pixel ratio
+      if (Platform.isAndroid) {
+        final devicePixelRatio = WidgetsBinding
+            .instance
+            .platformDispatcher
+            .views
+            .first
+            .devicePixelRatio;
+        return ScreenCoordinate(
+          x: (screenCoordinate.x / devicePixelRatio).round(),
+          y: (screenCoordinate.y / devicePixelRatio).round(),
+        );
+      }
+
+      return screenCoordinate;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Gets the map controller if it's initialized.
+  GoogleMapController? get mapController => _googleMapController;
 }

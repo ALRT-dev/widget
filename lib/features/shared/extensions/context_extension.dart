@@ -33,7 +33,7 @@ extension ContextExt on BuildContext {
   /// The [message] parameter is required and should be a string.
   void showErrorToast({
     required final String message,
-    final Duration autoCloseDuration = const Duration(seconds: 3),
+    final Duration autoCloseDuration = const Duration(seconds: 4),
   }) {
     Toastification().show(
       context: this,

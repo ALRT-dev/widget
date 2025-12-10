@@ -23,7 +23,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(14.spMin),
         border: Border.all(
           color: AppColors.lightGrey,
         ),
@@ -120,7 +120,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
       padding: EdgeInsets.all(10.spMin),
       decoration: BoxDecoration(
         color: _getMainColor().withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(10.spMin),
         border: Border.all(
           color: _getMainColor().withValues(alpha: 0.3),
         ),
@@ -204,10 +204,10 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
         vertical: 4.spMin,
       ),
       decoration: BoxDecoration(
-        color: severity.colorAWS.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12.r),
+        color: severity.colorAws.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(8.spMin),
         border: Border.all(
-          color: (textColor ?? severity.colorAWS).withValues(alpha: 0.5),
+          color: (textColor ?? severity.colorAws).withValues(alpha: 0.5),
         ),
       ),
       child: Text(
@@ -215,7 +215,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
         style: TextStyle(
           fontSize: 10.sp,
           fontWeight: FontWeight.w500,
-          color: textColor ?? severity.colorAWS,
+          color: textColor ?? severity.colorAws,
         ),
       ),
     );
@@ -291,7 +291,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
           color: isSelected
               ? AppColors.primary.withValues(alpha: 0.1)
               : AppColors.white,
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(8.spMin),
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.lightGrey,
           ),

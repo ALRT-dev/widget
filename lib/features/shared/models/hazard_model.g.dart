@@ -10,20 +10,27 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
   id: json['id'] as String?,
   title: json['title'] as String?,
   description: json['description'] as String?,
-  shortDescription: json['shortDescription'] as String?,
   severity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['severity']),
+  severityBand: $enumDecodeNullable(
+    _$HazardSeverityBandEnumMap,
+    json['severityBand'],
+  ),
   latitude: (json['latitude'] as num?)?.toDouble(),
   longitude: (json['longitude'] as num?)?.toDouble(),
   locationName: json['locationName'] as String?,
+  northeastLat: (json['northeastLat'] as num?)?.toDouble(),
+  northeastLng: (json['northeastLng'] as num?)?.toDouble(),
+  southwestLat: (json['southwestLat'] as num?)?.toDouble(),
+  southwestLng: (json['southwestLng'] as num?)?.toDouble(),
   categoryId: json['categoryId'] as String?,
   category: json['category'] == null
       ? null
       : HazardCategory.fromJson(json['category'] as Map<String, dynamic>),
+  fireStatus: $enumDecodeNullable(_$FireStatusEnumMap, json['fireStatus']),
   source: json['source'] == null
       ? null
       : HazardSource.fromJson(json['source'] as Map<String, dynamic>),
   aiSummary: json['aiSummary'] as String?,
-  aiSeverity: $enumDecodeNullable(_$HazardSeverityEnumMap, json['aiSeverity']),
   aiConfidence: $enumDecodeNullable(
     _$AIConfidenceEnumMap,
     json['aiConfidence'],
@@ -55,6 +62,7 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
           ?.map((e) => S3Media.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const <S3Media>[],
+  link: json['link'] as String?,
   occurredAt: _$JsonConverterFromJson<String, DateTime>(
     json['occurredAt'],
     const DateTimeConverter().fromJson,
@@ -77,16 +85,20 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'id': ?instance.id,
   'title': ?instance.title,
   'description': ?instance.description,
-  'shortDescription': ?instance.shortDescription,
   'severity': ?_$HazardSeverityEnumMap[instance.severity],
+  'severityBand': ?_$HazardSeverityBandEnumMap[instance.severityBand],
   'latitude': ?instance.latitude,
   'longitude': ?instance.longitude,
   'locationName': ?instance.locationName,
+  'northeastLat': ?instance.northeastLat,
+  'northeastLng': ?instance.northeastLng,
+  'southwestLat': ?instance.southwestLat,
+  'southwestLng': ?instance.southwestLng,
   'categoryId': ?instance.categoryId,
   'category': ?instance.category?.toJson(),
+  'fireStatus': ?_$FireStatusEnumMap[instance.fireStatus],
   'source': ?instance.source?.toJson(),
   'aiSummary': ?instance.aiSummary,
-  'aiSeverity': ?_$HazardSeverityEnumMap[instance.aiSeverity],
   'aiConfidence': ?_$AIConfidenceEnumMap[instance.aiConfidence],
   'callToAction': ?instance.callToAction,
   'isAwsCompliant': ?instance.isAwsCompliant,
@@ -103,6 +115,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'downvoteCount': instance.downvoteCount,
   'confidenceScore': ?instance.confidenceScore,
   'medias': instance.medias.map((e) => e.toJson()).toList(),
+  'link': ?instance.link,
   'occurredAt': ?_$JsonConverterToJson<String, DateTime>(
     instance.occurredAt,
     const DateTimeConverter().toJson,
@@ -124,10 +137,23 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
 const _$HazardSeverityEnumMap = {
   HazardSeverity.unknown: 'unknown',
   HazardSeverity.info: 'info',
-  HazardSeverity.low: 'low',
   HazardSeverity.advice: 'advice',
   HazardSeverity.watchAndAct: 'watchAndAct',
   HazardSeverity.emergency: 'emergency',
+};
+
+const _$HazardSeverityBandEnumMap = {
+  HazardSeverityBand.info: 'info',
+  HazardSeverityBand.monitor: 'monitor',
+  HazardSeverityBand.action: 'action',
+  HazardSeverityBand.critical: 'critical',
+};
+
+const _$FireStatusEnumMap = {
+  FireStatus.active: 'active',
+  FireStatus.beingControlled: 'beingControlled',
+  FireStatus.underControl: 'underControl',
+  FireStatus.closed: 'closed',
 };
 
 const _$AIConfidenceEnumMap = {

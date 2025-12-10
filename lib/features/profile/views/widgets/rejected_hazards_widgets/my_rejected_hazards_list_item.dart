@@ -27,7 +27,7 @@ class MyRejectedHazardsListItem extends ConsumerStatefulWidget {
 
 class _MyRejectedHazardsListItemState
     extends ConsumerState<MyRejectedHazardsListItem> {
-  late final provider = providerOfHazardItem(widget.report);
+  late final provider = providerOfHazardItem(widget.report.id ?? 'unknown');
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,8 @@ class _MyRejectedHazardsListItemState
                 ),
                 4.spMin.hSizedBox,
                 Text(
-                  widget.report.reviewFeedback ?? 'Please update this report.',
+                  widget.report.reviewFeedback ??
+                      'Your alrt report has been reviewed and rejected. Please check your profile for feedback.',
                   style: TextStyle(
                     fontSize: 12.spMin,
                     color: AppColors.grey,

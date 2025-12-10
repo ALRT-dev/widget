@@ -1,9 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
+import 'package:hazard_app/features/onboarding/providers/service_providers.dart';
+import 'package:hazard_app/features/onboarding/services/onboarding_service.dart';
 import 'package:hazard_app/features/profile/providers/states/my_location_subscriptions_provider_state.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/user_service.dart';
 import 'package:uuid/uuid.dart';
@@ -33,6 +38,9 @@ class MyLocationSubscriptionsProvider
   UserService get _userService => _ref.read(providerOfUserService);
   NotificationsFeedProvider get _notificationsFeedProvider =>
       _ref.read(providerOfNotificationsFeed.notifier);
+
+  OnboardingService get _onboardingService =>
+      _ref.read(providerOfOnboardingService);
 
   /// Fetches the location subscriptions for the current user.
   Future<void> getLocationSubscriptions() async {
@@ -205,6 +213,88 @@ class MyLocationSubscriptionsProvider
     );
   }
 
+  /// Updates the location subscription's location.
+  Future<void> updateLocationSubscriptionLocation({
+    required final AlrtLocation newLocation,
+  }) async {
+    state = state.copyWith(
+      updateUserLocationSubscriptionLocationState:
+          const UpdateUserLocationSubscriptionLocationState.loading(),
+    );
+
+    final result = await _onboardingService.setOnboardingLocation(
+      latitude: newLocation.latitude,
+      longitude: newLocation.longitude,
+      locationName: newLocation.name,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (_) {
+        state = state.copyWith(
+          updateUserLocationSubscriptionLocationState:
+              const UpdateUserLocationSubscriptionLocationState.success(),
+        );
+
+        // Refresh the location subscriptions
+        getLocationSubscriptions();
+
+        // after updating a location subscription, refresh the notifications feed
+        _notificationsFeedProvider.getNotificationsFeed();
+      },
+      (error) {
+        state = state.copyWith(
+          updateUserLocationSubscriptionLocationState:
+              UpdateUserLocationSubscriptionLocationState.error(error),
+        );
+      },
+    );
+  }
+
+  /// Updates the location subscription's radius.
+  Future<void> updateLocationSubscriptionRadius({
+    required final double newRadiusInKm,
+  }) async {
+    state = state.copyWith(
+      updateUserLocationSubscriptionRadiusState:
+          const UpdateUserLocationSubscriptionRadiusState.loading(),
+    );
+    final result = await _userService.updateOwnLocationSubscriptionRadius(
+      radiusKm: newRadiusInKm,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (_) {
+        state = state.copyWith(
+          updateUserLocationSubscriptionRadiusState:
+              const UpdateUserLocationSubscriptionRadiusState.success(),
+        );
+
+        // update the logged in user's ownLocationSubscriptionRadiusKm
+        _ref
+            .read(providerOfLoggedInUser.notifier)
+            .update(
+              (user) => user?.copyWith(
+                ownLocationSubscriptionRadiusKm: newRadiusInKm.toInt(),
+              ),
+            );
+
+        // Refresh the location subscriptions
+        getLocationSubscriptions();
+
+        // after updating a location subscription, refresh the notifications feed
+        _notificationsFeedProvider.getNotificationsFeed();
+      },
+      (error) {
+        state = state.copyWith(
+          updateUserLocationSubscriptionRadiusState:
+              UpdateUserLocationSubscriptionRadiusState.error(error),
+        );
+      },
+    );
+  }
+
   /// Updates [MyLocationSubscriptionsProviderState.locationSubscriptions]  with the given [locationSubscriptions].
   void updateLocationSubscriptions({
     required final List<LocationSubscription> locationSubscriptions,
@@ -248,5 +338,62 @@ class MyLocationSubscriptionsProvider
           .where((subscription) => subscription.id != subscriptionId)
           .toList(),
     );
+  }
+
+  /// Updates the user's own location subscription based on the logged in user's location and radius.
+  void updateOwnLocationSubscription() {
+    final index = state.locationSubscriptions.indexWhere(
+      (subscription) => subscription.isOwnLocation,
+    );
+    if (index == -1) return;
+
+    final latitude = _ref.read(providerOfLoggedInUser)?.latitude;
+    final longitude = _ref.read(providerOfLoggedInUser)?.longitude;
+    final locationName = _ref.read(providerOfLoggedInUser)?.locationName;
+    final radiusKm = _ref
+        .read(providerOfLoggedInUser)
+        ?.ownLocationSubscriptionRadiusKm;
+
+    if (latitude != null && longitude != null && radiusKm != null) {
+      // Calculate bounding box for the subscription area
+      // The frontend calculates radius as distance from center to corner (diagonal)
+      // For a square bounding box, corner distance = edge distance * √2
+      // So we need to divide the radius by √2 to get the edge distance
+      final earthRadiusKm = 6371.0;
+      final edgeRadiusKm = radiusKm / sqrt(2);
+
+      // Convert latitude to radians
+      final latRad = (latitude * pi) / 180;
+
+      // Calculate angular distance in radians
+      final angularDistance = edgeRadiusKm / earthRadiusKm;
+
+      // Calculate latitude delta (same in all directions)
+      final latDelta = (angularDistance * 180) / pi;
+
+      // Calculate longitude delta (varies with latitude)
+      final lngDelta = (angularDistance * 180) / pi / cos(latRad);
+
+      final northeastLat = latitude + latDelta;
+      final northeastLng = longitude + lngDelta;
+      final southwestLat = latitude - latDelta;
+      final southwestLng = longitude - lngDelta;
+
+      final updatedSubscription = state.locationSubscriptions[index].copyWith(
+        northeastLat: northeastLat,
+        northeastLng: northeastLng,
+        southwestLat: southwestLat,
+        southwestLng: southwestLng,
+        name: locationName,
+      );
+      updateLocationSubscriptions(
+        locationSubscriptions: state.locationSubscriptions.map((subscription) {
+          if (subscription.isOwnLocation) {
+            return updatedSubscription;
+          }
+          return subscription;
+        }).toList(),
+      );
+    }
   }
 }

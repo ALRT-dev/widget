@@ -5,22 +5,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/providers/states/notifications_feed_provider_state.dart';
-import 'package:hazard_app/features/search/views/widgets/hazard_categories_list.dart';
-import 'package:hazard_app/features/search/views/widgets/hazard_severity_filters_list.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
-import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/models/hazard_severity_with_count_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
-import 'package:hazard_app/features/shared/providers/hazard_severity_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
+import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class NotificationsAppBar extends ConsumerStatefulWidget {
   const NotificationsAppBar({super.key});
 
-  static const categoriesKey = 'NotificationsAppBarCategories';
-  static const severityFiltersKey = 'NotificationsAppBarSeverityFilters';
+  static const filtersKey = 'NotificationsAppBarFilters';
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -41,21 +36,6 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, child) {
-        final isCategoriesPresent = ref.watch(
-          providerOfHazardCategoriesForNotifications.select(
-            (value) => value.hazardCategories.isNotEmpty,
-          ),
-        );
-        final isSeveritiesPresent = ref.watch(
-          providerOfHazardSeverityFiltersForNotifications.select(
-            (value) => value.hazardSeverities.isNotEmpty,
-          ),
-        );
-        final isFiltersVisible = ref.watch(
-          providerOfHazardSeverityFiltersForNotifications.select(
-            (value) => value.isFiltersVisible,
-          ),
-        );
         final isHazardsLoading = ref.watch(
           providerOfNotificationsFeed.select(
             (value) => value.getNotificationsFeed.maybeWhen(
@@ -68,6 +48,11 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
           providerOfNotificationsFeed.select(
             (value) =>
                 value.searchString.isNotEmpty ? true : value.hazards.isNotEmpty,
+          ),
+        );
+        final hasFiltersSelected = ref.watch(
+          providerOfHazardFiltersForNotifications.select(
+            (value) => value.hasFiltersSelected,
           ),
         );
         return SliverAppBar(
@@ -84,7 +69,7 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
               color: AppColors.black,
             ),
           ),
-          bottom: !isHazardsPresent && !isHazardsLoading
+          bottom: !isHazardsPresent && !isHazardsLoading && !hasFiltersSelected
               ? PreferredSize(
                   preferredSize: Size.fromHeight(0),
                   child: Divider(
@@ -93,40 +78,16 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
                   ),
                 )
               : PreferredSize(
-                  preferredSize: Size.fromHeight(
-                    (61 +
-                            (isCategoriesPresent ? 57.spMin : 0) +
-                            (isSeveritiesPresent && isFiltersVisible
-                                ? 40.spMin
-                                : 0))
-                        .spMin,
-                  ),
+                  preferredSize: Size.fromHeight(63.spMin),
                   child: Column(
                     children: [
                       Row(
-                        spacing: 10.spMin,
                         children: [
-                          Expanded(
-                            child: _searchbarBuilder(),
-                          ),
+                          Expanded(child: _searchbarBuilder()),
                           _filtersButtonBuilder(),
                         ],
                       ).pX(20.0),
                       15.hSizedBox,
-                      if (isSeveritiesPresent && isFiltersVisible)
-                        HazardSeverityFiltersList(
-                          severityFiltersKey:
-                              NotificationsAppBar.severityFiltersKey,
-                          onSeveritiesSelectionUpdated:
-                              _handleSeveritySelectionChanged,
-                        ),
-                      if (isSeveritiesPresent && isFiltersVisible) 10.hSizedBox,
-                      HazardCategoriesList(
-                        categoriesKey: NotificationsAppBar.categoriesKey,
-                        onCategoriesSelectionUpdated:
-                            _handleCategorySelectionChanged,
-                      ),
-                      if (isCategoriesPresent) 15.hSizedBox,
                       Divider(
                         height: 0.0,
                         color: AppColors.lightGrey.withValues(alpha: 0.5),
@@ -192,33 +153,11 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
   }
 
   Widget _filtersButtonBuilder() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final isFiltersVisible = ref.watch(
-          providerOfHazardSeverityFiltersForNotifications.select(
-            (value) => value.isFiltersVisible,
-          ),
-        );
-
-        return Container(
-          width: 48.spMin,
-          height: 48.spMin,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: AppColors.lightGrey,
-            ),
-          ),
-          child: Icon(
-            isFiltersVisible
-                ? Icons.arrow_upward_rounded
-                : Icons.arrow_downward_rounded,
-            size: 22.spMin,
-            color: AppColors.black,
-          ),
-        ).onPressed(_handleFiltersButtonPressed);
-      },
-    );
+    return HazardFiltersButton(
+      filtersKey: NotificationsAppBar.filtersKey,
+      onFiltersUpdated: () => _getHazards(),
+      buttonShadow: [],
+    ).pL(10.0);
   }
 
   /// Updates the state with the given search string.
@@ -245,28 +184,8 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
       ..getNotificationsFeed();
   }
 
-  /// Handles the event when the category selection changes.
-  void _handleCategorySelectionChanged(
-    final List<HazardCategory> selectedCategories,
-  ) {
-    ref.read(providerOfNotificationsFeed.notifier)
-      ..updateSelectedCategories(selectedCategories)
-      ..getNotificationsFeed();
-  }
-
-  /// Handles the event when the severity selection changes.
-  void _handleSeveritySelectionChanged(
-    final List<HazardSeverityWithCount> selectedSeverities,
-  ) {
-    ref.read(providerOfNotificationsFeed.notifier)
-      ..updateSelectedSeverities(selectedSeverities)
-      ..getNotificationsFeed();
-  }
-
-  /// Toggles the visibility of the severity filters.
-  void _handleFiltersButtonPressed() {
-    ref
-        .read(providerOfHazardSeverityFiltersForNotifications.notifier)
-        .toggleFiltersVisibility();
+  /// Fetches the hazards for the notifications feed.
+  void _getHazards() {
+    ref.read(providerOfNotificationsFeed.notifier).getNotificationsFeed();
   }
 }

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 mixin _$HazardItemProviderState {
 
 /// The hazard item being managed.
- Hazard get hazard;/// The state of voting on the hazard.
+ Hazard? get hazard;/// The state of voting on the hazard.
  VoteHazardState get voteState;
 /// Create a copy of HazardItemProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -47,11 +47,11 @@ abstract mixin class $HazardItemProviderStateCopyWith<$Res>  {
   factory $HazardItemProviderStateCopyWith(HazardItemProviderState value, $Res Function(HazardItemProviderState) _then) = _$HazardItemProviderStateCopyWithImpl;
 @useResult
 $Res call({
- Hazard hazard, VoteHazardState voteState
+ Hazard? hazard, VoteHazardState voteState
 });
 
 
-$HazardCopyWith<$Res> get hazard;$VoteHazardStateCopyWith<$Res> get voteState;
+$HazardCopyWith<$Res>? get hazard;$VoteHazardStateCopyWith<$Res> get voteState;
 
 }
 /// @nodoc
@@ -64,10 +64,10 @@ class _$HazardItemProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HazardItemProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? hazard = null,Object? voteState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? hazard = freezed,Object? voteState = null,}) {
   return _then(_self.copyWith(
-hazard: null == hazard ? _self.hazard : hazard // ignore: cast_nullable_to_non_nullable
-as Hazard,voteState: null == voteState ? _self.voteState : voteState // ignore: cast_nullable_to_non_nullable
+hazard: freezed == hazard ? _self.hazard : hazard // ignore: cast_nullable_to_non_nullable
+as Hazard?,voteState: null == voteState ? _self.voteState : voteState // ignore: cast_nullable_to_non_nullable
 as VoteHazardState,
   ));
 }
@@ -75,9 +75,12 @@ as VoteHazardState,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$HazardCopyWith<$Res> get hazard {
-  
-  return $HazardCopyWith<$Res>(_self.hazard, (value) {
+$HazardCopyWith<$Res>? get hazard {
+    if (_self.hazard == null) {
+    return null;
+  }
+
+  return $HazardCopyWith<$Res>(_self.hazard!, (value) {
     return _then(_self.copyWith(hazard: value));
   });
 }/// Create a copy of HazardItemProviderState
@@ -171,7 +174,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Hazard hazard,  VoteHazardState voteState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Hazard? hazard,  VoteHazardState voteState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardItemProviderState() when $default != null:
 return $default(_that.hazard,_that.voteState);case _:
@@ -192,7 +195,7 @@ return $default(_that.hazard,_that.voteState);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Hazard hazard,  VoteHazardState voteState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Hazard? hazard,  VoteHazardState voteState)  $default,) {final _that = this;
 switch (_that) {
 case _HazardItemProviderState():
 return $default(_that.hazard,_that.voteState);case _:
@@ -212,7 +215,7 @@ return $default(_that.hazard,_that.voteState);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Hazard hazard,  VoteHazardState voteState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Hazard? hazard,  VoteHazardState voteState)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardItemProviderState() when $default != null:
 return $default(_that.hazard,_that.voteState);case _:
@@ -227,11 +230,11 @@ return $default(_that.hazard,_that.voteState);case _:
 
 
 class _HazardItemProviderState implements HazardItemProviderState {
-  const _HazardItemProviderState({required this.hazard, this.voteState = const VoteHazardState.initial()});
+  const _HazardItemProviderState({this.hazard, this.voteState = const VoteHazardState.initial()});
   
 
 /// The hazard item being managed.
-@override final  Hazard hazard;
+@override final  Hazard? hazard;
 /// The state of voting on the hazard.
 @override@JsonKey() final  VoteHazardState voteState;
 
@@ -265,11 +268,11 @@ abstract mixin class _$HazardItemProviderStateCopyWith<$Res> implements $HazardI
   factory _$HazardItemProviderStateCopyWith(_HazardItemProviderState value, $Res Function(_HazardItemProviderState) _then) = __$HazardItemProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- Hazard hazard, VoteHazardState voteState
+ Hazard? hazard, VoteHazardState voteState
 });
 
 
-@override $HazardCopyWith<$Res> get hazard;@override $VoteHazardStateCopyWith<$Res> get voteState;
+@override $HazardCopyWith<$Res>? get hazard;@override $VoteHazardStateCopyWith<$Res> get voteState;
 
 }
 /// @nodoc
@@ -282,10 +285,10 @@ class __$HazardItemProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HazardItemProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? hazard = null,Object? voteState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? hazard = freezed,Object? voteState = null,}) {
   return _then(_HazardItemProviderState(
-hazard: null == hazard ? _self.hazard : hazard // ignore: cast_nullable_to_non_nullable
-as Hazard,voteState: null == voteState ? _self.voteState : voteState // ignore: cast_nullable_to_non_nullable
+hazard: freezed == hazard ? _self.hazard : hazard // ignore: cast_nullable_to_non_nullable
+as Hazard?,voteState: null == voteState ? _self.voteState : voteState // ignore: cast_nullable_to_non_nullable
 as VoteHazardState,
   ));
 }
@@ -294,9 +297,12 @@ as VoteHazardState,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$HazardCopyWith<$Res> get hazard {
-  
-  return $HazardCopyWith<$Res>(_self.hazard, (value) {
+$HazardCopyWith<$Res>? get hazard {
+    if (_self.hazard == null) {
+    return null;
+  }
+
+  return $HazardCopyWith<$Res>(_self.hazard!, (value) {
     return _then(_self.copyWith(hazard: value));
   });
 }/// Create a copy of HazardItemProviderState

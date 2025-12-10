@@ -11,6 +11,8 @@ class ManageNotificationsScreen extends ConsumerStatefulWidget {
 
   static const route = '/manage-notifications';
 
+  static const filtersKey = 'ManagePushNotifications_filtersKey';
+
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
       _ManageNotificationsScreenState();
@@ -78,33 +80,36 @@ class _ManageNotificationsScreenState
   }
 
   Widget _buildNotificationCategoriesTab() {
-    return Padding(
-      padding: EdgeInsets.all(16.spMin),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Notification Categories',
-            style: TextStyle(
-              fontSize: 18.spMin,
-              fontWeight: FontWeight.w600,
-              color: AppColors.black,
-            ),
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.all(16.spMin),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Notification Categories',
+                style: TextStyle(
+                  fontSize: 18.spMin,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.black,
+                ),
+              ),
+              8.spMin.hSizedBox,
+              Text(
+                'Choose which types of alrts you want to receive on your device.',
+                style: TextStyle(
+                  fontSize: 14.spMin,
+                  color: AppColors.grey,
+                ),
+              ),
+            ],
           ),
-          8.spMin.hSizedBox,
-          Text(
-            'Choose which types of alrts you want to receive on your device.',
-            style: TextStyle(
-              fontSize: 14.spMin,
-              color: AppColors.grey,
-            ),
-          ),
-          16.spMin.hSizedBox,
-          Expanded(
-            child: ManagePushNotificationsList(),
-          ),
-        ],
-      ),
+        ),
+        Expanded(
+          child: ManagePushNotificationsList(),
+        ),
+      ],
     );
   }
 

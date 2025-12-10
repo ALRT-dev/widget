@@ -1,21 +1,24 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart' show ImageConfiguration, Size;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
-import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/enums/fire_status_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:hazard_app/features/shared/providers/repository_providers.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
+import 'package:hazard_app/features/shared/utils/hazard_util.dart';
 
 class HazardService {
   HazardService(final Ref ref) : _ref = ref;
@@ -28,9 +31,11 @@ class HazardService {
   /// Fetches the list of hazards from the server.
   Future<Either<List<Hazard>, AppError>> getHazards({
     required final HazardSearchParams searchParams,
+    final CancelToken? cancelToken,
   }) async {
     final result = await _hazardRepository.getHazards(
       searchParams: searchParams,
+      cancelToken: cancelToken,
     );
 
     final success = await result.whenSuccess(
@@ -46,7 +51,25 @@ class HazardService {
   Future<Either<List<Hazard>, AppError>> getAllHazards({
     final int numberOfParallelRequests = 10,
     required final HazardSearchParams searchParams,
+    final bool allowEmptyCategoryIds = false,
+    final bool allowAllSourceFiltersFalse = false,
+    final CancelToken? cancelToken,
   }) async {
+    // If no category IDs are provided, return an empty list immediately.
+    if (searchParams.categoryIds.isEmpty && !allowEmptyCategoryIds) {
+      return Success(<Hazard>[]);
+    }
+
+    // If all hazard source filters are false, return an empty list immediately.
+    if (!searchParams.awsEmergency &&
+        !searchParams.awsWatchAndAct &&
+        !searchParams.awsAdvice &&
+        !searchParams.officialNonAws &&
+        !searchParams.userReported &&
+        !allowAllSourceFiltersFalse) {
+      return Success(<Hazard>[]);
+    }
+
     final allHazards = <Hazard>[];
     final pageSize = searchParams.pageSize;
     int currentPage = searchParams.page;
@@ -64,6 +87,7 @@ class HazardService {
         batchFutures.add(
           getHazards(
             searchParams: pageSearchParams,
+            cancelToken: cancelToken,
           ),
         );
       }
@@ -106,15 +130,20 @@ class HazardService {
     }
 
     // Return the combined list of all hazards
-    return Success(allHazards);
+    return Success(
+      HazardUtil.sortHazards(
+        allHazards,
+        searchParams.sortSettings,
+      ),
+    );
   }
 
-  /// Fetches hazards along with categories from the server.
-  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
-  getHazardsWithCategories({
+  /// Fetches hazards along with subscription ID from the server.
+  Future<Either<GetHazardsWithSubscriptionIdResponse, AppError>>
+  getHazardsWithSubscriptionId({
     required final HazardSearchParams searchParams,
   }) async {
-    final result = await _hazardRepository.getGetHazardsWithCategories(
+    final result = await _hazardRepository.getGetHazardsWithSubscriptionId(
       searchParams: searchParams,
     );
 
@@ -129,83 +158,6 @@ class HazardService {
 
     return result.copyWith(
       success: (_) => success,
-    );
-  }
-
-  /// Fetches all hazards along with categories from the server making multiple parallel requests.
-  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
-  getAllHazardsWithCategories({
-    final int numberOfParallelRequests = 10,
-    required final HazardSearchParams searchParams,
-  }) async {
-    final allHazards = <Hazard>[];
-    final pageSize = searchParams.pageSize;
-    int currentPage = searchParams.page;
-    bool hasMoreData = true;
-    GetHazardsWithCategoriesResponse? firstResponse;
-
-    while (hasMoreData) {
-      final batchFutures =
-          <Future<Either<GetHazardsWithCategoriesResponse, AppError>>>[];
-
-      // Create parallel requests for the current batch of pages
-      for (int i = 0; i < numberOfParallelRequests; i++) {
-        final pageSearchParams = searchParams.copyWith(
-          page: currentPage + i,
-        );
-
-        batchFutures.add(
-          getHazardsWithCategories(
-            searchParams: pageSearchParams,
-          ),
-        );
-      }
-
-      // Wait for this batch to complete
-      final batchResults = await Future.wait(batchFutures);
-
-      // Process batch results
-      bool hasDataInThisBatch = false;
-      for (final result in batchResults) {
-        final error = result.when(
-          (response) {
-            // Store the first response to preserve categories and metadata
-            firstResponse ??= response;
-
-            if (response.hazards.isNotEmpty) {
-              allHazards.addAll(response.hazards);
-              hasDataInThisBatch = true;
-
-              // If this page has fewer items than page size, it's the last page
-              if (response.hazards.length < pageSize) {
-                hasMoreData = false;
-              }
-            }
-            return null; // Success case
-          },
-          (error) => error, // Return error
-        );
-
-        // If any request fails, return the error
-        if (error != null) {
-          return Failure(error);
-        }
-      }
-
-      // If no data was found in any of the parallel requests, we're done
-      if (!hasDataInThisBatch) {
-        hasMoreData = false;
-      }
-
-      // Move to the next batch of pages
-      currentPage += numberOfParallelRequests;
-    }
-
-    // Return the combined response with all hazards
-    return Success(
-      (firstResponse ?? const GetHazardsWithCategoriesResponse()).copyWith(
-        hazards: allHazards,
-      ),
     );
   }
 
@@ -311,30 +263,36 @@ class HazardService {
   generateHazardMarkerBitmaps() async {
     final categoriesResult = await getAllSubHazardCategories();
     final categories = categoriesResult.whenSuccess((cats) => cats) ?? [];
-    final severities = HazardSeverity.values;
+    final severityBands = HazardSeverityBand.values;
 
     // Ensure the "other" category is included
     categories.add(HazardCategory(id: 'other'));
 
     final futures = <Future<Map<String, BitmapDescriptor>>>[];
 
+    final parentCategories = categories
+        .map((cat) => cat.parentId)
+        .where((parentId) => parentId != null)
+        .cast<String>()
+        .toList();
+
     // Generate bitmaps for each category and severity combination
     for (final category in categories) {
-      for (final severity in severities) {
-        final keyAws = '${category.id}_${severity.name}_aws';
+      for (final severityBand in severityBands) {
+        final keyAws = '${category.id}_${severityBand.name}_aws';
         final futureAws = getBitmapDescriptorForHazard(
           categoryId: category.id,
           parentCategoryId: category.parentId,
-          severity: severity,
+          severityBand: severityBand,
           isAwsCompliant: true,
         ).then((bitmap) => {keyAws: bitmap});
         futures.add(futureAws);
 
-        final keyNonAws = '${category.id}_${severity.name}_non_aws';
+        final keyNonAws = '${category.id}_${severityBand.name}_non_aws';
         final futureNonAws = getBitmapDescriptorForHazard(
           categoryId: category.id,
           parentCategoryId: category.parentId,
-          severity: severity,
+          severityBand: severityBand,
           isAwsCompliant: false,
         ).then((bitmap) => {keyNonAws: bitmap});
         futures.add(futureNonAws);
@@ -355,16 +313,36 @@ class HazardService {
       futures.add(future);
     }
 
+    // Generate bitmaps for parent categories
+    for (final parentCategoryId in parentCategories) {
+      for (final severity in severityBands) {
+        final keyAws = '${parentCategoryId}_${severity.name}_aws';
+        final futureAws = getBitmapDescriptorForHazard(
+          categoryId: parentCategoryId,
+          parentCategoryId: null,
+          severityBand: severity,
+          isAwsCompliant: true,
+        ).then((bitmap) => {keyAws: bitmap});
+        futures.add(futureAws);
+
+        final keyNonAws = '${parentCategoryId}_${severity.name}_non_aws';
+        final futureNonAws = getBitmapDescriptorForHazard(
+          categoryId: parentCategoryId,
+          parentCategoryId: null,
+          severityBand: severity,
+          isAwsCompliant: false,
+        ).then((bitmap) => {keyNonAws: bitmap});
+        futures.add(futureNonAws);
+      }
+    }
+
     // Generate bitmaps for bushfire markers
-    final bushfireMarkerKeys = [
-      'bushfire_notApplicable',
-      'bushfire_plannedBurn',
-      'bushfire_responding',
-    ];
-    for (final key in bushfireMarkerKeys) {
+    for (final fireStatus in FireStatus.values) {
+      final key = 'fireStatus_${fireStatus.name}';
       final future = getBitmapDescriptorForAssetPath(
-        assetPath: 'assets/images/hazards/aws/$key.png',
-        fallbackAssetPath: 'assets/images/hazards/aws/bushfire_advice.png',
+        assetPath: 'assets/images/hazards/non_aws/$key.png',
+        fallbackAssetPath:
+            'assets/images/hazards/non_aws/fireStatus_underControl.png',
       ).then((bitmap) => {key: bitmap});
       futures.add(future);
     }
@@ -385,13 +363,13 @@ class HazardService {
   Future<BitmapDescriptor> getBitmapDescriptorForHazard({
     required final String categoryId,
     required final String? parentCategoryId,
-    required final HazardSeverity severity,
+    required final HazardSeverityBand severityBand,
     final bool isAwsCompliant = false,
     final Size size = const Size(40, 40),
   }) async {
     try {
       // Check for child category asset
-      final key = '${categoryId}_${severity.name}';
+      final key = '${categoryId}_${severityBand.name}';
       final assetPath =
           'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}$key.png';
 
@@ -405,7 +383,7 @@ class HazardService {
 
       // If child category asset doesn't exist, check for parent category asset
       if (parentCategoryId != null) {
-        final parentKey = '${parentCategoryId}_${severity.name}';
+        final parentKey = '${parentCategoryId}_${severityBand.name}';
         final parentAssetPath =
             'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}$parentKey.png';
         exists = await assetExists(assetPath: parentAssetPath);
@@ -420,12 +398,12 @@ class HazardService {
       // If neither exists, use the generic "other" asset for the severity
       exists = await assetExists(
         assetPath:
-            'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severity.name}.png',
+            'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
       );
       if (exists) {
         return BitmapDescriptor.asset(
           ImageConfiguration(size: size),
-          'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severity.name}.png',
+          'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
         );
       }
 
@@ -471,9 +449,6 @@ class HazardService {
       processedMedias: await _mediaService.convertS3MediaToAlrtMedia(
         s3Medias: hazard.medias,
       ),
-      callToAction:
-          hazard.callToAction ??
-          getFallbackCallToAction(hazard.severity ?? HazardSeverity.unknown),
     );
   }
 
@@ -493,20 +468,5 @@ class HazardService {
     } catch (e) {
       return false;
     }
-  }
-
-  /// Gets a fallback call to action message based on hazard severity.
-  String getFallbackCallToAction(final HazardSeverity severity) {
-    return switch (severity) {
-      HazardSeverity.info => 'Stay informed and follow any official guidance.',
-      HazardSeverity.low => 'Be cautious and stay aware of your surroundings.',
-      HazardSeverity.advice => 'Take necessary precautions and stay safe.',
-      HazardSeverity.watchAndAct =>
-        'Be prepared to take action if the situation escalates.',
-      HazardSeverity.emergency =>
-        'Follow emergency procedures and seek safety immediately.',
-      HazardSeverity.unknown =>
-        'Stay alert and follow local safety guidelines.',
-    };
   }
 }

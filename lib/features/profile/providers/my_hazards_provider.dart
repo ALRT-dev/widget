@@ -47,8 +47,8 @@ class MyHazardsProvider extends StateNotifier<MyHazardsProviderState> {
     final result = await _hazardService.getHazards(
       searchParams: HazardSearchParams(
         reportedById: _loggedInUser!.id,
-        showExpired: true,
         reviewStatus: HazardReviewStatus.accepted,
+        showExpired: true,
         sortSettings: [
           {SortCategory.createdAt: SortOrder.desc},
         ],

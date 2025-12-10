@@ -4,8 +4,9 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/shared/converters/date_time_converter.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
-import 'package:hazard_app/features/shared/enums/bushfire_alert_level_types.dart';
+import 'package:hazard_app/features/shared/enums/fire_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
@@ -13,7 +14,6 @@ import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_source_model.dart';
 import 'package:hazard_app/features/shared/models/s3_media_model.dart';
-import 'package:hazard_app/others/app_colors.dart';
 
 part 'hazard_model.freezed.dart';
 part 'hazard_model.g.dart';
@@ -32,11 +32,11 @@ abstract class Hazard with _$Hazard {
     /// The detailed description of the hazard.
     final String? description,
 
-    /// The short description of the hazard.
-    final String? shortDescription,
-
     /// The severity level of the hazard as per user input or source.
     final HazardSeverity? severity,
+
+    /// The severity band of the hazard.
+    final HazardSeverityBand? severityBand,
 
     /// The latitude of the hazard location.
     final double? latitude,
@@ -47,20 +47,34 @@ abstract class Hazard with _$Hazard {
     /// The human-readable name of the hazard location.
     final String? locationName,
 
+    /// The north-east latitude of the hazard bounding box.
+    final double? northeastLat,
+
+    /// The north-east longitude of the hazard bounding box.
+    final double? northeastLng,
+
+    /// The south-west latitude of the hazard bounding box.
+    final double? southwestLat,
+
+    /// The south-west longitude of the hazard bounding box.
+    final double? southwestLng,
+
     /// The id of the category the hazard belongs to.
     final String? categoryId,
 
     /// The category the hazard belongs to.
     final HazardCategory? category,
 
+    /// The fire status of the hazard (if applicable).
+    ///
+    /// If the hazard is not a fire-related hazard, this will be null.
+    final FireStatus? fireStatus,
+
     /// The source details of the hazard.
     final HazardSource? source,
 
     /// The AI-generated summary of the hazard.
     final String? aiSummary,
-
-    /// The AI-determined severity of the hazard.
-    final HazardSeverity? aiSeverity,
 
     /// The AI-determined confidence level of the hazard.
     final AIConfidence? aiConfidence,
@@ -112,6 +126,9 @@ abstract class Hazard with _$Hazard {
     @Default(<AlrtMedia>[])
     final List<AlrtMedia> processedMedias,
 
+    /// The external link related to the hazard for more information.
+    final String? link,
+
     /// The date and time when the hazard occurred.
     @DateTimeConverter() final DateTime? occurredAt,
 
@@ -128,6 +145,9 @@ abstract class Hazard with _$Hazard {
   /// The net vote count (upvotes - downvotes) for the hazard.
   int get voteCount => upvoteCount - downvoteCount;
 
+  /// Indicates whether the hazard was reported by a user.
+  bool get isUserReported => reportedBy != null;
+
   /// Indicates whether the hazard has expired based on the current date and time.
   bool get isExpired {
     if (expiresAt == null) {
@@ -138,18 +158,25 @@ abstract class Hazard with _$Hazard {
 
   /// The file path for the hazard icon based on its category and severity.
   String get iconPath {
+    if (source?.id == 'smartraveller') {
+      final severityBandName =
+          severityBand?.name ?? HazardSeverityBand.info.name;
+      return 'assets/images/hazards/non_aws/other_$severityBandName.png';
+    }
+
+    if (fireStatus != null) {
+      if ((categoryId == "bushfire" && isAwsCompliant == false) ||
+          categoryId == "otherFire") {
+        return 'assets/images/hazards/non_aws/fireStatus_${fireStatus!.name}.png';
+      }
+    }
+
     if (reportedBy != null) {
       return 'assets/images/hazards/non_aws/${categoryId}_user.png';
     }
 
-    if (bushFireAlertLevel != null &&
-        bushFireAlertLevel != BushfireAlertLevel.advice) {
-      final alertLevelName = bushFireAlertLevel!.name;
-      return 'assets/images/hazards/aws/${categoryId}_$alertLevelName.png';
-    }
-
-    final severityName = severity?.name ?? HazardSeverity.info.name;
-    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${categoryId}_$severityName.png';
+    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
+    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${categoryId}_$severityBandName.png';
   }
 
   /// The fallback file path for the hazard icon based on its severity.
@@ -158,12 +185,12 @@ abstract class Hazard with _$Hazard {
       return 'assets/images/hazards/non_aws/other_user.png';
     }
 
-    final severityName = severity?.name ?? HazardSeverity.info.name;
+    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
     final parentCategoryId = category?.parentId;
     if (parentCategoryId != null) {
-      return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${parentCategoryId}_$severityName.png';
+      return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${parentCategoryId}_$severityBandName.png';
     }
-    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityName.png';
+    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityBandName.png';
   }
 
   /// The second fallback file path for the hazard icon based on its severity.
@@ -172,8 +199,8 @@ abstract class Hazard with _$Hazard {
       return 'assets/images/hazards/non_aws/other_user.png';
     }
 
-    final severityName = severity?.name ?? HazardSeverity.info.name;
-    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityName.png';
+    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
+    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityBandName.png';
   }
 
   /// Gets the appropriate BitmapDescriptor for the hazard marker.
@@ -181,14 +208,23 @@ abstract class Hazard with _$Hazard {
     Map<String, BitmapDescriptor> bitmapMap,
   ) {
     var key =
-        '${categoryId}_${severity?.name ?? HazardSeverity.info.name}${isAwsCompliant == true ? '_aws' : '_non_aws'}';
+        '${categoryId}_${severityBand?.name ?? HazardSeverityBand.info.name}${isAwsCompliant == true ? '_aws' : '_non_aws'}';
 
-    /// For bushfire hazards, use the bushfire alert level in the key
-    if (bushFireAlertLevel != null &&
-        bushFireAlertLevel != BushfireAlertLevel.advice) {
-      key = '${categoryId}_${bushFireAlertLevel!.name}';
+    if (source?.id == 'smartraveller') {
+      final severityBandName =
+          severityBand?.name ?? HazardSeverityBand.info.name;
+      key = 'other_${severityBandName}_non_aws';
     }
 
+    // Check for fire status override
+    if (fireStatus != null) {
+      if ((categoryId == "bushfire" && isAwsCompliant == false) ||
+          categoryId == "otherFire") {
+        key = 'fireStatus_${fireStatus!.name}';
+      }
+    }
+
+    // Check for user-reported override
     if (reportedBy != null) {
       key = '${categoryId}_user';
     }
@@ -196,44 +232,8 @@ abstract class Hazard with _$Hazard {
     return bitmapMap[key];
   }
 
-  /// Determines the bushfire alert level if the hazard is a bushfire.
-  ///
-  /// Returns null if the hazard is not a bushfire or if the description is empty.
-  BushfireAlertLevel? get bushFireAlertLevel {
-    if (!(category?.isBushfire ?? false) || (description?.isEmpty ?? true)) {
-      return null;
-    }
-    final matchedLevel = BushfireAlertLevel.values.firstWhere(
-      (level) => level.keywords.any(
-        (keyword) => description!.toLowerCase().contains(
-          RegExp(r'\b' + keyword + r'\b'),
-        ),
-      ),
-      orElse: () => BushfireAlertLevel.notApplicable,
-    );
-
-    if (matchedLevel != BushfireAlertLevel.advice) {
-      // if description contains 'advice', return advice level
-      return BushfireAlertLevel.advice.keywords.any(
-            (keyword) => description!.toLowerCase().contains(
-              RegExp(r'\b' + keyword + r'\b'),
-            ),
-          )
-          ? BushfireAlertLevel.advice
-          : matchedLevel;
-    }
-
-    return matchedLevel;
-  }
-
-  /// The color associated with the hazard's severity.
+  /// The color associated with the hazard's severity band.
   Color get color {
-    // If the hazard is a bushfire and has a specific alert level, use that color
-    if (bushFireAlertLevel != null &&
-        bushFireAlertLevel != BushfireAlertLevel.advice) {
-      return AppColors.transparent;
-    }
-
     // If the hazard is user-reported, use the user report status color
     if (reportedBy != null) {
       final reportsStatus = reportedBy!.reportsStatus;
@@ -242,11 +242,11 @@ abstract class Hazard with _$Hazard {
 
     // If the hazard follows AWS standards, use AWS colors
     if (isAwsCompliant == true) {
-      return severity?.colorAWS ?? HazardSeverity.info.colorAWS;
+      return severityBand?.colorAws ?? HazardSeverityBand.info.colorAws;
     }
 
     // Otherwise, use non-AWS colors
-    return severity?.colorNonAWS ?? HazardSeverity.info.colorNonAWS;
+    return severityBand?.colorNonAws ?? HazardSeverityBand.info.colorNonAws;
   }
 
   /// The title associated with the hazard's severity.
@@ -254,7 +254,7 @@ abstract class Hazard with _$Hazard {
     if (isAwsCompliant == true) {
       return severity?.titleAws ?? HazardSeverity.info.titleAws;
     }
-    return severity?.titleNonAWS ?? HazardSeverity.info.titleNonAWS;
+    return severity?.titleNonAws ?? HazardSeverity.info.titleNonAws;
   }
 
   factory Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);

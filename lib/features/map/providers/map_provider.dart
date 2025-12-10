@@ -3,6 +3,7 @@ import 'dart:math' hide log;
 import 'dart:developer';
 
 import 'package:collection/collection.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,10 +23,12 @@ import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
+import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/providers/hazard_categories_provider.dart';
-import 'package:hazard_app/features/shared/providers/hazard_severity_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/utils/location_helper.dart';
@@ -36,7 +39,10 @@ final providerOfMap =
     StateNotifierProvider.autoDispose<MapProvider, MapProviderState>(
       (ref) => MapProvider(
         ref: ref,
-        state: MapProviderState(),
+        state: MapProviderState(
+          getMapHazardsCancelToken: CancelToken(),
+          getHazardsToAvoidCancelToken: CancelToken(),
+        ),
       ),
     );
 
@@ -53,10 +59,6 @@ class MapProvider extends StateNotifier<MapProviderState> {
   MapService get _mapService => _ref.read(providerOfMapService);
   HazardService get _hazardService => _ref.read(providerOfHazardService);
   LocationService get _locationService => _ref.read(providerOfLocationService);
-  HazardCategoriesProvider get _hazardCategoriesProvider =>
-      _ref.read(providerOfHazardCategoriesForMap.notifier);
-  HazardSeverityFiltersProvider get _hazardSeverityFiltersProvider =>
-      _ref.read(providerOfHazardSeverityFiltersForMap.notifier);
   HazardMarkersBitmapsProviderState get _hazardMarkerBitmapsProviderState =>
       _ref.read(providerOfHazardMarkerBitmaps);
 
@@ -82,7 +84,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
       if (mounted) {
         state = state.copyWith(
           isMapReady: false,
-          pendingAnimationBounds: null,
+          pendingCameraUpdateToApply: null,
         );
       }
     });
@@ -100,9 +102,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
     updateIsMapReady(true);
 
     // Execute any pending animation
-    final pendingBounds = state.pendingAnimationBounds;
-    if (pendingBounds != null) {
-      animateToBounds(bounds: pendingBounds);
+    final pendingCameraUpdateToApply = state.pendingCameraUpdateToApply;
+    if (pendingCameraUpdateToApply != null) {
+      animateToCameraUpdate(
+        cameraUpdate: pendingCameraUpdateToApply,
+      );
     }
   }
 
@@ -129,44 +133,75 @@ class MapProvider extends StateNotifier<MapProviderState> {
       return;
     }
 
-    final selectedCategories = _ref
-        .read(providerOfHazardCategoriesForMap)
-        .selectedCategories;
-    final selectedSeverities = _ref
-        .read(providerOfHazardSeverityFiltersForMap)
-        .selectedSeverities;
+    final selectedCategoryIds = _ref
+        .read(providerOfHazardFiltersForMap)
+        .selectedCategoryIds
+        .toList();
+    final awsEmergency = _ref.read(providerOfHazardFiltersForMap).awsEmergency;
+    final awsWatchAndAct = _ref
+        .read(providerOfHazardFiltersForMap)
+        .awsWatchAndAct;
+    final awsAdvice = _ref.read(providerOfHazardFiltersForMap).awsAdvice;
+    final officialNonAws = _ref
+        .read(providerOfHazardFiltersForMap)
+        .officialNonAws;
+    final userReported = _ref.read(providerOfHazardFiltersForMap).userReported;
 
-    final result = await _hazardService.getAllHazardsWithCategories(
+    // cancel the old requests before making new requests
+    if (state.getMapHazardsCancelToken.requestOptions != null) {
+      state.getMapHazardsCancelToken.cancel();
+      state = state.copyWith(getMapHazardsCancelToken: CancelToken());
+    }
+
+    final result = await _hazardService.getAllHazards(
+      cancelToken: state.getMapHazardsCancelToken,
       searchParams: HazardSearchParams(
-        categoryIds: selectedCategories.map((e) => e.id).toList(),
-        severities: selectedSeverities.map((e) => e.severity).toList(),
+        categoryIds: selectedCategoryIds,
+        awsEmergency: awsEmergency,
+        awsWatchAndAct: awsWatchAndAct,
+        awsAdvice: awsAdvice,
+        officialNonAws: officialNonAws,
+        userReported: userReported,
         northeastLat: visibleBounds.northeast.latitude,
         northeastLng: visibleBounds.northeast.longitude,
         southwestLat: visibleBounds.southwest.latitude,
         southwestLng: visibleBounds.southwest.longitude,
-        pageSize: 100,
+        ignoreHazardLatLngBounds: true,
+        sortSettings: [
+          {SortCategory.severityBand: SortOrder.desc},
+          {SortCategory.createdAt: SortOrder.desc},
+        ],
+        pageSize: 20,
       ),
     );
     if (!mounted) return;
 
     result.when(
-      (response) {
+      (hazards) {
         state = state.copyWith(
-          getMapHazardsState: GetMapHazardsState.success(response.hazards),
-          hazards: response.hazards,
+          getMapHazardsState: GetMapHazardsState.success(hazards),
+          hazards: hazards,
         );
 
-        generateMarkers();
-
-        // Also update hazard categories in the hazard categories provider
-        _hazardCategoriesProvider.updateHazardCategories(
-          response.categoryFilters,
+        final selectedHazard = hazards.firstWhereOrNull(
+          (hazard) => hazard.id == state.selectedHazard?.id,
         );
+        if (selectedHazard != null) {
+          updateSelectedHazard(selectedHazard);
+        }
 
-        // Also update hazard severity filters in the hazard severity filters provider
-        _hazardSeverityFiltersProvider.updateHazardSeverities(
-          response.severityFilters,
-        );
+        // Update all the hazards in the hazard item providers
+        for (final hazard in hazards) {
+          if (hazard.id == null) continue;
+          final hazardItemProvider = providerOfHazardItem(hazard.id!);
+          _ref.read(hazardItemProvider.notifier).updateHazard(hazard);
+        }
+
+        if (hazards.isEmpty) {
+          removeAllHazardMarkers();
+        } else {
+          generateMarkers();
+        }
       },
       (l) {
         state = state.copyWith(
@@ -223,14 +258,27 @@ class MapProvider extends StateNotifier<MapProviderState> {
         .toList()
         .toBounds();
 
+    // cancel the old requests before making new requests
+    if (state.getHazardsToAvoidCancelToken.requestOptions != null) {
+      state.getHazardsToAvoidCancelToken.cancel();
+      state = state.copyWith(getHazardsToAvoidCancelToken: CancelToken());
+    }
+
     final result = await _hazardService.getAllHazards(
-      numberOfParallelRequests: 5,
+      cancelToken: state.getHazardsToAvoidCancelToken,
+      allowEmptyCategoryIds: true,
+      allowAllSourceFiltersFalse: true,
       searchParams: HazardSearchParams(
         northeastLat: bounds.northeast.latitude,
         northeastLng: bounds.northeast.longitude,
         southwestLat: bounds.southwest.latitude,
         southwestLng: bounds.southwest.longitude,
-        pageSize: 100,
+        ignoreHazardLatLngBounds: true,
+        sortSettings: [
+          {SortCategory.severityBand: SortOrder.desc},
+          {SortCategory.createdAt: SortOrder.desc},
+        ],
+        pageSize: 20,
       ),
     );
 
@@ -240,6 +288,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
   /// Fetches address from coordinates using the map service and updates the state accordingly.
   Future<void> getAddressFromCoordinates({
     required final LatLng coordinates,
+    final bool getSubUrbOnly = false,
   }) async {
     final isLoading = state.getAddressFromCoordinatesState.maybeWhen(
       orElse: () => false,
@@ -254,6 +303,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     final result = await _mapService.getAddressFromCoordinates(
       coordinates: coordinates,
+      getSubUrbOnly: getSubUrbOnly,
     );
     if (!mounted) return;
 
@@ -297,15 +347,16 @@ class MapProvider extends StateNotifier<MapProviderState> {
     required final LatLngBounds bounds,
     final double padding = 100.0,
   }) async {
+    final cameraUpdate = CameraUpdate.newLatLngBounds(bounds, padding);
     if (!state.isMapReady) {
       // If map is not ready, store the bounds for later execution
       state = state.copyWith(
-        pendingAnimationBounds: bounds,
+        pendingCameraUpdateToApply: cameraUpdate,
       );
     } else {
       // If map is ready, attempt to animate immediately
       final result = await _mapService.animateCamera(
-        cameraUpdate: CameraUpdate.newLatLngBounds(bounds, padding),
+        cameraUpdate: cameraUpdate,
       );
       if (!mounted) return;
 
@@ -313,13 +364,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
         (success) {
           // Animation succeeded, reset pending bounds
           state = state.copyWith(
-            pendingAnimationBounds: null,
+            pendingCameraUpdateToApply: null,
           );
         },
         (failure) {
           // If animation fails, queue it
           state = state.copyWith(
-            pendingAnimationBounds: bounds,
+            pendingCameraUpdateToApply: cameraUpdate,
           );
         },
       );
@@ -772,34 +823,34 @@ class MapProvider extends StateNotifier<MapProviderState> {
   void generateMarkers() async {
     final hazards = state.hazards;
     final currentZoom = state.cameraPosition.zoom;
-
-    // Progressive clustering based on zoom level
-    if (currentZoom >= 12.0) {
-      // Show individual markers at very high zoom levels
-      _showAllIndividualMarkers();
-    } else {
-      // Show progressive clusters at lower zoom levels
-      _showProgressiveClusters(hazards, currentZoom);
-    }
-  }
-
-  /// Shows all individual hazard markers without clustering
-  void _showAllIndividualMarkers() async {
-    final hazards = state.hazards;
     final individualMarkers = <Marker>[];
+
+    // At low zoom levels (< 6.5), show small red dots instead of detailed icons
+    final useRedDotBitmap = currentZoom < 6.5;
+    final redDotBitmap = _hazardMarkerBitmapsProviderState.redDotBitmap;
 
     for (final hazard in hazards) {
       if (hazard.latitude == null || hazard.longitude == null) continue;
 
-      final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
-      final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(markerBitmaps);
+      BitmapDescriptor? bitmapDescriptor;
+      if (useRedDotBitmap && redDotBitmap != null) {
+        bitmapDescriptor = redDotBitmap;
+      } else {
+        final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
+        bitmapDescriptor = hazard.getMarkerBitmapDescriptor(markerBitmaps);
+      }
+
       individualMarkers.add(
         Marker(
           markerId: MarkerId(
-            hazard.id ?? '${hazard.latitude},${hazard.longitude}',
+            'hazard_${hazard.id ?? '${hazard.latitude},${hazard.longitude}'}',
           ),
           position: LatLng(hazard.latitude!, hazard.longitude!),
-          onTap: () => updateSelectedHazard(hazard),
+          onTap: () => _onIndividualMarkerTap(
+            hazard: hazard,
+            isRedDot: useRedDotBitmap,
+          ),
+          consumeTapEvents: true,
           icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
         ),
       );
@@ -826,257 +877,44 @@ class MapProvider extends StateNotifier<MapProviderState> {
     updateMarkers(allMarkers);
   }
 
-  /// Shows progressive clusters based on zoom level and geographic proximity
-  void _showProgressiveClusters(List<Hazard> hazards, double zoomLevel) async {
-    if (hazards.isEmpty) return;
-
-    // Calculate cluster distance based on zoom level
-    // Higher zoom = smaller cluster distance (more granular clusters)
-    final clusterDistance = _getClusterDistance(zoomLevel);
-
-    // First group by category
-    final Map<String, List<Hazard>> hazardsByCategory = {};
-    for (final hazard in hazards) {
-      if (hazard.latitude == null || hazard.longitude == null) continue;
-
-      final categoryId = hazard.categoryId ?? 'unknown';
-      hazardsByCategory.putIfAbsent(categoryId, () => []);
-      hazardsByCategory[categoryId]!.add(hazard);
-    }
-
-    final clusterMarkerFutures = <Future<Marker>>[];
-    final individualMarkerFutures = <Future<Marker>>[];
-
-    // Create geographic clusters within each category
-    for (final entry in hazardsByCategory.entries) {
-      final categoryId = entry.key;
-      final categoryHazards = entry.value;
-
-      final categoryClusters = _createGeographicClusters(
-        categoryHazards,
-        clusterDistance,
+  void _onIndividualMarkerTap({
+    required final Hazard hazard,
+    final bool isRedDot = false,
+  }) {
+    if (isRedDot) {
+      // At low zoom levels, just zoom in closer to show detailed marker
+      animateTo(
+        position: LatLng(hazard.latitude!, hazard.longitude!),
+        zoom: 8.0,
       );
-
-      // Create markers for each geographic cluster
-      for (int i = 0; i < categoryClusters.length; i++) {
-        final cluster = categoryClusters[i];
-
-        if (cluster.length == 1) {
-          // Show individual marker for single hazard
-          final hazard = cluster.first;
-          final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
-          final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(
-            markerBitmaps,
-          );
-
-          final individualMarker = Marker(
-            markerId: MarkerId(
-              hazard.id ?? '${hazard.latitude},${hazard.longitude}',
-            ),
-            position: LatLng(hazard.latitude!, hazard.longitude!),
-            onTap: () => updateSelectedHazard(hazard),
-            icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
-          );
-          individualMarkerFutures.add(Future.value(individualMarker));
-        } else {
-          // Show cluster marker for multiple hazards
-          // Calculate cluster center
-          double totalLat = 0;
-          double totalLng = 0;
-          for (final hazard in cluster) {
-            totalLat += hazard.latitude!;
-            totalLng += hazard.longitude!;
-          }
-
-          final centerLat = totalLat / cluster.length;
-          final centerLng = totalLng / cluster.length;
-          final clusterPosition = LatLng(centerLat, centerLng);
-
-          // Create cluster marker using the first hazard's information
-          final firstHazard = cluster.first;
-
-          final future =
-              _createCategoryClusterMarkerIcon(
-                cluster.length,
-                firstHazard,
-              ).then(
-                (bitmapDescriptor) {
-                  return Marker(
-                    markerId: MarkerId('cluster_${categoryId}_$i'),
-                    position: clusterPosition,
-                    onTap: () {
-                      // Zoom in to break the cluster further
-                      _mapService.animateCamera(
-                        cameraUpdate: CameraUpdate.newLatLngBounds(
-                          cluster
-                              .map(
-                                (hazard) => LatLng(
-                                  hazard.latitude!,
-                                  hazard.longitude!,
-                                ),
-                              )
-                              .toList()
-                              .toBounds(),
-                          100.0,
-                        ),
-                      );
-                    },
-                    icon: bitmapDescriptor,
-                  );
-                },
-              );
-
-          clusterMarkerFutures.add(future);
-        }
-      }
+      return;
     }
 
-    final clusterMarkers = await Future.wait(clusterMarkerFutures);
-    final individualMarkers = await Future.wait(individualMarkerFutures);
+    updateSelectedHazard(hazard);
 
-    // Preserve non-hazard markers
-    final selectedPlaceMarker = state.markers.firstWhereOrNull(
-      (marker) => marker.markerId.value == 'selected_location',
-    );
-    final routeLabelMarkers = state.markers.where(
-      (marker) => marker.markerId.value.startsWith('route_label_'),
-    );
-    final currentUserLocationMarker = state.markers.firstWhereOrNull(
-      (marker) => marker.markerId.value == 'user_location',
-    );
+    // Calculate position with offset to create top padding effect
+    final markerPosition = LatLng(hazard.latitude!, hazard.longitude!);
 
-    final allMarkers = <Marker>{
-      ...clusterMarkers,
-      ...individualMarkers,
-      if (selectedPlaceMarker != null) selectedPlaceMarker,
-      ...routeLabelMarkers,
-      if (currentUserLocationMarker != null) currentUserLocationMarker,
-    };
+    // Calculate consistent visual offset based on zoom level
+    // This ensures the marker appears in the same relative position on screen
+    // regardless of zoom level (e.g., 30% from the top of the screen)
+    final currentZoom = state.cameraPosition.zoom;
 
-    updateMarkers(allMarkers);
-  }
+    // Calculate latitude degrees per pixel at current zoom level
+    // At zoom level z, each tile is 256 pixels and represents 360/(2^z) degrees
+    final degreesPerPixel = 360.0 / (256.0 * pow(2, currentZoom));
 
-  /// Gets the clustering distance based on zoom level
-  double _getClusterDistance(double zoomLevel) {
-    // Distance in kilometers for clustering
-    // Lower zoom = larger distance (fewer, bigger clusters)
-    // Higher zoom = smaller distance (more, smaller clusters)
-    if (zoomLevel <= 3) return 5000.0; // 10000km clusters
-    if (zoomLevel <= 4) return 700.0; // 900km clusters
-    if (zoomLevel <= 5) return 200.0; // 700km clusters
-    if (zoomLevel <= 6) return 100.0; // 100km clusters
-    if (zoomLevel <= 7) return 40.0; // 40km clusters
-    if (zoomLevel <= 8) return 20.0; // 20km clusters
-    if (zoomLevel <= 10) return 10.0; // 10km clusters
-    if (zoomLevel <= 12) return 5.0; // 5km clusters
-    return 2.0; // 2km clusters
-  }
+    // Offset by approximately 150 pixels (adjust this value to fine-tune positioning)
+    // This will consistently place the marker about 150 pixels from the top
+    final pixelOffset = 120.0;
+    final latOffset = degreesPerPixel * pixelOffset;
 
-  /// Creates geographic clusters from a list of hazards based on distance
-  List<List<Hazard>> _createGeographicClusters(
-    List<Hazard> hazards,
-    double maxDistanceKm,
-  ) {
-    final clusters = <List<Hazard>>[];
-    final unprocessed = List<Hazard>.from(hazards);
-
-    while (unprocessed.isNotEmpty) {
-      final seed = unprocessed.removeAt(0);
-      final cluster = [seed];
-
-      // Find all hazards within clustering distance of the seed
-      for (int i = unprocessed.length - 1; i >= 0; i--) {
-        final hazard = unprocessed[i];
-        final distance =
-            calculateDistanceInMeters(
-              seed.latitude!,
-              seed.longitude!,
-              hazard.latitude!,
-              hazard.longitude!,
-            ) /
-            1000; // Convert to km
-
-        if (distance <= maxDistanceKm) {
-          cluster.add(hazard);
-          unprocessed.removeAt(i);
-        }
-      }
-
-      clusters.add(cluster);
-    }
-
-    return clusters;
-  }
-
-  /// Creates a cluster marker icon with the first hazard's icon and count badge
-  Future<BitmapDescriptor> _createCategoryClusterMarkerIcon(
-    int count,
-    Hazard firstHazard,
-  ) async {
-    const size = 60.0;
-    const countBadgeSize = 26.0;
-
-    final widget = SizedBox(
-      width: size,
-      height: size,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Main hazard icon using the actual hazard icon path
-          Positioned.fill(
-            child: Image.asset(
-              firstHazard.iconPath,
-              width: size,
-              height: size,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Image.asset(
-                firstHazard.fallbackIconPath,
-                width: size,
-                height: size,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => Image.asset(
-                  firstHazard.fallbackIconPath2,
-                  width: size,
-                  height: size,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ),
-          // Count badge in top-right corner
-          Positioned(
-            top: 0,
-            left: 3.0,
-            child: Container(
-              width: countBadgeSize,
-              height: countBadgeSize,
-              decoration: BoxDecoration(
-                color: AppColors.red,
-                shape: BoxShape.circle,
-              ),
-              padding: const EdgeInsets.all(2.0),
-              child: Center(
-                child: FittedBox(
-                  child: Text(
-                    '$count',
-                    style: const TextStyle(
-                      color: AppColors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+    final targetPosition = LatLng(
+      markerPosition.latitude + latOffset,
+      markerPosition.longitude,
     );
 
-    return widget.toBitmapDescriptor(
-      logicalSize: const Size(size, size),
-      imageSize: const Size(size * 2, size * 2),
-    );
+    animateTo(position: targetPosition, zoom: currentZoom + 0.01);
   }
 
   /// Updates [MapProviderState.isMapReady] to the given [isMapReady].
@@ -1091,6 +929,22 @@ class MapProvider extends StateNotifier<MapProviderState> {
     state = state.copyWith(
       hazards: hazards,
     );
+  }
+
+  /// Removes a hazard by its [hazardId] from the state.
+  void removeFromHazards(final String hazardId) {
+    final updatedHazards = state.hazards
+        .where((hazard) => hazard.id != hazardId)
+        .toList();
+    updateHazards(updatedHazards);
+
+    // If the removed hazard was the selected one, clear selection
+    if (state.selectedHazard?.id == hazardId) {
+      updateSelectedHazard(null);
+    }
+
+    // Regenerate markers after removal
+    generateMarkers();
   }
 
   /// Updates [MapProviderState.selectedHazard] to the given [hazard].
@@ -1121,6 +975,16 @@ class MapProvider extends StateNotifier<MapProviderState> {
     updateMarkers(
       {...state.markers, marker},
     );
+  }
+
+  /// Removes all hazard markers from the current set of markers.
+  void removeAllHazardMarkers() {
+    final updatedMarkers = state.markers
+        .where(
+          (marker) => !marker.markerId.value.startsWith('hazard_'),
+        )
+        .toSet();
+    updateMarkers(updatedMarkers);
   }
 
   /// Updates [MapProviderState.polylines] to the given [polylines].

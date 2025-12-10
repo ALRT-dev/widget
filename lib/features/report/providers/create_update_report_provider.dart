@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/states/my_hazards_provider_state.dart';
 import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
@@ -34,7 +35,9 @@ class CreateReportProvider
     required final Ref ref,
     required final CreateUpdateReportProviderState state,
   }) : _ref = ref,
-       super(state);
+       super(state) {
+    getCategoriesToSelect();
+  }
 
   final Ref _ref;
   MediaService get _mediaService => _ref.read(providerOfMediaService);
@@ -43,14 +46,39 @@ class CreateReportProvider
       _ref.read(providerOfMyHazards.notifier);
   MyHazardsProviderState get _myHazardsProviderState =>
       _ref.read(providerOfMyHazards);
+  MapProvider get _mapProvider => _ref.read(providerOfMap.notifier);
+
+  /// Fetches the list of hazard categories to select from and updates the state accordingly.
+  Future<void> getCategoriesToSelect() async {
+    state = state.copyWith(
+      getCategoriesToSelectState: GetCategoriesToSelectState.loading(),
+    );
+
+    final result = await _hazardService.getAllParentHazardCategories();
+    if (!mounted) return;
+
+    result.when(
+      (categories) {
+        state = state.copyWith(
+          getCategoriesToSelectState: GetCategoriesToSelectState.success(
+            categories,
+          ),
+          categoriesToSelect: categories,
+        );
+      },
+      (error) {
+        state = state.copyWith(
+          getCategoriesToSelectState: GetCategoriesToSelectState.error(error),
+        );
+      },
+    );
+  }
 
   /// Creates or updates a hazard report using the data in the current state.
   Future<void> createOrUpdateReport() async {
     updateReportSubmitted(true);
 
     final hazard = state.hazardToCreateOrUpdate.copyWith(
-      title:
-          'Hazard at ${state.hazardToCreateOrUpdate.locationName ?? 'Unknown Location'}',
       categoryId: state.hazardToCreateOrUpdate.category?.id,
       category: null,
     );
@@ -137,6 +165,9 @@ class CreateReportProvider
             }
           }
         }
+
+        // refresh the hazard on the map
+        _mapProvider.getMapHazards();
       },
       (error) {
         updateCreatingHazardReport(
@@ -164,6 +195,15 @@ class CreateReportProvider
   void updateHazardToCreateOrUpdate(final Hazard hazard) {
     state = state.copyWith(
       hazardToCreateOrUpdate: hazard,
+    );
+  }
+
+  /// Updates [CreateUpdateReportProviderState.hazardToCreateOrUpdate.title] with the given [title].
+  void updateTitle(final String title) {
+    updateHazardToCreateOrUpdate(
+      state.hazardToCreateOrUpdate.copyWith(
+        title: title,
+      ),
     );
   }
 
@@ -219,6 +259,13 @@ class CreateReportProvider
     state = state.copyWith(medias: medias);
   }
 
+  /// Adds medias to [CreateUpdateReportProviderState.medias].
+  void addMedias(final List<AlrtMedia> medias) {
+    updateMedias(
+      [...state.medias, ...medias],
+    );
+  }
+
   /// Removes a media from [CreateUpdateReportProviderState.medias] with the given [mediaId].
   void removeMedia(final String mediaId) {
     updateMedias(
@@ -267,12 +314,11 @@ class CreateReportProvider
   void resetAllFields() {
     state = state.copyWith(
       hazardToCreateOrUpdate: state.hazardToCreateOrUpdate.copyWith(
-        occurredAt: null,
         category: null,
-        severity: null,
         latitude: null,
         longitude: null,
         locationName: null,
+        title: null,
         description: null,
       ),
       medias: [],

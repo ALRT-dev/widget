@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -45,6 +47,38 @@ abstract class LocationSubscription with _$LocationSubscription {
     northeast: LatLng(northeastLat, northeastLng),
     southwest: LatLng(southwestLat, southwestLng),
   );
+
+  /// Computes the center point of the subscription area.
+  LatLng get center => LatLng(
+    (northeastLat + southwestLat) / 2,
+    (northeastLng + southwestLng) / 2,
+  );
+
+  /// Calculates the approximate radius in kilometers from the bounds.
+  /// This uses the Haversine formula to calculate distance from center to northeast corner.
+  double get radiusInKm {
+    const earthRadiusKm = 6371.0;
+
+    final centerLat = center.latitude;
+    final centerLng = center.longitude;
+
+    // Calculate distance from center to northeast corner
+    final lat1Rad = centerLat * math.pi / 180;
+    final lat2Rad = northeastLat * math.pi / 180;
+    final deltaLatRad = (northeastLat - centerLat) * math.pi / 180;
+    final deltaLngRad = (northeastLng - centerLng) * math.pi / 180;
+
+    final a =
+        math.sin(deltaLatRad / 2) * math.sin(deltaLatRad / 2) +
+        math.cos(lat1Rad) *
+            math.cos(lat2Rad) *
+            math.sin(deltaLngRad / 2) *
+            math.sin(deltaLngRad / 2);
+
+    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+
+    return earthRadiusKm * c;
+  }
 
   factory LocationSubscription.fromJson(Map<String, dynamic> json) =>
       _$LocationSubscriptionFromJson(json);

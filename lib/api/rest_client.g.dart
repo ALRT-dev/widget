@@ -47,6 +47,43 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<AuthSuccess> verifyAppleOAuth({
+    required String identityToken,
+    String? firstName,
+    String? lastName,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'identityToken': identityToken,
+      'firstName': firstName,
+      'lastName': lastName,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _options = _setStreamType<AuthSuccess>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/auth/oauth/apple',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late AuthSuccess _value;
+    try {
+      _value = AuthSuccess.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<AuthSuccess> refreshToken({required String accessToken}) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -71,6 +108,94 @@ class _RestClient implements RestClient {
       rethrow;
     }
     return _value;
+  }
+
+  @override
+  Future<void> setOnboardingLocation({
+    required double latitude,
+    required double longitude,
+    String? locationName,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'latitude': latitude,
+      'longitude': longitude,
+      'locationName': locationName,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _options = _setStreamType<void>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/onboarding/location',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
+  Future<void> setOnboardingRadius({required double radiusInKm}) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = {'radiusInKm': radiusInKm};
+    final _options = _setStreamType<void>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/onboarding/radius',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
+  Future<void> setOnboardingNotificationPreferences({
+    required String pushNotificationPreference,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = {'pushNotificationPreference': pushNotificationPreference};
+    final _options = _setStreamType<void>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/onboarding/notifications',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
+  Future<void> acceptOnboardingTermsOfService() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<void>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/onboarding/accept-tos',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
   }
 
   @override
@@ -101,9 +226,13 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<AppUser> updateCurrentUser({required AppUser user}) async {
+  Future<AppUser> updateCurrentUser({
+    required AppUser user,
+    CancelToken? cancelToken,
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = user;
     final _options = _setStreamType<AppUser>(
@@ -113,6 +242,7 @@ class _RestClient implements RestClient {
             '/user',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -268,6 +398,72 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<LocationSubscription> updateOwnLocationSubscription({
+    required double latitude,
+    required double longitude,
+    String? locationName,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'latitude': latitude,
+      'longitude': longitude,
+      'locationName': locationName,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _options = _setStreamType<LocationSubscription>(
+      Options(method: 'PUT', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/user/own-location-subscription',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late LocationSubscription _value;
+    try {
+      _value = LocationSubscription.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<LocationSubscription> updateOwnLocationSubscriptionRadius({
+    required double radiusKm,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = {'radiusKm': radiusKm};
+    final _options = _setStreamType<LocationSubscription>(
+      Options(method: 'PUT', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/user/own-location-subscription-radius',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late LocationSubscription _value;
+    try {
+      _value = LocationSubscription.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<PushNotificationSettings> getPushNotificationSettings() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -295,14 +491,14 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<HttpResponse<dynamic>> updatePushNotificationSettings({
-    required List<PushNotificationUpdateInput> updates,
+  Future<PushNotificationSettings> updatePushNotificationSettings({
+    required PushNotificationSettings pushNotificationSettings,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = {'updates': updates};
-    final _options = _setStreamType<HttpResponse<dynamic>>(
+    final _data = pushNotificationSettings;
+    final _options = _setStreamType<PushNotificationSettings>(
       Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -312,19 +508,26 @@ class _RestClient implements RestClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch(_options);
-    final _value = _result.data;
-    final httpResponse = HttpResponse(_value, _result);
-    return httpResponse;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late PushNotificationSettings _value;
+    try {
+      _value = PushNotificationSettings.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
   Future<List<Hazard>> getHazards({
     required HazardSearchParams searchParams,
+    CancelToken? cancelToken,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.addAll(searchParams.toJson());
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<List<Hazard>>(
@@ -334,6 +537,7 @@ class _RestClient implements RestClient {
             '/hazards',
             queryParameters: queryParameters,
             data: _data,
+            cancelToken: cancelToken,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
@@ -351,7 +555,7 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<GetHazardsWithCategoriesResponse> getGetHazardsWithCategories({
+  Future<GetHazardsWithSubscriptionIdResponse> getGetHazardsWithSubscriptionId({
     required HazardSearchParams searchParams,
   }) async {
     final _extra = <String, dynamic>{};
@@ -359,20 +563,20 @@ class _RestClient implements RestClient {
     queryParameters.addAll(searchParams.toJson());
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<GetHazardsWithCategoriesResponse>(
+    final _options = _setStreamType<GetHazardsWithSubscriptionIdResponse>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazards/hazards-with-categories',
+            '/hazards/hazards-with-subscription-id',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late GetHazardsWithCategoriesResponse _value;
+    late GetHazardsWithSubscriptionIdResponse _value;
     try {
-      _value = GetHazardsWithCategoriesResponse.fromJson(_result.data!);
+      _value = GetHazardsWithSubscriptionIdResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -650,7 +854,7 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<GetHazardsWithCategoriesResponse> getNotificationsFeed({
+  Future<List<Hazard>> getNotificationsFeed({
     HazardSearchParams? searchParams,
   }) async {
     final _extra = <String, dynamic>{};
@@ -659,7 +863,7 @@ class _RestClient implements RestClient {
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<GetHazardsWithCategoriesResponse>(
+    final _options = _setStreamType<List<Hazard>>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -669,10 +873,12 @@ class _RestClient implements RestClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late GetHazardsWithCategoriesResponse _value;
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<Hazard> _value;
     try {
-      _value = GetHazardsWithCategoriesResponse.fromJson(_result.data!);
+      _value = _result.data!
+          .map((dynamic i) => Hazard.fromJson(i as Map<String, dynamic>))
+          .toList();
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

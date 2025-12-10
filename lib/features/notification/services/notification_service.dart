@@ -6,7 +6,7 @@ import 'package:hazard_app/features/notification/providers/repository_providers.
 import 'package:hazard_app/features/notification/repositories/notification_repository.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -22,21 +22,30 @@ class NotificationService {
   StreamSubscription<RemoteMessage>? _remoteMessageStreamSub;
 
   /// Fetches the hazards that the user has subscribed to for notifications.
-  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
-  getNotificationsFeed({
+  Future<Either<List<Hazard>, AppError>> getNotificationsFeed({
     final HazardSearchParams? searchParams,
   }) async {
+    // If no category IDs are provided, return an empty list immediately.
+    if (searchParams?.categoryIds.isEmpty ?? true) {
+      return Success(<Hazard>[]);
+    }
+
+    // If all hazard source filters are false, return an empty list immediately.
+    if (!(searchParams?.awsEmergency ?? false) &&
+        !(searchParams?.awsWatchAndAct ?? false) &&
+        !(searchParams?.awsAdvice ?? false) &&
+        !(searchParams?.officialNonAws ?? false) &&
+        !(searchParams?.userReported ?? false)) {
+      return Success(<Hazard>[]);
+    }
+
     final result = await _notificationRepository.getNotificationsFeed(
       searchParams: searchParams,
     );
 
-    final success = await result.whenSuccess((response) async {
-      final populatedHazards = await _hazardService
-          .populateHazardsWithRequiredData(response.hazards);
-      return response.copyWith(
-        hazards: populatedHazards,
-      );
-    });
+    final success = await result.whenSuccess(
+      _hazardService.populateHazardsWithRequiredData,
+    );
 
     return result.copyWith(
       success: (_) => success,

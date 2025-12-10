@@ -5,12 +5,11 @@ import 'package:dio/dio.dart';
 import 'package:hazard_app/api/endpoints.dart';
 import 'package:hazard_app/features/auth/models/auth_success_model.dart';
 import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
-import 'package:hazard_app/features/notification/models/push_notification_update_input_model.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:retrofit/retrofit.dart';
@@ -25,13 +24,42 @@ abstract class RestClient {
 
   @POST(kUrlOAuthGoogle)
   Future<AuthSuccess> verifyGoogleOAuth({
-    @Field() required String idToken,
+    @Field() required final String idToken,
+  });
+
+  @POST(kUrlOAuthApple)
+  Future<AuthSuccess> verifyAppleOAuth({
+    @Field() required final String identityToken,
+    @Field() final String? firstName,
+    @Field() final String? lastName,
   });
 
   @POST(kUrlRefreshToken)
   Future<AuthSuccess> refreshToken({
-    @Field() required String accessToken,
+    @Field() required final String accessToken,
   });
+
+  // ---------------------------- ONBOARDING ----------------------------
+
+  @POST(kUrlOnboardingLocation)
+  Future<void> setOnboardingLocation({
+    @Field() required final double latitude,
+    @Field() required final double longitude,
+    @Field() final String? locationName,
+  });
+
+  @POST(kUrlOnboardingRadius)
+  Future<void> setOnboardingRadius({
+    @Field() required final double radiusInKm,
+  });
+
+  @POST(kUrlOnboardingNotifications)
+  Future<void> setOnboardingNotificationPreferences({
+    @Field() required final String pushNotificationPreference,
+  });
+
+  @POST(kUrlOnboardingAcceptTos)
+  Future<void> acceptOnboardingTermsOfService();
 
   // ---------------------------- USER ----------------------------
 
@@ -40,7 +68,8 @@ abstract class RestClient {
 
   @PUT(kUrlUser)
   Future<AppUser> updateCurrentUser({
-    @Body() required AppUser user,
+    @Body() required final AppUser user,
+    @CancelRequest() final CancelToken? cancelToken,
   });
 
   @PUT(kUrlUserProfilePicture)
@@ -68,12 +97,24 @@ abstract class RestClient {
   @GET(kUrlUserLocationSubscriptions)
   Future<List<LocationSubscription>> getLocationSubscriptions();
 
+  @PUT(kUrlOwnLocationSubscription)
+  Future<LocationSubscription> updateOwnLocationSubscription({
+    @Field() required final double latitude,
+    @Field() required final double longitude,
+    @Field() final String? locationName,
+  });
+
+  @PUT(kUrlOwnLocationSubscriptionRadius)
+  Future<LocationSubscription> updateOwnLocationSubscriptionRadius({
+    @Field() required final double radiusKm,
+  });
+
   @GET(kUrlPushNotificationSettings)
   Future<PushNotificationSettings> getPushNotificationSettings();
 
   @PUT(kUrlPushNotificationSettings)
-  Future<HttpResponse> updatePushNotificationSettings({
-    @Field() required final List<PushNotificationUpdateInput> updates,
+  Future<PushNotificationSettings> updatePushNotificationSettings({
+    @Body() required final PushNotificationSettings pushNotificationSettings,
   });
 
   // ---------------------------- HAZARD ----------------------------
@@ -81,10 +122,11 @@ abstract class RestClient {
   @GET(kUrlHazards)
   Future<List<Hazard>> getHazards({
     @Queries() required final HazardSearchParams searchParams,
+    @CancelRequest() final CancelToken? cancelToken,
   });
 
-  @GET(kUrlHazardsWithCategories)
-  Future<GetHazardsWithCategoriesResponse> getGetHazardsWithCategories({
+  @GET(kUrlHazardsWithSubscriptionId)
+  Future<GetHazardsWithSubscriptionIdResponse> getGetHazardsWithSubscriptionId({
     @Queries() required final HazardSearchParams searchParams,
   });
 
@@ -132,7 +174,7 @@ abstract class RestClient {
   // ---------------------------- NOTIFICATION ----------------------------
 
   @GET(kUrlNotificationsFeed)
-  Future<GetHazardsWithCategoriesResponse> getNotificationsFeed({
+  Future<List<Hazard>> getNotificationsFeed({
     @Queries() final HazardSearchParams? searchParams,
   });
 

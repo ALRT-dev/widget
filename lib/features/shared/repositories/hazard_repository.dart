@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
@@ -7,7 +8,7 @@ import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/models/get_hazards_with_categories_response_model.dart';
+import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -15,10 +16,11 @@ import 'package:hazard_app/features/shared/utils/either.dart';
 abstract class HazardRepository {
   Future<Either<List<Hazard>, AppError>> getHazards({
     required final HazardSearchParams searchParams,
+    final CancelToken? cancelToken,
   });
 
-  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
-  getGetHazardsWithCategories({
+  Future<Either<GetHazardsWithSubscriptionIdResponse, AppError>>
+  getGetHazardsWithSubscriptionId({
     required final HazardSearchParams searchParams,
   });
 
@@ -63,12 +65,14 @@ class HazardRepositoryImpl extends HazardRepository {
   @override
   Future<Either<List<Hazard>, AppError>> getHazards({
     required final HazardSearchParams searchParams,
+    final CancelToken? cancelToken,
   }) {
     return runAsyncCall(
       name: 'getHazards',
       future: () async {
         final result = await _restClient.getHazards(
           searchParams: searchParams,
+          cancelToken: cancelToken,
         );
         return Success(result);
       },
@@ -77,14 +81,14 @@ class HazardRepositoryImpl extends HazardRepository {
   }
 
   @override
-  Future<Either<GetHazardsWithCategoriesResponse, AppError>>
-  getGetHazardsWithCategories({
+  Future<Either<GetHazardsWithSubscriptionIdResponse, AppError>>
+  getGetHazardsWithSubscriptionId({
     required HazardSearchParams searchParams,
   }) {
     return runAsyncCall(
-      name: 'getGetHazardsWithCategories',
+      name: 'getGetHazardsWithSubscriptionId',
       future: () async {
-        final result = await _restClient.getGetHazardsWithCategories(
+        final result = await _restClient.getGetHazardsWithSubscriptionId(
           searchParams: searchParams,
         );
         return Success(result);

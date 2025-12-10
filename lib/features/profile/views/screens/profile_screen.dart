@@ -114,8 +114,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.yellow.withValues(alpha: 0.85),
-                    AppColors.yellow,
+                    AppColors.orange.withValues(alpha: 0.8),
+                    AppColors.orange,
                   ],
                 ),
               ),
@@ -127,47 +127,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         (value) => value?.email,
                       ),
                     );
-                    final userLocation = ref.watch(
-                      providerOfLoggedInUser.select(
-                        (value) => value?.locationName,
-                      ),
-                    );
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         40.hSizedBox,
-                        _buildUserAvatar(),
+                        _buildUserAvatar(
+                          borderColor: AppColors.white.withValues(alpha: 0.7),
+                        ),
                         12.hSizedBox,
-                        _buildUserName(),
+                        _buildUserName(
+                          color: AppColors.white.withValues(alpha: 0.9),
+                        ),
                         if (userEmail != null) 2.hSizedBox,
                         if (userEmail != null)
                           Text(
                             userEmail,
                             style: TextStyle(
                               fontSize: 16.spMin,
-                              color: AppColors.black.withValues(alpha: 0.8),
+                              color: AppColors.white.withValues(alpha: 0.8),
                               fontWeight: FontWeight.w500,
                             ),
-                          ),
-                        if (userLocation != null) 6.hSizedBox,
-                        if (userLocation != null)
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.location_on_outlined,
-                                size: 13.spMin,
-                                color: AppColors.black.withValues(alpha: 0.8),
-                              ),
-                              3.wSizedBox,
-                              Text(
-                                userLocation,
-                                style: TextStyle(
-                                  fontSize: 12.spMin,
-                                  color: AppColors.black,
-                                ),
-                              ),
-                            ],
                           ),
                       ],
                     );
@@ -183,7 +162,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildUserName({
     final double fontSize = 24.0,
-    final Color color = AppColors.black,
+    final Color color = AppColors.white,
   }) {
     return Consumer(
       builder: (context, ref, child) {
@@ -208,7 +187,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final double size = 80.0,
     final Color? backgroundColor,
     final Color foregroundColor = AppColors.white,
-    final Color borderColor = AppColors.black,
+    final Color borderColor = AppColors.white,
     final double borderWidth = 3,
     final double uploadProgressPadding = 20.0,
   }) {
@@ -330,45 +309,119 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return _buildSection(
       title: 'Performance Metrics',
       icon: Icons.trending_up_outlined,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final xpPoints = ref.watch(
+                      providerOfLoggedInUser.select(
+                        (value) => value?.xpPoints ?? 0,
+                      ),
+                    );
+                    return _buildScoreCard(
+                      'XP Score',
+                      xpPoints.toString(),
+                      Icons.star_outline,
+                      AppColors.orange,
+                      'Level 1 - Watcher',
+                    );
+                  },
+                ),
+              ),
+              16.wSizedBox,
+              Expanded(
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final reliabilityScore = ref.watch(
+                      providerOfLoggedInUser.select(
+                        (value) => (value?.reliabilityScore ?? 0.0) * 100,
+                      ),
+                    );
+
+                    return _buildScoreCard(
+                      'Reliability',
+                      '${reliabilityScore.toStringAsFixed(0)}%',
+                      Icons.shield_outlined,
+                      AppColors.green,
+                      _reliabilityDescription(reliabilityScore / 100),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          16.hSizedBox,
+          _buildBadgeCard(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBadgeCard() {
+    return Container(
+      padding: EdgeInsets.all(16.spMin),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.orange500.withValues(alpha: 0.8),
+            AppColors.orange500,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16.spMin),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.orange500.withValues(alpha: 0.1),
+            blurRadius: 15.spMin,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Row(
         children: [
-          Expanded(
-            child: Consumer(
-              builder: (context, ref, child) {
-                final xpPoints = ref.watch(
-                  providerOfLoggedInUser.select(
-                    (value) => value?.xpPoints ?? 0,
-                  ),
-                );
-                return _buildScoreCard(
-                  'XP Score',
-                  xpPoints.toString(),
-                  Icons.star_outline,
-                  AppColors.orange,
-                  'Level 1 - Watcher',
-                );
-              },
+          Container(
+            width: 48.spMin,
+            height: 48.spMin,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(12.spMin),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadowColor,
+                  blurRadius: 8.spMin,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                '🏅',
+                style: TextStyle(fontSize: 24.spMin),
+              ),
             ),
           ),
-          16.spMin.wSizedBox,
-          Expanded(
-            child: Consumer(
-              builder: (context, ref, child) {
-                final reliabilityScore = ref.watch(
-                  providerOfLoggedInUser.select(
-                    (value) => (value?.reliabilityScore ?? 0.0) * 100,
-                  ),
-                );
-
-                return _buildScoreCard(
-                  'Reliability',
-                  '${reliabilityScore.toStringAsFixed(0)}%',
-                  Icons.shield_outlined,
-                  AppColors.green,
-                  _reliabilityDescription(reliabilityScore / 100),
-                );
-              },
-            ),
+          16.wSizedBox,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'New Achievement',
+                style: TextStyle(
+                  fontSize: 12.spMin,
+                  color: AppColors.white,
+                ),
+              ),
+              Text(
+                'Safety Explorer',
+                style: TextStyle(
+                  fontSize: 16.spMin,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.white,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -609,12 +662,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   width: 48.spMin,
                   height: 48.spMin,
                   decoration: BoxDecoration(
-                    color: AppColors.blue.withValues(alpha: 0.1),
+                    color: AppColors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.spMin),
                   ),
                   child: Icon(
                     Icons.notifications_active_outlined,
-                    color: AppColors.blue,
+                    color: AppColors.orange,
                     size: 24.spMin,
                   ),
                 ),
@@ -802,7 +855,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         Icon(
           icon,
           size: 20.spMin,
-          color: AppColors.blue,
+          color: AppColors.orange,
         ),
         4.spMin.hSizedBox,
         Text(
@@ -917,7 +970,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               text,
               style: TextStyle(
                 fontSize: 14.spMin,
-                color: AppColors.blue,
+                color: AppColors.orange,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -925,7 +978,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Icon(
               Icons.arrow_forward_ios,
               size: 12.spMin,
-              color: AppColors.blue,
+              color: AppColors.orange,
             ),
           ],
         ),
@@ -1085,9 +1138,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   /// Shows the update profile picture button.
   void _showUpdateProfilePictureButton() {
-    ref
-        .read(providerOfProfile.notifier)
-        .updateShowUpdateProfilePictureButton(true);
+    // ref
+    //     .read(providerOfProfile.notifier)
+    //     .updateShowUpdateProfilePictureButton(true);
   }
 
   /// Uploads a new profile picture.

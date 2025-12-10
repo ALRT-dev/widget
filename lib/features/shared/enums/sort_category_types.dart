@@ -1,5 +1,5 @@
 enum SortCategory {
-  severity,
+  severityBand,
   distance,
   createdAt,
   confidenceScore,

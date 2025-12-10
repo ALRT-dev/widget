@@ -5,6 +5,7 @@ import 'package:hazard_app/features/report/providers/create_update_report_provid
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class CreateReportMediasList extends ConsumerStatefulWidget {
@@ -31,8 +32,8 @@ class _CreateReportMediasListState
       physics: NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        mainAxisSpacing: 10.w,
-        crossAxisSpacing: 10.w,
+        mainAxisSpacing: 10.spMin,
+        crossAxisSpacing: 10.spMin,
       ),
       itemBuilder: (context, index) {
         if (index == 0) return _addButtonBuilder();
@@ -48,7 +49,7 @@ class _CreateReportMediasListState
   Widget _addButtonBuilder() {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.r),
+        borderRadius: BorderRadius.circular(14.spMin),
         border: Border.all(
           color: AppColors.lightGrey,
         ),
@@ -62,8 +63,14 @@ class _CreateReportMediasListState
   }
 
   /// Handles the action of picking multiple media files when the add button is pressed.
-  void _pickMedias() {
+  void _pickMedias() async {
     context.unfocusInputs();
-    ref.read(providerOfCreateReport.notifier).pickMedias();
+    final medias = await showImagePickerBottomSheet(
+      context: context,
+    );
+    if (!mounted) return;
+    if (medias != null && medias.isNotEmpty) {
+      ref.read(providerOfCreateReport.notifier).addMedias(medias);
+    }
   }
 }

@@ -15,8 +15,13 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PushNotificationSettings {
 
-/// Push notifications settings by severity level.
- PushNotificationSettingsBySeverity get severity;
+/// Whether AWS Emergency level "Emergency" is selected.
+ bool get awsEmergency;/// Whether AWS Emergency level "Watch and Act" is selected.
+ bool get awsWatchAndAct;/// Whether AWS Emergency level "Advice" is selected.
+ bool get awsAdvice;/// Whether Official Non-AWS sources are selected.
+ bool get officialNonAws;/// Whether User Reported sources are selected.
+ bool get userReported;/// The IDs of the categories the user is subscribed to.
+ Set<String> get subscribedCategoryIds;
 /// Create a copy of PushNotificationSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +34,16 @@ $PushNotificationSettingsCopyWith<PushNotificationSettings> get copyWith => _$Pu
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PushNotificationSettings&&(identical(other.severity, severity) || other.severity == severity));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PushNotificationSettings&&(identical(other.awsEmergency, awsEmergency) || other.awsEmergency == awsEmergency)&&(identical(other.awsWatchAndAct, awsWatchAndAct) || other.awsWatchAndAct == awsWatchAndAct)&&(identical(other.awsAdvice, awsAdvice) || other.awsAdvice == awsAdvice)&&(identical(other.officialNonAws, officialNonAws) || other.officialNonAws == officialNonAws)&&(identical(other.userReported, userReported) || other.userReported == userReported)&&const DeepCollectionEquality().equals(other.subscribedCategoryIds, subscribedCategoryIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,severity);
+int get hashCode => Object.hash(runtimeType,awsEmergency,awsWatchAndAct,awsAdvice,officialNonAws,userReported,const DeepCollectionEquality().hash(subscribedCategoryIds));
 
 @override
 String toString() {
-  return 'PushNotificationSettings(severity: $severity)';
+  return 'PushNotificationSettings(awsEmergency: $awsEmergency, awsWatchAndAct: $awsWatchAndAct, awsAdvice: $awsAdvice, officialNonAws: $officialNonAws, userReported: $userReported, subscribedCategoryIds: $subscribedCategoryIds)';
 }
 
 
@@ -49,11 +54,11 @@ abstract mixin class $PushNotificationSettingsCopyWith<$Res>  {
   factory $PushNotificationSettingsCopyWith(PushNotificationSettings value, $Res Function(PushNotificationSettings) _then) = _$PushNotificationSettingsCopyWithImpl;
 @useResult
 $Res call({
- PushNotificationSettingsBySeverity severity
+ bool awsEmergency, bool awsWatchAndAct, bool awsAdvice, bool officialNonAws, bool userReported, Set<String> subscribedCategoryIds
 });
 
 
-$PushNotificationSettingsBySeverityCopyWith<$Res> get severity;
+
 
 }
 /// @nodoc
@@ -66,22 +71,18 @@ class _$PushNotificationSettingsCopyWithImpl<$Res>
 
 /// Create a copy of PushNotificationSettings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? severity = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? awsEmergency = null,Object? awsWatchAndAct = null,Object? awsAdvice = null,Object? officialNonAws = null,Object? userReported = null,Object? subscribedCategoryIds = null,}) {
   return _then(_self.copyWith(
-severity: null == severity ? _self.severity : severity // ignore: cast_nullable_to_non_nullable
-as PushNotificationSettingsBySeverity,
+awsEmergency: null == awsEmergency ? _self.awsEmergency : awsEmergency // ignore: cast_nullable_to_non_nullable
+as bool,awsWatchAndAct: null == awsWatchAndAct ? _self.awsWatchAndAct : awsWatchAndAct // ignore: cast_nullable_to_non_nullable
+as bool,awsAdvice: null == awsAdvice ? _self.awsAdvice : awsAdvice // ignore: cast_nullable_to_non_nullable
+as bool,officialNonAws: null == officialNonAws ? _self.officialNonAws : officialNonAws // ignore: cast_nullable_to_non_nullable
+as bool,userReported: null == userReported ? _self.userReported : userReported // ignore: cast_nullable_to_non_nullable
+as bool,subscribedCategoryIds: null == subscribedCategoryIds ? _self.subscribedCategoryIds : subscribedCategoryIds // ignore: cast_nullable_to_non_nullable
+as Set<String>,
   ));
 }
-/// Create a copy of PushNotificationSettings
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$PushNotificationSettingsBySeverityCopyWith<$Res> get severity {
-  
-  return $PushNotificationSettingsBySeverityCopyWith<$Res>(_self.severity, (value) {
-    return _then(_self.copyWith(severity: value));
-  });
-}
+
 }
 
 
@@ -163,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PushNotificationSettingsBySeverity severity)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  Set<String> subscribedCategoryIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PushNotificationSettings() when $default != null:
-return $default(_that.severity);case _:
+return $default(_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.subscribedCategoryIds);case _:
   return orElse();
 
 }
@@ -184,10 +185,10 @@ return $default(_that.severity);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PushNotificationSettingsBySeverity severity)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  Set<String> subscribedCategoryIds)  $default,) {final _that = this;
 switch (_that) {
 case _PushNotificationSettings():
-return $default(_that.severity);case _:
+return $default(_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.subscribedCategoryIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +205,10 @@ return $default(_that.severity);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PushNotificationSettingsBySeverity severity)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  Set<String> subscribedCategoryIds)?  $default,) {final _that = this;
 switch (_that) {
 case _PushNotificationSettings() when $default != null:
-return $default(_that.severity);case _:
+return $default(_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.subscribedCategoryIds);case _:
   return null;
 
 }
@@ -219,11 +220,28 @@ return $default(_that.severity);case _:
 @JsonSerializable()
 
 class _PushNotificationSettings extends PushNotificationSettings {
-  const _PushNotificationSettings({this.severity = const PushNotificationSettingsBySeverity()}): super._();
+  const _PushNotificationSettings({this.awsEmergency = false, this.awsWatchAndAct = false, this.awsAdvice = false, this.officialNonAws = false, this.userReported = false, final  Set<String> subscribedCategoryIds = const <String>{}}): _subscribedCategoryIds = subscribedCategoryIds,super._();
   factory _PushNotificationSettings.fromJson(Map<String, dynamic> json) => _$PushNotificationSettingsFromJson(json);
 
-/// Push notifications settings by severity level.
-@override@JsonKey() final  PushNotificationSettingsBySeverity severity;
+/// Whether AWS Emergency level "Emergency" is selected.
+@override@JsonKey() final  bool awsEmergency;
+/// Whether AWS Emergency level "Watch and Act" is selected.
+@override@JsonKey() final  bool awsWatchAndAct;
+/// Whether AWS Emergency level "Advice" is selected.
+@override@JsonKey() final  bool awsAdvice;
+/// Whether Official Non-AWS sources are selected.
+@override@JsonKey() final  bool officialNonAws;
+/// Whether User Reported sources are selected.
+@override@JsonKey() final  bool userReported;
+/// The IDs of the categories the user is subscribed to.
+ final  Set<String> _subscribedCategoryIds;
+/// The IDs of the categories the user is subscribed to.
+@override@JsonKey() Set<String> get subscribedCategoryIds {
+  if (_subscribedCategoryIds is EqualUnmodifiableSetView) return _subscribedCategoryIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableSetView(_subscribedCategoryIds);
+}
+
 
 /// Create a copy of PushNotificationSettings
 /// with the given fields replaced by the non-null parameter values.
@@ -238,16 +256,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PushNotificationSettings&&(identical(other.severity, severity) || other.severity == severity));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PushNotificationSettings&&(identical(other.awsEmergency, awsEmergency) || other.awsEmergency == awsEmergency)&&(identical(other.awsWatchAndAct, awsWatchAndAct) || other.awsWatchAndAct == awsWatchAndAct)&&(identical(other.awsAdvice, awsAdvice) || other.awsAdvice == awsAdvice)&&(identical(other.officialNonAws, officialNonAws) || other.officialNonAws == officialNonAws)&&(identical(other.userReported, userReported) || other.userReported == userReported)&&const DeepCollectionEquality().equals(other._subscribedCategoryIds, _subscribedCategoryIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,severity);
+int get hashCode => Object.hash(runtimeType,awsEmergency,awsWatchAndAct,awsAdvice,officialNonAws,userReported,const DeepCollectionEquality().hash(_subscribedCategoryIds));
 
 @override
 String toString() {
-  return 'PushNotificationSettings(severity: $severity)';
+  return 'PushNotificationSettings(awsEmergency: $awsEmergency, awsWatchAndAct: $awsWatchAndAct, awsAdvice: $awsAdvice, officialNonAws: $officialNonAws, userReported: $userReported, subscribedCategoryIds: $subscribedCategoryIds)';
 }
 
 
@@ -258,11 +276,11 @@ abstract mixin class _$PushNotificationSettingsCopyWith<$Res> implements $PushNo
   factory _$PushNotificationSettingsCopyWith(_PushNotificationSettings value, $Res Function(_PushNotificationSettings) _then) = __$PushNotificationSettingsCopyWithImpl;
 @override @useResult
 $Res call({
- PushNotificationSettingsBySeverity severity
+ bool awsEmergency, bool awsWatchAndAct, bool awsAdvice, bool officialNonAws, bool userReported, Set<String> subscribedCategoryIds
 });
 
 
-@override $PushNotificationSettingsBySeverityCopyWith<$Res> get severity;
+
 
 }
 /// @nodoc
@@ -275,291 +293,15 @@ class __$PushNotificationSettingsCopyWithImpl<$Res>
 
 /// Create a copy of PushNotificationSettings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? severity = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? awsEmergency = null,Object? awsWatchAndAct = null,Object? awsAdvice = null,Object? officialNonAws = null,Object? userReported = null,Object? subscribedCategoryIds = null,}) {
   return _then(_PushNotificationSettings(
-severity: null == severity ? _self.severity : severity // ignore: cast_nullable_to_non_nullable
-as PushNotificationSettingsBySeverity,
-  ));
-}
-
-/// Create a copy of PushNotificationSettings
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$PushNotificationSettingsBySeverityCopyWith<$Res> get severity {
-  
-  return $PushNotificationSettingsBySeverityCopyWith<$Res>(_self.severity, (value) {
-    return _then(_self.copyWith(severity: value));
-  });
-}
-}
-
-
-/// @nodoc
-mixin _$PushNotificationSettingsBySeverity {
-
- bool get info; bool get advice; bool get watchAndAct; bool get emergency;
-/// Create a copy of PushNotificationSettingsBySeverity
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$PushNotificationSettingsBySeverityCopyWith<PushNotificationSettingsBySeverity> get copyWith => _$PushNotificationSettingsBySeverityCopyWithImpl<PushNotificationSettingsBySeverity>(this as PushNotificationSettingsBySeverity, _$identity);
-
-  /// Serializes this PushNotificationSettingsBySeverity to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PushNotificationSettingsBySeverity&&(identical(other.info, info) || other.info == info)&&(identical(other.advice, advice) || other.advice == advice)&&(identical(other.watchAndAct, watchAndAct) || other.watchAndAct == watchAndAct)&&(identical(other.emergency, emergency) || other.emergency == emergency));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,info,advice,watchAndAct,emergency);
-
-@override
-String toString() {
-  return 'PushNotificationSettingsBySeverity(info: $info, advice: $advice, watchAndAct: $watchAndAct, emergency: $emergency)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $PushNotificationSettingsBySeverityCopyWith<$Res>  {
-  factory $PushNotificationSettingsBySeverityCopyWith(PushNotificationSettingsBySeverity value, $Res Function(PushNotificationSettingsBySeverity) _then) = _$PushNotificationSettingsBySeverityCopyWithImpl;
-@useResult
-$Res call({
- bool info, bool advice, bool watchAndAct, bool emergency
-});
-
-
-
-
-}
-/// @nodoc
-class _$PushNotificationSettingsBySeverityCopyWithImpl<$Res>
-    implements $PushNotificationSettingsBySeverityCopyWith<$Res> {
-  _$PushNotificationSettingsBySeverityCopyWithImpl(this._self, this._then);
-
-  final PushNotificationSettingsBySeverity _self;
-  final $Res Function(PushNotificationSettingsBySeverity) _then;
-
-/// Create a copy of PushNotificationSettingsBySeverity
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? info = null,Object? advice = null,Object? watchAndAct = null,Object? emergency = null,}) {
-  return _then(_self.copyWith(
-info: null == info ? _self.info : info // ignore: cast_nullable_to_non_nullable
-as bool,advice: null == advice ? _self.advice : advice // ignore: cast_nullable_to_non_nullable
-as bool,watchAndAct: null == watchAndAct ? _self.watchAndAct : watchAndAct // ignore: cast_nullable_to_non_nullable
-as bool,emergency: null == emergency ? _self.emergency : emergency // ignore: cast_nullable_to_non_nullable
-as bool,
-  ));
-}
-
-}
-
-
-/// Adds pattern-matching-related methods to [PushNotificationSettingsBySeverity].
-extension PushNotificationSettingsBySeverityPatterns on PushNotificationSettingsBySeverity {
-/// A variant of `map` that fallback to returning `orElse`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _PushNotificationSettingsBySeverity value)?  $default,{required TResult orElse(),}){
-final _that = this;
-switch (_that) {
-case _PushNotificationSettingsBySeverity() when $default != null:
-return $default(_that);case _:
-  return orElse();
-
-}
-}
-/// A `switch`-like method, using callbacks.
-///
-/// Callbacks receives the raw object, upcasted.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case final Subclass2 value:
-///     return ...;
-/// }
-/// ```
-
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _PushNotificationSettingsBySeverity value)  $default,){
-final _that = this;
-switch (_that) {
-case _PushNotificationSettingsBySeverity():
-return $default(_that);case _:
-  throw StateError('Unexpected subclass');
-
-}
-}
-/// A variant of `map` that fallback to returning `null`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
-
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _PushNotificationSettingsBySeverity value)?  $default,){
-final _that = this;
-switch (_that) {
-case _PushNotificationSettingsBySeverity() when $default != null:
-return $default(_that);case _:
-  return null;
-
-}
-}
-/// A variant of `when` that fallback to an `orElse` callback.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool info,  bool advice,  bool watchAndAct,  bool emergency)?  $default,{required TResult orElse(),}) {final _that = this;
-switch (_that) {
-case _PushNotificationSettingsBySeverity() when $default != null:
-return $default(_that.info,_that.advice,_that.watchAndAct,_that.emergency);case _:
-  return orElse();
-
-}
-}
-/// A `switch`-like method, using callbacks.
-///
-/// As opposed to `map`, this offers destructuring.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case Subclass2(:final field2):
-///     return ...;
-/// }
-/// ```
-
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool info,  bool advice,  bool watchAndAct,  bool emergency)  $default,) {final _that = this;
-switch (_that) {
-case _PushNotificationSettingsBySeverity():
-return $default(_that.info,_that.advice,_that.watchAndAct,_that.emergency);case _:
-  throw StateError('Unexpected subclass');
-
-}
-}
-/// A variant of `when` that fallback to returning `null`
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
-
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool info,  bool advice,  bool watchAndAct,  bool emergency)?  $default,) {final _that = this;
-switch (_that) {
-case _PushNotificationSettingsBySeverity() when $default != null:
-return $default(_that.info,_that.advice,_that.watchAndAct,_that.emergency);case _:
-  return null;
-
-}
-}
-
-}
-
-/// @nodoc
-@JsonSerializable()
-
-class _PushNotificationSettingsBySeverity implements PushNotificationSettingsBySeverity {
-  const _PushNotificationSettingsBySeverity({this.info = true, this.advice = true, this.watchAndAct = true, this.emergency = true});
-  factory _PushNotificationSettingsBySeverity.fromJson(Map<String, dynamic> json) => _$PushNotificationSettingsBySeverityFromJson(json);
-
-@override@JsonKey() final  bool info;
-@override@JsonKey() final  bool advice;
-@override@JsonKey() final  bool watchAndAct;
-@override@JsonKey() final  bool emergency;
-
-/// Create a copy of PushNotificationSettingsBySeverity
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$PushNotificationSettingsBySeverityCopyWith<_PushNotificationSettingsBySeverity> get copyWith => __$PushNotificationSettingsBySeverityCopyWithImpl<_PushNotificationSettingsBySeverity>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$PushNotificationSettingsBySeverityToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PushNotificationSettingsBySeverity&&(identical(other.info, info) || other.info == info)&&(identical(other.advice, advice) || other.advice == advice)&&(identical(other.watchAndAct, watchAndAct) || other.watchAndAct == watchAndAct)&&(identical(other.emergency, emergency) || other.emergency == emergency));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,info,advice,watchAndAct,emergency);
-
-@override
-String toString() {
-  return 'PushNotificationSettingsBySeverity(info: $info, advice: $advice, watchAndAct: $watchAndAct, emergency: $emergency)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$PushNotificationSettingsBySeverityCopyWith<$Res> implements $PushNotificationSettingsBySeverityCopyWith<$Res> {
-  factory _$PushNotificationSettingsBySeverityCopyWith(_PushNotificationSettingsBySeverity value, $Res Function(_PushNotificationSettingsBySeverity) _then) = __$PushNotificationSettingsBySeverityCopyWithImpl;
-@override @useResult
-$Res call({
- bool info, bool advice, bool watchAndAct, bool emergency
-});
-
-
-
-
-}
-/// @nodoc
-class __$PushNotificationSettingsBySeverityCopyWithImpl<$Res>
-    implements _$PushNotificationSettingsBySeverityCopyWith<$Res> {
-  __$PushNotificationSettingsBySeverityCopyWithImpl(this._self, this._then);
-
-  final _PushNotificationSettingsBySeverity _self;
-  final $Res Function(_PushNotificationSettingsBySeverity) _then;
-
-/// Create a copy of PushNotificationSettingsBySeverity
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? info = null,Object? advice = null,Object? watchAndAct = null,Object? emergency = null,}) {
-  return _then(_PushNotificationSettingsBySeverity(
-info: null == info ? _self.info : info // ignore: cast_nullable_to_non_nullable
-as bool,advice: null == advice ? _self.advice : advice // ignore: cast_nullable_to_non_nullable
-as bool,watchAndAct: null == watchAndAct ? _self.watchAndAct : watchAndAct // ignore: cast_nullable_to_non_nullable
-as bool,emergency: null == emergency ? _self.emergency : emergency // ignore: cast_nullable_to_non_nullable
-as bool,
+awsEmergency: null == awsEmergency ? _self.awsEmergency : awsEmergency // ignore: cast_nullable_to_non_nullable
+as bool,awsWatchAndAct: null == awsWatchAndAct ? _self.awsWatchAndAct : awsWatchAndAct // ignore: cast_nullable_to_non_nullable
+as bool,awsAdvice: null == awsAdvice ? _self.awsAdvice : awsAdvice // ignore: cast_nullable_to_non_nullable
+as bool,officialNonAws: null == officialNonAws ? _self.officialNonAws : officialNonAws // ignore: cast_nullable_to_non_nullable
+as bool,userReported: null == userReported ? _self.userReported : userReported // ignore: cast_nullable_to_non_nullable
+as bool,subscribedCategoryIds: null == subscribedCategoryIds ? _self._subscribedCategoryIds : subscribedCategoryIds // ignore: cast_nullable_to_non_nullable
+as Set<String>,
   ));
 }
 

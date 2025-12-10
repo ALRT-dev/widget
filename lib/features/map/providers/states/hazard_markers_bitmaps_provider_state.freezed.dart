@@ -15,7 +15,8 @@ T _$identity<T>(T value) => value;
 mixin _$HazardMarkersBitmapsProviderState {
 
 /// The map of hazard (severity and category emoji) to their corresponding marker bitmaps.
- Map<String, BitmapDescriptor> get markerBitmaps;/// The state of generating marker bitmaps.
+ Map<String, BitmapDescriptor> get markerBitmaps;/// Bitmap for small red dot icon used at low zoom levels.
+ BitmapDescriptor? get redDotBitmap;/// The state of generating marker bitmaps.
  GenerateMarkerBitmaps get generateMarkerBitmaps;
 /// Create a copy of HazardMarkersBitmapsProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -27,16 +28,16 @@ $HazardMarkersBitmapsProviderStateCopyWith<HazardMarkersBitmapsProviderState> ge
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardMarkersBitmapsProviderState&&const DeepCollectionEquality().equals(other.markerBitmaps, markerBitmaps)&&(identical(other.generateMarkerBitmaps, generateMarkerBitmaps) || other.generateMarkerBitmaps == generateMarkerBitmaps));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardMarkersBitmapsProviderState&&const DeepCollectionEquality().equals(other.markerBitmaps, markerBitmaps)&&(identical(other.redDotBitmap, redDotBitmap) || other.redDotBitmap == redDotBitmap)&&(identical(other.generateMarkerBitmaps, generateMarkerBitmaps) || other.generateMarkerBitmaps == generateMarkerBitmaps));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(markerBitmaps),generateMarkerBitmaps);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(markerBitmaps),redDotBitmap,generateMarkerBitmaps);
 
 @override
 String toString() {
-  return 'HazardMarkersBitmapsProviderState(markerBitmaps: $markerBitmaps, generateMarkerBitmaps: $generateMarkerBitmaps)';
+  return 'HazardMarkersBitmapsProviderState(markerBitmaps: $markerBitmaps, redDotBitmap: $redDotBitmap, generateMarkerBitmaps: $generateMarkerBitmaps)';
 }
 
 
@@ -47,7 +48,7 @@ abstract mixin class $HazardMarkersBitmapsProviderStateCopyWith<$Res>  {
   factory $HazardMarkersBitmapsProviderStateCopyWith(HazardMarkersBitmapsProviderState value, $Res Function(HazardMarkersBitmapsProviderState) _then) = _$HazardMarkersBitmapsProviderStateCopyWithImpl;
 @useResult
 $Res call({
- Map<String, BitmapDescriptor> markerBitmaps, GenerateMarkerBitmaps generateMarkerBitmaps
+ Map<String, BitmapDescriptor> markerBitmaps, BitmapDescriptor? redDotBitmap, GenerateMarkerBitmaps generateMarkerBitmaps
 });
 
 
@@ -64,10 +65,11 @@ class _$HazardMarkersBitmapsProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HazardMarkersBitmapsProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? markerBitmaps = null,Object? generateMarkerBitmaps = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? markerBitmaps = null,Object? redDotBitmap = freezed,Object? generateMarkerBitmaps = null,}) {
   return _then(_self.copyWith(
 markerBitmaps: null == markerBitmaps ? _self.markerBitmaps : markerBitmaps // ignore: cast_nullable_to_non_nullable
-as Map<String, BitmapDescriptor>,generateMarkerBitmaps: null == generateMarkerBitmaps ? _self.generateMarkerBitmaps : generateMarkerBitmaps // ignore: cast_nullable_to_non_nullable
+as Map<String, BitmapDescriptor>,redDotBitmap: freezed == redDotBitmap ? _self.redDotBitmap : redDotBitmap // ignore: cast_nullable_to_non_nullable
+as BitmapDescriptor?,generateMarkerBitmaps: null == generateMarkerBitmaps ? _self.generateMarkerBitmaps : generateMarkerBitmaps // ignore: cast_nullable_to_non_nullable
 as GenerateMarkerBitmaps,
   ));
 }
@@ -162,10 +164,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Map<String, BitmapDescriptor> markerBitmaps,  GenerateMarkerBitmaps generateMarkerBitmaps)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Map<String, BitmapDescriptor> markerBitmaps,  BitmapDescriptor? redDotBitmap,  GenerateMarkerBitmaps generateMarkerBitmaps)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardMarkersBitmapsProviderState() when $default != null:
-return $default(_that.markerBitmaps,_that.generateMarkerBitmaps);case _:
+return $default(_that.markerBitmaps,_that.redDotBitmap,_that.generateMarkerBitmaps);case _:
   return orElse();
 
 }
@@ -183,10 +185,10 @@ return $default(_that.markerBitmaps,_that.generateMarkerBitmaps);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Map<String, BitmapDescriptor> markerBitmaps,  GenerateMarkerBitmaps generateMarkerBitmaps)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Map<String, BitmapDescriptor> markerBitmaps,  BitmapDescriptor? redDotBitmap,  GenerateMarkerBitmaps generateMarkerBitmaps)  $default,) {final _that = this;
 switch (_that) {
 case _HazardMarkersBitmapsProviderState():
-return $default(_that.markerBitmaps,_that.generateMarkerBitmaps);case _:
+return $default(_that.markerBitmaps,_that.redDotBitmap,_that.generateMarkerBitmaps);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +205,10 @@ return $default(_that.markerBitmaps,_that.generateMarkerBitmaps);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Map<String, BitmapDescriptor> markerBitmaps,  GenerateMarkerBitmaps generateMarkerBitmaps)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Map<String, BitmapDescriptor> markerBitmaps,  BitmapDescriptor? redDotBitmap,  GenerateMarkerBitmaps generateMarkerBitmaps)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardMarkersBitmapsProviderState() when $default != null:
-return $default(_that.markerBitmaps,_that.generateMarkerBitmaps);case _:
+return $default(_that.markerBitmaps,_that.redDotBitmap,_that.generateMarkerBitmaps);case _:
   return null;
 
 }
@@ -218,7 +220,7 @@ return $default(_that.markerBitmaps,_that.generateMarkerBitmaps);case _:
 
 
 class _HazardMarkersBitmapsProviderState implements HazardMarkersBitmapsProviderState {
-  const _HazardMarkersBitmapsProviderState({final  Map<String, BitmapDescriptor> markerBitmaps = const {}, this.generateMarkerBitmaps = const GenerateMarkerBitmaps.initial()}): _markerBitmaps = markerBitmaps;
+  const _HazardMarkersBitmapsProviderState({final  Map<String, BitmapDescriptor> markerBitmaps = const {}, this.redDotBitmap, this.generateMarkerBitmaps = const GenerateMarkerBitmaps.initial()}): _markerBitmaps = markerBitmaps;
   
 
 /// The map of hazard (severity and category emoji) to their corresponding marker bitmaps.
@@ -230,6 +232,8 @@ class _HazardMarkersBitmapsProviderState implements HazardMarkersBitmapsProvider
   return EqualUnmodifiableMapView(_markerBitmaps);
 }
 
+/// Bitmap for small red dot icon used at low zoom levels.
+@override final  BitmapDescriptor? redDotBitmap;
 /// The state of generating marker bitmaps.
 @override@JsonKey() final  GenerateMarkerBitmaps generateMarkerBitmaps;
 
@@ -243,16 +247,16 @@ _$HazardMarkersBitmapsProviderStateCopyWith<_HazardMarkersBitmapsProviderState> 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardMarkersBitmapsProviderState&&const DeepCollectionEquality().equals(other._markerBitmaps, _markerBitmaps)&&(identical(other.generateMarkerBitmaps, generateMarkerBitmaps) || other.generateMarkerBitmaps == generateMarkerBitmaps));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardMarkersBitmapsProviderState&&const DeepCollectionEquality().equals(other._markerBitmaps, _markerBitmaps)&&(identical(other.redDotBitmap, redDotBitmap) || other.redDotBitmap == redDotBitmap)&&(identical(other.generateMarkerBitmaps, generateMarkerBitmaps) || other.generateMarkerBitmaps == generateMarkerBitmaps));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_markerBitmaps),generateMarkerBitmaps);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_markerBitmaps),redDotBitmap,generateMarkerBitmaps);
 
 @override
 String toString() {
-  return 'HazardMarkersBitmapsProviderState(markerBitmaps: $markerBitmaps, generateMarkerBitmaps: $generateMarkerBitmaps)';
+  return 'HazardMarkersBitmapsProviderState(markerBitmaps: $markerBitmaps, redDotBitmap: $redDotBitmap, generateMarkerBitmaps: $generateMarkerBitmaps)';
 }
 
 
@@ -263,7 +267,7 @@ abstract mixin class _$HazardMarkersBitmapsProviderStateCopyWith<$Res> implement
   factory _$HazardMarkersBitmapsProviderStateCopyWith(_HazardMarkersBitmapsProviderState value, $Res Function(_HazardMarkersBitmapsProviderState) _then) = __$HazardMarkersBitmapsProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- Map<String, BitmapDescriptor> markerBitmaps, GenerateMarkerBitmaps generateMarkerBitmaps
+ Map<String, BitmapDescriptor> markerBitmaps, BitmapDescriptor? redDotBitmap, GenerateMarkerBitmaps generateMarkerBitmaps
 });
 
 
@@ -280,10 +284,11 @@ class __$HazardMarkersBitmapsProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HazardMarkersBitmapsProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? markerBitmaps = null,Object? generateMarkerBitmaps = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? markerBitmaps = null,Object? redDotBitmap = freezed,Object? generateMarkerBitmaps = null,}) {
   return _then(_HazardMarkersBitmapsProviderState(
 markerBitmaps: null == markerBitmaps ? _self._markerBitmaps : markerBitmaps // ignore: cast_nullable_to_non_nullable
-as Map<String, BitmapDescriptor>,generateMarkerBitmaps: null == generateMarkerBitmaps ? _self.generateMarkerBitmaps : generateMarkerBitmaps // ignore: cast_nullable_to_non_nullable
+as Map<String, BitmapDescriptor>,redDotBitmap: freezed == redDotBitmap ? _self.redDotBitmap : redDotBitmap // ignore: cast_nullable_to_non_nullable
+as BitmapDescriptor?,generateMarkerBitmaps: null == generateMarkerBitmaps ? _self.generateMarkerBitmaps : generateMarkerBitmaps // ignore: cast_nullable_to_non_nullable
 as GenerateMarkerBitmaps,
   ));
 }

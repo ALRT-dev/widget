@@ -52,10 +52,12 @@ class UserService {
 
   /// Updates the current logged-in user.
   Future<Either<AppUser, AppError>> updateCurrentUser({
-    required AppUser user,
+    required final AppUser user,
+    final CancelToken? cancelToken,
   }) async {
     final result = await _userRepository.updateCurrentUser(
       user: user,
+      cancelToken: cancelToken,
     );
 
     final success = await result.whenSuccess(populateUserWithRequiredData);
@@ -116,6 +118,29 @@ class UserService {
     return _userRepository.getLocationSubscriptions();
   }
 
+  /// Updates the own location subscription of the current user.
+  Future<Either<LocationSubscription, AppError>> updateOwnLocationSubscription({
+    required final double latitude,
+    required final double longitude,
+    final String? locationName,
+  }) {
+    return _userRepository.updateOwnLocationSubscription(
+      latitude: latitude,
+      longitude: longitude,
+      locationName: locationName,
+    );
+  }
+
+  /// Updates the own location subscription radius of the current user.
+  Future<Either<LocationSubscription, AppError>>
+  updateOwnLocationSubscriptionRadius({
+    required final double radiusKm,
+  }) {
+    return _userRepository.updateOwnLocationSubscriptionRadius(
+      radiusKm: radiusKm,
+    );
+  }
+
   /// Fetches the push notification settings of the current user.
   Future<Either<PushNotificationSettings, AppError>>
   getPushNotificationSettings() {
@@ -123,11 +148,12 @@ class UserService {
   }
 
   /// Updates the push notification settings of the current user.
-  Future<Either<void, AppError>> updatePushNotificationSettings({
-    required final PushNotificationSettings settings,
+  Future<Either<PushNotificationSettings, AppError>>
+  updatePushNotificationSettings({
+    required final PushNotificationSettings pushNotificationSettings,
   }) {
     return _userRepository.updatePushNotificationSettings(
-      updates: settings.toUpdates(),
+      pushNotificationSettings: pushNotificationSettings,
     );
   }
 

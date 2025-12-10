@@ -25,6 +25,16 @@ abstract class MyLocationSubscriptionsProviderState
     @Default(<UnsubscribeFromLocationStateWrapper>[])
     final List<UnsubscribeFromLocationStateWrapper>
     unsubscribeFromLocationStateWrappers,
+
+    /// The state of updating a location subscription's location.
+    @Default(UpdateUserLocationSubscriptionLocationState.initial())
+    final UpdateUserLocationSubscriptionLocationState
+    updateUserLocationSubscriptionLocationState,
+
+    /// The state of updating a location subscription's radius.
+    @Default(UpdateUserLocationSubscriptionRadiusState.initial())
+    final UpdateUserLocationSubscriptionRadiusState
+    updateUserLocationSubscriptionRadiusState,
   }) = _MyLocationSubscriptionsProviderState;
 }
 
@@ -82,4 +92,32 @@ class UnsubscribeFromLocationState with _$UnsubscribeFromLocationState {
   const factory UnsubscribeFromLocationState.error(
     final AppError error,
   ) = _UnsubscribeFromLocationStateError;
+}
+
+@freezed
+class UpdateUserLocationSubscriptionLocationState
+    with _$UpdateUserLocationSubscriptionLocationState {
+  const factory UpdateUserLocationSubscriptionLocationState.initial() =
+      _UpdateUserLocationSubscriptionLocationStateInitial;
+  const factory UpdateUserLocationSubscriptionLocationState.loading() =
+      _UpdateUserLocationSubscriptionLocationStateLoading;
+  const factory UpdateUserLocationSubscriptionLocationState.success() =
+      _UpdateUserLocationSubscriptionLocationStateSuccess;
+  const factory UpdateUserLocationSubscriptionLocationState.error(
+    final AppError error,
+  ) = _UpdateUserLocationSubscriptionLocationStateError;
+}
+
+@freezed
+class UpdateUserLocationSubscriptionRadiusState
+    with _$UpdateUserLocationSubscriptionRadiusState {
+  const factory UpdateUserLocationSubscriptionRadiusState.initial() =
+      _UpdateUserLocationSubscriptionRadiusStateInitial;
+  const factory UpdateUserLocationSubscriptionRadiusState.loading() =
+      _UpdateUserLocationSubscriptionRadiusStateLoading;
+  const factory UpdateUserLocationSubscriptionRadiusState.success() =
+      _UpdateUserLocationSubscriptionRadiusStateSuccess;
+  const factory UpdateUserLocationSubscriptionRadiusState.error(
+    final AppError error,
+  ) = _UpdateUserLocationSubscriptionRadiusStateError;
 }
