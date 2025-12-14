@@ -141,8 +141,6 @@ class AuthRepositoryImpl implements AuthRepository {
         final authResult = await _msalAuth!.acquireToken(
           scopes: [
             'https://graph.microsoft.com/user.read',
-            'openid',
-            'profile',
             'email',
           ],
           prompt: Prompt.login,

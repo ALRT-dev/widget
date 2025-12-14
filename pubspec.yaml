@@ -81,7 +81,7 @@ flutter:
 
   assets:
     - .env
-    - msal_config.json
+    - assets/msal_config.json
     - assets/translations/
     - assets/logos/
     - assets/icons/

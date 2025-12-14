@@ -51,6 +51,7 @@
       <string>com.googleusercontent.apps.446474907793-dkkgqvogtimtqtocdnbpv8meppphuqoq</string>
       <string>msauthv2</string>
       <string>msauthv3</string>
+      <string>microsoftauthenticator</string>
     </array>
     <key>LSRequiresIPhoneOS</key>
     <true />
