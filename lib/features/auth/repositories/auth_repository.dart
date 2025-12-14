@@ -5,6 +5,7 @@ import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 import 'package:hazard_app/others/env.dart';
+import 'package:msal_auth/msal_auth.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 abstract class AuthRepository {
@@ -17,6 +18,8 @@ abstract class AuthRepository {
   });
 
   Future<Either<AuthSuccess, AppError>> signInWithApple();
+
+  Future<Either<AuthSuccess, AppError>> signInWithMicrosoft();
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -28,6 +31,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   final RestClient _restClient;
   final GoogleSignIn _googleSignIn;
+  SingleAccountPca? _msalAuth;
 
   @override
   Future<Either<void, AppError>> initializeGoogleSignIn() {
@@ -106,6 +110,54 @@ class AuthRepositoryImpl implements AuthRepository {
           identityToken: identityToken,
           firstName: credential.givenName,
           lastName: credential.familyName,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<AuthSuccess, AppError>> signInWithMicrosoft() {
+    return runAsyncCall(
+      name: 'signInWithMicrosoft',
+      future: () async {
+        // Initialize MSAL if not already initialized
+        _msalAuth ??= await SingleAccountPca.create(
+          clientId: Env.microsoftClientId,
+          androidConfig: AndroidConfig(
+            configFilePath: 'assets/msal_config.json',
+            redirectUri: 'msauth://com.example.hazard_app/YOUR_SIGNATURE_HASH',
+          ),
+          appleConfig: AppleConfig(
+            authority:
+                'https://login.microsoftonline.com/${Env.microsoftTenantId}',
+            authorityType: AuthorityType.aad,
+            broker: Broker.msAuthenticator,
+          ),
+        );
+
+        // Acquire token interactively
+        final authResult = await _msalAuth!.acquireToken(
+          scopes: [
+            'https://graph.microsoft.com/user.read',
+            'openid',
+            'profile',
+            'email',
+          ],
+          prompt: Prompt.login,
+        );
+
+        final idToken = authResult.idToken;
+        if (idToken == null || idToken.isEmpty) {
+          throw AppError(
+            message: 'Failed to get identity token from Microsoft',
+          );
+        }
+
+        // Verify with backend
+        final result = await _restClient.verifyMicrosoftOAuth(
+          idToken: idToken,
         );
         return Success(result);
       },

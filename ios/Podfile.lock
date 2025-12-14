@@ -113,6 +113,12 @@ PODS:
     - Flutter
   - media_kit_video (0.0.1):
     - Flutter
+  - MSAL (2.2.0):
+    - MSAL/app-lib (= 2.2.0)
+  - MSAL/app-lib (2.2.0)
+  - msal_auth (2.0.2):
+    - Flutter
+    - MSAL (~> 2.2.0)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
     - nanopb/encode (= 3.30910.0)
@@ -155,6 +161,7 @@ DEPENDENCIES:
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - media_kit_libs_ios_video (from `.symlinks/plugins/media_kit_libs_ios_video/ios`)
   - media_kit_video (from `.symlinks/plugins/media_kit_video/ios`)
+  - msal_auth (from `.symlinks/plugins/msal_auth/ios`)
   - native_video_player (from `.symlinks/plugins/native_video_player/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
@@ -181,6 +188,7 @@ SPEC REPOS:
     - GoogleUtilities
     - GTMAppAuth
     - GTMSessionFetcher
+    - MSAL
     - nanopb
     - PromisesObjC
 
@@ -211,6 +219,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/media_kit_libs_ios_video/ios"
   media_kit_video:
     :path: ".symlinks/plugins/media_kit_video/ios"
+  msal_auth:
+    :path: ".symlinks/plugins/msal_auth/ios"
   native_video_player:
     :path: ".symlinks/plugins/native_video_player/ios"
   package_info_plus:
@@ -258,6 +268,8 @@ SPEC CHECKSUMS:
   image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
   media_kit_libs_ios_video: a5fe24bc7875ccd6378a0978c13185e1344651c1
   media_kit_video: 5da63f157170e5bf303bf85453b7ef6971218a2e
+  MSAL: 551bfa97974d3f6a82f9f53312976b9fa5904a52
+  msal_auth: 7c6fe42d566e2b60d3d229082e17ea7830bc581f
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   native_video_player: 29ab24a926804ac8c4a57eb6d744c7d927c2bc3e
   package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4

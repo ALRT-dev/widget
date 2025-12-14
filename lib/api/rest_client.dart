@@ -34,6 +34,11 @@ abstract class RestClient {
     @Field() final String? lastName,
   });
 
+  @POST(kUrlOAuthMicrosoft)
+  Future<AuthSuccess> verifyMicrosoftOAuth({
+    @Field() required final String idToken,
+  });
+
   @POST(kUrlRefreshToken)
   Future<AuthSuccess> refreshToken({
     @Field() required final String accessToken,

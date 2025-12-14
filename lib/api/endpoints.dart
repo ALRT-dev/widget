@@ -6,6 +6,7 @@ const kUrlBaseDev = 'http://192.168.1.68:9000/api';
 
 const kUrlOAuthGoogle = '/auth/oauth/google';
 const kUrlOAuthApple = '/auth/oauth/apple';
+const kUrlOAuthMicrosoft = '/auth/oauth/microsoft';
 const kUrlRefreshToken = '/auth/refresh-token';
 
 // ---------------------------- ONBOARDING ----------------------------
