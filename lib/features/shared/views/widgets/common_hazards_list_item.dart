@@ -532,20 +532,23 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard!.aiSummary?.trim(),
           ),
         );
-        final callToAction = ref.watch(
+        final callsToAction = ref.watch(
           provider.select(
-            (value) => value.hazard!.callToAction?.trim(),
+            (value) => value.hazard!.callsToAction,
           ),
         );
+        final callToActionText = callsToAction
+            ?.where((s) => s.trim().isNotEmpty)
+            .join(' ');
 
         final text = isUserReported
             ? [
                 if (aiSummary?.isNotEmpty ?? false) aiSummary,
-                if (callToAction?.isNotEmpty ?? false) callToAction!,
+                if (callToActionText?.isNotEmpty ?? false) callToActionText!,
               ].join(' ')
             : [
                 if (shortDescription.isNotEmpty) shortDescription,
-                if (callToAction?.isNotEmpty ?? false) callToAction!,
+                if (callToActionText?.isNotEmpty ?? false) callToActionText!,
               ].join(' ');
 
         if (text.isEmpty) {

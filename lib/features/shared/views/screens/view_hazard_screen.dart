@@ -733,11 +733,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   Widget _buildWhatToDoSection() {
     return Consumer(
       builder: (context, ref, child) {
-        final callToAction = ref.watch(
-          provider.select((value) => value.hazard?.callToAction),
+        final callsToAction = ref.watch(
+          provider.select((value) => value.hazard?.callsToAction),
         );
 
-        final shouldShow = (callToAction?.isNotEmpty ?? false);
+        final shouldShow = (callsToAction?.isNotEmpty ?? false);
 
         if (!shouldShow) return const SizedBox.shrink();
 
@@ -768,14 +768,40 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                       ),
                     ),
                     12.spMin.hSizedBox,
-                    Text(
-                      callToAction!,
-                      style: TextStyle(
-                        color: AppColors.black.withValues(alpha: 0.9),
-                        fontSize: 14.spMin,
-                        height: 1.5,
-                      ),
-                    ),
+                    ...callsToAction!.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final action = entry.value;
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: index < callsToAction.length - 1
+                              ? 8.spMin
+                              : 0,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '• ',
+                              style: TextStyle(
+                                color: AppColors.black.withValues(alpha: 0.9),
+                                fontSize: 14.spMin,
+                                height: 1.5,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                action,
+                                style: TextStyle(
+                                  color: AppColors.black.withValues(alpha: 0.9),
+                                  fontSize: 14.spMin,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),
