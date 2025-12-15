@@ -205,12 +205,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           children: [
             Platform.isIOS
                 ? Expanded(child: _buildAppleButton())
-                : Expanded(child: _buildMicrosoftButton()),
+                // : Expanded(child: _buildMicrosoftButton()),
+                : SizedBox.shrink(),
             Expanded(child: _buildGoogleButton()),
           ],
         ),
-        12.hSizedBox,
-        if (Platform.isIOS) _buildMicrosoftButton(),
+        // 12.hSizedBox,
+        // if (Platform.isIOS) _buildMicrosoftButton(),
       ],
     );
   }
@@ -339,6 +340,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
   }
 
+  // ignore: unused_element
   Widget _buildMicrosoftButton() {
     return Consumer(
       builder: (context, ref, child) {
