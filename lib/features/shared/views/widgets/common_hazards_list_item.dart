@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/notification/views/widgets/confirmation_buttons.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
-import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -211,11 +210,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard!.isAwsCompliant ?? false,
           ),
         );
-        final hazardColor = ref.watch(
-          provider.select(
-            (value) => value.hazard!.color,
-          ),
-        );
         final severityTitle = ref.watch(
           provider.select(
             (value) => value.hazard!.severityTitle,
@@ -281,9 +275,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   style: TextStyle(
                     fontSize: 10.spMin,
                     fontWeight: FontWeight.w600,
-                    color: hazardColor.isLight
-                        ? AppColors.black
-                        : AppColors.white,
+                    color: AppColors.black,
                   ),
                 ),
               ),
