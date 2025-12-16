@@ -1,3 +1,10 @@
+## v1.0.0+17 - 2025/12/15
+* "What we know" and "What to do" are based on the new prompts.
+* Moved the "Confirm" button to the right side for better accessibility.
+* Removed title from the alert creation screen.
+* 5km radius while creating an alert.
+
+
 ## v1.0.0+16 - 2025/12/04
 * Bug Fixes and Improvements
 
