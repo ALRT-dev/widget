@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/utils/dialogs.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -160,7 +161,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
             _chipsBuilder().pT(5.0),
         ],
       ),
-    );
+    ).onPressed(_handleRouteSafetyAnalysisTap);
   }
 
   Widget _chipsBuilder() {
@@ -403,5 +404,16 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
   /// Handles start navigation button press.
   void _handleToggleNavigation() {
     ref.read(providerOfMap.notifier).toggleNavigation();
+  }
+
+  /// Handles tap on the route safety analysis section.
+  void _handleRouteSafetyAnalysisTap() {
+    final hasHazards = _routeHazardSummary.totalHazards > 0;
+    if (!hasHazards) return;
+
+    showMapHazardsListBottomSheet(
+      context: context,
+      showOnlyRouteHazards: true,
+    );
   }
 }
