@@ -96,21 +96,17 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                           (value) => value.hazard?.reportedBy?.id,
                         ),
                       );
-                      final reviewStatus = ref.watch(
-                        provider.select((value) => value.hazard?.reviewStatus),
-                      );
                       final reviewFeedback = ref.watch(
                         provider.select(
                           (value) => value.hazard?.reviewFeedback,
                         ),
                       );
 
-                      final isRejectedAndHasFeedback =
+                      final hasFeedback =
                           reportedById == loggedInUserId &&
-                          reviewStatus == HazardReviewStatus.rejected &&
                           (reviewFeedback?.isNotEmpty ?? false);
 
-                      if (!isRejectedAndHasFeedback) {
+                      if (!hasFeedback) {
                         return const SizedBox.shrink();
                       }
 
