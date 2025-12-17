@@ -821,7 +821,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
   /// Generates markers for all hazards in the state.
   void generateMarkers() async {
-    final hazards = state.hazards;
+    final hazards = state.showRouteHazards
+        ? state.currentRoutePlan?.hazardsToAvoid ?? []
+        : state.hazards;
     final currentZoom = state.cameraPosition.zoom;
     final individualMarkers = <Marker>[];
 
@@ -1356,6 +1358,20 @@ class MapProvider extends StateNotifier<MapProviderState> {
       state.currentRoutePlan?.copyWith(
         destination: destination,
       ),
+    );
+  }
+
+  /// Updates [MapProviderState.showRouteHazards] to the given [showRouteHazards].
+  void updateShowRouteHazards(final bool showRouteHazards) {
+    state = state.copyWith(
+      showRouteHazards: showRouteHazards,
+    );
+  }
+
+  /// Toggles the route hazards visibility.
+  void toggleShowRouteHazards() {
+    updateShowRouteHazards(
+      !state.showRouteHazards,
     );
   }
 }
