@@ -144,6 +144,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (widget.isInfoWindow) _coloredHeaderBuilder(),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -157,8 +158,10 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _headerBuilder(),
-                                8.hSizedBox,
+                                if (!widget.isInfoWindow) ...[
+                                  _normalHeaderBuilder(),
+                                  8.hSizedBox,
+                                ],
                                 _titleBuilder(),
                                 4.hSizedBox,
                                 _dateAndDistanceBuilder(),
@@ -172,8 +175,10 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     ),
                   ],
                 ).pX(16.0).pT(16.0),
-                8.hSizedBox,
-                _shortDescriptionBuilder().pX(16.0),
+                if (!widget.isInfoWindow) ...[
+                  8.hSizedBox,
+                  _shortDescriptionBuilder().pX(16.0),
+                ],
                 14.hSizedBox,
                 if (widget.showTrustMeter && widget.hazard.isUserReported) ...[
                   _confirmationButtonsBuilder().pX(16.0),
@@ -197,7 +202,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     ).pX(widget.horizontalPadding);
   }
 
-  Widget _headerBuilder() {
+  Widget _normalHeaderBuilder() {
     return Consumer(
       builder: (context, ref, child) {
         final isUserReported = ref.watch(
@@ -299,6 +304,136 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                 ],
               ),
           ],
+        );
+      },
+    );
+  }
+
+  Widget _coloredHeaderBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isUserReported = ref.watch(
+          provider.select(
+            (value) => value.hazard!.isUserReported,
+          ),
+        );
+        final isAwsCompliant = ref.watch(
+          provider.select(
+            (value) => value.hazard!.isAwsCompliant ?? false,
+          ),
+        );
+        final severityTitle = ref.watch(
+          provider.select(
+            (value) => value.hazard!.severityTitle,
+          ),
+        );
+        final source = ref.watch(
+          provider.select(
+            (value) => value.hazard!.source,
+          ),
+        );
+        final hazardColor = ref.watch(
+          provider.select(
+            (value) => value.hazard?.color ?? AppColors.black,
+          ),
+        );
+
+        final isVerified = source != null;
+
+        final categoryLabel = isUserReported
+            ? 'USER'
+            : isAwsCompliant
+            ? 'AWS'
+            : 'OFFICIAL';
+
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.spMin,
+            vertical: 8.spMin,
+          ),
+          decoration: BoxDecoration(
+            color: hazardColor,
+            border: Border(
+              bottom: BorderSide(
+                color: hazardColor == AppColors.transparent
+                    ? AppColors.black
+                    : hazardColor,
+                width: 1.0,
+              ),
+            ),
+          ),
+          child: Row(
+            spacing: 8.spMin,
+            children: [
+              // Category Pill
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.spMin,
+                  vertical: 4.spMin,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(20.spMin),
+                  border: Border.all(
+                    color: AppColors.lightGrey,
+                    width: 1.0,
+                  ),
+                ),
+                child: Text(
+                  categoryLabel,
+                  style: TextStyle(
+                    fontSize: 10.spMin,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
+                ),
+              ),
+              // Severity/Category Text
+              if (isAwsCompliant)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.spMin,
+                    vertical: 4.spMin,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(20.spMin),
+                    border: Border.all(
+                      color: AppColors.lightGrey,
+                      width: 1.0,
+                    ),
+                  ),
+                  child: Text(
+                    severityTitle,
+                    style: TextStyle(
+                      fontSize: 10.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ),
+              // Verification Badge
+              if (isVerified)
+                Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.white,
+                      ),
+                      child: Icon(
+                        Icons.verified_rounded,
+                        size: 18.spMin,
+                        color: AppColors.blue,
+                      ),
+                    ),
+                    if (widget.showCloseButton && widget.onClosePressed != null)
+                      33.wSizedBox,
+                  ],
+                ),
+            ],
+          ),
         );
       },
     );
