@@ -331,26 +331,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   },
                 ),
               ),
-              16.wSizedBox,
-              Expanded(
-                child: Consumer(
-                  builder: (context, ref, child) {
-                    final reliabilityScore = ref.watch(
-                      providerOfLoggedInUser.select(
-                        (value) => (value?.reliabilityScore ?? 0.0) * 100,
-                      ),
-                    );
+              // 16.wSizedBox,
+              // Expanded(
+              //   child: Consumer(
+              //     builder: (context, ref, child) {
+              //       final reliabilityScore = ref.watch(
+              //         providerOfLoggedInUser.select(
+              //           (value) => (value?.reliabilityScore ?? 0.0) * 100,
+              //         ),
+              //       );
 
-                    return _buildScoreCard(
-                      'Reliability',
-                      '${reliabilityScore.toStringAsFixed(0)}%',
-                      Icons.shield_outlined,
-                      AppColors.green,
-                      _reliabilityDescription(reliabilityScore / 100),
-                    );
-                  },
-                ),
-              ),
+              //       return _buildScoreCard(
+              //         'Reliability',
+              //         '${reliabilityScore.toStringAsFixed(0)}%',
+              //         Icons.shield_outlined,
+              //         AppColors.green,
+              //         _reliabilityDescription(reliabilityScore / 100),
+              //       );
+              //     },
+              //   ),
+              // ),
             ],
           ),
           16.hSizedBox,
@@ -1053,6 +1053,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return 'U';
   }
 
+  // ignore: unused_element
   String _reliabilityDescription(double score) {
     if (score >= 0.8) {
       return 'Excellent';
