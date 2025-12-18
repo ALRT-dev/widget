@@ -49,3 +49,7 @@ const kUrlNotifications = '/notifications';
 const kUrlNotificationsFeed = '$kUrlNotifications/feed';
 const kUrlNotificationsPushNotificationToken =
     '$kUrlNotifications/push-notification-token';
+
+// ---------------------------- SUPPORT ----------------------------
+
+const kUrlSupport = '/support';

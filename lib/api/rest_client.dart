@@ -187,4 +187,14 @@ abstract class RestClient {
   Future<HttpResponse> sendPushNotificationToken({
     @Field() required final String token,
   });
+
+  // ---------------------------- SUPPORT ----------------------------
+
+  @POST(kUrlSupport)
+  Future<void> submitSupportRequest({
+    @Field() required final String requestType,
+    @Field() required final String details,
+    @Field() final String? userName,
+    @Field() final String? userEmail,
+  });
 }

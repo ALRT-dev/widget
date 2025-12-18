@@ -937,6 +937,37 @@ class _RestClient implements RestClient {
     return httpResponse;
   }
 
+  @override
+  Future<void> submitSupportRequest({
+    required String requestType,
+    required String details,
+    String? userName,
+    String? userEmail,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'requestType': requestType,
+      'details': details,
+      'userName': userName,
+      'userEmail': userEmail,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _options = _setStreamType<void>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/support',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||
