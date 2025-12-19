@@ -4,10 +4,7 @@ platform :ios do
   require 'date'
 
   my_release_note = <<~NOTE
-    * "What we know" and "What to do" are based on the new prompts.
-    * Moved the "Confirm" button to the right side for better accessibility.
-    * Removed title from the alert creation screen.
-    * 5km radius while creating an alert.
+    * Bug fixes and improvements.
   NOTE
 
   desc "Automatically increment the version name and version code. Also prepare the changelogs and release note from git commits."

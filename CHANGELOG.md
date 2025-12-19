@@ -1,3 +1,7 @@
+## v1.0.0+18 - 2025/12/18
+* Bug fixes and improvements.
+
+
 ## v1.0.0+17 - 2025/12/15
 * "What we know" and "What to do" are based on the new prompts.
 * Moved the "Confirm" button to the right side for better accessibility.
