@@ -21,13 +21,13 @@ class _HazardNotificationsListState
     extends ConsumerState<HazardNotificationsList> {
   @override
   Widget build(BuildContext context) {
-    final getNotificationsFeedState = ref.watch(
+    final getNotificationsFeedHazardsState = ref.watch(
       providerOfNotificationsFeed.select(
-        (value) => value.getNotificationsFeed,
+        (value) => value.getNotificationsFeedHazardsState,
       ),
     );
 
-    return getNotificationsFeedState.maybeWhen(
+    return getNotificationsFeedHazardsState.maybeWhen(
       loading: _loadingBuilder,
       success: (_) => _dataBuilder(),
       error: (error) => _errorBuilder(),
@@ -120,9 +120,23 @@ class _HazardNotificationsListState
           return _emptyBuilder();
         }
 
+        final getNextNotificationsFeedHazardsState = ref.watch(
+          providerOfNotificationsFeed.select(
+            (value) => value.getNextNotificationsFeedHazardsState,
+          ),
+        );
+        final isLoadingMore = getNextNotificationsFeedHazardsState.maybeWhen(
+          loading: () => true,
+          orElse: () => false,
+        );
+
         return SliverList.separated(
-          itemCount: hazards.length,
+          itemCount: hazards.length + (isLoadingMore ? 1 : 0),
           itemBuilder: (context, index) {
+            if (index == hazards.length) {
+              // Show loading indicator at the bottom
+              return Spinner().pad(20.0);
+            }
             final hazard = hazards[index];
             return CommonHazardsListItem(
               key: ValueKey(hazard.id),

@@ -16,8 +16,10 @@ mixin _$NotificationsFeedProviderState {
 
 /// The search string to filter hazards by their title or description.
  String get searchString;/// The list of hazards in the notifications feed.
- List<Hazard> get hazards;/// The state of fetching the notifications feed.
- GetNotificationsFeed get getNotificationsFeed;
+ List<Hazard> get hazards;/// The current page of the notifications feed.
+ int get currentPage;/// The state of fetching the notifications feed.
+ GetNotificationsFeedHazardsState get getNotificationsFeedHazardsState;/// The state of fetching the next page of notifications feed.
+ GetNotificationsFeedHazardsState get getNextNotificationsFeedHazardsState;
 /// Create a copy of NotificationsFeedProviderState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +30,16 @@ $NotificationsFeedProviderStateCopyWith<NotificationsFeedProviderState> get copy
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is NotificationsFeedProviderState&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.getNotificationsFeed, getNotificationsFeed) || other.getNotificationsFeed == getNotificationsFeed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is NotificationsFeedProviderState&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.getNotificationsFeedHazardsState, getNotificationsFeedHazardsState) || other.getNotificationsFeedHazardsState == getNotificationsFeedHazardsState)&&(identical(other.getNextNotificationsFeedHazardsState, getNextNotificationsFeedHazardsState) || other.getNextNotificationsFeedHazardsState == getNextNotificationsFeedHazardsState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(hazards),getNotificationsFeed);
+int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(hazards),currentPage,getNotificationsFeedHazardsState,getNextNotificationsFeedHazardsState);
 
 @override
 String toString() {
-  return 'NotificationsFeedProviderState(searchString: $searchString, hazards: $hazards, getNotificationsFeed: $getNotificationsFeed)';
+  return 'NotificationsFeedProviderState(searchString: $searchString, hazards: $hazards, currentPage: $currentPage, getNotificationsFeedHazardsState: $getNotificationsFeedHazardsState, getNextNotificationsFeedHazardsState: $getNextNotificationsFeedHazardsState)';
 }
 
 
@@ -48,11 +50,11 @@ abstract mixin class $NotificationsFeedProviderStateCopyWith<$Res>  {
   factory $NotificationsFeedProviderStateCopyWith(NotificationsFeedProviderState value, $Res Function(NotificationsFeedProviderState) _then) = _$NotificationsFeedProviderStateCopyWithImpl;
 @useResult
 $Res call({
- String searchString, List<Hazard> hazards, GetNotificationsFeed getNotificationsFeed
+ String searchString, List<Hazard> hazards, int currentPage, GetNotificationsFeedHazardsState getNotificationsFeedHazardsState, GetNotificationsFeedHazardsState getNextNotificationsFeedHazardsState
 });
 
 
-$GetNotificationsFeedCopyWith<$Res> get getNotificationsFeed;
+$GetNotificationsFeedHazardsStateCopyWith<$Res> get getNotificationsFeedHazardsState;$GetNotificationsFeedHazardsStateCopyWith<$Res> get getNextNotificationsFeedHazardsState;
 
 }
 /// @nodoc
@@ -65,22 +67,33 @@ class _$NotificationsFeedProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of NotificationsFeedProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? searchString = null,Object? hazards = null,Object? getNotificationsFeed = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? searchString = null,Object? hazards = null,Object? currentPage = null,Object? getNotificationsFeedHazardsState = null,Object? getNextNotificationsFeedHazardsState = null,}) {
   return _then(_self.copyWith(
 searchString: null == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
 as String,hazards: null == hazards ? _self.hazards : hazards // ignore: cast_nullable_to_non_nullable
-as List<Hazard>,getNotificationsFeed: null == getNotificationsFeed ? _self.getNotificationsFeed : getNotificationsFeed // ignore: cast_nullable_to_non_nullable
-as GetNotificationsFeed,
+as List<Hazard>,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,getNotificationsFeedHazardsState: null == getNotificationsFeedHazardsState ? _self.getNotificationsFeedHazardsState : getNotificationsFeedHazardsState // ignore: cast_nullable_to_non_nullable
+as GetNotificationsFeedHazardsState,getNextNotificationsFeedHazardsState: null == getNextNotificationsFeedHazardsState ? _self.getNextNotificationsFeedHazardsState : getNextNotificationsFeedHazardsState // ignore: cast_nullable_to_non_nullable
+as GetNotificationsFeedHazardsState,
   ));
 }
 /// Create a copy of NotificationsFeedProviderState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$GetNotificationsFeedCopyWith<$Res> get getNotificationsFeed {
+$GetNotificationsFeedHazardsStateCopyWith<$Res> get getNotificationsFeedHazardsState {
   
-  return $GetNotificationsFeedCopyWith<$Res>(_self.getNotificationsFeed, (value) {
-    return _then(_self.copyWith(getNotificationsFeed: value));
+  return $GetNotificationsFeedHazardsStateCopyWith<$Res>(_self.getNotificationsFeedHazardsState, (value) {
+    return _then(_self.copyWith(getNotificationsFeedHazardsState: value));
+  });
+}/// Create a copy of NotificationsFeedProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$GetNotificationsFeedHazardsStateCopyWith<$Res> get getNextNotificationsFeedHazardsState {
+  
+  return $GetNotificationsFeedHazardsStateCopyWith<$Res>(_self.getNextNotificationsFeedHazardsState, (value) {
+    return _then(_self.copyWith(getNextNotificationsFeedHazardsState: value));
   });
 }
 }
@@ -164,10 +177,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String searchString,  List<Hazard> hazards,  GetNotificationsFeed getNotificationsFeed)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String searchString,  List<Hazard> hazards,  int currentPage,  GetNotificationsFeedHazardsState getNotificationsFeedHazardsState,  GetNotificationsFeedHazardsState getNextNotificationsFeedHazardsState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _NotificationsFeedProviderState() when $default != null:
-return $default(_that.searchString,_that.hazards,_that.getNotificationsFeed);case _:
+return $default(_that.searchString,_that.hazards,_that.currentPage,_that.getNotificationsFeedHazardsState,_that.getNextNotificationsFeedHazardsState);case _:
   return orElse();
 
 }
@@ -185,10 +198,10 @@ return $default(_that.searchString,_that.hazards,_that.getNotificationsFeed);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String searchString,  List<Hazard> hazards,  GetNotificationsFeed getNotificationsFeed)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String searchString,  List<Hazard> hazards,  int currentPage,  GetNotificationsFeedHazardsState getNotificationsFeedHazardsState,  GetNotificationsFeedHazardsState getNextNotificationsFeedHazardsState)  $default,) {final _that = this;
 switch (_that) {
 case _NotificationsFeedProviderState():
-return $default(_that.searchString,_that.hazards,_that.getNotificationsFeed);case _:
+return $default(_that.searchString,_that.hazards,_that.currentPage,_that.getNotificationsFeedHazardsState,_that.getNextNotificationsFeedHazardsState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +218,10 @@ return $default(_that.searchString,_that.hazards,_that.getNotificationsFeed);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String searchString,  List<Hazard> hazards,  GetNotificationsFeed getNotificationsFeed)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String searchString,  List<Hazard> hazards,  int currentPage,  GetNotificationsFeedHazardsState getNotificationsFeedHazardsState,  GetNotificationsFeedHazardsState getNextNotificationsFeedHazardsState)?  $default,) {final _that = this;
 switch (_that) {
 case _NotificationsFeedProviderState() when $default != null:
-return $default(_that.searchString,_that.hazards,_that.getNotificationsFeed);case _:
+return $default(_that.searchString,_that.hazards,_that.currentPage,_that.getNotificationsFeedHazardsState,_that.getNextNotificationsFeedHazardsState);case _:
   return null;
 
 }
@@ -220,7 +233,7 @@ return $default(_that.searchString,_that.hazards,_that.getNotificationsFeed);cas
 
 
 class _NotificationsFeedProviderState implements NotificationsFeedProviderState {
-  const _NotificationsFeedProviderState({this.searchString = '', final  List<Hazard> hazards = const <Hazard>[], this.getNotificationsFeed = const GetNotificationsFeed.initial()}): _hazards = hazards;
+  const _NotificationsFeedProviderState({this.searchString = '', final  List<Hazard> hazards = const <Hazard>[], this.currentPage = 1, this.getNotificationsFeedHazardsState = const GetNotificationsFeedHazardsState.initial(), this.getNextNotificationsFeedHazardsState = const GetNotificationsFeedHazardsState.initial()}): _hazards = hazards;
   
 
 /// The search string to filter hazards by their title or description.
@@ -234,8 +247,12 @@ class _NotificationsFeedProviderState implements NotificationsFeedProviderState 
   return EqualUnmodifiableListView(_hazards);
 }
 
+/// The current page of the notifications feed.
+@override@JsonKey() final  int currentPage;
 /// The state of fetching the notifications feed.
-@override@JsonKey() final  GetNotificationsFeed getNotificationsFeed;
+@override@JsonKey() final  GetNotificationsFeedHazardsState getNotificationsFeedHazardsState;
+/// The state of fetching the next page of notifications feed.
+@override@JsonKey() final  GetNotificationsFeedHazardsState getNextNotificationsFeedHazardsState;
 
 /// Create a copy of NotificationsFeedProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -247,16 +264,16 @@ _$NotificationsFeedProviderStateCopyWith<_NotificationsFeedProviderState> get co
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NotificationsFeedProviderState&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.getNotificationsFeed, getNotificationsFeed) || other.getNotificationsFeed == getNotificationsFeed));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _NotificationsFeedProviderState&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.getNotificationsFeedHazardsState, getNotificationsFeedHazardsState) || other.getNotificationsFeedHazardsState == getNotificationsFeedHazardsState)&&(identical(other.getNextNotificationsFeedHazardsState, getNextNotificationsFeedHazardsState) || other.getNextNotificationsFeedHazardsState == getNextNotificationsFeedHazardsState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(_hazards),getNotificationsFeed);
+int get hashCode => Object.hash(runtimeType,searchString,const DeepCollectionEquality().hash(_hazards),currentPage,getNotificationsFeedHazardsState,getNextNotificationsFeedHazardsState);
 
 @override
 String toString() {
-  return 'NotificationsFeedProviderState(searchString: $searchString, hazards: $hazards, getNotificationsFeed: $getNotificationsFeed)';
+  return 'NotificationsFeedProviderState(searchString: $searchString, hazards: $hazards, currentPage: $currentPage, getNotificationsFeedHazardsState: $getNotificationsFeedHazardsState, getNextNotificationsFeedHazardsState: $getNextNotificationsFeedHazardsState)';
 }
 
 
@@ -267,11 +284,11 @@ abstract mixin class _$NotificationsFeedProviderStateCopyWith<$Res> implements $
   factory _$NotificationsFeedProviderStateCopyWith(_NotificationsFeedProviderState value, $Res Function(_NotificationsFeedProviderState) _then) = __$NotificationsFeedProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- String searchString, List<Hazard> hazards, GetNotificationsFeed getNotificationsFeed
+ String searchString, List<Hazard> hazards, int currentPage, GetNotificationsFeedHazardsState getNotificationsFeedHazardsState, GetNotificationsFeedHazardsState getNextNotificationsFeedHazardsState
 });
 
 
-@override $GetNotificationsFeedCopyWith<$Res> get getNotificationsFeed;
+@override $GetNotificationsFeedHazardsStateCopyWith<$Res> get getNotificationsFeedHazardsState;@override $GetNotificationsFeedHazardsStateCopyWith<$Res> get getNextNotificationsFeedHazardsState;
 
 }
 /// @nodoc
@@ -284,12 +301,14 @@ class __$NotificationsFeedProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of NotificationsFeedProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? searchString = null,Object? hazards = null,Object? getNotificationsFeed = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? searchString = null,Object? hazards = null,Object? currentPage = null,Object? getNotificationsFeedHazardsState = null,Object? getNextNotificationsFeedHazardsState = null,}) {
   return _then(_NotificationsFeedProviderState(
 searchString: null == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
 as String,hazards: null == hazards ? _self._hazards : hazards // ignore: cast_nullable_to_non_nullable
-as List<Hazard>,getNotificationsFeed: null == getNotificationsFeed ? _self.getNotificationsFeed : getNotificationsFeed // ignore: cast_nullable_to_non_nullable
-as GetNotificationsFeed,
+as List<Hazard>,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,getNotificationsFeedHazardsState: null == getNotificationsFeedHazardsState ? _self.getNotificationsFeedHazardsState : getNotificationsFeedHazardsState // ignore: cast_nullable_to_non_nullable
+as GetNotificationsFeedHazardsState,getNextNotificationsFeedHazardsState: null == getNextNotificationsFeedHazardsState ? _self.getNextNotificationsFeedHazardsState : getNextNotificationsFeedHazardsState // ignore: cast_nullable_to_non_nullable
+as GetNotificationsFeedHazardsState,
   ));
 }
 
@@ -297,16 +316,25 @@ as GetNotificationsFeed,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$GetNotificationsFeedCopyWith<$Res> get getNotificationsFeed {
+$GetNotificationsFeedHazardsStateCopyWith<$Res> get getNotificationsFeedHazardsState {
   
-  return $GetNotificationsFeedCopyWith<$Res>(_self.getNotificationsFeed, (value) {
-    return _then(_self.copyWith(getNotificationsFeed: value));
+  return $GetNotificationsFeedHazardsStateCopyWith<$Res>(_self.getNotificationsFeedHazardsState, (value) {
+    return _then(_self.copyWith(getNotificationsFeedHazardsState: value));
+  });
+}/// Create a copy of NotificationsFeedProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$GetNotificationsFeedHazardsStateCopyWith<$Res> get getNextNotificationsFeedHazardsState {
+  
+  return $GetNotificationsFeedHazardsStateCopyWith<$Res>(_self.getNextNotificationsFeedHazardsState, (value) {
+    return _then(_self.copyWith(getNextNotificationsFeedHazardsState: value));
   });
 }
 }
 
 /// @nodoc
-mixin _$GetNotificationsFeed {
+mixin _$GetNotificationsFeedHazardsState {
 
 
 
@@ -314,7 +342,7 @@ mixin _$GetNotificationsFeed {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GetNotificationsFeed);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GetNotificationsFeedHazardsState);
 }
 
 
@@ -323,20 +351,20 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'GetNotificationsFeed()';
+  return 'GetNotificationsFeedHazardsState()';
 }
 
 
 }
 
 /// @nodoc
-class $GetNotificationsFeedCopyWith<$Res>  {
-$GetNotificationsFeedCopyWith(GetNotificationsFeed _, $Res Function(GetNotificationsFeed) __);
+class $GetNotificationsFeedHazardsStateCopyWith<$Res>  {
+$GetNotificationsFeedHazardsStateCopyWith(GetNotificationsFeedHazardsState _, $Res Function(GetNotificationsFeedHazardsState) __);
 }
 
 
-/// Adds pattern-matching-related methods to [GetNotificationsFeed].
-extension GetNotificationsFeedPatterns on GetNotificationsFeed {
+/// Adds pattern-matching-related methods to [GetNotificationsFeedHazardsState].
+extension GetNotificationsFeedHazardsStatePatterns on GetNotificationsFeedHazardsState {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -349,13 +377,13 @@ extension GetNotificationsFeedPatterns on GetNotificationsFeed {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _GetNotificationsFeedInitial value)?  initial,TResult Function( _GetNotificationsFeedLoading value)?  loading,TResult Function( _GetNotificationsFeedSuccess value)?  success,TResult Function( _GetNotificationsFeedError value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _GetNotificationsFeedHazardsStateInitial value)?  initial,TResult Function( _GetNotificationsFeedHazardsStateLoading value)?  loading,TResult Function( _GetNotificationsFeedHazardsStateSuccess value)?  success,TResult Function( _GetNotificationsFeedHazardsStateError value)?  error,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _GetNotificationsFeedInitial() when initial != null:
-return initial(_that);case _GetNotificationsFeedLoading() when loading != null:
-return loading(_that);case _GetNotificationsFeedSuccess() when success != null:
-return success(_that);case _GetNotificationsFeedError() when error != null:
+case _GetNotificationsFeedHazardsStateInitial() when initial != null:
+return initial(_that);case _GetNotificationsFeedHazardsStateLoading() when loading != null:
+return loading(_that);case _GetNotificationsFeedHazardsStateSuccess() when success != null:
+return success(_that);case _GetNotificationsFeedHazardsStateError() when error != null:
 return error(_that);case _:
   return orElse();
 
@@ -374,13 +402,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _GetNotificationsFeedInitial value)  initial,required TResult Function( _GetNotificationsFeedLoading value)  loading,required TResult Function( _GetNotificationsFeedSuccess value)  success,required TResult Function( _GetNotificationsFeedError value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _GetNotificationsFeedHazardsStateInitial value)  initial,required TResult Function( _GetNotificationsFeedHazardsStateLoading value)  loading,required TResult Function( _GetNotificationsFeedHazardsStateSuccess value)  success,required TResult Function( _GetNotificationsFeedHazardsStateError value)  error,}){
 final _that = this;
 switch (_that) {
-case _GetNotificationsFeedInitial():
-return initial(_that);case _GetNotificationsFeedLoading():
-return loading(_that);case _GetNotificationsFeedSuccess():
-return success(_that);case _GetNotificationsFeedError():
+case _GetNotificationsFeedHazardsStateInitial():
+return initial(_that);case _GetNotificationsFeedHazardsStateLoading():
+return loading(_that);case _GetNotificationsFeedHazardsStateSuccess():
+return success(_that);case _GetNotificationsFeedHazardsStateError():
 return error(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -398,13 +426,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _GetNotificationsFeedInitial value)?  initial,TResult? Function( _GetNotificationsFeedLoading value)?  loading,TResult? Function( _GetNotificationsFeedSuccess value)?  success,TResult? Function( _GetNotificationsFeedError value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _GetNotificationsFeedHazardsStateInitial value)?  initial,TResult? Function( _GetNotificationsFeedHazardsStateLoading value)?  loading,TResult? Function( _GetNotificationsFeedHazardsStateSuccess value)?  success,TResult? Function( _GetNotificationsFeedHazardsStateError value)?  error,}){
 final _that = this;
 switch (_that) {
-case _GetNotificationsFeedInitial() when initial != null:
-return initial(_that);case _GetNotificationsFeedLoading() when loading != null:
-return loading(_that);case _GetNotificationsFeedSuccess() when success != null:
-return success(_that);case _GetNotificationsFeedError() when error != null:
+case _GetNotificationsFeedHazardsStateInitial() when initial != null:
+return initial(_that);case _GetNotificationsFeedHazardsStateLoading() when loading != null:
+return loading(_that);case _GetNotificationsFeedHazardsStateSuccess() when success != null:
+return success(_that);case _GetNotificationsFeedHazardsStateError() when error != null:
 return error(_that);case _:
   return null;
 
@@ -424,10 +452,10 @@ return error(_that);case _:
 
 @optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<Hazard> hazards)?  success,TResult Function( AppError error)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _GetNotificationsFeedInitial() when initial != null:
-return initial();case _GetNotificationsFeedLoading() when loading != null:
-return loading();case _GetNotificationsFeedSuccess() when success != null:
-return success(_that.hazards);case _GetNotificationsFeedError() when error != null:
+case _GetNotificationsFeedHazardsStateInitial() when initial != null:
+return initial();case _GetNotificationsFeedHazardsStateLoading() when loading != null:
+return loading();case _GetNotificationsFeedHazardsStateSuccess() when success != null:
+return success(_that.hazards);case _GetNotificationsFeedHazardsStateError() when error != null:
 return error(_that.error);case _:
   return orElse();
 
@@ -448,10 +476,10 @@ return error(_that.error);case _:
 
 @optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<Hazard> hazards)  success,required TResult Function( AppError error)  error,}) {final _that = this;
 switch (_that) {
-case _GetNotificationsFeedInitial():
-return initial();case _GetNotificationsFeedLoading():
-return loading();case _GetNotificationsFeedSuccess():
-return success(_that.hazards);case _GetNotificationsFeedError():
+case _GetNotificationsFeedHazardsStateInitial():
+return initial();case _GetNotificationsFeedHazardsStateLoading():
+return loading();case _GetNotificationsFeedHazardsStateSuccess():
+return success(_that.hazards);case _GetNotificationsFeedHazardsStateError():
 return error(_that.error);case _:
   throw StateError('Unexpected subclass');
 
@@ -471,10 +499,10 @@ return error(_that.error);case _:
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<Hazard> hazards)?  success,TResult? Function( AppError error)?  error,}) {final _that = this;
 switch (_that) {
-case _GetNotificationsFeedInitial() when initial != null:
-return initial();case _GetNotificationsFeedLoading() when loading != null:
-return loading();case _GetNotificationsFeedSuccess() when success != null:
-return success(_that.hazards);case _GetNotificationsFeedError() when error != null:
+case _GetNotificationsFeedHazardsStateInitial() when initial != null:
+return initial();case _GetNotificationsFeedHazardsStateLoading() when loading != null:
+return loading();case _GetNotificationsFeedHazardsStateSuccess() when success != null:
+return success(_that.hazards);case _GetNotificationsFeedHazardsStateError() when error != null:
 return error(_that.error);case _:
   return null;
 
@@ -486,8 +514,8 @@ return error(_that.error);case _:
 /// @nodoc
 
 
-class _GetNotificationsFeedInitial implements GetNotificationsFeed {
-  const _GetNotificationsFeedInitial();
+class _GetNotificationsFeedHazardsStateInitial implements GetNotificationsFeedHazardsState {
+  const _GetNotificationsFeedHazardsStateInitial();
   
 
 
@@ -497,7 +525,7 @@ class _GetNotificationsFeedInitial implements GetNotificationsFeed {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetNotificationsFeedInitial);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetNotificationsFeedHazardsStateInitial);
 }
 
 
@@ -506,7 +534,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'GetNotificationsFeed.initial()';
+  return 'GetNotificationsFeedHazardsState.initial()';
 }
 
 
@@ -518,8 +546,8 @@ String toString() {
 /// @nodoc
 
 
-class _GetNotificationsFeedLoading implements GetNotificationsFeed {
-  const _GetNotificationsFeedLoading();
+class _GetNotificationsFeedHazardsStateLoading implements GetNotificationsFeedHazardsState {
+  const _GetNotificationsFeedHazardsStateLoading();
   
 
 
@@ -529,7 +557,7 @@ class _GetNotificationsFeedLoading implements GetNotificationsFeed {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetNotificationsFeedLoading);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetNotificationsFeedHazardsStateLoading);
 }
 
 
@@ -538,7 +566,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'GetNotificationsFeed.loading()';
+  return 'GetNotificationsFeedHazardsState.loading()';
 }
 
 
@@ -550,8 +578,8 @@ String toString() {
 /// @nodoc
 
 
-class _GetNotificationsFeedSuccess implements GetNotificationsFeed {
-  const _GetNotificationsFeedSuccess(final  List<Hazard> hazards): _hazards = hazards;
+class _GetNotificationsFeedHazardsStateSuccess implements GetNotificationsFeedHazardsState {
+  const _GetNotificationsFeedHazardsStateSuccess(final  List<Hazard> hazards): _hazards = hazards;
   
 
  final  List<Hazard> _hazards;
@@ -562,17 +590,17 @@ class _GetNotificationsFeedSuccess implements GetNotificationsFeed {
 }
 
 
-/// Create a copy of GetNotificationsFeed
+/// Create a copy of GetNotificationsFeedHazardsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$GetNotificationsFeedSuccessCopyWith<_GetNotificationsFeedSuccess> get copyWith => __$GetNotificationsFeedSuccessCopyWithImpl<_GetNotificationsFeedSuccess>(this, _$identity);
+_$GetNotificationsFeedHazardsStateSuccessCopyWith<_GetNotificationsFeedHazardsStateSuccess> get copyWith => __$GetNotificationsFeedHazardsStateSuccessCopyWithImpl<_GetNotificationsFeedHazardsStateSuccess>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetNotificationsFeedSuccess&&const DeepCollectionEquality().equals(other._hazards, _hazards));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetNotificationsFeedHazardsStateSuccess&&const DeepCollectionEquality().equals(other._hazards, _hazards));
 }
 
 
@@ -581,15 +609,15 @@ int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(
 
 @override
 String toString() {
-  return 'GetNotificationsFeed.success(hazards: $hazards)';
+  return 'GetNotificationsFeedHazardsState.success(hazards: $hazards)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$GetNotificationsFeedSuccessCopyWith<$Res> implements $GetNotificationsFeedCopyWith<$Res> {
-  factory _$GetNotificationsFeedSuccessCopyWith(_GetNotificationsFeedSuccess value, $Res Function(_GetNotificationsFeedSuccess) _then) = __$GetNotificationsFeedSuccessCopyWithImpl;
+abstract mixin class _$GetNotificationsFeedHazardsStateSuccessCopyWith<$Res> implements $GetNotificationsFeedHazardsStateCopyWith<$Res> {
+  factory _$GetNotificationsFeedHazardsStateSuccessCopyWith(_GetNotificationsFeedHazardsStateSuccess value, $Res Function(_GetNotificationsFeedHazardsStateSuccess) _then) = __$GetNotificationsFeedHazardsStateSuccessCopyWithImpl;
 @useResult
 $Res call({
  List<Hazard> hazards
@@ -600,17 +628,17 @@ $Res call({
 
 }
 /// @nodoc
-class __$GetNotificationsFeedSuccessCopyWithImpl<$Res>
-    implements _$GetNotificationsFeedSuccessCopyWith<$Res> {
-  __$GetNotificationsFeedSuccessCopyWithImpl(this._self, this._then);
+class __$GetNotificationsFeedHazardsStateSuccessCopyWithImpl<$Res>
+    implements _$GetNotificationsFeedHazardsStateSuccessCopyWith<$Res> {
+  __$GetNotificationsFeedHazardsStateSuccessCopyWithImpl(this._self, this._then);
 
-  final _GetNotificationsFeedSuccess _self;
-  final $Res Function(_GetNotificationsFeedSuccess) _then;
+  final _GetNotificationsFeedHazardsStateSuccess _self;
+  final $Res Function(_GetNotificationsFeedHazardsStateSuccess) _then;
 
-/// Create a copy of GetNotificationsFeed
+/// Create a copy of GetNotificationsFeedHazardsState
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? hazards = null,}) {
-  return _then(_GetNotificationsFeedSuccess(
+  return _then(_GetNotificationsFeedHazardsStateSuccess(
 null == hazards ? _self._hazards : hazards // ignore: cast_nullable_to_non_nullable
 as List<Hazard>,
   ));
@@ -622,23 +650,23 @@ as List<Hazard>,
 /// @nodoc
 
 
-class _GetNotificationsFeedError implements GetNotificationsFeed {
-  const _GetNotificationsFeedError(this.error);
+class _GetNotificationsFeedHazardsStateError implements GetNotificationsFeedHazardsState {
+  const _GetNotificationsFeedHazardsStateError(this.error);
   
 
  final  AppError error;
 
-/// Create a copy of GetNotificationsFeed
+/// Create a copy of GetNotificationsFeedHazardsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$GetNotificationsFeedErrorCopyWith<_GetNotificationsFeedError> get copyWith => __$GetNotificationsFeedErrorCopyWithImpl<_GetNotificationsFeedError>(this, _$identity);
+_$GetNotificationsFeedHazardsStateErrorCopyWith<_GetNotificationsFeedHazardsStateError> get copyWith => __$GetNotificationsFeedHazardsStateErrorCopyWithImpl<_GetNotificationsFeedHazardsStateError>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetNotificationsFeedError&&(identical(other.error, error) || other.error == error));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetNotificationsFeedHazardsStateError&&(identical(other.error, error) || other.error == error));
 }
 
 
@@ -647,15 +675,15 @@ int get hashCode => Object.hash(runtimeType,error);
 
 @override
 String toString() {
-  return 'GetNotificationsFeed.error(error: $error)';
+  return 'GetNotificationsFeedHazardsState.error(error: $error)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$GetNotificationsFeedErrorCopyWith<$Res> implements $GetNotificationsFeedCopyWith<$Res> {
-  factory _$GetNotificationsFeedErrorCopyWith(_GetNotificationsFeedError value, $Res Function(_GetNotificationsFeedError) _then) = __$GetNotificationsFeedErrorCopyWithImpl;
+abstract mixin class _$GetNotificationsFeedHazardsStateErrorCopyWith<$Res> implements $GetNotificationsFeedHazardsStateCopyWith<$Res> {
+  factory _$GetNotificationsFeedHazardsStateErrorCopyWith(_GetNotificationsFeedHazardsStateError value, $Res Function(_GetNotificationsFeedHazardsStateError) _then) = __$GetNotificationsFeedHazardsStateErrorCopyWithImpl;
 @useResult
 $Res call({
  AppError error
@@ -666,23 +694,23 @@ $AppErrorCopyWith<$Res> get error;
 
 }
 /// @nodoc
-class __$GetNotificationsFeedErrorCopyWithImpl<$Res>
-    implements _$GetNotificationsFeedErrorCopyWith<$Res> {
-  __$GetNotificationsFeedErrorCopyWithImpl(this._self, this._then);
+class __$GetNotificationsFeedHazardsStateErrorCopyWithImpl<$Res>
+    implements _$GetNotificationsFeedHazardsStateErrorCopyWith<$Res> {
+  __$GetNotificationsFeedHazardsStateErrorCopyWithImpl(this._self, this._then);
 
-  final _GetNotificationsFeedError _self;
-  final $Res Function(_GetNotificationsFeedError) _then;
+  final _GetNotificationsFeedHazardsStateError _self;
+  final $Res Function(_GetNotificationsFeedHazardsStateError) _then;
 
-/// Create a copy of GetNotificationsFeed
+/// Create a copy of GetNotificationsFeedHazardsState
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
-  return _then(_GetNotificationsFeedError(
+  return _then(_GetNotificationsFeedHazardsStateError(
 null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
 as AppError,
   ));
 }
 
-/// Create a copy of GetNotificationsFeed
+/// Create a copy of GetNotificationsFeedHazardsState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')

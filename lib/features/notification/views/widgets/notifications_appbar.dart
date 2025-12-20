@@ -38,7 +38,7 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
       builder: (context, ref, child) {
         final isHazardsLoading = ref.watch(
           providerOfNotificationsFeed.select(
-            (value) => value.getNotificationsFeed.maybeWhen(
+            (value) => value.getNotificationsFeedHazardsState.maybeWhen(
               orElse: () => false,
               loading: () => true,
             ),
@@ -170,7 +170,9 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
       const Duration(milliseconds: 300),
       () {
         if (!mounted) return;
-        ref.read(providerOfNotificationsFeed.notifier).getNotificationsFeed();
+        ref
+            .read(providerOfNotificationsFeed.notifier)
+            .getNotificationsFeedHazards();
       },
     );
   }
@@ -181,11 +183,13 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
     _searchFocusNode.unfocus();
     ref.read(providerOfNotificationsFeed.notifier)
       ..updateSearchString('')
-      ..getNotificationsFeed();
+      ..getNotificationsFeedHazards();
   }
 
   /// Fetches the hazards for the notifications feed.
   void _getHazards() {
-    ref.read(providerOfNotificationsFeed.notifier).getNotificationsFeed();
+    ref
+        .read(providerOfNotificationsFeed.notifier)
+        .getNotificationsFeedHazards();
   }
 }

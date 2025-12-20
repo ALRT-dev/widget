@@ -156,7 +156,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         _myLocationSubscriptionsProvider.addLocationSubscription(subscription);
 
         // after subscribing to a location, refresh the notifications feed
-        _notificationsFeedProvider.getNotificationsFeed();
+        _notificationsFeedProvider.getNotificationsFeedHazards();
       },
       (error) {
         state = state.copyWith(
@@ -196,7 +196,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         );
 
         // after unsubscribing from a location, refresh the notifications feed
-        _notificationsFeedProvider.getNotificationsFeed();
+        _notificationsFeedProvider.getNotificationsFeedHazards();
       },
       (error) {
         state = state.copyWith(

@@ -15,16 +15,27 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           NotificationsAppBar(),
           10.hSizedBox.sliverBox,
@@ -38,5 +49,19 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   void _onInit() {
     // Removes expired hazards from the notifications feed upon initialization.
     ref.read(providerOfNotificationsFeed.notifier).removeExpiredHazards();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      // User has scrolled near the bottom (200 pixels before the end)
+      _loadMoreNotifications();
+    }
+  }
+
+  void _loadMoreNotifications() {
+    ref
+        .read(providerOfNotificationsFeed.notifier)
+        .getNextNotificationsFeedHazards();
   }
 }

@@ -14,20 +14,29 @@ abstract class NotificationsFeedProviderState
     /// The list of hazards in the notifications feed.
     @Default(<Hazard>[]) final List<Hazard> hazards,
 
+    /// The current page of the notifications feed.
+    @Default(1) final int currentPage,
+
     /// The state of fetching the notifications feed.
-    @Default(GetNotificationsFeed.initial())
-    final GetNotificationsFeed getNotificationsFeed,
+    @Default(GetNotificationsFeedHazardsState.initial())
+    final GetNotificationsFeedHazardsState getNotificationsFeedHazardsState,
+
+    /// The state of fetching the next page of notifications feed.
+    @Default(GetNotificationsFeedHazardsState.initial())
+    final GetNotificationsFeedHazardsState getNextNotificationsFeedHazardsState,
   }) = _NotificationsFeedProviderState;
 }
 
 @freezed
-class GetNotificationsFeed with _$GetNotificationsFeed {
-  const factory GetNotificationsFeed.initial() = _GetNotificationsFeedInitial;
-  const factory GetNotificationsFeed.loading() = _GetNotificationsFeedLoading;
-  const factory GetNotificationsFeed.success(
+class GetNotificationsFeedHazardsState with _$GetNotificationsFeedHazardsState {
+  const factory GetNotificationsFeedHazardsState.initial() =
+      _GetNotificationsFeedHazardsStateInitial;
+  const factory GetNotificationsFeedHazardsState.loading() =
+      _GetNotificationsFeedHazardsStateLoading;
+  const factory GetNotificationsFeedHazardsState.success(
     final List<Hazard> hazards,
-  ) = _GetNotificationsFeedSuccess;
-  const factory GetNotificationsFeed.error(
+  ) = _GetNotificationsFeedHazardsStateSuccess;
+  const factory GetNotificationsFeedHazardsState.error(
     final AppError error,
-  ) = _GetNotificationsFeedError;
+  ) = _GetNotificationsFeedHazardsStateError;
 }
