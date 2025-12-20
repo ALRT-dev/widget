@@ -19,10 +19,26 @@ class HazardSearchScreen extends ConsumerStatefulWidget {
 }
 
 class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           HazardSearchAppBar(),
           10.hSizedBox.sliverBox,
@@ -141,5 +157,17 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
   /// Toggles the subscription state when the subscribe button is pressed.
   void _handleSubscribePressed() {
     ref.read(providerOfMainSearch.notifier).toggleSubscription();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      // User has scrolled near the bottom (200 pixels before the end)
+      _loadMoreHazards();
+    }
+  }
+
+  void _loadMoreHazards() {
+    ref.read(providerOfMainSearch.notifier).getNextHazards();
   }
 }

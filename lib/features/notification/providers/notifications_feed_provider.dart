@@ -213,7 +213,7 @@ class NotificationsFeedProvider
           getNextNotificationsFeedHazardsState:
               GetNotificationsFeedHazardsState.success(hazards),
         );
-        updateHazards([...state.hazards, ...hazards]);
+        addMultipleToHazards(hazards);
       },
       (error) {
         state = state.copyWith(
@@ -246,6 +246,26 @@ class NotificationsFeedProvider
       }
       return hazard;
     }).toList();
+    updateHazards(updatedHazards);
+  }
+
+  /// Adds multiple new hazards to the existing list of hazards in the state.
+  ///
+  /// If the hazard already exists (based on ID), it will be updated instead of added again.
+  void addMultipleToHazards(final List<Hazard> newHazards) {
+    final updatedHazards = List<Hazard>.from(state.hazards);
+    for (final newHazard in newHazards) {
+      final index = updatedHazards.indexWhere(
+        (hazard) => hazard.id == newHazard.id,
+      );
+      if (index != -1) {
+        // Hazard already exists, update it
+        updatedHazards[index] = newHazard;
+      } else {
+        // Hazard does not exist, add it
+        updatedHazards.add(newHazard);
+      }
+    }
     updateHazards(updatedHazards);
   }
 
