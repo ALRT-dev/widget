@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/common_hazards_list_item.dart';
@@ -53,7 +55,17 @@ class _MapHazardsListState extends ConsumerState<MapHazardsList> {
         final mapHazards = ref.watch(
           providerOfMap.select(
             (value) => widget.showOnlyRouteHazards
-                ? value.currentRoutePlan?.hazardsToAvoid ?? []
+                ? HazardAvoidanceHelper.getRelevantHazardsForPolyline(
+                    value.currentRoutePlan?.hazardsToAvoid ?? [],
+                    value
+                            .currentRoutePlan
+                            ?.currentRoute
+                            ?.currentRoute
+                            .polylinePoints
+                            ?.map((e) => LatLng(e.latitude, e.longitude))
+                            .toList() ??
+                        [],
+                  )
                 : value.hazards,
           ),
         );

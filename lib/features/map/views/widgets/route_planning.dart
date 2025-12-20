@@ -166,8 +166,8 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
 
   Widget _chipsBuilder() {
     return Wrap(
-      spacing: 8.w,
-      runSpacing: 4.h,
+      spacing: 8.spMin,
+      runSpacing: 4.spMin,
       children: [
         if (_routeHazardSummary.emergencyHazards > 0)
           _chipItemBuilder(
@@ -285,7 +285,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: 12.spMin,
+          horizontal: 5.spMin,
           vertical: 6.spMin,
         ),
         decoration: BoxDecoration(
@@ -310,7 +310,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
               Text(
                 duration,
                 style: TextStyle(
-                  fontSize: 10.sp,
+                  fontSize: 12.spMin,
                   color: isSelected ? AppColors.primary : AppColors.black,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
