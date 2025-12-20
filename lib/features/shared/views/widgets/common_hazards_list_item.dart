@@ -144,7 +144,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (widget.isInfoWindow) _coloredHeaderBuilder(),
+                _coloredHeaderBuilder(),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -158,10 +158,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                if (!widget.isInfoWindow) ...[
-                                  _normalHeaderBuilder(),
-                                  8.hSizedBox,
-                                ],
                                 _titleBuilder(),
                                 4.hSizedBox,
                                 _dateAndDistanceBuilder(),
@@ -202,6 +198,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     ).pX(widget.horizontalPadding);
   }
 
+  // ignore: unused_element
   Widget _normalHeaderBuilder() {
     return Consumer(
       builder: (context, ref, child) {
@@ -376,7 +373,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(20.spMin),
                   border: Border.all(
-                    color: AppColors.lightGrey,
+                    color: AppColors.black,
                     width: 1.0,
                   ),
                 ),
@@ -400,7 +397,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     color: AppColors.white,
                     borderRadius: BorderRadius.circular(20.spMin),
                     border: Border.all(
-                      color: AppColors.lightGrey,
+                      color: AppColors.black,
                       width: 1.0,
                     ),
                   ),
