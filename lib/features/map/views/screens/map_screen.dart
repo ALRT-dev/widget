@@ -13,7 +13,6 @@ import 'package:hazard_app/features/map/views/widgets/route_planning.dart';
 import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
 import 'package:hazard_app/features/map/views/widgets/selected_location_preview.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
-import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
@@ -95,23 +94,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   );
 
                   if (isRoutePresent) {
-                    return Column(
-                      children: [
-                        RouteSourceAndDestination(),
-                        10.hSizedBox,
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            _filtersButtonBuilder(),
-                          ],
-                        ),
-                      ],
-                    );
+                    return RouteSourceAndDestination();
                   }
                   return Row(
                     children: [
                       Expanded(child: MapSearchbar()),
-                      _filtersButtonBuilder(),
                     ],
                   );
                 },
@@ -132,6 +119,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           spacing: 10.spMin,
                           children: [
                             CustomCompassButton(),
+                            HazardFiltersButton(
+                              filtersKey: MapScreen.filtersKey,
+                              onFiltersUpdated: () => _getMapHazards(),
+                            ),
                             CustomMyLocationButton(),
                           ],
                         ),
@@ -174,13 +165,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ],
       ),
     );
-  }
-
-  Widget _filtersButtonBuilder() {
-    return HazardFiltersButton(
-      filtersKey: MapScreen.filtersKey,
-      onFiltersUpdated: () => _getMapHazards(),
-    ).pL(10.0);
   }
 
   Widget _viewListButtonBuilder() {
