@@ -80,7 +80,7 @@ class _HazardFiltersBottomsheetContentState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Alrt Filters',
+          'ALRT Filters',
           style: TextStyle(
             fontSize: 22.spMin,
             fontWeight: FontWeight.w700,

@@ -52,7 +52,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
       leadingWidth: 0.0,
       toolbarHeight: 50.spMin,
       title: Text(
-        'ALRT Intelligent Search',
+        'ALRT Search',
         style: TextStyle(
           color: AppColors.black,
         ),

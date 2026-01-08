@@ -84,9 +84,18 @@ class _CreateUpdateReportScreenState
                 (value) => value.hazardToCreateOrUpdate.id?.isNotEmpty ?? false,
               ),
             );
+            final reportSubmitted = ref.watch(
+              providerOfCreateReport.select(
+                (value) => value.reportSubmitted,
+              ),
+            );
 
             return Text(
-              isUpdating ? 'Update an ALRT' : 'Report an ALRT',
+              reportSubmitted
+                  ? 'ALRT Submitted'
+                  : isUpdating
+                  ? 'Update an ALRT'
+                  : 'ALRT Reporting',
               style: TextStyle(
                 color: AppColors.black,
               ),
