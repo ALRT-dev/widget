@@ -940,12 +940,16 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 child: Container(
                   padding: EdgeInsets.only(bottom: 12.spMin),
                   decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: AppColors.lightGrey,
-                        width: 1,
-                      ),
-                    ),
+                    border:
+                        isUserReported ||
+                            (license == null && (advisoryText?.isEmpty ?? true))
+                        ? null
+                        : Border(
+                            bottom: BorderSide(
+                              color: AppColors.lightGrey,
+                              width: 1,
+                            ),
+                          ),
                   ),
                   child: Row(
                     children: [
@@ -1119,6 +1123,28 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                         TextSpan(
                           text: copyrightText,
                         ),
+                        if (license?.link?.isNotEmpty ?? false) ...[
+                          TextSpan(
+                            text: ' Used under ',
+                          ),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap: () => openLink(
+                                context: context,
+                                link: license.link!,
+                              ),
+                              child: Text(
+                                license!.badgeText,
+                                style: TextStyle(
+                                  fontSize: 11.spMin,
+                                  color: AppColors.blue,
+                                  decoration: TextDecoration.none,
+                                ),
+                              ),
+                            ),
+                          ),
+                          TextSpan(text: ' license.'),
+                        ],
                       ],
                     ),
                   ),
