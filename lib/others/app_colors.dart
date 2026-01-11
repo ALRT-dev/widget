@@ -21,6 +21,7 @@ class AppColors {
   static const shadowColorMedium = Color(0x1F000000);
   static const shadowColorDark = Color(0x33000000);
 
+  static const extraLightblue = Color(0xFFEAF4FF);
   static const blue = Color(0xFF3478F5);
   static const darkBlue = Color(0xFF004ACE);
   static const yellow = Color(0xFFFCDD00);
@@ -33,6 +34,7 @@ class AppColors {
   static const red500 = Color(0xFFEF4444);
   static const darkRed = Color(0xFFFF0000);
   static const green = Color(0xFF34A853);
+  static const darkGreen = Color(0xFF0B8043);
   static const brown = Color(0xFF8B4513);
 
   static const info = blue;
