@@ -22,6 +22,9 @@ abstract class HazardSource with _$HazardSource {
     /// The copyright information for the hazard source.
     final String? copyrightText,
 
+    /// The link to the copyright information for the hazard source.
+    final String? copyrightLink,
+
     /// The advisory text provided by the hazard source.
     final String? advisoryText,
   }) = _HazardSource;

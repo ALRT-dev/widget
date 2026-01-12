@@ -903,6 +903,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           ),
         );
 
+        final copyrightLink = ref.watch(
+          provider.select(
+            (value) => value.hazard?.source?.copyrightLink,
+          ),
+        );
+
         return Container(
           decoration: BoxDecoration(
             color: AppColors.blue.withValues(alpha: 0.03),
@@ -1076,11 +1082,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                         ),
 
                         // View Link
-                        if (license.link != null)
+                        if (copyrightLink != null || license.link != null)
                           GestureDetector(
                             onTap: () => openLink(
                               context: context,
-                              link: license.link!,
+                              link: copyrightLink ?? license.link!,
                             ),
                             child: Text(
                               'View',

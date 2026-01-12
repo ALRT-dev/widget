@@ -17,6 +17,7 @@ _HazardSource _$HazardSourceFromJson(Map<String, dynamic> json) =>
               json['license'] as Map<String, dynamic>,
             ),
       copyrightText: json['copyrightText'] as String?,
+      copyrightLink: json['copyrightLink'] as String?,
       advisoryText: json['advisoryText'] as String?,
     );
 
@@ -27,5 +28,6 @@ Map<String, dynamic> _$HazardSourceToJson(_HazardSource instance) =>
       'url': ?instance.url,
       'license': ?instance.license?.toJson(),
       'copyrightText': ?instance.copyrightText,
+      'copyrightLink': ?instance.copyrightLink,
       'advisoryText': ?instance.advisoryText,
     };
