@@ -1,3 +1,7 @@
+## v1.0.0+21 - 2026/01/12
+* Bug fixes and improvements.
+
+
 ## v1.0.0+20 - 2026/01/11
 * Bug fixes and improvements.
 
