@@ -8,6 +8,7 @@ import 'package:hazard_app/features/profile/views/screens/support_request_screen
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
 import 'package:hazard_app/features/profile/providers/states/profile_provider_state.dart';
+import 'package:hazard_app/features/profile/views/screens/delete_account_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/profile/views/widgets/accepted_hazards_widgets/my_accepted_hazards_list.dart';
 import 'package:hazard_app/features/profile/views/widgets/rejected_hazards_widgets/my_rejected_hazards_list.dart';
@@ -58,8 +59,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   24.spMin.hSizedBox,
                   _buildSupportRequestSection(),
                   16.spMin.hSizedBox,
+                  _buildDeleteAccountSection(),
+                  50.spMin.hSizedBox,
                   _buildLogoutSection(),
-                  32.spMin.hSizedBox,
+                  10.spMin.hSizedBox,
                 ],
               ),
             ),
@@ -778,7 +781,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
                 Icon(
                   Icons.chevron_right,
-                  color: AppColors.grey,
+                  color: AppColors.blue,
                   size: 20.spMin,
                 ),
               ],
@@ -797,6 +800,83 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       onPressed: () {
         _showLogoutDialog();
       },
+    );
+  }
+
+  Widget _buildDeleteAccountSection() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12.spMin),
+        border: Border.all(
+          color: AppColors.extraLightGrey,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColor,
+            blurRadius: 8.spMin,
+            offset: Offset(0, 2.0),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.spMin),
+          onTap: _gotoDeleteAccountScreen,
+          child: Padding(
+            padding: EdgeInsets.all(16.spMin),
+            child: Row(
+              children: [
+                Container(
+                  width: 48.spMin,
+                  height: 48.spMin,
+                  decoration: BoxDecoration(
+                    color: AppColors.red.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12.spMin),
+                  ),
+                  child: Icon(
+                    Icons.delete_forever_outlined,
+                    color: AppColors.red,
+                    size: 24.spMin,
+                  ),
+                ),
+                16.spMin.wSizedBox,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Delete Account',
+                        style: TextStyle(
+                          fontSize: 16.spMin,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.red,
+                        ),
+                      ),
+                      4.spMin.hSizedBox,
+                      Text(
+                        'Permanently delete your account and all associated data',
+                        style: TextStyle(
+                          fontSize: 13.spMin,
+                          color: AppColors.grey,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.red.withValues(alpha: 0.7),
+                  size: 20.spMin,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -1220,6 +1300,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   /// Navigates to the Support Request screen.
   void _gotoSupportRequestScreen() {
     context.push(SupportRequestScreen.route);
+  }
+
+  /// Navigates to the Delete Account screen.
+  void _gotoDeleteAccountScreen() {
+    context.push(DeleteAccountScreen.route);
   }
 
   /// Shows the update profile picture button.

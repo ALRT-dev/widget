@@ -25,6 +25,10 @@ _AppUser _$AppUserFromJson(Map<String, dynamic> json) => _AppUser(
   reportsStatus:
       $enumDecodeNullable(_$UserReportsStatusEnumMap, json['reportsStatus']) ??
       UserReportsStatus.unverified,
+  scheduledDeletionAt: _$JsonConverterFromJson<String, DateTime>(
+    json['scheduledDeletionAt'],
+    const DateTimeConverter().fromJson,
+  ),
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
@@ -46,6 +50,10 @@ Map<String, dynamic> _$AppUserToJson(_AppUser instance) => <String, dynamic>{
   'upvotesReceivedCount': instance.upvotesReceivedCount,
   'ownLocationSubscriptionRadiusKm': instance.ownLocationSubscriptionRadiusKm,
   'reportsStatus': _$UserReportsStatusEnumMap[instance.reportsStatus]!,
+  'scheduledDeletionAt': ?_$JsonConverterToJson<String, DateTime>(
+    instance.scheduledDeletionAt,
+    const DateTimeConverter().toJson,
+  ),
   'createdAt': ?instance.createdAt?.toIso8601String(),
 };
 
@@ -54,3 +62,13 @@ const _$UserReportsStatusEnumMap = {
   UserReportsStatus.emerging: 'emerging',
   UserReportsStatus.verified: 'verified',
 };
+
+Value? _$JsonConverterFromJson<Json, Value>(
+  Object? json,
+  Value? Function(Json json) fromJson,
+) => json == null ? null : fromJson(json as Json);
+
+Json? _$JsonConverterToJson<Json, Value>(
+  Value? value,
+  Json? Function(Value value) toJson,
+) => value == null ? null : toJson(value);

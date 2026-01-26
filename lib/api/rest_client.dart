@@ -122,6 +122,12 @@ abstract class RestClient {
     @Body() required final PushNotificationSettings pushNotificationSettings,
   });
 
+  @DELETE(kUrlUserAccount)
+  Future<void> deleteAccount();
+
+  @POST(kUrlUserAccountCancelDeletion)
+  Future<void> cancelAccountDeletion();
+
   // ---------------------------- HAZARD ----------------------------
 
   @GET(kUrlHazards)
