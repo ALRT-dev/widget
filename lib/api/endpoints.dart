@@ -1,6 +1,6 @@
 const kUrlBase = 'http://15.135.57.148/api';
 // const kUrlBase = 'http://192.168.1.65:9000/api';
-const kUrlBaseDev = 'http://192.168.1.70:9000/api';
+const kUrlBaseDev = 'http://192.168.1.66:9000/api';
 
 // ---------------------------- AUTH ----------------------------
 
@@ -31,6 +31,9 @@ const kUrlOwnLocationSubscriptionRadius =
     '$kUrlUser/own-location-subscription-radius';
 
 const kUrlPushNotificationSettings = '$kUrlUser/push-notification-settings';
+
+const kUrlUserAccount = '$kUrlUser/account';
+const kUrlUserAccountCancelDeletion = '$kUrlUserAccount/cancel-deletion';
 
 // ---------------------------- HAZARD ----------------------------
 

@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hazard_app/features/shared/converters/date_time_converter.dart';
 import 'package:hazard_app/features/shared/enums/user_reports_status_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 
@@ -62,6 +63,11 @@ abstract class AppUser with _$AppUser {
     /// The user's report verification status.
     @Default(UserReportsStatus.unverified)
     final UserReportsStatus reportsStatus,
+
+    /// The timestamp when the user account is scheduled for deletion.
+    ///
+    /// If null, the user account is not scheduled for deletion.
+    @DateTimeConverter() final DateTime? scheduledDeletionAt,
 
     /// The timestamp when the user account was created.
     final DateTime? createdAt,

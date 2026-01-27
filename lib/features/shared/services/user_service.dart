@@ -157,6 +157,16 @@ class UserService {
     );
   }
 
+  /// Deletes the current user's account.
+  Future<Either<void, AppError>> deleteAccount() {
+    return _userRepository.deleteAccount();
+  }
+
+  /// Cancels the scheduled account deletion.
+  Future<Either<void, AppError>> cancelAccountDeletion() {
+    return _userRepository.cancelAccountDeletion();
+  }
+
   /// Populates the given [appUser] with required data such as processed profile picture.
   Future<AppUser> populateUserWithRequiredData(final AppUser appUser) async {
     return appUser.copyWith(
