@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
 import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
+import 'package:hazard_app/features/profile/views/screens/support_request_screen.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
 import 'package:hazard_app/features/profile/providers/states/profile_provider_state.dart';
@@ -55,6 +56,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   _buildSubmittedHazardsSection(),
                   _buildFailedReviewsSection(),
                   24.spMin.hSizedBox,
+                  _buildSupportRequestSection(),
+                  16.spMin.hSizedBox,
                   _buildLogoutSection(),
                   32.spMin.hSizedBox,
                 ],
@@ -331,26 +334,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   },
                 ),
               ),
-              16.wSizedBox,
-              Expanded(
-                child: Consumer(
-                  builder: (context, ref, child) {
-                    final reliabilityScore = ref.watch(
-                      providerOfLoggedInUser.select(
-                        (value) => (value?.reliabilityScore ?? 0.0) * 100,
-                      ),
-                    );
+              // 16.wSizedBox,
+              // Expanded(
+              //   child: Consumer(
+              //     builder: (context, ref, child) {
+              //       final reliabilityScore = ref.watch(
+              //         providerOfLoggedInUser.select(
+              //           (value) => (value?.reliabilityScore ?? 0.0) * 100,
+              //         ),
+              //       );
 
-                    return _buildScoreCard(
-                      'Reliability',
-                      '${reliabilityScore.toStringAsFixed(0)}%',
-                      Icons.shield_outlined,
-                      AppColors.green,
-                      _reliabilityDescription(reliabilityScore / 100),
-                    );
-                  },
-                ),
-              ),
+              //       return _buildScoreCard(
+              //         'Reliability',
+              //         '${reliabilityScore.toStringAsFixed(0)}%',
+              //         Icons.shield_outlined,
+              //         AppColors.green,
+              //         _reliabilityDescription(reliabilityScore / 100),
+              //       );
+              //     },
+              //   ),
+              // ),
             ],
           ),
           16.hSizedBox,
@@ -687,6 +690,83 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       4.spMin.hSizedBox,
                       Text(
                         'Control your notification preferences and stay updated',
+                        style: TextStyle(
+                          fontSize: 13.spMin,
+                          color: AppColors.grey,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: AppColors.grey,
+                  size: 20.spMin,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSupportRequestSection() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12.spMin),
+        border: Border.all(
+          color: AppColors.extraLightGrey,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColor,
+            blurRadius: 8.spMin,
+            offset: Offset(0, 2.0),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.spMin),
+          onTap: _gotoSupportRequestScreen,
+          child: Padding(
+            padding: EdgeInsets.all(16.spMin),
+            child: Row(
+              children: [
+                Container(
+                  width: 48.spMin,
+                  height: 48.spMin,
+                  decoration: BoxDecoration(
+                    color: AppColors.blue.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12.spMin),
+                  ),
+                  child: Icon(
+                    Icons.support_agent_outlined,
+                    color: AppColors.blue,
+                    size: 24.spMin,
+                  ),
+                ),
+                16.spMin.wSizedBox,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Support Request',
+                        style: TextStyle(
+                          fontSize: 16.spMin,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.black,
+                        ),
+                      ),
+                      4.spMin.hSizedBox,
+                      Text(
+                        'Need help? Submit a support request or feedback',
                         style: TextStyle(
                           fontSize: 13.spMin,
                           color: AppColors.grey,
@@ -1053,6 +1133,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return 'U';
   }
 
+  // ignore: unused_element
   String _reliabilityDescription(double score) {
     if (score >= 0.8) {
       return 'Excellent';
@@ -1134,6 +1215,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   /// Navigates to the Manage Notifications screen.
   void _gotoManageNotificationsScreen() {
     context.push(ManageNotificationsScreen.route);
+  }
+
+  /// Navigates to the Support Request screen.
+  void _gotoSupportRequestScreen() {
+    context.push(SupportRequestScreen.route);
   }
 
   /// Shows the update profile picture button.

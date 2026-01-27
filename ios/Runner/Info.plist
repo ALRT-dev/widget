@@ -32,6 +32,12 @@
           <string>com.googleusercontent.apps.446474907793-dkkgqvogtimtqtocdnbpv8meppphuqoq</string>
         </array>
       </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>msauth.$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+        </array>
+      </dict>
     </array>
     <key>CFBundleVersion</key>
     <string>$(FLUTTER_BUILD_NUMBER)</string>
@@ -43,6 +49,9 @@
       <string>com.google</string>
       <string>com.google.gppconsent</string>
       <string>com.googleusercontent.apps.446474907793-dkkgqvogtimtqtocdnbpv8meppphuqoq</string>
+      <string>msauthv2</string>
+      <string>msauthv3</string>
+      <string>microsoftauthenticator</string>
     </array>
     <key>LSRequiresIPhoneOS</key>
     <true />

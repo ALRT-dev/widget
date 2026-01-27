@@ -16,6 +16,7 @@ import 'package:hazard_app/features/onboarding/views/onboarding_location_screen.
 import 'package:hazard_app/features/onboarding/views/onboarding_radius_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_welcome_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/support_request_screen.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/splash_screen.dart';
@@ -168,6 +169,12 @@ class AppRouter {
           path: ManageNotificationsScreen.route,
           builder: (context, state) {
             return ManageNotificationsScreen();
+          },
+        ),
+        GoRoute(
+          path: SupportRequestScreen.route,
+          builder: (context, state) {
+            return const SupportRequestScreen();
           },
         ),
       ],

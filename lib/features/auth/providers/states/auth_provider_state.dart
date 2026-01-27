@@ -13,6 +13,10 @@ abstract class AuthProviderState with _$AuthProviderState {
     /// The state of signing in with Apple.
     @Default(SignInWithAppleState.initial())
     SignInWithAppleState signInWithAppleState,
+
+    /// The state of signing in with Microsoft.
+    @Default(SignInWithMicrosoftState.initial())
+    SignInWithMicrosoftState signInWithMicrosoftState,
   }) = _AuthProviderState;
 }
 
@@ -34,4 +38,17 @@ class SignInWithAppleState with _$SignInWithAppleState {
   const factory SignInWithAppleState.error(
     final AppError error,
   ) = SignInWithAppleStateError;
+}
+
+@freezed
+class SignInWithMicrosoftState with _$SignInWithMicrosoftState {
+  const factory SignInWithMicrosoftState.initial() =
+      SignInWithMicrosoftStateInitial;
+  const factory SignInWithMicrosoftState.loading() =
+      SignInWithMicrosoftStateLoading;
+  const factory SignInWithMicrosoftState.success() =
+      SignInWithMicrosoftStateSuccess;
+  const factory SignInWithMicrosoftState.error(
+    final AppError error,
+  ) = SignInWithMicrosoftStateError;
 }

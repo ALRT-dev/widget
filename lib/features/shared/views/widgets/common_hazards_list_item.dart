@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/notification/views/widgets/confirmation_buttons.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
-import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -145,6 +144,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _coloredHeaderBuilder(),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -158,8 +158,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _headerBuilder(),
-                                8.hSizedBox,
                                 _titleBuilder(),
                                 4.hSizedBox,
                                 _dateAndDistanceBuilder(),
@@ -173,8 +171,10 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     ),
                   ],
                 ).pX(16.0).pT(16.0),
-                8.hSizedBox,
-                _shortDescriptionBuilder().pX(16.0),
+                if (!widget.isInfoWindow) ...[
+                  8.hSizedBox,
+                  _shortDescriptionBuilder().pX(16.0),
+                ],
                 14.hSizedBox,
                 if (widget.showTrustMeter && widget.hazard.isUserReported) ...[
                   _confirmationButtonsBuilder().pX(16.0),
@@ -198,7 +198,8 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     ).pX(widget.horizontalPadding);
   }
 
-  Widget _headerBuilder() {
+  // ignore: unused_element
+  Widget _normalHeaderBuilder() {
     return Consumer(
       builder: (context, ref, child) {
         final isUserReported = ref.watch(
@@ -209,11 +210,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         final isAwsCompliant = ref.watch(
           provider.select(
             (value) => value.hazard!.isAwsCompliant ?? false,
-          ),
-        );
-        final hazardColor = ref.watch(
-          provider.select(
-            (value) => value.hazard!.color,
           ),
         );
         final severityTitle = ref.watch(
@@ -281,9 +277,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   style: TextStyle(
                     fontSize: 10.spMin,
                     fontWeight: FontWeight.w600,
-                    color: hazardColor.isLight
-                        ? AppColors.black
-                        : AppColors.white,
+                    color: AppColors.black,
                   ),
                 ),
               ),
@@ -307,6 +301,136 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                 ],
               ),
           ],
+        );
+      },
+    );
+  }
+
+  Widget _coloredHeaderBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isUserReported = ref.watch(
+          provider.select(
+            (value) => value.hazard!.isUserReported,
+          ),
+        );
+        final isAwsCompliant = ref.watch(
+          provider.select(
+            (value) => value.hazard!.isAwsCompliant ?? false,
+          ),
+        );
+        final severityTitle = ref.watch(
+          provider.select(
+            (value) => value.hazard!.severityTitle,
+          ),
+        );
+        final source = ref.watch(
+          provider.select(
+            (value) => value.hazard!.source,
+          ),
+        );
+        final hazardColor = ref.watch(
+          provider.select(
+            (value) => value.hazard?.color ?? AppColors.black,
+          ),
+        );
+
+        final isVerified = source != null;
+
+        final categoryLabel = isUserReported
+            ? 'USER'
+            : isAwsCompliant
+            ? 'AWS'
+            : 'OFFICIAL';
+
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.spMin,
+            vertical: 8.spMin,
+          ),
+          decoration: BoxDecoration(
+            color: hazardColor,
+            border: Border(
+              bottom: BorderSide(
+                color: hazardColor == AppColors.transparent
+                    ? AppColors.black
+                    : hazardColor,
+                width: 1.0,
+              ),
+            ),
+          ),
+          child: Row(
+            spacing: 8.spMin,
+            children: [
+              // Category Pill
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.spMin,
+                  vertical: 4.spMin,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(20.spMin),
+                  border: Border.all(
+                    color: AppColors.black,
+                    width: 1.0,
+                  ),
+                ),
+                child: Text(
+                  categoryLabel,
+                  style: TextStyle(
+                    fontSize: 10.spMin,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
+                ),
+              ),
+              // Severity/Category Text
+              if (isAwsCompliant)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.spMin,
+                    vertical: 4.spMin,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(20.spMin),
+                    border: Border.all(
+                      color: AppColors.black,
+                      width: 1.0,
+                    ),
+                  ),
+                  child: Text(
+                    severityTitle,
+                    style: TextStyle(
+                      fontSize: 10.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ),
+              // Verification Badge
+              if (isVerified)
+                Row(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.white,
+                      ),
+                      child: Icon(
+                        Icons.verified_rounded,
+                        size: 18.spMin,
+                        color: AppColors.blue,
+                      ),
+                    ),
+                    if (widget.showCloseButton && widget.onClosePressed != null)
+                      33.wSizedBox,
+                  ],
+                ),
+            ],
+          ),
         );
       },
     );
@@ -356,7 +480,9 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       builder: (context, ref, child) {
         final title = ref.watch(
           provider.select(
-            (value) => value.hazard!.title ?? 'Unknown Hazard',
+            (value) => value.hazard?.isUserReported ?? false
+                ? value.hazard?.category?.name ?? 'Alert Report'
+                : value.hazard!.title ?? 'Alert',
           ),
         );
 
@@ -530,20 +656,23 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard!.aiSummary?.trim(),
           ),
         );
-        final callToAction = ref.watch(
+        final callsToAction = ref.watch(
           provider.select(
-            (value) => value.hazard!.callToAction?.trim(),
+            (value) => value.hazard!.callsToAction,
           ),
         );
+        final callToActionText = callsToAction
+            ?.where((s) => s.trim().isNotEmpty)
+            .join(' ');
 
         final text = isUserReported
             ? [
                 if (aiSummary?.isNotEmpty ?? false) aiSummary,
-                if (callToAction?.isNotEmpty ?? false) callToAction!,
+                if (callToActionText?.isNotEmpty ?? false) callToActionText!,
               ].join(' ')
             : [
                 if (shortDescription.isNotEmpty) shortDescription,
-                if (callToAction?.isNotEmpty ?? false) callToAction!,
+                if (callToActionText?.isNotEmpty ?? false) callToActionText!,
               ].join(' ');
 
         if (text.isEmpty) {

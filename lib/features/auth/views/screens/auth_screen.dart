@@ -203,10 +203,15 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
         Row(
           spacing: 12.spMin,
           children: [
-            if (Platform.isIOS) Expanded(child: _buildAppleButton()),
+            Platform.isIOS
+                ? Expanded(child: _buildAppleButton())
+                // : Expanded(child: _buildMicrosoftButton()),
+                : SizedBox.shrink(),
             Expanded(child: _buildGoogleButton()),
           ],
         ),
+        // 12.hSizedBox,
+        // if (Platform.isIOS) _buildMicrosoftButton(),
       ],
     );
   }
@@ -260,7 +265,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(
                 vertical: 12.spMin,
-                horizontal: 16.spMin,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.r),
@@ -323,7 +327,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
             isLoading: isLoading,
             padding: EdgeInsets.symmetric(
               vertical: 12.spMin,
-              horizontal: 16.spMin,
             ),
             icon: SvgPicture.asset(
               'assets/logos/google.svg',
@@ -331,6 +334,37 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               height: 20.spMin,
             ),
             value: 'Google',
+          ),
+        );
+      },
+    );
+  }
+
+  // ignore: unused_element
+  Widget _buildMicrosoftButton() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final isLoading = ref.watch(
+          providerOfAuth.select(
+            (state) =>
+                state.signInWithMicrosoftState
+                    is SignInWithMicrosoftStateLoading,
+          ),
+        );
+        return SizedBox(
+          height: 50.spMin,
+          child: Button.bordered(
+            onPressed: _signInWithMicrosoft,
+            isLoading: isLoading,
+            padding: EdgeInsets.symmetric(
+              vertical: 12.spMin,
+            ),
+            icon: Image.asset(
+              'assets/logos/microsoft.png',
+              width: 18.spMin,
+              height: 18.spMin,
+            ),
+            value: 'Microsoft',
           ),
         );
       },
@@ -465,6 +499,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   /// Signs in the user with Apple.
   void _signInWithApple() {
     ref.read(providerOfAuth.notifier).signInWithApple();
+  }
+
+  /// Signs in the user with Microsoft.
+  void _signInWithMicrosoft() {
+    ref.read(providerOfAuth.notifier).signInWithMicrosoft();
   }
 
   /// Handles guest mode flow.

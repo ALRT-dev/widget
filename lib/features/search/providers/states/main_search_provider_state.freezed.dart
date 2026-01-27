@@ -16,9 +16,11 @@ mixin _$MainSearchProviderState {
 
 /// The location selected from the search results.
  AlrtLocation? get searchedLocation;/// The hazards fetched from the search results after a successful fetch.
- List<Hazard> get hazards;/// The ID of the subscription to the current searched location.
+ List<Hazard> get hazards;/// The current page of hazards being viewed.
+ int get currentPage;/// The ID of the subscription to the current searched location.
  String? get subscriptionId;/// The state of fetching hazards by location.
- GetHazardsByLocationState get getHazardsByLocationState;/// The state of subscribing to location.
+ GetHazardsByLocationState get getHazardsByLocationState;/// The state of fetching the next page of hazards by location.
+ GetHazardsByLocationState get getNextHazardsByLocationState;/// The state of subscribing to location.
  SubscribeToLocationState get subscribeToLocationState;/// The state of unsubscribing from location.
  UnsubscribeFromLocationState get unsubscribeFromLocationState;
 /// Create a copy of MainSearchProviderState
@@ -31,16 +33,16 @@ $MainSearchProviderStateCopyWith<MainSearchProviderState> get copyWith => _$Main
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MainSearchProviderState&&(identical(other.searchedLocation, searchedLocation) || other.searchedLocation == searchedLocation)&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.subscriptionId, subscriptionId) || other.subscriptionId == subscriptionId)&&(identical(other.getHazardsByLocationState, getHazardsByLocationState) || other.getHazardsByLocationState == getHazardsByLocationState)&&(identical(other.subscribeToLocationState, subscribeToLocationState) || other.subscribeToLocationState == subscribeToLocationState)&&(identical(other.unsubscribeFromLocationState, unsubscribeFromLocationState) || other.unsubscribeFromLocationState == unsubscribeFromLocationState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MainSearchProviderState&&(identical(other.searchedLocation, searchedLocation) || other.searchedLocation == searchedLocation)&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.subscriptionId, subscriptionId) || other.subscriptionId == subscriptionId)&&(identical(other.getHazardsByLocationState, getHazardsByLocationState) || other.getHazardsByLocationState == getHazardsByLocationState)&&(identical(other.getNextHazardsByLocationState, getNextHazardsByLocationState) || other.getNextHazardsByLocationState == getNextHazardsByLocationState)&&(identical(other.subscribeToLocationState, subscribeToLocationState) || other.subscribeToLocationState == subscribeToLocationState)&&(identical(other.unsubscribeFromLocationState, unsubscribeFromLocationState) || other.unsubscribeFromLocationState == unsubscribeFromLocationState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,searchedLocation,const DeepCollectionEquality().hash(hazards),subscriptionId,getHazardsByLocationState,subscribeToLocationState,unsubscribeFromLocationState);
+int get hashCode => Object.hash(runtimeType,searchedLocation,const DeepCollectionEquality().hash(hazards),currentPage,subscriptionId,getHazardsByLocationState,getNextHazardsByLocationState,subscribeToLocationState,unsubscribeFromLocationState);
 
 @override
 String toString() {
-  return 'MainSearchProviderState(searchedLocation: $searchedLocation, hazards: $hazards, subscriptionId: $subscriptionId, getHazardsByLocationState: $getHazardsByLocationState, subscribeToLocationState: $subscribeToLocationState, unsubscribeFromLocationState: $unsubscribeFromLocationState)';
+  return 'MainSearchProviderState(searchedLocation: $searchedLocation, hazards: $hazards, currentPage: $currentPage, subscriptionId: $subscriptionId, getHazardsByLocationState: $getHazardsByLocationState, getNextHazardsByLocationState: $getNextHazardsByLocationState, subscribeToLocationState: $subscribeToLocationState, unsubscribeFromLocationState: $unsubscribeFromLocationState)';
 }
 
 
@@ -51,11 +53,11 @@ abstract mixin class $MainSearchProviderStateCopyWith<$Res>  {
   factory $MainSearchProviderStateCopyWith(MainSearchProviderState value, $Res Function(MainSearchProviderState) _then) = _$MainSearchProviderStateCopyWithImpl;
 @useResult
 $Res call({
- AlrtLocation? searchedLocation, List<Hazard> hazards, String? subscriptionId, GetHazardsByLocationState getHazardsByLocationState, SubscribeToLocationState subscribeToLocationState, UnsubscribeFromLocationState unsubscribeFromLocationState
+ AlrtLocation? searchedLocation, List<Hazard> hazards, int currentPage, String? subscriptionId, GetHazardsByLocationState getHazardsByLocationState, GetHazardsByLocationState getNextHazardsByLocationState, SubscribeToLocationState subscribeToLocationState, UnsubscribeFromLocationState unsubscribeFromLocationState
 });
 
 
-$AlrtLocationCopyWith<$Res>? get searchedLocation;$GetHazardsByLocationStateCopyWith<$Res> get getHazardsByLocationState;$SubscribeToLocationStateCopyWith<$Res> get subscribeToLocationState;$UnsubscribeFromLocationStateCopyWith<$Res> get unsubscribeFromLocationState;
+$AlrtLocationCopyWith<$Res>? get searchedLocation;$GetHazardsByLocationStateCopyWith<$Res> get getHazardsByLocationState;$GetHazardsByLocationStateCopyWith<$Res> get getNextHazardsByLocationState;$SubscribeToLocationStateCopyWith<$Res> get subscribeToLocationState;$UnsubscribeFromLocationStateCopyWith<$Res> get unsubscribeFromLocationState;
 
 }
 /// @nodoc
@@ -68,12 +70,14 @@ class _$MainSearchProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of MainSearchProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? searchedLocation = freezed,Object? hazards = null,Object? subscriptionId = freezed,Object? getHazardsByLocationState = null,Object? subscribeToLocationState = null,Object? unsubscribeFromLocationState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? searchedLocation = freezed,Object? hazards = null,Object? currentPage = null,Object? subscriptionId = freezed,Object? getHazardsByLocationState = null,Object? getNextHazardsByLocationState = null,Object? subscribeToLocationState = null,Object? unsubscribeFromLocationState = null,}) {
   return _then(_self.copyWith(
 searchedLocation: freezed == searchedLocation ? _self.searchedLocation : searchedLocation // ignore: cast_nullable_to_non_nullable
 as AlrtLocation?,hazards: null == hazards ? _self.hazards : hazards // ignore: cast_nullable_to_non_nullable
-as List<Hazard>,subscriptionId: freezed == subscriptionId ? _self.subscriptionId : subscriptionId // ignore: cast_nullable_to_non_nullable
+as List<Hazard>,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,subscriptionId: freezed == subscriptionId ? _self.subscriptionId : subscriptionId // ignore: cast_nullable_to_non_nullable
 as String?,getHazardsByLocationState: null == getHazardsByLocationState ? _self.getHazardsByLocationState : getHazardsByLocationState // ignore: cast_nullable_to_non_nullable
+as GetHazardsByLocationState,getNextHazardsByLocationState: null == getNextHazardsByLocationState ? _self.getNextHazardsByLocationState : getNextHazardsByLocationState // ignore: cast_nullable_to_non_nullable
 as GetHazardsByLocationState,subscribeToLocationState: null == subscribeToLocationState ? _self.subscribeToLocationState : subscribeToLocationState // ignore: cast_nullable_to_non_nullable
 as SubscribeToLocationState,unsubscribeFromLocationState: null == unsubscribeFromLocationState ? _self.unsubscribeFromLocationState : unsubscribeFromLocationState // ignore: cast_nullable_to_non_nullable
 as UnsubscribeFromLocationState,
@@ -99,6 +103,15 @@ $GetHazardsByLocationStateCopyWith<$Res> get getHazardsByLocationState {
   
   return $GetHazardsByLocationStateCopyWith<$Res>(_self.getHazardsByLocationState, (value) {
     return _then(_self.copyWith(getHazardsByLocationState: value));
+  });
+}/// Create a copy of MainSearchProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$GetHazardsByLocationStateCopyWith<$Res> get getNextHazardsByLocationState {
+  
+  return $GetHazardsByLocationStateCopyWith<$Res>(_self.getNextHazardsByLocationState, (value) {
+    return _then(_self.copyWith(getNextHazardsByLocationState: value));
   });
 }/// Create a copy of MainSearchProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -200,10 +213,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AlrtLocation? searchedLocation,  List<Hazard> hazards,  String? subscriptionId,  GetHazardsByLocationState getHazardsByLocationState,  SubscribeToLocationState subscribeToLocationState,  UnsubscribeFromLocationState unsubscribeFromLocationState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( AlrtLocation? searchedLocation,  List<Hazard> hazards,  int currentPage,  String? subscriptionId,  GetHazardsByLocationState getHazardsByLocationState,  GetHazardsByLocationState getNextHazardsByLocationState,  SubscribeToLocationState subscribeToLocationState,  UnsubscribeFromLocationState unsubscribeFromLocationState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MainSearchProviderState() when $default != null:
-return $default(_that.searchedLocation,_that.hazards,_that.subscriptionId,_that.getHazardsByLocationState,_that.subscribeToLocationState,_that.unsubscribeFromLocationState);case _:
+return $default(_that.searchedLocation,_that.hazards,_that.currentPage,_that.subscriptionId,_that.getHazardsByLocationState,_that.getNextHazardsByLocationState,_that.subscribeToLocationState,_that.unsubscribeFromLocationState);case _:
   return orElse();
 
 }
@@ -221,10 +234,10 @@ return $default(_that.searchedLocation,_that.hazards,_that.subscriptionId,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AlrtLocation? searchedLocation,  List<Hazard> hazards,  String? subscriptionId,  GetHazardsByLocationState getHazardsByLocationState,  SubscribeToLocationState subscribeToLocationState,  UnsubscribeFromLocationState unsubscribeFromLocationState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( AlrtLocation? searchedLocation,  List<Hazard> hazards,  int currentPage,  String? subscriptionId,  GetHazardsByLocationState getHazardsByLocationState,  GetHazardsByLocationState getNextHazardsByLocationState,  SubscribeToLocationState subscribeToLocationState,  UnsubscribeFromLocationState unsubscribeFromLocationState)  $default,) {final _that = this;
 switch (_that) {
 case _MainSearchProviderState():
-return $default(_that.searchedLocation,_that.hazards,_that.subscriptionId,_that.getHazardsByLocationState,_that.subscribeToLocationState,_that.unsubscribeFromLocationState);case _:
+return $default(_that.searchedLocation,_that.hazards,_that.currentPage,_that.subscriptionId,_that.getHazardsByLocationState,_that.getNextHazardsByLocationState,_that.subscribeToLocationState,_that.unsubscribeFromLocationState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -241,10 +254,10 @@ return $default(_that.searchedLocation,_that.hazards,_that.subscriptionId,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AlrtLocation? searchedLocation,  List<Hazard> hazards,  String? subscriptionId,  GetHazardsByLocationState getHazardsByLocationState,  SubscribeToLocationState subscribeToLocationState,  UnsubscribeFromLocationState unsubscribeFromLocationState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( AlrtLocation? searchedLocation,  List<Hazard> hazards,  int currentPage,  String? subscriptionId,  GetHazardsByLocationState getHazardsByLocationState,  GetHazardsByLocationState getNextHazardsByLocationState,  SubscribeToLocationState subscribeToLocationState,  UnsubscribeFromLocationState unsubscribeFromLocationState)?  $default,) {final _that = this;
 switch (_that) {
 case _MainSearchProviderState() when $default != null:
-return $default(_that.searchedLocation,_that.hazards,_that.subscriptionId,_that.getHazardsByLocationState,_that.subscribeToLocationState,_that.unsubscribeFromLocationState);case _:
+return $default(_that.searchedLocation,_that.hazards,_that.currentPage,_that.subscriptionId,_that.getHazardsByLocationState,_that.getNextHazardsByLocationState,_that.subscribeToLocationState,_that.unsubscribeFromLocationState);case _:
   return null;
 
 }
@@ -256,7 +269,7 @@ return $default(_that.searchedLocation,_that.hazards,_that.subscriptionId,_that.
 
 
 class _MainSearchProviderState implements MainSearchProviderState {
-  const _MainSearchProviderState({this.searchedLocation, final  List<Hazard> hazards = const <Hazard>[], this.subscriptionId, this.getHazardsByLocationState = const GetHazardsByLocationState.initial(), this.subscribeToLocationState = const SubscribeToLocationState.initial(), this.unsubscribeFromLocationState = const UnsubscribeFromLocationState.initial()}): _hazards = hazards;
+  const _MainSearchProviderState({this.searchedLocation, final  List<Hazard> hazards = const <Hazard>[], this.currentPage = 1, this.subscriptionId, this.getHazardsByLocationState = const GetHazardsByLocationState.initial(), this.getNextHazardsByLocationState = const GetHazardsByLocationState.initial(), this.subscribeToLocationState = const SubscribeToLocationState.initial(), this.unsubscribeFromLocationState = const UnsubscribeFromLocationState.initial()}): _hazards = hazards;
   
 
 /// The location selected from the search results.
@@ -270,10 +283,14 @@ class _MainSearchProviderState implements MainSearchProviderState {
   return EqualUnmodifiableListView(_hazards);
 }
 
+/// The current page of hazards being viewed.
+@override@JsonKey() final  int currentPage;
 /// The ID of the subscription to the current searched location.
 @override final  String? subscriptionId;
 /// The state of fetching hazards by location.
 @override@JsonKey() final  GetHazardsByLocationState getHazardsByLocationState;
+/// The state of fetching the next page of hazards by location.
+@override@JsonKey() final  GetHazardsByLocationState getNextHazardsByLocationState;
 /// The state of subscribing to location.
 @override@JsonKey() final  SubscribeToLocationState subscribeToLocationState;
 /// The state of unsubscribing from location.
@@ -289,16 +306,16 @@ _$MainSearchProviderStateCopyWith<_MainSearchProviderState> get copyWith => __$M
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MainSearchProviderState&&(identical(other.searchedLocation, searchedLocation) || other.searchedLocation == searchedLocation)&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.subscriptionId, subscriptionId) || other.subscriptionId == subscriptionId)&&(identical(other.getHazardsByLocationState, getHazardsByLocationState) || other.getHazardsByLocationState == getHazardsByLocationState)&&(identical(other.subscribeToLocationState, subscribeToLocationState) || other.subscribeToLocationState == subscribeToLocationState)&&(identical(other.unsubscribeFromLocationState, unsubscribeFromLocationState) || other.unsubscribeFromLocationState == unsubscribeFromLocationState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MainSearchProviderState&&(identical(other.searchedLocation, searchedLocation) || other.searchedLocation == searchedLocation)&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.currentPage, currentPage) || other.currentPage == currentPage)&&(identical(other.subscriptionId, subscriptionId) || other.subscriptionId == subscriptionId)&&(identical(other.getHazardsByLocationState, getHazardsByLocationState) || other.getHazardsByLocationState == getHazardsByLocationState)&&(identical(other.getNextHazardsByLocationState, getNextHazardsByLocationState) || other.getNextHazardsByLocationState == getNextHazardsByLocationState)&&(identical(other.subscribeToLocationState, subscribeToLocationState) || other.subscribeToLocationState == subscribeToLocationState)&&(identical(other.unsubscribeFromLocationState, unsubscribeFromLocationState) || other.unsubscribeFromLocationState == unsubscribeFromLocationState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,searchedLocation,const DeepCollectionEquality().hash(_hazards),subscriptionId,getHazardsByLocationState,subscribeToLocationState,unsubscribeFromLocationState);
+int get hashCode => Object.hash(runtimeType,searchedLocation,const DeepCollectionEquality().hash(_hazards),currentPage,subscriptionId,getHazardsByLocationState,getNextHazardsByLocationState,subscribeToLocationState,unsubscribeFromLocationState);
 
 @override
 String toString() {
-  return 'MainSearchProviderState(searchedLocation: $searchedLocation, hazards: $hazards, subscriptionId: $subscriptionId, getHazardsByLocationState: $getHazardsByLocationState, subscribeToLocationState: $subscribeToLocationState, unsubscribeFromLocationState: $unsubscribeFromLocationState)';
+  return 'MainSearchProviderState(searchedLocation: $searchedLocation, hazards: $hazards, currentPage: $currentPage, subscriptionId: $subscriptionId, getHazardsByLocationState: $getHazardsByLocationState, getNextHazardsByLocationState: $getNextHazardsByLocationState, subscribeToLocationState: $subscribeToLocationState, unsubscribeFromLocationState: $unsubscribeFromLocationState)';
 }
 
 
@@ -309,11 +326,11 @@ abstract mixin class _$MainSearchProviderStateCopyWith<$Res> implements $MainSea
   factory _$MainSearchProviderStateCopyWith(_MainSearchProviderState value, $Res Function(_MainSearchProviderState) _then) = __$MainSearchProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- AlrtLocation? searchedLocation, List<Hazard> hazards, String? subscriptionId, GetHazardsByLocationState getHazardsByLocationState, SubscribeToLocationState subscribeToLocationState, UnsubscribeFromLocationState unsubscribeFromLocationState
+ AlrtLocation? searchedLocation, List<Hazard> hazards, int currentPage, String? subscriptionId, GetHazardsByLocationState getHazardsByLocationState, GetHazardsByLocationState getNextHazardsByLocationState, SubscribeToLocationState subscribeToLocationState, UnsubscribeFromLocationState unsubscribeFromLocationState
 });
 
 
-@override $AlrtLocationCopyWith<$Res>? get searchedLocation;@override $GetHazardsByLocationStateCopyWith<$Res> get getHazardsByLocationState;@override $SubscribeToLocationStateCopyWith<$Res> get subscribeToLocationState;@override $UnsubscribeFromLocationStateCopyWith<$Res> get unsubscribeFromLocationState;
+@override $AlrtLocationCopyWith<$Res>? get searchedLocation;@override $GetHazardsByLocationStateCopyWith<$Res> get getHazardsByLocationState;@override $GetHazardsByLocationStateCopyWith<$Res> get getNextHazardsByLocationState;@override $SubscribeToLocationStateCopyWith<$Res> get subscribeToLocationState;@override $UnsubscribeFromLocationStateCopyWith<$Res> get unsubscribeFromLocationState;
 
 }
 /// @nodoc
@@ -326,12 +343,14 @@ class __$MainSearchProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of MainSearchProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? searchedLocation = freezed,Object? hazards = null,Object? subscriptionId = freezed,Object? getHazardsByLocationState = null,Object? subscribeToLocationState = null,Object? unsubscribeFromLocationState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? searchedLocation = freezed,Object? hazards = null,Object? currentPage = null,Object? subscriptionId = freezed,Object? getHazardsByLocationState = null,Object? getNextHazardsByLocationState = null,Object? subscribeToLocationState = null,Object? unsubscribeFromLocationState = null,}) {
   return _then(_MainSearchProviderState(
 searchedLocation: freezed == searchedLocation ? _self.searchedLocation : searchedLocation // ignore: cast_nullable_to_non_nullable
 as AlrtLocation?,hazards: null == hazards ? _self._hazards : hazards // ignore: cast_nullable_to_non_nullable
-as List<Hazard>,subscriptionId: freezed == subscriptionId ? _self.subscriptionId : subscriptionId // ignore: cast_nullable_to_non_nullable
+as List<Hazard>,currentPage: null == currentPage ? _self.currentPage : currentPage // ignore: cast_nullable_to_non_nullable
+as int,subscriptionId: freezed == subscriptionId ? _self.subscriptionId : subscriptionId // ignore: cast_nullable_to_non_nullable
 as String?,getHazardsByLocationState: null == getHazardsByLocationState ? _self.getHazardsByLocationState : getHazardsByLocationState // ignore: cast_nullable_to_non_nullable
+as GetHazardsByLocationState,getNextHazardsByLocationState: null == getNextHazardsByLocationState ? _self.getNextHazardsByLocationState : getNextHazardsByLocationState // ignore: cast_nullable_to_non_nullable
 as GetHazardsByLocationState,subscribeToLocationState: null == subscribeToLocationState ? _self.subscribeToLocationState : subscribeToLocationState // ignore: cast_nullable_to_non_nullable
 as SubscribeToLocationState,unsubscribeFromLocationState: null == unsubscribeFromLocationState ? _self.unsubscribeFromLocationState : unsubscribeFromLocationState // ignore: cast_nullable_to_non_nullable
 as UnsubscribeFromLocationState,
@@ -358,6 +377,15 @@ $GetHazardsByLocationStateCopyWith<$Res> get getHazardsByLocationState {
   
   return $GetHazardsByLocationStateCopyWith<$Res>(_self.getHazardsByLocationState, (value) {
     return _then(_self.copyWith(getHazardsByLocationState: value));
+  });
+}/// Create a copy of MainSearchProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$GetHazardsByLocationStateCopyWith<$Res> get getNextHazardsByLocationState {
+  
+  return $GetHazardsByLocationStateCopyWith<$Res>(_self.getNextHazardsByLocationState, (value) {
+    return _then(_self.copyWith(getNextHazardsByLocationState: value));
   });
 }/// Create a copy of MainSearchProviderState
 /// with the given fields replaced by the non-null parameter values.

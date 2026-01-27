@@ -5,6 +5,7 @@ import 'package:hazard_app/features/shared/repositories/cache_manager_repository
 import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
 import 'package:hazard_app/features/shared/repositories/media_repository.dart';
 import 'package:hazard_app/features/shared/repositories/shared_prefs_repository.dart';
+import 'package:hazard_app/features/shared/repositories/support_repository.dart';
 import 'package:hazard_app/features/shared/repositories/user_repository.dart';
 
 /// Provides [SharedPreferencesRepository].
@@ -42,3 +43,10 @@ final providerOfCacheManagerRepository = Provider<CacheManagerRepository>(
     );
   },
 );
+
+/// Provides [SupportRepository].
+final providerOfSupportRepository = Provider<SupportRepository>((ref) {
+  return SupportRepositoryImpl(
+    restClient: ref.watch(providerOfRestClient),
+  );
+});

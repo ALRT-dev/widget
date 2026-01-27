@@ -31,12 +31,18 @@ class HazardFiltersBottomsheetContent extends ConsumerStatefulWidget {
 
 class _HazardFiltersBottomsheetContentState
     extends ConsumerState<HazardFiltersBottomsheetContent> {
+  bool _isAlertTypesExpanded = false;
+  bool _isCategoriesExpanded = false;
+
   @override
   Widget build(BuildContext context) {
     return BaseBottomsheet(
       safeAreaBottom: false,
-      child: SizedBox(
-        height: 0.85.sh,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        height: !_isAlertTypesExpanded && !_isCategoriesExpanded
+            ? 0.3.sh
+            : 0.85.sh,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -74,7 +80,7 @@ class _HazardFiltersBottomsheetContentState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Alrt Filters',
+          'ALRT Filters',
           style: TextStyle(
             fontSize: 22.spMin,
             fontWeight: FontWeight.w700,
@@ -117,8 +123,10 @@ class _HazardFiltersBottomsheetContentState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           16.hSizedBox,
-          _awsEmergencySection(),
-          28.hSizedBox,
+          _alertTypesSection(),
+          _isAlertTypesExpanded || _isCategoriesExpanded
+              ? 28.hSizedBox
+              : 14.hSizedBox,
           _categoriesSection(),
           24.hSizedBox,
         ],
@@ -130,41 +138,85 @@ class _HazardFiltersBottomsheetContentState
     String title, {
     required bool isEnabled,
     required VoidCallback onToggle,
+    required bool isExpanded,
+    required VoidCallback onExpandToggle,
   }) {
-    return GestureDetector(
-      onTap: onToggle,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      padding: EdgeInsets.all(18.spMin),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.spMin),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+            spreadRadius: 1,
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+            spreadRadius: 2,
+          ),
+        ],
+      ),
       child: Row(
         children: [
-          Container(
-            width: 3,
-            height: 16.spMin,
-            decoration: BoxDecoration(
-              color: AppColors.black,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          8.wSizedBox,
           Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 16.spMin,
-                fontWeight: FontWeight.w600,
-                color: AppColors.black,
+            child: GestureDetector(
+              onTap: onExpandToggle,
+              behavior: HitTestBehavior.opaque,
+              child: Row(
+                children: [
+                  Container(
+                    width: 3,
+                    height: 16.spMin,
+                    decoration: BoxDecoration(
+                      color: AppColors.black,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  8.wSizedBox,
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 16.spMin,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                  AnimatedRotation(
+                    turns: isExpanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: AppColors.black,
+                      size: 24.sp,
+                    ),
+                  ),
+                  8.wSizedBox,
+                ],
               ),
             ),
           ),
-          _customToggleSwitch(
-            isEnabled: isEnabled,
-            onToggle: (_) => onToggle(),
-            activeColor: AppColors.green.withValues(alpha: 0.6),
+          GestureDetector(
+            onTap: onToggle,
+            child: _customToggleSwitch(
+              isEnabled: isEnabled,
+              onToggle: (_) => onToggle(),
+              activeColor: AppColors.green.withValues(alpha: 0.6),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _awsEmergencySection() {
+  Widget _alertTypesSection() {
     return Consumer(
       builder: (context, ref, child) {
         final awsEmergency = ref.watch(
@@ -225,66 +277,83 @@ class _HazardFiltersBottomsheetContentState
                 }
                 widget.onFiltersUpdated?.call();
               },
-            ),
-            16.hSizedBox,
-            _filterToggleCard(
-              title: 'Emergency',
-              description: 'Immediate threat to life and property',
-              isEnabled: awsEmergency,
-              onToggle: (value) {
-                filterProvider.updateAwsEmergency(value);
-                widget.onFiltersUpdated?.call();
+              isExpanded: _isAlertTypesExpanded,
+              onExpandToggle: () {
+                setState(() {
+                  _isAlertTypesExpanded = !_isAlertTypesExpanded;
+                });
               },
-              color: Colors.red,
-              icon: Icons.warning_rounded,
             ),
-            12.hSizedBox,
-            _filterToggleCard(
-              title: 'Watch and Act',
-              description: 'Conditions are changing - prepare now',
-              isEnabled: awsWatchAndAct,
-              onToggle: (value) {
-                filterProvider.updateAwsWatchAndAct(value);
-                widget.onFiltersUpdated?.call();
-              },
-              color: Colors.orange,
-              icon: Icons.visibility_rounded,
-            ),
-            12.hSizedBox,
-            _filterToggleCard(
-              title: 'Advice',
-              description: 'Stay informed and monitor conditions',
-              isEnabled: awsAdvice,
-              onToggle: (value) {
-                filterProvider.updateAwsAdvice(value);
-                widget.onFiltersUpdated?.call();
-              },
-              color: Colors.amber,
-              icon: Icons.info_outline_rounded,
-            ),
-            12.hSizedBox,
-            _filterToggleCard(
-              title: 'Official Non-AWS',
-              description: 'Official sources other than AWS',
-              isEnabled: officialNonAws,
-              onToggle: (value) {
-                filterProvider.updateOfficialNonAws(value);
-                widget.onFiltersUpdated?.call();
-              },
-              color: Colors.blue,
-              icon: Icons.account_balance_rounded,
-            ),
-            12.hSizedBox,
-            _filterToggleCard(
-              title: 'User Reported',
-              description: 'Community and user submissions',
-              isEnabled: isUserReported,
-              onToggle: (value) {
-                filterProvider.updateUserReported(value);
-                widget.onFiltersUpdated?.call();
-              },
-              color: Colors.green,
-              icon: Icons.group_rounded,
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              alignment: Alignment.topCenter,
+              child: _isAlertTypesExpanded
+                  ? Column(
+                      children: [
+                        16.hSizedBox,
+                        _filterToggleCard(
+                          title: 'Emergency',
+                          description: 'Immediate threat to life and property',
+                          isEnabled: awsEmergency,
+                          onToggle: (value) {
+                            filterProvider.updateAwsEmergency(value);
+                            widget.onFiltersUpdated?.call();
+                          },
+                          color: Colors.red,
+                          icon: Icons.warning_rounded,
+                        ),
+                        12.hSizedBox,
+                        _filterToggleCard(
+                          title: 'Watch and Act',
+                          description: 'Conditions are changing - prepare now',
+                          isEnabled: awsWatchAndAct,
+                          onToggle: (value) {
+                            filterProvider.updateAwsWatchAndAct(value);
+                            widget.onFiltersUpdated?.call();
+                          },
+                          color: Colors.orange,
+                          icon: Icons.visibility_rounded,
+                        ),
+                        12.hSizedBox,
+                        _filterToggleCard(
+                          title: 'Advice',
+                          description: 'Stay informed and monitor conditions',
+                          isEnabled: awsAdvice,
+                          onToggle: (value) {
+                            filterProvider.updateAwsAdvice(value);
+                            widget.onFiltersUpdated?.call();
+                          },
+                          color: Colors.amber,
+                          icon: Icons.info_outline_rounded,
+                        ),
+                        12.hSizedBox,
+                        _filterToggleCard(
+                          title: 'Official Non-AWS',
+                          description: 'Official sources other than AWS',
+                          isEnabled: officialNonAws,
+                          onToggle: (value) {
+                            filterProvider.updateOfficialNonAws(value);
+                            widget.onFiltersUpdated?.call();
+                          },
+                          color: Colors.blue,
+                          icon: Icons.account_balance_rounded,
+                        ),
+                        12.hSizedBox,
+                        _filterToggleCard(
+                          title: 'User Reported',
+                          description: 'Community and user submissions',
+                          isEnabled: isUserReported,
+                          onToggle: (value) {
+                            filterProvider.updateUserReported(value);
+                            widget.onFiltersUpdated?.call();
+                          },
+                          color: Colors.green,
+                          icon: Icons.group_rounded,
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
             ),
           ],
         );
@@ -307,8 +376,7 @@ class _HazardFiltersBottomsheetContentState
         padding: EdgeInsets.all(18.spMin),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16.r),
-
+          borderRadius: BorderRadius.circular(16.spMin),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
@@ -376,7 +444,7 @@ class _HazardFiltersBottomsheetContentState
         height: 26.spMin,
         decoration: BoxDecoration(
           color: isEnabled ? activeColor : Colors.grey.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(13.r),
+          borderRadius: BorderRadius.circular(13.spMin),
         ),
         child: Stack(
           children: [
@@ -389,7 +457,7 @@ class _HazardFiltersBottomsheetContentState
                 height: 22.spMin,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(11.r),
+                  borderRadius: BorderRadius.circular(11.spMin),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.1),
@@ -430,6 +498,12 @@ class _HazardFiltersBottomsheetContentState
                 'Categories',
                 isEnabled: isAnyAlertTypeEnabled,
                 onToggle: () {},
+                isExpanded: _isCategoriesExpanded,
+                onExpandToggle: () {
+                  setState(() {
+                    _isCategoriesExpanded = !_isCategoriesExpanded;
+                  });
+                },
               ),
               16.hSizedBox,
               SizedBox(
@@ -471,9 +545,29 @@ class _HazardFiltersBottomsheetContentState
                     }
                     widget.onFiltersUpdated?.call();
                   },
+                  isExpanded: _isCategoriesExpanded,
+                  onExpandToggle: () {
+                    setState(() {
+                      _isCategoriesExpanded = !_isCategoriesExpanded;
+                    });
+                  },
                 ),
-                16.hSizedBox,
-                ...cats.map((category) => _categoryToggleCard(category)),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  alignment: Alignment.topCenter,
+                  child: _isCategoriesExpanded
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            16.hSizedBox,
+                            ...cats.map(
+                              (category) => _categoryToggleCard(category),
+                            ),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
+                ),
               ],
             );
           },

@@ -80,7 +80,7 @@ abstract class Hazard with _$Hazard {
     final AIConfidence? aiConfidence,
 
     /// The things users can do to mitigate the hazard.
-    final String? callToAction,
+    final List<String>? callsToAction,
 
     /// Indicates whether the hazard follows AWS standards.
     final bool? isAwsCompliant,

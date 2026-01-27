@@ -70,6 +70,9 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
       getHazardsByLocationState: const GetHazardsByLocationState.loading(),
     );
 
+    // Reset the current page to 1 when fetching initial hazards
+    updateCurrentPage(1);
+
     final selectedCategoryIds = _ref
         .read(providerOfHazardFiltersForSearch)
         .selectedCategoryIds
@@ -124,6 +127,78 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
     );
   }
 
+  /// Fetches the next page of hazards for the given location and updates the state accordingly.
+  Future<void> getNextHazards() async {
+    final location = state.searchedLocation;
+    if (location?.bounds == null) return;
+
+    final isLoading = state.getNextHazardsByLocationState.maybeWhen(
+      loading: () => true,
+      orElse: () => false,
+    );
+    if (isLoading) return; // Prevent multiple simultaneous fetches
+
+    state = state.copyWith(
+      getNextHazardsByLocationState: const GetHazardsByLocationState.loading(),
+    );
+
+    final selectedCategoryIds = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .selectedCategoryIds
+        .toList();
+    final awsEmergency = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .awsEmergency;
+    final awsWatchAndAct = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .awsWatchAndAct;
+    final awsAdvice = _ref.read(providerOfHazardFiltersForSearch).awsAdvice;
+    final officialNonAws = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .officialNonAws;
+    final userReported = _ref
+        .read(providerOfHazardFiltersForSearch)
+        .userReported;
+
+    // Update the current page by 1, since we are fetching the next page
+    updateCurrentPage(state.currentPage + 1);
+
+    final result = await _hazardService.getHazardsWithSubscriptionId(
+      searchParams: HazardSearchParams(
+        northeastLat: location!.bounds?.northeastLat,
+        northeastLng: location.bounds?.northeastLng,
+        southwestLat: location.bounds?.southwestLat,
+        southwestLng: location.bounds?.southwestLng,
+        categoryIds: selectedCategoryIds,
+        awsEmergency: awsEmergency,
+        awsWatchAndAct: awsWatchAndAct,
+        awsAdvice: awsAdvice,
+        officialNonAws: officialNonAws,
+        userReported: userReported,
+
+        // Pass the updated current page
+        page: state.currentPage,
+      ),
+    );
+    if (!mounted) return;
+
+    result.when(
+      (response) {
+        state = state.copyWith(
+          getNextHazardsByLocationState: GetHazardsByLocationState.success(
+            response.hazards,
+          ),
+        );
+        addMultipleToHazards(response.hazards);
+      },
+      (error) {
+        state = state.copyWith(
+          getNextHazardsByLocationState: GetHazardsByLocationState.error(error),
+        );
+      },
+    );
+  }
+
   /// Subscribes to the current [MainSearchProviderState.searchedLocation].
   Future<void> subscribeToLocation() async {
     final location = state.searchedLocation;
@@ -156,7 +231,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         _myLocationSubscriptionsProvider.addLocationSubscription(subscription);
 
         // after subscribing to a location, refresh the notifications feed
-        _notificationsFeedProvider.getNotificationsFeed();
+        _notificationsFeedProvider.getNotificationsFeedHazards();
       },
       (error) {
         state = state.copyWith(
@@ -196,7 +271,7 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
         );
 
         // after unsubscribing from a location, refresh the notifications feed
-        _notificationsFeedProvider.getNotificationsFeed();
+        _notificationsFeedProvider.getNotificationsFeedHazards();
       },
       (error) {
         state = state.copyWith(
@@ -248,6 +323,26 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
     updateHazards(updatedHazards);
   }
 
+  /// Adds multiple new hazards to the existing list of hazards in the state.
+  ///
+  /// If the hazard already exists (based on ID), it will be updated instead of added again.
+  void addMultipleToHazards(final List<Hazard> newHazards) {
+    final updatedHazards = List<Hazard>.from(state.hazards);
+    for (final newHazard in newHazards) {
+      final index = updatedHazards.indexWhere(
+        (hazard) => hazard.id == newHazard.id,
+      );
+      if (index != -1) {
+        // Hazard already exists, update it
+        updatedHazards[index] = newHazard;
+      } else {
+        // Hazard does not exist, add it
+        updatedHazards.add(newHazard);
+      }
+    }
+    updateHazards(updatedHazards);
+  }
+
   /// Adds a new hazard to the existing list of hazards in the state.
   void addToHazards(final Hazard newHazard) {
     final index = state.hazards.indexWhere(
@@ -276,6 +371,13 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
   void updateSubscriptionId(final String? subscriptionId) {
     state = state.copyWith(
       subscriptionId: subscriptionId,
+    );
+  }
+
+  /// Updates [MainSearchProviderState.currentPage] with the given [currentPage].
+  void updateCurrentPage(final int currentPage) {
+    state = state.copyWith(
+      currentPage: currentPage,
     );
   }
 }

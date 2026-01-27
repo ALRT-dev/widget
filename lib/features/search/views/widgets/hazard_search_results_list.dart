@@ -193,13 +193,27 @@ class _HazardSearchResultsListState
             (value) => value.hazards,
           ),
         );
+        final getNextHazardsByLocationState = ref.watch(
+          providerOfMainSearch.select(
+            (value) => value.getNextHazardsByLocationState,
+          ),
+        );
+        final isLoadingMore = getNextHazardsByLocationState.maybeWhen(
+          loading: () => true,
+          orElse: () => false,
+        );
+
         if (hazards.isEmpty) {
           return _emptyBuilder();
         }
 
         return SliverList.separated(
-          itemCount: hazards.length,
+          itemCount: hazards.length + (isLoadingMore ? 1 : 0),
           itemBuilder: (context, index) {
+            if (index == hazards.length) {
+              // Show loading indicator at the bottom
+              return Spinner().pad(20.0);
+            }
             final hazard = hazards[index];
             return CommonHazardsListItem(
               key: ValueKey(hazard.id),

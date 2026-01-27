@@ -29,7 +29,7 @@ class NotificationsFeedProvider
     required final NotificationsFeedProviderState state,
   }) : _ref = ref,
        super(state) {
-    getNotificationsFeed();
+    getNotificationsFeedHazards();
     _listenToSocketForHazards();
   }
 
@@ -91,10 +91,77 @@ class NotificationsFeedProvider
   }
 
   /// Fetches the hazards that the user has subscribed to for notifications
-  Future<void> getNotificationsFeed() async {
+  Future<void> getNotificationsFeedHazards() async {
+    final selectedCategoryIds = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .selectedCategoryIds
+        .toList();
+    final awsEmergency = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .awsEmergency;
+    final awsWatchAndAct = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .awsWatchAndAct;
+    final awsAdvice = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .awsAdvice;
+    final officialNonAws = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .officialNonAws;
+    final userReported = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .userReported;
+
     state = state.copyWith(
-      getNotificationsFeed: const GetNotificationsFeed.loading(),
+      getNotificationsFeedHazardsState:
+          const GetNotificationsFeedHazardsState.loading(),
     );
+
+    // Reset current page to 1 when fetching the first page
+    updateCurrentPage(1);
+
+    final result = await _notificationService.getNotificationsFeed(
+      searchParams: HazardSearchParams(
+        searchString: state.searchString,
+        categoryIds: selectedCategoryIds,
+        awsEmergency: awsEmergency,
+        awsWatchAndAct: awsWatchAndAct,
+        awsAdvice: awsAdvice,
+        officialNonAws: officialNonAws,
+        userReported: userReported,
+
+        // Pass the current page
+        page: state.currentPage,
+      ),
+    );
+    if (!mounted) return;
+
+    result.when(
+      (hazards) {
+        state = state.copyWith(
+          getNotificationsFeedHazardsState:
+              GetNotificationsFeedHazardsState.success(
+                hazards,
+              ),
+        );
+        updateHazards(hazards);
+      },
+      (error) {
+        state = state.copyWith(
+          getNotificationsFeedHazardsState:
+              GetNotificationsFeedHazardsState.error(error),
+        );
+      },
+    );
+  }
+
+  /// Fetches the hazards that the user has subscribed to for notifications
+  Future<void> getNextNotificationsFeedHazards() async {
+    final isLoading = state.getNextNotificationsFeedHazardsState.maybeWhen(
+      loading: () => true,
+      orElse: () => false,
+    );
+    if (isLoading) return; // Prevent multiple simultaneous fetches
 
     final selectedCategoryIds = _ref
         .read(providerOfHazardFiltersForNotifications)
@@ -116,6 +183,14 @@ class NotificationsFeedProvider
         .read(providerOfHazardFiltersForNotifications)
         .userReported;
 
+    state = state.copyWith(
+      getNextNotificationsFeedHazardsState:
+          const GetNotificationsFeedHazardsState.loading(),
+    );
+
+    // Update the current page by 1, since we are fetching the next page
+    updateCurrentPage(state.currentPage + 1);
+
     final result = await _notificationService.getNotificationsFeed(
       searchParams: HazardSearchParams(
         searchString: state.searchString,
@@ -125,6 +200,9 @@ class NotificationsFeedProvider
         awsAdvice: awsAdvice,
         officialNonAws: officialNonAws,
         userReported: userReported,
+
+        // Pass the updated current page
+        page: state.currentPage,
       ),
     );
     if (!mounted) return;
@@ -132,13 +210,15 @@ class NotificationsFeedProvider
     result.when(
       (hazards) {
         state = state.copyWith(
-          getNotificationsFeed: GetNotificationsFeed.success(hazards),
+          getNextNotificationsFeedHazardsState:
+              GetNotificationsFeedHazardsState.success(hazards),
         );
-        updateHazards(hazards);
+        addMultipleToHazards(hazards);
       },
       (error) {
         state = state.copyWith(
-          getNotificationsFeed: GetNotificationsFeed.error(error),
+          getNextNotificationsFeedHazardsState:
+              GetNotificationsFeedHazardsState.error(error),
         );
       },
     );
@@ -169,6 +249,26 @@ class NotificationsFeedProvider
     updateHazards(updatedHazards);
   }
 
+  /// Adds multiple new hazards to the existing list of hazards in the state.
+  ///
+  /// If the hazard already exists (based on ID), it will be updated instead of added again.
+  void addMultipleToHazards(final List<Hazard> newHazards) {
+    final updatedHazards = List<Hazard>.from(state.hazards);
+    for (final newHazard in newHazards) {
+      final index = updatedHazards.indexWhere(
+        (hazard) => hazard.id == newHazard.id,
+      );
+      if (index != -1) {
+        // Hazard already exists, update it
+        updatedHazards[index] = newHazard;
+      } else {
+        // Hazard does not exist, add it
+        updatedHazards.add(newHazard);
+      }
+    }
+    updateHazards(updatedHazards);
+  }
+
   /// Adds a new hazard to the existing list of hazards in the state.
   void addToHazards(final Hazard newHazard) {
     final index = state.hazards.indexWhere(
@@ -193,10 +293,18 @@ class NotificationsFeedProvider
     updateHazards(updatedHazards);
   }
 
-  /// Updates [NotificationsFeedProviderState.getNotificationsFeed] to loading state.
+  /// Updates [NotificationsFeedProviderState.getNotificationsFeedHazardsState] to loading state.
   void updateGetNotificationsFeedStateToLoading() {
     state = state.copyWith(
-      getNotificationsFeed: const GetNotificationsFeed.loading(),
+      getNotificationsFeedHazardsState:
+          const GetNotificationsFeedHazardsState.loading(),
+    );
+  }
+
+  /// Updates [NotificationsFeedProviderState.currentPage] with the provided [currentPage].
+  void updateCurrentPage(final int currentPage) {
+    state = state.copyWith(
+      currentPage: currentPage,
     );
   }
 }

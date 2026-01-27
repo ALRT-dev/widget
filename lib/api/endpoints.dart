@@ -1,11 +1,12 @@
-const kUrlBase = 'http://3.26.195.127/api';
+const kUrlBase = 'http://15.135.57.148/api';
 // const kUrlBase = 'http://192.168.1.65:9000/api';
-const kUrlBaseDev = 'http://192.168.1.68:9000/api';
+const kUrlBaseDev = 'http://192.168.1.70:9000/api';
 
 // ---------------------------- AUTH ----------------------------
 
 const kUrlOAuthGoogle = '/auth/oauth/google';
 const kUrlOAuthApple = '/auth/oauth/apple';
+const kUrlOAuthMicrosoft = '/auth/oauth/microsoft';
 const kUrlRefreshToken = '/auth/refresh-token';
 
 // ---------------------------- ONBOARDING ----------------------------
@@ -48,3 +49,7 @@ const kUrlNotifications = '/notifications';
 const kUrlNotificationsFeed = '$kUrlNotifications/feed';
 const kUrlNotificationsPushNotificationToken =
     '$kUrlNotifications/push-notification-token';
+
+// ---------------------------- SUPPORT ----------------------------
+
+const kUrlSupport = '/support';

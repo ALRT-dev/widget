@@ -102,6 +102,27 @@ class AuthService {
     return result;
   }
 
+  /// Signs in the user with Microsoft.
+  Future<Either<AuthSuccess, AppError>> signInWithMicrosoft() async {
+    final result = await _authRepository.signInWithMicrosoft();
+
+    await result.whenSuccess((response) {
+      log('Access Token ::  ${response.accessToken}');
+      log('Refresh Token ::  ${response.refreshToken}');
+      return Future.wait([
+        _saveAuthMethod(
+          authMethod: AuthMethod.microsoft,
+        ),
+        _saveAuthTokens(
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        ),
+      ]);
+    });
+
+    return result;
+  }
+
   /// Logs out the user by deleting the access token from local storage.
   Future<Either<void, AppError>> logout() async {
     await _deleteAccessToken();

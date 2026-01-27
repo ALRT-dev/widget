@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/others/app_colors.dart';
 
 class CompassPainter extends CustomPainter {
   @override
@@ -60,27 +61,32 @@ class _CustomCompassButtonState extends ConsumerState<CustomCompassButton> {
     return AnimatedOpacity(
       duration: Duration(milliseconds: 300),
       opacity: bearing == 0 ? 0.0 : 1.0,
-      child: Material(
-        elevation: 3.0,
-        shape: CircleBorder(),
+      child: GestureDetector(
+        onTap: _handleTap,
         child: Container(
-          width: 50.spMin,
-          height: 50.spMin,
+          width: 48.spMin,
+          height: 48.spMin,
           decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(14.spMin),
+            border: Border.all(
+              color: AppColors.lightGrey,
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0, 0.0),
+              ),
+            ],
           ),
           child: Transform.rotate(
             angle: -bearing * pi / 180,
-            child: InkWell(
-              onTap: _handleTap,
-              customBorder: CircleBorder(),
-              child: Padding(
-                padding: EdgeInsets.all(12.spMin),
-                child: CustomPaint(
-                  painter: CompassPainter(),
-                  size: Size(26.spMin, 26.spMin),
-                ),
+            child: Padding(
+              padding: EdgeInsets.all(12.spMin),
+              child: CustomPaint(
+                painter: CompassPainter(),
+                size: Size(24.spMin, 24.spMin),
               ),
             ),
           ),

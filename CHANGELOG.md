@@ -1,3 +1,26 @@
+## v1.0.0+21 - 2026/01/12
+* Bug fixes and improvements.
+
+
+## v1.0.0+20 - 2026/01/11
+* Bug fixes and improvements.
+
+
+## v1.0.0+19 - 2025/12/20
+* Bug fixes and improvements.
+
+
+## v1.0.0+18 - 2025/12/18
+* Bug fixes and improvements.
+
+
+## v1.0.0+17 - 2025/12/15
+* "What we know" and "What to do" are based on the new prompts.
+* Moved the "Confirm" button to the right side for better accessibility.
+* Removed title from the alert creation screen.
+* 5km radius while creating an alert.
+
+
 ## v1.0.0+16 - 2025/12/04
 * Bug Fixes and Improvements
 

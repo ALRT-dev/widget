@@ -68,6 +68,57 @@ class _ConfirmationButtonsState extends ConsumerState<ConfirmationButtons> {
       ),
       child: Row(
         children: [
+          // Not There button
+          Expanded(
+            child: GestureDetector(
+              onTap: _handleDownvote,
+              child: Container(
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10.spMin),
+                    bottomLeft: Radius.circular(10.spMin),
+                  ),
+
+                  color: _voteType == HazardVoteType.downvote
+                      ? Colors.red
+                      : Colors.transparent,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 6.spMin,
+                  children: [
+                    Icon(
+                      Icons.thumb_down_outlined,
+                      size: 16.spMin,
+                      color: _voteType == HazardVoteType.downvote
+                          ? AppColors.white
+                          : AppColors.grey,
+                    ),
+                    Text(
+                      'Not There',
+                      style: TextStyle(
+                        fontSize: 12.spMin,
+                        fontWeight: FontWeight.w600,
+                        color: _voteType == HazardVoteType.downvote
+                            ? AppColors.white
+                            : AppColors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Divider
+          Container(
+            width: 1.0,
+            height: double.infinity,
+            margin: EdgeInsets.symmetric(vertical: 8.spMin),
+            color: AppColors.lightGrey,
+          ),
+
           // Confirm button
           Expanded(
             child: GestureDetector(
@@ -76,8 +127,8 @@ class _ConfirmationButtonsState extends ConsumerState<ConfirmationButtons> {
                 height: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10.spMin),
-                    bottomLeft: Radius.circular(10.spMin),
+                    topRight: Radius.circular(10.spMin),
+                    bottomRight: Radius.circular(10.spMin),
                   ),
                   color: _voteType == HazardVoteType.upvote
                       ? Colors.green
@@ -100,56 +151,6 @@ class _ConfirmationButtonsState extends ConsumerState<ConfirmationButtons> {
                         fontSize: 12.spMin,
                         fontWeight: FontWeight.w600,
                         color: _voteType == HazardVoteType.upvote
-                            ? AppColors.white
-                            : AppColors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // Divider
-          Container(
-            width: 1.0,
-            height: double.infinity,
-            margin: EdgeInsets.symmetric(vertical: 8.spMin),
-            color: AppColors.lightGrey,
-          ),
-
-          // Not There button
-          Expanded(
-            child: GestureDetector(
-              onTap: _handleDownvote,
-              child: Container(
-                height: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(10.spMin),
-                    bottomRight: Radius.circular(10.spMin),
-                  ),
-                  color: _voteType == HazardVoteType.downvote
-                      ? Colors.red
-                      : Colors.transparent,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 6.spMin,
-                  children: [
-                    Icon(
-                      Icons.thumb_down_outlined,
-                      size: 16.spMin,
-                      color: _voteType == HazardVoteType.downvote
-                          ? AppColors.white
-                          : AppColors.grey,
-                    ),
-                    Text(
-                      'Not There',
-                      style: TextStyle(
-                        fontSize: 12.spMin,
-                        fontWeight: FontWeight.w600,
-                        color: _voteType == HazardVoteType.downvote
                             ? AppColors.white
                             : AppColors.grey,
                       ),

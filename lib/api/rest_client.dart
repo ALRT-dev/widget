@@ -34,6 +34,11 @@ abstract class RestClient {
     @Field() final String? lastName,
   });
 
+  @POST(kUrlOAuthMicrosoft)
+  Future<AuthSuccess> verifyMicrosoftOAuth({
+    @Field() required final String idToken,
+  });
+
   @POST(kUrlRefreshToken)
   Future<AuthSuccess> refreshToken({
     @Field() required final String accessToken,
@@ -181,5 +186,15 @@ abstract class RestClient {
   @POST(kUrlNotificationsPushNotificationToken)
   Future<HttpResponse> sendPushNotificationToken({
     @Field() required final String token,
+  });
+
+  // ---------------------------- SUPPORT ----------------------------
+
+  @POST(kUrlSupport)
+  Future<void> submitSupportRequest({
+    @Field() required final String requestType,
+    @Field() required final String details,
+    @Field() final String? userName,
+    @Field() final String? userEmail,
   });
 }

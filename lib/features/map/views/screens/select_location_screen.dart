@@ -13,6 +13,7 @@ import 'package:hazard_app/features/map/views/widgets/place_search_results_list.
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/utils/location_helper.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -21,6 +22,8 @@ class SelectLocationScreenArgs {
     this.initialLocation,
     this.getSubUrbOnly = false,
     this.showYourLocationOption = true,
+    this.centerLocation,
+    this.radiusInMeters,
   });
 
   /// The initial location to be displayed on the map when the screen loads.
@@ -31,6 +34,18 @@ class SelectLocationScreenArgs {
 
   /// Whether to show the "Your Location" option.
   final bool showYourLocationOption;
+
+  /// The center location for radius constraint.
+  /// If provided with [radiusInMeters], only locations within the radius can be selected.
+  final AlrtLocation? centerLocation;
+
+  /// The radius in meters for location selection constraint.
+  /// If provided with [centerLocation], only locations within this radius can be selected.
+  final double? radiusInMeters;
+
+  /// Whether radius constraint is enabled.
+  bool get hasRadiusConstraint =>
+      centerLocation != null && radiusInMeters != null;
 }
 
 class SelectLocationScreen extends ConsumerStatefulWidget {
@@ -79,13 +94,19 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
             child: _searchbarBuilder().pX(20.0),
           ).sliverBox,
           20.hSizedBox.sliverBox,
+
           if (widget.args?.showYourLocationOption ?? true)
             _yourLocationBuilder().sliverBox,
           _chooseOnTheMapBuilder().sliverBox,
           Divider().pX(20.0).sliverBox,
+          if (widget.args?.hasRadiusConstraint ?? false)
+            _radiusConstraintBannerBuilder().sliverBox,
           PlaceSearchResultsList(
             placesSearchKey: SelectLocationScreen.placesSearchKey,
             onPlaceSelected: _handlePlaceSelected,
+            radiusFilter: widget.args?.hasRadiusConstraint ?? false
+                ? _isLocationWithinRadius
+                : null,
           ),
         ],
       ),
@@ -160,6 +181,56 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
     );
   }
 
+  Widget _radiusConstraintBannerBuilder() {
+    final radiusInKm = (widget.args!.radiusInMeters! / 1000).toStringAsFixed(1);
+
+    return Consumer(
+      builder: (context, ref, child) {
+        final hasSearchResults = ref.watch(
+          providerOfPlacesForSelectLocation.select(
+            (value) => value.places.isNotEmpty,
+          ),
+        );
+        if (!hasSearchResults) {
+          return SizedBox.shrink();
+        }
+
+        return Container(
+          margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+          padding: EdgeInsets.all(12.spMin),
+          decoration: BoxDecoration(
+            color: AppColors.blue.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10.r),
+            border: Border.all(
+              color: AppColors.blue.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                color: AppColors.blue,
+                size: 20.spMin,
+              ),
+              12.wSizedBox,
+              Expanded(
+                child: Text(
+                  'Showing locations within $radiusInKm km from your location.',
+                  style: TextStyle(
+                    fontSize: 14.spMin,
+                    color: AppColors.blue,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _yourLocationBuilder() {
     return ListTile(
       leading: RoundButton(
@@ -226,9 +297,60 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
     _handleSearchChanged('');
   }
 
+  /// Checks if a location is within the radius constraint.
+  bool _isLocationWithinRadius(double? latitude, double? longitude) {
+    if (!widget.args!.hasRadiusConstraint) return true;
+    if (latitude == null || longitude == null) return false;
+
+    final centerLat = widget.args!.centerLocation!.latitude;
+    final centerLng = widget.args!.centerLocation!.longitude;
+    final maxRadius = widget.args!.radiusInMeters!;
+
+    final distance = calculateDistanceInMeters(
+      centerLat,
+      centerLng,
+      latitude,
+      longitude,
+    );
+
+    return distance <= maxRadius;
+  }
+
+  /// Formats distance in a user-friendly way.
+  String _formatDistance(double distanceInMeters) {
+    if (distanceInMeters < 1000) {
+      return '${distanceInMeters.toStringAsFixed(0)} m';
+    }
+    return '${(distanceInMeters / 1000).toStringAsFixed(1)} km';
+  }
+
   /// Fetches the user's current location from the [LocationProvider] and pops the screen with that location.
   void _handleYourLocationPressed() async {
     final currentUserLocation = ref.read(providerOfLocation).location;
+
+    // Check radius constraint
+    if (widget.args?.hasRadiusConstraint ?? false) {
+      if (!_isLocationWithinRadius(
+        currentUserLocation.latitude,
+        currentUserLocation.longitude,
+      )) {
+        final distance = calculateDistanceInMeters(
+          widget.args!.centerLocation!.latitude,
+          widget.args!.centerLocation!.longitude,
+          currentUserLocation.latitude,
+          currentUserLocation.longitude,
+        );
+        final radiusInKm = (widget.args!.radiusInMeters! / 1000)
+            .toStringAsFixed(1);
+        if (!mounted) return;
+        context.showErrorToast(
+          message:
+              'Your location is ${_formatDistance(distance)} away. Please select a location within $radiusInKm km.',
+        );
+        return;
+      }
+    }
+
     final result = await ref
         .read(providerOfLocationService)
         .getAddressFromCoordinates(
@@ -260,17 +382,56 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
       extra: SelectLocationOnMapScreenArgs(
         initialLocation: widget.args?.initialLocation,
         getSubUrbOnly: widget.args?.getSubUrbOnly ?? false,
+        centerLocation: widget.args?.centerLocation,
+        radiusInMeters: widget.args?.radiusInMeters,
       ),
     );
     if (!mounted) return;
 
     if (location != null && location is AlrtLocation) {
+      // Validate radius constraint
+      if (widget.args?.hasRadiusConstraint ?? false) {
+        if (!_isLocationWithinRadius(location.latitude, location.longitude)) {
+          final distance = calculateDistanceInMeters(
+            widget.args!.centerLocation!.latitude,
+            widget.args!.centerLocation!.longitude,
+            location.latitude,
+            location.longitude,
+          );
+          final radiusInKm = (widget.args!.radiusInMeters! / 1000)
+              .toStringAsFixed(1);
+          context.showErrorToast(
+            message:
+                'Selected location is ${_formatDistance(distance)} away. Please select within $radiusInKm km.',
+          );
+          return;
+        }
+      }
       context.pop(location);
     }
   }
 
   /// Handles the selection of a place from the search results and pops the screen with the selected location.
   void _handlePlaceSelected(final GooglePlace place) {
+    // Validation is already done by the radiusFilter in PlaceSearchResultsList
+    // This is just an extra safety check
+    if (widget.args?.hasRadiusConstraint ?? false) {
+      if (!_isLocationWithinRadius(place.latitude, place.longitude)) {
+        final distance = calculateDistanceInMeters(
+          widget.args!.centerLocation!.latitude,
+          widget.args!.centerLocation!.longitude,
+          place.latitude,
+          place.longitude,
+        );
+        final radiusInKm = (widget.args!.radiusInMeters! / 1000)
+            .toStringAsFixed(1);
+        context.showErrorToast(
+          message:
+              'Selected location is ${_formatDistance(distance)} away. Please select within $radiusInKm km.',
+        );
+        return;
+      }
+    }
     context.pop(place.toAlrtLocation);
   }
 }

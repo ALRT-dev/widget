@@ -35,7 +35,9 @@ _Hazard _$HazardFromJson(Map<String, dynamic> json) => _Hazard(
     _$AIConfidenceEnumMap,
     json['aiConfidence'],
   ),
-  callToAction: json['callToAction'] as String?,
+  callsToAction: (json['callsToAction'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
   isAwsCompliant: json['isAwsCompliant'] as bool?,
   reportedBy: json['reportedBy'] == null
       ? null
@@ -100,7 +102,7 @@ Map<String, dynamic> _$HazardToJson(_Hazard instance) => <String, dynamic>{
   'source': ?instance.source?.toJson(),
   'aiSummary': ?instance.aiSummary,
   'aiConfidence': ?_$AIConfidenceEnumMap[instance.aiConfidence],
-  'callToAction': ?instance.callToAction,
+  'callsToAction': ?instance.callsToAction,
   'isAwsCompliant': ?instance.isAwsCompliant,
   'reportedBy': ?instance.reportedBy?.toJson(),
   'reviewStatus': ?_$HazardReviewStatusEnumMap[instance.reviewStatus],

@@ -79,6 +79,9 @@ abstract class MapProviderState with _$MapProviderState {
 
     /// Pending camera update to apply when the map is ready
     final CameraUpdate? pendingCameraUpdateToApply,
+
+    /// Whether to show route hazards
+    @Default(false) final bool showRouteHazards,
   }) = _MapProviderState;
 }
 

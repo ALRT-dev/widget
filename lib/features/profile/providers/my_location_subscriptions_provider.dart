@@ -127,7 +127,7 @@ class MyLocationSubscriptionsProvider
         addLocationSubscription(locationSubscription);
 
         // after subscribing to a location, refresh the notifications feed
-        _notificationsFeedProvider.getNotificationsFeed();
+        _notificationsFeedProvider.getNotificationsFeedHazards();
       },
       (error) {
         state = state.copyWith(
@@ -192,7 +192,7 @@ class MyLocationSubscriptionsProvider
         removeLocationSubscription(subscriptionId);
 
         // after unsubscribing from a location, refresh the notifications feed
-        _notificationsFeedProvider.getNotificationsFeed();
+        _notificationsFeedProvider.getNotificationsFeedHazards();
       },
       (error) {
         state = state.copyWith(
@@ -240,7 +240,7 @@ class MyLocationSubscriptionsProvider
         getLocationSubscriptions();
 
         // after updating a location subscription, refresh the notifications feed
-        _notificationsFeedProvider.getNotificationsFeed();
+        _notificationsFeedProvider.getNotificationsFeedHazards();
       },
       (error) {
         state = state.copyWith(
@@ -284,7 +284,7 @@ class MyLocationSubscriptionsProvider
         getLocationSubscriptions();
 
         // after updating a location subscription, refresh the notifications feed
-        _notificationsFeedProvider.getNotificationsFeed();
+        _notificationsFeedProvider.getNotificationsFeedHazards();
       },
       (error) {
         state = state.copyWith(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
@@ -96,21 +97,17 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                           (value) => value.hazard?.reportedBy?.id,
                         ),
                       );
-                      final reviewStatus = ref.watch(
-                        provider.select((value) => value.hazard?.reviewStatus),
-                      );
                       final reviewFeedback = ref.watch(
                         provider.select(
                           (value) => value.hazard?.reviewFeedback,
                         ),
                       );
 
-                      final isRejectedAndHasFeedback =
+                      final hasFeedback =
                           reportedById == loggedInUserId &&
-                          reviewStatus == HazardReviewStatus.rejected &&
                           (reviewFeedback?.isNotEmpty ?? false);
 
-                      if (!isRejectedAndHasFeedback) {
+                      if (!hasFeedback) {
                         return const SizedBox.shrink();
                       }
 
@@ -251,7 +248,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       builder: (context, ref, child) {
         final title = ref.watch(
           provider.select(
-            (value) => value.hazard?.title ?? 'Alert Report',
+            (value) => value.hazard?.isUserReported ?? false
+                ? value.hazard?.category?.name ?? 'Alert Report'
+                : value.hazard?.title ?? 'Alert',
           ),
         );
         final categoryName = ref.watch(
@@ -471,13 +470,13 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         _buildWhatToDoSection(),
 
         // Official Description Section
-        _buildOfficialDescriptionSection(),
+        // _buildOfficialDescriptionSection(),
 
         // Medias Section
         _buildMediasSection(),
 
         // Source Section
-        _buildSourceSectionNew(),
+        _buildSourceSection(),
         40.hSizedBox,
       ],
     );
@@ -731,11 +730,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   Widget _buildWhatToDoSection() {
     return Consumer(
       builder: (context, ref, child) {
-        final callToAction = ref.watch(
-          provider.select((value) => value.hazard?.callToAction),
+        final callsToAction = ref.watch(
+          provider.select((value) => value.hazard?.callsToAction),
         );
 
-        final shouldShow = (callToAction?.isNotEmpty ?? false);
+        final shouldShow = (callsToAction?.isNotEmpty ?? false);
 
         if (!shouldShow) return const SizedBox.shrink();
 
@@ -766,14 +765,40 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                       ),
                     ),
                     12.spMin.hSizedBox,
-                    Text(
-                      callToAction!,
-                      style: TextStyle(
-                        color: AppColors.black.withValues(alpha: 0.9),
-                        fontSize: 14.spMin,
-                        height: 1.5,
-                      ),
-                    ),
+                    ...callsToAction!.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final action = entry.value;
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: index < callsToAction.length - 1
+                              ? 8.spMin
+                              : 0,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '• ',
+                              style: TextStyle(
+                                color: AppColors.black.withValues(alpha: 0.9),
+                                fontSize: 14.spMin,
+                                height: 1.5,
+                              ),
+                            ),
+                            Expanded(
+                              child: Text(
+                                action,
+                                style: TextStyle(
+                                  color: AppColors.black.withValues(alpha: 0.9),
+                                  fontSize: 14.spMin,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),
@@ -784,6 +809,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _buildOfficialDescriptionSection() {
     return Consumer(
       builder: (context, ref, child) {
@@ -844,7 +870,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
-  Widget _buildSourceSectionNew() {
+  Widget _buildSourceSection() {
     return Consumer(
       builder: (context, ref, child) {
         final source = ref.watch(
@@ -855,67 +881,113 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             (value) => value.hazard?.isUserReported ?? false,
           ),
         );
-        final link = ref.watch(
+        final sourceLink = ref.watch(
           provider.select(
             (value) => value.hazard?.link ?? value.hazard?.source?.url,
+          ),
+        );
+        final copyrightText = ref.watch(
+          provider.select(
+            (value) => value.hazard?.source?.copyrightText,
+          ),
+        );
+        final advisoryText = ref.watch(
+          provider.select(
+            (value) => value.hazard?.source?.advisoryText,
+          ),
+        );
+
+        final license = ref.watch(
+          provider.select(
+            (value) => value.hazard?.source?.license,
+          ),
+        );
+
+        final copyrightLink = ref.watch(
+          provider.select(
+            (value) => value.hazard?.source?.copyrightLink,
           ),
         );
 
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.extraLightGrey.withValues(alpha: 0.4),
+            color: AppColors.blue.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(12.spMin),
-            border: Border.all(
-              color: AppColors.lightGrey.withValues(alpha: 0.5),
-              width: 2,
+            border: Border(
+              left: BorderSide(
+                color: AppColors.blue,
+                width: 4,
+              ),
             ),
           ),
           padding: EdgeInsets.all(16.spMin),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Attribution Title
               Text(
-                'Source',
+                'DATA ATTRIBUTION',
                 style: TextStyle(
-                  color: AppColors.black,
-                  fontSize: 14.spMin,
+                  color: AppColors.grey,
                   fontWeight: FontWeight.w600,
+                  fontSize: 12.spMin,
                 ),
               ),
               12.spMin.hSizedBox,
 
+              // Source Row
               GestureDetector(
-                onTap: link != null
-                    ? () => openLink(context: context, link: link)
+                onTap: sourceLink != null
+                    ? () => openLink(
+                        context: context,
+                        link: sourceLink,
+                      )
                     : null,
                 child: Container(
-                  padding: EdgeInsets.all(12.spMin),
+                  padding: EdgeInsets.only(bottom: 12.spMin),
                   decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(8.spMin),
-                    border: Border.all(
-                      color: AppColors.lightGrey.withValues(alpha: 0.5),
-                    ),
+                    border:
+                        isUserReported ||
+                            (license == null && (advisoryText?.isEmpty ?? true))
+                        ? null
+                        : Border(
+                            bottom: BorderSide(
+                              color: AppColors.lightGrey,
+                              width: 1,
+                            ),
+                          ),
                   ),
                   child: Row(
                     children: [
+                      // Source Icon
                       Container(
                         width: 40.spMin,
                         height: 40.spMin,
                         decoration: BoxDecoration(
-                          color: AppColors.lightGrey.withValues(alpha: 0.3),
+                          color: AppColors.blue.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8.spMin),
                         ),
-                        child: Icon(
-                          isUserReported == true
-                              ? Icons.person_outline_rounded
-                              : Icons.shield_outlined,
-                          size: 20.spMin,
-                          color: AppColors.grey,
+                        child: Center(
+                          child: isUserReported == true
+                              ? Icon(
+                                  Icons.person_outline_rounded,
+                                  size: 24.spMin,
+                                  color: AppColors.blue,
+                                )
+                              : SvgPicture.asset(
+                                  'assets/icons/shield.svg',
+                                  width: 24.spMin,
+                                  height: 24.spMin,
+                                  colorFilter: ColorFilter.mode(
+                                    AppColors.blue,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
                         ),
                       ),
                       12.spMin.wSizedBox,
 
+                      // Source Info
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -923,32 +995,167 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                             Text(
                               source?.name ?? 'Community Report',
                               style: TextStyle(
-                                fontSize: 14.spMin,
+                                fontSize: 15.spMin,
                                 color: AppColors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            2.spMin.hSizedBox,
+                            Text(
+                              isUserReported ? 'Community' : 'Official Source',
+                              style: TextStyle(
+                                fontSize: 12.spMin,
+                                color: AppColors.grey,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            if (isUserReported)
-                              Text(
-                                'Community',
-                                style: TextStyle(
-                                  fontSize: 12.spMin,
-                                  color: AppColors.grey,
-                                ),
-                              ),
                           ],
                         ),
                       ),
-                      if (source?.url != null)
-                        Icon(
-                          Icons.open_in_new,
-                          size: 16.spMin,
-                          color: AppColors.grey,
+
+                      // External Link Icon
+                      if (sourceLink != null)
+                        Container(
+                          width: 32.spMin,
+                          height: 32.spMin,
+                          decoration: BoxDecoration(
+                            color: AppColors.lightGrey.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(8.spMin),
+                          ),
+                          child: Icon(
+                            Icons.open_in_new,
+                            size: 16.spMin,
+                            color: AppColors.grey,
+                          ),
                         ),
                     ],
                   ),
                 ),
               ),
+
+              // License Row (only for non-user-reported)
+              if (!isUserReported) ...[
+                if (license != null) ...[
+                  12.spMin.hSizedBox,
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 12.spMin,
+                      vertical: 10.spMin,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.lightGrey.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8.spMin),
+                    ),
+                    child: Row(
+                      children: [
+                        // License Badge
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.spMin,
+                            vertical: 4.spMin,
+                          ),
+                          decoration: BoxDecoration(
+                            color: license.backgroundColor,
+                            borderRadius: BorderRadius.circular(4.spMin),
+                          ),
+                          child: Text(
+                            license.badgeText,
+                            style: TextStyle(
+                              fontSize: 11.spMin,
+                              fontWeight: FontWeight.w600,
+                              color: license.foregroundColor,
+                            ),
+                          ),
+                        ),
+                        10.spMin.wSizedBox,
+
+                        // License Text
+                        Expanded(
+                          child: Text(
+                            license.licenseText,
+                            style: TextStyle(
+                              fontSize: 12.spMin,
+                              color: AppColors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+
+                        // View Link
+                        if (copyrightLink != null || license.link != null)
+                          GestureDetector(
+                            onTap: () => openLink(
+                              context: context,
+                              link: copyrightLink ?? license.link!,
+                            ),
+                            child: Text(
+                              'View',
+                              style: TextStyle(
+                                fontSize: 12.spMin,
+                                color: AppColors.blue,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                // Advisory Text
+                if (advisoryText?.isNotEmpty ?? false) ...[
+                  10.hSizedBox,
+                  Text(
+                    advisoryText!,
+                    style: TextStyle(
+                      fontSize: 11.spMin,
+                      color: AppColors.grey,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+
+                // Copyright Notice
+                if (copyrightText?.isNotEmpty ?? false) ...[
+                  10.hSizedBox,
+                  Text.rich(
+                    TextSpan(
+                      style: TextStyle(
+                        fontSize: 11.spMin,
+                        color: AppColors.grey,
+                        height: 1.5,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: copyrightText,
+                        ),
+                        if (license?.link?.isNotEmpty ?? false) ...[
+                          TextSpan(
+                            text: ' Used under ',
+                          ),
+                          WidgetSpan(
+                            child: GestureDetector(
+                              onTap: () => openLink(
+                                context: context,
+                                link: license.link!,
+                              ),
+                              child: Text(
+                                license!.badgeText,
+                                style: TextStyle(
+                                  fontSize: 11.spMin,
+                                  color: AppColors.blue,
+                                  decoration: TextDecoration.none,
+                                ),
+                              ),
+                            ),
+                          ),
+                          TextSpan(text: ' license.'),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ],
             ],
           ),
         );

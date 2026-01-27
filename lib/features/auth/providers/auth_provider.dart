@@ -89,4 +89,27 @@ class AuthProvider extends Notifier<AuthProviderState> {
       },
     );
   }
+
+  /// Signs in the user with Microsoft.
+  Future<void> signInWithMicrosoft() async {
+    state = state.copyWith(
+      signInWithMicrosoftState: const SignInWithMicrosoftState.loading(),
+    );
+
+    final result = await _authService.signInWithMicrosoft();
+    if (!ref.mounted) return;
+
+    result.when(
+      (data) {
+        state = state.copyWith(
+          signInWithMicrosoftState: const SignInWithMicrosoftState.success(),
+        );
+      },
+      (error) {
+        state = state.copyWith(
+          signInWithMicrosoftState: SignInWithMicrosoftState.error(error),
+        );
+      },
+    );
+  }
 }

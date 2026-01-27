@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
@@ -83,9 +84,18 @@ class _CreateUpdateReportScreenState
                 (value) => value.hazardToCreateOrUpdate.id?.isNotEmpty ?? false,
               ),
             );
+            final reportSubmitted = ref.watch(
+              providerOfCreateReport.select(
+                (value) => value.reportSubmitted,
+              ),
+            );
 
             return Text(
-              isUpdating ? 'Update an ALRT' : 'Report an ALRT',
+              reportSubmitted
+                  ? 'ALRT Submitted'
+                  : isUpdating
+                  ? 'Update an ALRT'
+                  : 'ALRT Reporting',
               style: TextStyle(
                 color: AppColors.black,
               ),
@@ -145,7 +155,7 @@ class _CreateUpdateReportScreenState
                     spacing: 24.spMin,
                     children: [
                       _locationBuilder(),
-                      _titleBuilder(),
+                      // _titleBuilder(),
                       _descriptionBuilder(),
                       _mediaBuilder(),
                     ],
@@ -262,6 +272,7 @@ class _CreateUpdateReportScreenState
     ).onPressed(onPressed);
   }
 
+  // ignore: unused_element
   Widget _titleBuilder() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -488,12 +499,19 @@ class _CreateUpdateReportScreenState
               ),
       ),
     );
+    final userLocation = ref.read(
+      providerOfLocation.select(
+        (value) => value.location,
+      ),
+    );
 
     final location = await context.push(
       SelectLocationScreen.route,
       extra: SelectLocationScreenArgs(
         initialLocation: selectedLocation,
         getSubUrbOnly: true,
+        centerLocation: userLocation,
+        radiusInMeters: 5000,
       ),
     );
     if (!mounted) return;

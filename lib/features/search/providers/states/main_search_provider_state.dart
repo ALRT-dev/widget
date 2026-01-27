@@ -15,12 +15,19 @@ abstract class MainSearchProviderState with _$MainSearchProviderState {
     /// The hazards fetched from the search results after a successful fetch.
     @Default(<Hazard>[]) final List<Hazard> hazards,
 
+    /// The current page of hazards being viewed.
+    @Default(1) final int currentPage,
+
     /// The ID of the subscription to the current searched location.
     final String? subscriptionId,
 
     /// The state of fetching hazards by location.
     @Default(GetHazardsByLocationState.initial())
     final GetHazardsByLocationState getHazardsByLocationState,
+
+    /// The state of fetching the next page of hazards by location.
+    @Default(GetHazardsByLocationState.initial())
+    final GetHazardsByLocationState getNextHazardsByLocationState,
 
     /// The state of subscribing to location.
     @Default(SubscribeToLocationState.initial())
