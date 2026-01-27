@@ -12,10 +12,11 @@ const kUrlRefreshToken = '/auth/refresh-token';
 // ---------------------------- ONBOARDING ----------------------------
 
 const kUrlOnboarding = '/onboarding';
+const kUrlOnboardingAcceptDisclaimer = '$kUrlOnboarding/accept-disclaimer';
+const kUrlOnboardingAcceptTos = '$kUrlOnboarding/accept-tos';
 const kUrlOnboardingLocation = '$kUrlOnboarding/location';
 const kUrlOnboardingRadius = '$kUrlOnboarding/radius';
 const kUrlOnboardingNotifications = '$kUrlOnboarding/notifications';
-const kUrlOnboardingAcceptTos = '$kUrlOnboarding/accept-tos';
 
 // ---------------------------- USER ----------------------------
 

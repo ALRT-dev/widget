@@ -46,6 +46,12 @@ abstract class RestClient {
 
   // ---------------------------- ONBOARDING ----------------------------
 
+  @POST(kUrlOnboardingAcceptDisclaimer)
+  Future<void> acceptOnboardingDisclaimer();
+
+  @POST(kUrlOnboardingAcceptTos)
+  Future<void> acceptOnboardingTermsOfService();
+
   @POST(kUrlOnboardingLocation)
   Future<void> setOnboardingLocation({
     @Field() required final double latitude,
@@ -62,9 +68,6 @@ abstract class RestClient {
   Future<void> setOnboardingNotificationPreferences({
     @Field() required final String pushNotificationPreference,
   });
-
-  @POST(kUrlOnboardingAcceptTos)
-  Future<void> acceptOnboardingTermsOfService();
 
   // ---------------------------- USER ----------------------------
 

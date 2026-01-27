@@ -13,6 +13,7 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/utils/app_links.dart';
 import 'package:hazard_app/features/shared/utils/open_link.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -533,7 +534,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   void _gotoTermsOfService() {
     openLink(
       context: context,
-      link: 'https://www.safetyalrt.com/termsofuse',
+      link: AppLinks.termsOfUse,
     );
   }
 
@@ -541,7 +542,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   void _gotoPrivacyPolicy() {
     openLink(
       context: context,
-      link: 'https://www.safetyalrt.com/privacy',
+      link: AppLinks.privacyPolicy,
     );
   }
 }

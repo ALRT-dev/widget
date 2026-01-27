@@ -14,6 +14,8 @@ import 'package:hazard_app/features/onboarding/views/onboarding_complete_screen.
 import 'package:hazard_app/features/onboarding/views/onboarding_emergency_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_location_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_radius_screen.dart';
+import 'package:hazard_app/features/onboarding/views/onboarding_disclaimer_screen.dart';
+import 'package:hazard_app/features/onboarding/views/onboarding_legal_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_welcome_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/delete_account_screen.dart';
@@ -57,6 +59,18 @@ class AppRouter {
           path: OnboardingWelcomeScreen.route,
           builder: (context, state) {
             return const OnboardingWelcomeScreen();
+          },
+        ),
+        GoRoute(
+          path: OnboardingDisclaimerScreen.route,
+          builder: (context, state) {
+            return const OnboardingDisclaimerScreen();
+          },
+        ),
+        GoRoute(
+          path: OnboardingLegalScreen.route,
+          builder: (context, state) {
+            return const OnboardingLegalScreen();
           },
         ),
         GoRoute(

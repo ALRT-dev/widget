@@ -13,6 +13,16 @@ class OnboardingService {
   OnboardingRepository get _onboardingRepository =>
       _ref.read(providerOfOnboardingRepository);
 
+  /// Accepts the disclaimer during onboarding.
+  Future<Either<void, AppError>> acceptOnboardingDisclaimer() {
+    return _onboardingRepository.acceptOnboardingDisclaimer();
+  }
+
+  /// Accepts the terms of service during onboarding.
+  Future<Either<void, AppError>> acceptOnboardingTermsOfService() {
+    return _onboardingRepository.acceptOnboardingTermsOfService();
+  }
+
   /// Sets the user's location during onboarding.
   Future<Either<void, AppError>> setOnboardingLocation({
     required double latitude,
@@ -42,10 +52,5 @@ class OnboardingService {
     return _onboardingRepository.setOnboardingNotificationPreferences(
       pushNotificationPreference: pushNotificationPreference,
     );
-  }
-
-  /// Accepts the terms of service during onboarding.
-  Future<Either<void, AppError>> acceptOnboardingTermsOfService() {
-    return _onboardingRepository.acceptOnboardingTermsOfService();
   }
 }

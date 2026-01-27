@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
-import 'package:hazard_app/features/onboarding/views/widgets/logo.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -238,12 +236,31 @@ class _OnboardingEmergencyScreenState
           padding: EdgeInsets.all(20.spMin),
           child: Column(
             children: [
-              const Logo(),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    child: Container(
+                      width: 40.spMin,
+                      height: 40.spMin,
+                      decoration: BoxDecoration(
+                        color: AppColors.extraLightGrey,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.arrow_back_ios_new,
+                        size: 18.spMin,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               24.hSizedBox,
               ProgressBar(
-                currentStep: 4,
-                totalSteps: 5,
-                label: 'Step 4 of 5',
+                currentStep: 6,
+                totalSteps: 7,
+                label: 'Step 6 of 7',
               ),
               40.hSizedBox,
               _buildHeaderSection(),
@@ -660,9 +677,7 @@ class _OnboardingEmergencyScreenState
     if (!mounted) return;
 
     result.when(
-      (onboardingResponse) {
-        context.push(OnboardingStep.tosAcceptance.nextStep.route);
-      },
+      (onboardingResponse) {},
       (error) {
         context.showErrorToast(
           message: error.message,

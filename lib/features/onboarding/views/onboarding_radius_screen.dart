@@ -7,7 +7,6 @@ import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart'
 import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/gradient_button.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
-import 'package:hazard_app/features/onboarding/views/widgets/logo.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/confirmation_popup.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
@@ -265,6 +264,7 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -316,12 +316,31 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
           padding: EdgeInsets.all(20.spMin),
           child: Column(
             children: [
-              const Logo(),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    child: Container(
+                      width: 40.spMin,
+                      height: 40.spMin,
+                      decoration: BoxDecoration(
+                        color: AppColors.extraLightGrey,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.arrow_back_ios_new,
+                        size: 18.spMin,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               24.hSizedBox,
               ProgressBar(
-                currentStep: 2,
-                totalSteps: 5,
-                label: 'Step 2 of 5',
+                currentStep: 4,
+                totalSteps: 7,
+                label: 'Step 4 of 7',
               ),
               40.hSizedBox,
               _buildHeaderSection(),

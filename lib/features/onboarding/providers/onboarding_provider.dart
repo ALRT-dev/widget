@@ -33,6 +33,58 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
   OnboardingService get _onboardingService =>
       _ref.read(providerOfOnboardingService);
 
+  /// Accepts the disclaimer during onboarding.
+  Future<Either<void, AppError>> acceptOnboardingDisclaimer() async {
+    state = state.copyWith(
+      continueOnboarding: const ContinueOnboarding.loading(),
+    );
+
+    final result = await _onboardingService.acceptOnboardingDisclaimer();
+
+    if (mounted) {
+      result.when(
+        (onboardingResponse) {
+          state = state.copyWith(
+            continueOnboarding: ContinueOnboarding.success(),
+          );
+        },
+        (error) {
+          state = state.copyWith(
+            continueOnboarding: ContinueOnboarding.error(error),
+          );
+        },
+      );
+    }
+
+    return result;
+  }
+
+  /// Accepts the terms of service during onboarding.
+  Future<Either<void, AppError>> acceptOnboardingTermsOfService() async {
+    state = state.copyWith(
+      continueOnboarding: const ContinueOnboarding.loading(),
+    );
+
+    final result = await _onboardingService.acceptOnboardingTermsOfService();
+
+    if (mounted) {
+      result.when(
+        (onboardingResponse) {
+          state = state.copyWith(
+            continueOnboarding: ContinueOnboarding.success(),
+          );
+        },
+        (error) {
+          state = state.copyWith(
+            continueOnboarding: ContinueOnboarding.error(error),
+          );
+        },
+      );
+    }
+
+    return result;
+  }
+
   /// Opens the device's location settings.
   Future<void> openLocationSettings() async {
     await _locationService.openLocationSettings();
@@ -122,32 +174,6 @@ class OnboardingProvider extends StateNotifier<OnboardingProviderState> {
         .setOnboardingNotificationPreferences(
           pushNotificationPreference: state.selectedNotificationPreference!,
         );
-    if (mounted) {
-      result.when(
-        (onboardingResponse) {
-          state = state.copyWith(
-            continueOnboarding: ContinueOnboarding.success(),
-          );
-        },
-        (error) {
-          state = state.copyWith(
-            continueOnboarding: ContinueOnboarding.error(error),
-          );
-        },
-      );
-    }
-
-    return result;
-  }
-
-  /// Accepts the terms of service during onboarding.
-  Future<Either<void, AppError>> acceptOnboardingTermsOfService() async {
-    state = state.copyWith(
-      continueOnboarding: const ContinueOnboarding.loading(),
-    );
-
-    final result = await _onboardingService.acceptOnboardingTermsOfService();
-
     if (mounted) {
       result.when(
         (onboardingResponse) {
