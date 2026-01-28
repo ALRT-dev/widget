@@ -4,6 +4,9 @@ platform :ios do
   require 'date'
 
   my_release_note = <<~NOTE
+    * Onboarding Screens Updated.
+    * Location Permission Request Improved.
+    * Deleted Account Feature Added.
     * Bug fixes and improvements.
   NOTE
 
@@ -48,16 +51,11 @@ platform :ios do
 
   desc "Deploy the PROD application to TestFlight"
   lane :beta_release do
-    # sh 'fvm flutter build ipa --flavor prod -t lib/main_prod.dart'
     match(type: "appstore")
-    gym(
-      scheme: "prod",
-      export_method: "app-store",
-      output_directory: "./build",
-      output_name: "Runner"
-    )
+    sh 'fvm flutter build ipa --flavor prod -t lib/main_prod.dart'
     upload_to_testflight(
-      changelog: my_release_note
+      changelog: my_release_note,
+      ipa: "../build/ios/ipa/hazard_app.ipa"
     )
   end
 
