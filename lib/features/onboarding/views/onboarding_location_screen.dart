@@ -508,7 +508,7 @@ class _OnboardingLocationScreenState
               ),
               24.hSizedBox,
               Text(
-                'We can\'t access your location',
+                'Location Permission Request',
                 style: TextStyle(
                   fontSize: 20.spMin,
                   fontWeight: FontWeight.w600,
@@ -518,7 +518,7 @@ class _OnboardingLocationScreenState
               ),
               12.hSizedBox,
               Text(
-                'To post alerts or get local updates, allow location access in your phone settings.',
+                'We need your location to provide you with the most relevant alerts and updates.',
                 style: TextStyle(
                   fontSize: 16.spMin,
                   color: AppColors.grey,
@@ -566,8 +566,8 @@ class _OnboardingLocationScreenState
               ),
               24.hSizedBox,
               _buildIconButton(
-                title: "Open Device Settings",
-                icon: Icons.settings,
+                title: "Yes, allow location access",
+                icon: Icons.location_on,
                 onPressed: () async {
                   await ref
                       .read(providerOfOnboarding.notifier)
@@ -580,7 +580,7 @@ class _OnboardingLocationScreenState
               ),
               12.hSizedBox,
               _buildIconButton(
-                title: "Search by Suburb",
+                title: "No, I'll search by suburb",
                 icon: Icons.search,
                 onPressed: () {
                   setState(() {
