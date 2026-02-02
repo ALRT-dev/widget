@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -259,8 +260,8 @@ class _OnboardingEmergencyScreenState
               24.hSizedBox,
               ProgressBar(
                 currentStep: 6,
-                totalSteps: 7,
-                label: 'Step 6 of 7',
+                totalSteps: OnboardingStep.values.length - 1,
+                label: 'Step 6 of ${OnboardingStep.values.length - 1}',
               ),
               40.hSizedBox,
               _buildHeaderSection(),

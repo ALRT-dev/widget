@@ -215,8 +215,8 @@ class _OnboardingLocationScreenState
               24.hSizedBox,
               ProgressBar(
                 currentStep: 3,
-                totalSteps: 7,
-                label: 'Step 3 of 7',
+                totalSteps: OnboardingStep.values.length - 1,
+                label: 'Step 3 of ${OnboardingStep.values.length - 1}',
               ),
               40.hSizedBox,
               _buildHeaderSection(),
@@ -739,7 +739,7 @@ class _OnboardingLocationScreenState
       _showConfirmation = false;
     });
 
-    context.push(OnboardingStep.location.nextStep.route);
+    // context.push(OnboardingStep.location.nextStep.route);
   }
 
   void _onNext() async {

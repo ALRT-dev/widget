@@ -289,8 +289,8 @@ class _OnboardingAlertSourcesScreenState
               24.hSizedBox,
               ProgressBar(
                 currentStep: 5,
-                totalSteps: 7,
-                label: 'Step 5 of 7',
+                totalSteps: OnboardingStep.values.length - 1,
+                label: 'Step 5 of ${OnboardingStep.values.length - 1}',
               ),
               40.hSizedBox,
               _buildHeaderSection(),
@@ -574,7 +574,7 @@ class _OnboardingAlertSourcesScreenState
       _showConfirmation = false;
     });
 
-    context.push(OnboardingStep.pushNotification.nextStep.route);
+    // context.push(OnboardingStep.pushNotification.nextStep.route);
   }
 
   void _onNext() async {

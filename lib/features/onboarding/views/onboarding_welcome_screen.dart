@@ -127,9 +127,10 @@ class _OnboardingWelcomeScreenState
         children: [
           20.hSizedBox,
           ProgressBar(
-            currentStep: 0,
-            totalSteps: 7,
-            label: 'Step 0 of 7',
+            currentStep: OnboardingStep.welcome.index + 1,
+            totalSteps: OnboardingStep.values.length - 1,
+            label:
+                'Step ${OnboardingStep.welcome.index + 1} of ${OnboardingStep.values.length - 1}',
           ),
           40.hSizedBox,
           _buildLogo(),

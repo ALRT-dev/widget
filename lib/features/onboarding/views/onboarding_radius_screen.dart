@@ -339,8 +339,8 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
               24.hSizedBox,
               ProgressBar(
                 currentStep: 4,
-                totalSteps: 7,
-                label: 'Step 4 of 7',
+                totalSteps: OnboardingStep.values.length - 1,
+                label: 'Step 4 of ${OnboardingStep.values.length - 1}',
               ),
               40.hSizedBox,
               _buildHeaderSection(),
@@ -874,7 +874,7 @@ class _OnboardingRadiusScreenState extends ConsumerState<OnboardingRadiusScreen>
       _showConfirmation = false;
     });
 
-    context.push(OnboardingStep.radius.nextStep.route);
+    // context.push(OnboardingStep.radius.nextStep.route);
   }
 
   void _onNext() async {

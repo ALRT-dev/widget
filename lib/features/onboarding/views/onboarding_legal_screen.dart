@@ -140,9 +140,10 @@ class _OnboardingLegalScreenState extends ConsumerState<OnboardingLegalScreen>
                     _buildHeader(),
                     24.hSizedBox,
                     ProgressBar(
-                      currentStep: 2,
-                      totalSteps: 7,
-                      label: 'Step 2 of 7',
+                      currentStep: OnboardingStep.legal.index + 1,
+                      totalSteps: OnboardingStep.values.length - 1,
+                      label:
+                          'Step ${OnboardingStep.legal.index + 1} of ${OnboardingStep.values.length - 1}',
                     ),
                     32.hSizedBox,
                     _buildLockIcon(),

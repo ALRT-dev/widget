@@ -1,18 +1,15 @@
-import 'package:hazard_app/features/onboarding/views/onboarding_alert_sources_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_complete_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_disclaimer_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_legal_screen.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_location_screen.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_radius_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_welcome_screen.dart';
 
 enum OnboardingStep {
   welcome,
   disclaimer,
   legal,
-  location,
-  radius,
-  pushNotification,
+  // location,
+  // radius,
+  // pushNotification,
   completed;
 
   /// Returns the route associated with the onboarding step.
@@ -24,12 +21,12 @@ enum OnboardingStep {
         return OnboardingDisclaimerScreen.route;
       case OnboardingStep.legal:
         return OnboardingLegalScreen.route;
-      case OnboardingStep.location:
-        return OnboardingLocationScreen.route;
-      case OnboardingStep.radius:
-        return OnboardingRadiusScreen.route;
-      case OnboardingStep.pushNotification:
-        return OnboardingAlertSourcesScreen.route;
+      // case OnboardingStep.location:
+      //   return OnboardingLocationScreen.route;
+      // case OnboardingStep.radius:
+      //   return OnboardingRadiusScreen.route;
+      // case OnboardingStep.pushNotification:
+      //   return OnboardingAlertSourcesScreen.route;
       case OnboardingStep.completed:
         return OnboardingCompleteScreen.route;
     }

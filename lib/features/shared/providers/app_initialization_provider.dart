@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/auth/providers/service_providers.dart';
 import 'package:hazard_app/features/map/providers/hazard_markers_bitmaps_provider.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
+import 'package:hazard_app/features/shared/models/app_user_model.dart';
 import 'package:hazard_app/features/shared/providers/instance_providers.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
@@ -18,6 +19,10 @@ class AppInitializationProvider extends Notifier<bool> {
   bool build() {
     return false;
   }
+
+  AppUser? get _loggedInUser => ref.read(providerOfLoggedInUser);
+  bool get _isOnboardingCompleted =>
+      _loggedInUser?.isOnboardingCompleted ?? false;
 
   /// Initializes the app by performing necessary setup tasks.
   Future<void> initialize() async {
@@ -68,7 +73,8 @@ class AppInitializationProvider extends Notifier<bool> {
   }
 
   /// Gets the location of the current user.
-  Future<void> _getCurrentUserLocation() {
+  Future<void> _getCurrentUserLocation() async {
+    if (!_isOnboardingCompleted) return;
     return ref.read(providerOfLocation.notifier).getLocation();
   }
 

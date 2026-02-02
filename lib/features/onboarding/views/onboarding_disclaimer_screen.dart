@@ -133,9 +133,10 @@ class _OnboardingDisclaimerScreenState
               _buildHeader(),
               24.hSizedBox,
               ProgressBar(
-                currentStep: 1,
-                totalSteps: 7,
-                label: 'Step 1 of 7',
+                currentStep: OnboardingStep.disclaimer.index + 1,
+                totalSteps: OnboardingStep.values.length - 1,
+                label:
+                    'Step ${OnboardingStep.disclaimer.index + 1} of ${OnboardingStep.values.length - 1}',
               ),
               40.hSizedBox,
               _buildShieldIcon(),
