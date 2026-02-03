@@ -1,3 +1,8 @@
+## v1.0.0+23 - 2026/02/02
+* Icons updated.
+* Bug fixes and improvements.
+
+
 ## v1.0.0+22 - 2026/01/28
 * Onboarding Screens Updated.
 * Location Permission Request Improved.

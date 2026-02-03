@@ -4,9 +4,7 @@ platform :ios do
   require 'date'
 
   my_release_note = <<~NOTE
-    * Onboarding Screens Updated.
-    * Location Permission Request Improved.
-    * Deleted Account Feature Added.
+    * Icons updated.
     * Bug fixes and improvements.
   NOTE
 
@@ -33,7 +31,7 @@ platform :ios do
     firebase_app_distribution(
       app: "1:841565771679:ios:9b500f20dcdaa31dde0faa",
       release_notes_file: '../release_note.txt',
-      ipa_path: "../build/ios/ipa/[Dev] Alrt.ipa",
+      ipa_path: "../build/ios/ipa/[Dev] ALRT.ipa",
       groups: 'alrt',
     )
   end
@@ -44,18 +42,18 @@ platform :ios do
     firebase_app_distribution(
       app: "1:841565771679:ios:45b8377b1d906f78de0faa",
       release_notes_file: '../release_note.txt',
-      ipa_path: "../build/ios/ipa/Alrt.ipa",
+      ipa_path: "../build/ios/ipa/ALRT.ipa",
       groups: 'alrt',
     )
   end
 
   desc "Deploy the PROD application to TestFlight"
   lane :beta_release do
-    match(type: "appstore")
-    sh 'fvm flutter build ipa --flavor prod -t lib/main_prod.dart'
+    # match(type: "appstore")
+    # sh 'fvm flutter build ipa --flavor prod -t lib/main_prod.dart'
     upload_to_testflight(
       changelog: my_release_note,
-      ipa: "../build/ios/ipa/hazard_app.ipa"
+      ipa: "../build/ios/ipa/ALRT.ipa"
     )
   end
 
