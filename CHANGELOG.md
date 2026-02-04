@@ -1,3 +1,7 @@
+## v1.0.0+24 - 2026/02/03
+* App name updated from "Alrt" to "ALRT"
+
+
 ## v1.0.0+23 - 2026/02/02
 * Icons updated.
 * Bug fixes and improvements.

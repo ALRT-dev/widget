@@ -4,8 +4,7 @@ platform :ios do
   require 'date'
 
   my_release_note = <<~NOTE
-    * Icons updated.
-    * Bug fixes and improvements.
+    * App name updated from "Alrt" to "ALRT"
   NOTE
 
   desc "Automatically increment the version name and version code. Also prepare the changelogs and release note from git commits."
