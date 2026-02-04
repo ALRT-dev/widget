@@ -66,7 +66,7 @@ class AuthInterceptor implements Interceptor {
 
         final accessToken = ignoreToken ? null : await getAccessToken();
         final headers = <String, String>{
-          'Accept-Encoding': 'gzip, deflate, br',
+          'Accept-Encoding': 'gzip, deflate',
           'content-type': 'application/json',
           if (accessToken != null) 'Authorization': 'Bearer $accessToken',
           ...existingHeaders,

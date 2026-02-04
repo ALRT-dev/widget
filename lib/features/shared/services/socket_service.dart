@@ -55,11 +55,7 @@ class SocketService {
         final token = await authInterceptor.getAccessToken();
         if (token == null) throw AppError(message: 'No auth token found!');
 
-        final socketUrl = _dioInstance.options.baseUrl.substring(
-          0,
-          // this will remove "/api" from the base url
-          _dioInstance.options.baseUrl.length - 4,
-        );
+        final socketUrl = _dioInstance.options.baseUrl;
 
         log('Attempting to connect to socket at: $socketUrl');
 
