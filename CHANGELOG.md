@@ -1,3 +1,7 @@
+## v1.0.0+25 - 2026/02/04
+* Bug fixes and improvements
+
+
 ## v1.0.0+24 - 2026/02/03
 * App name updated from "Alrt" to "ALRT"
 
