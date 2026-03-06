@@ -110,13 +110,13 @@ class _HazardFiltersBottomsheetContentState
               vertical: 5.spMin,
             ),
             child: Text(
-              'Clear All',
+              'Reset All',
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.white,
               ),
             ),
-          ),
+          ).onPressed(_handleResetAll),
         ],
       ),
     );
@@ -502,5 +502,10 @@ class _HazardFiltersBottomsheetContentState
         ),
       ),
     ).onPressed(() => onToggle(!isSelected));
+  }
+
+  void _handleResetAll() {
+    ref.read(_filtersProvider.notifier).resetAllFilters();
+    widget.onFiltersUpdated?.call();
   }
 }

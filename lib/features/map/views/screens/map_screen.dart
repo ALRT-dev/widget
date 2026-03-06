@@ -8,6 +8,7 @@ import 'package:hazard_app/features/map/utils/dialogs.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_compass_button.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_my_location_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_hazard_info_window.dart';
+import 'package:hazard_app/features/map/views/widgets/map_keys_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
 import 'package:hazard_app/features/map/views/widgets/route_planning.dart';
 import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
@@ -123,6 +124,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                               filtersKey: MapScreen.filtersKey,
                               onFiltersUpdated: () => _getMapHazards(),
                             ),
+                            MapKeysButton(),
                             CustomMyLocationButton(),
                           ],
                         ),

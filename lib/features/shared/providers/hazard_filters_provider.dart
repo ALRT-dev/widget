@@ -122,8 +122,12 @@ class HazardFiltersProvider extends StateNotifier<HazardFiltersProviderState> {
     }
   }
 
-  /// Clears all selected filters.
-  void clearAllFilters() {
-    state = const HazardFiltersProviderState();
+  /// Resets all filters to their initial values.
+  void resetAllFilters() {
+    final allCategoryIds = state.allCategoryIds;
+    state = HazardFiltersProviderState(
+      allCategoryIds: allCategoryIds,
+      selectedCategoryIds: allCategoryIds,
+    );
   }
 }
