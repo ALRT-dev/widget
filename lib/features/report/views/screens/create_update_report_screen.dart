@@ -15,10 +15,14 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/providers/service_providers.dart';
+import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
-import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
+import 'package:hazard_app/features/shared/views/widgets/dotted_border_container.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class CreateUpdateReportScreenArgs {
   CreateUpdateReportScreenArgs({this.hazardToUpdate});
@@ -52,6 +56,8 @@ class _CreateUpdateReportScreenState
   final _descriptionController = TextEditingController();
   final _scrollController = ScrollController();
 
+  MediaService get _mediaService => ref.read(providerOfMediaService);
+
   @override
   void initState() {
     super.initState();
@@ -76,7 +82,21 @@ class _CreateUpdateReportScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.extraLightGrey,
       appBar: AppBar(
+        backgroundColor: AppColors.transparent,
+        surfaceTintColor: AppColors.transparent,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.orange,
+                AppColors.red200,
+              ],
+            ),
+          ),
+        ),
+        centerTitle: false,
         title: Consumer(
           builder: (context, ref, child) {
             final isUpdating = ref.watch(
@@ -95,21 +115,19 @@ class _CreateUpdateReportScreenState
                   ? 'ALRT Submitted'
                   : isUpdating
                   ? 'Update an ALRT'
-                  : 'ALRT Reporting',
+                  : 'Report an ALRT',
               style: TextStyle(
-                color: AppColors.black,
+                color: AppColors.white,
               ),
             );
           },
         ),
-        backgroundColor: context.theme.scaffoldBackgroundColor,
-        foregroundColor: AppColors.black,
+        foregroundColor: AppColors.white,
         actions: [
           _clearAllBuilder(),
           15.wSizedBox,
         ],
       ),
-      bottomNavigationBar: _submitButtonBuilder(),
       body: Consumer(
         builder: (context, ref, child) {
           final reportSubmitted = ref.watch(
@@ -131,7 +149,8 @@ class _CreateUpdateReportScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _sectionTitleBuilder(
-            title: 'Select Category',
+            title: 'Select Category'.toUpperCase(),
+            color: AppColors.orange,
             isRequired: true,
           ),
           10.hSizedBox,
@@ -164,6 +183,8 @@ class _CreateUpdateReportScreenState
               );
             },
           ),
+          24.hSizedBox,
+          _submitButtonBuilder(),
         ],
       ),
     );
@@ -174,31 +195,52 @@ class _CreateUpdateReportScreenState
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.check_circle_rounded,
-            color: AppColors.green,
-            size: 80.spMin,
+          Container(
+            width: 86.spMin,
+            height: 86.spMin,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.green.withValues(alpha: 0.8),
+                  AppColors.darkGreen.withValues(alpha: 0.8),
+                ],
+              ),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.white.withValues(alpha: 0.4),
+                  blurRadius: 20.spMin,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Icon(
+              Icons.check_rounded,
+              size: 50.spMin,
+              color: AppColors.white,
+            ),
           ),
-          10.hSizedBox,
+          20.hSizedBox,
           Text(
-            'Report Submitted!',
+            'ALRT Submitted!',
             style: TextStyle(
-              fontSize: 18.spMin,
+              fontSize: 24.spMin,
               fontWeight: FontWeight.w600,
             ),
           ),
           5.hSizedBox,
           Text(
-            'Your report has been submitted. We will review it shortly and let you know afterwards.',
+            'Thank you for keeping your community safe.\nYour ALRT has been submitted for review.',
             style: TextStyle(
               fontSize: 14.spMin,
               fontWeight: FontWeight.normal,
+              color: AppColors.mediumGrey,
             ),
             textAlign: TextAlign.center,
           ),
           20.hSizedBox,
           _submitAnotherButtonBuilder(),
-          10.hSizedBox,
+          12.hSizedBox,
           _seeActiveReportsButtonBuilder(),
         ],
       ).pX(20.0),
@@ -207,6 +249,7 @@ class _CreateUpdateReportScreenState
 
   Widget _sectionTitleBuilder({
     required final String title,
+    final Color? color,
     final bool isRequired = false,
   }) {
     return Row(
@@ -214,7 +257,8 @@ class _CreateUpdateReportScreenState
         Text(
           title,
           style: TextStyle(
-            fontSize: 14.sp,
+            fontSize: 14.spMin,
+            color: color,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -258,9 +302,11 @@ class _CreateUpdateReportScreenState
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
-          color: AppColors.black,
+          color: AppColors.grey.withValues(alpha: 0.8),
           fontWeight: FontWeight.normal,
         ),
+        filled: true,
+        fillColor: AppColors.white,
         contentPadding: contentPadding,
         disabledBorder: context.theme.inputDecorationTheme.border?.copyWith(
           borderSide: BorderSide(
@@ -343,8 +389,81 @@ class _CreateUpdateReportScreenState
       spacing: 8.h,
       children: [
         _sectionTitleBuilder(title: 'Upload Media'),
-        CreateReportMediasList(),
+        Consumer(
+          builder: (context, ref, child) {
+            final hasMedias = ref.watch(
+              providerOfCreateReport.select(
+                (value) => value.medias.isNotEmpty,
+              ),
+            );
+            if (!hasMedias) return _mediaPickerBuilder();
+            return CreateReportMediasList();
+          },
+        ),
       ],
+    );
+  }
+
+  Widget _mediaPickerBuilder() {
+    return Row(
+      spacing: 10.spMin,
+      children: [
+        // Camera Button
+        Expanded(
+          child: _mediaPickerButtonBuilder(
+            icon: LucideIcons.camera,
+            label: 'Camera',
+            onPressed: _handleCameraPress,
+          ),
+        ),
+        // Gallery Button
+        Expanded(
+          child: _mediaPickerButtonBuilder(
+            icon: LucideIcons.image,
+            label: 'Gallery',
+            onPressed: _handleGalleryPress,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _mediaPickerButtonBuilder({
+    required final IconData icon,
+    required final String label,
+    required final VoidCallback onPressed,
+  }) {
+    return DottedBorderContainer(
+      strokeWidth: 1.2,
+      borderRadius: 12.spMin,
+      borderColor: AppColors.lightGrey,
+      child: Container(
+        width: double.infinity,
+        height: 115.spMin,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(12.spMin),
+        ),
+        child: Column(
+          spacing: 6.spMin,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: AppColors.grey.withValues(alpha: 0.6),
+              size: 30.spMin,
+            ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14.spMin,
+                fontWeight: FontWeight.w600,
+                color: AppColors.grey.withValues(alpha: 0.8),
+              ),
+            ),
+          ],
+        ),
+      ).onPressed(onPressed),
     );
   }
 
@@ -361,25 +480,10 @@ class _CreateUpdateReportScreenState
         final hasAllRequiredDataEntered = _hasAllRequiredDataEntered(ref);
         if (!hasAllRequiredDataEntered) return const SizedBox.shrink();
 
-        return Container(
-          decoration: BoxDecoration(
-            color: context.theme.scaffoldBackgroundColor,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColorMedium,
-                blurRadius: 3,
-                offset: const Offset(0, -1),
-              ),
-            ],
-          ),
-          padding: EdgeInsets.all(10.spMin),
-          child: SafeArea(
-            child: Button.filled(
-              value: 'Submit Report',
-              icon: Icon(Icons.check_rounded),
-              onPressed: _handleSubmitReport,
-            ),
-          ),
+        return Button.gradient(
+          value: 'Submit Report',
+          icon: Icon(Icons.check_rounded),
+          onPressed: _handleSubmitReport,
         );
       },
     );
@@ -395,12 +499,43 @@ class _CreateUpdateReportScreenState
         );
         if (isUpdating) return const SizedBox.shrink();
 
-        return Button.bordered(
-          width: 300.0,
-          value: 'Submit Another Report',
-          icon: Icon(Icons.add_rounded),
-          onPressed: _handleAnotherReport,
-        );
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 6.0,
+                offset: const Offset(0.0, 0.0),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 10.spMin,
+            vertical: 15.spMin,
+          ),
+          child: Center(
+            child: Row(
+              spacing: 10.spMin,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.add_rounded,
+                  color: AppColors.black,
+                ),
+                Text(
+                  'Submit Another Report',
+                  style: TextStyle(
+                    fontSize: 14.spMin,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ).onPressed(_handleAnotherReport);
       },
     );
   }
@@ -415,15 +550,43 @@ class _CreateUpdateReportScreenState
         );
         if (isUpdating) return const SizedBox.shrink();
 
-        return Button.bordered(
-          width: 300.0,
-          value: 'See My Active Reports',
-          icon: Icon(Icons.list_rounded),
-          onPressed: () {
-            ref.read(providerOfHomeTab.notifier).state = HomeTab.profile;
-            context.push(MyHazardsScreen.route);
-          },
-        );
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 6.0,
+                offset: const Offset(0.0, 0.0),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 10.spMin,
+            vertical: 15.spMin,
+          ),
+          child: Center(
+            child: Row(
+              spacing: 10.spMin,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.list_rounded, color: AppColors.black),
+                Text(
+                  'See My Active Reports',
+                  style: TextStyle(
+                    fontSize: 14.spMin,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ).onPressed(() {
+          ref.read(providerOfHomeTab.notifier).state = HomeTab.profile;
+          context.push(MyHazardsScreen.route);
+        });
       },
     );
   }
@@ -435,16 +598,23 @@ class _CreateUpdateReportScreenState
         if (!hasAnyDataEntered) {
           return const SizedBox.shrink();
         }
-        return RoundButton(
-          icon: Icon(
-            Icons.delete_rounded,
-            color: AppColors.black,
-            size: 24.spMin,
+        return Container(
+          width: 32.spMin,
+          height: 32.spMin,
+          decoration: BoxDecoration(
+            color: AppColors.white.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(8.spMin),
+            border: Border.all(
+              color: AppColors.white.withValues(alpha: 0.3),
+              width: 1.0,
+            ),
           ),
-          size: 35.0,
-          backgroundColor: AppColors.lightGrey.withValues(alpha: 0.7),
-          onPressed: _clearAll,
-        );
+          child: Icon(
+            LucideIcons.trash2,
+            color: AppColors.white.withValues(alpha: 0.8),
+            size: 16.spMin,
+          ),
+        ).onPressed(_clearAll);
       },
     );
   }
@@ -586,5 +756,41 @@ class _CreateUpdateReportScreenState
         );
       }
     });
+  }
+
+  Future<void> _handleCameraPress() async {
+    final result = await _mediaService.pickImage(
+      source: ImageSource.camera,
+    );
+    if (!mounted) return;
+
+    result.when(
+      (media) {
+        if (media != null) {
+          ref.read(providerOfCreateReport.notifier).addMedias([media]);
+        }
+      },
+      (error) {
+        context.showErrorToast(
+          message: 'We were unable to pick media. Please try again.',
+        );
+      },
+    );
+  }
+
+  Future<void> _handleGalleryPress() async {
+    final result = await _mediaService.pickMedias();
+    if (!mounted) return;
+
+    result.when(
+      (medias) {
+        ref.read(providerOfCreateReport.notifier).addMedias(medias);
+      },
+      (error) {
+        context.showErrorToast(
+          message: 'We were unable to pick media. Please try again.',
+        );
+      },
+    );
   }
 }

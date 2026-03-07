@@ -254,13 +254,13 @@ class AppTheme {
         focusedBorder: inputBorder.copyWith(
           borderSide: BorderSide(
             color: AppColors.orange,
-            width: 2.0,
+            width: 1.2,
           ),
         ),
         focusedErrorBorder: inputBorder.copyWith(
           borderSide: BorderSide(
             color: AppColors.orange,
-            width: 2.0,
+            width: 1.2,
           ),
         ),
         contentPadding: EdgeInsets.symmetric(
