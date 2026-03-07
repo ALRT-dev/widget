@@ -18,23 +18,9 @@ class _CustomMyLocationButtonState
     extends ConsumerState<CustomMyLocationButton> {
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 48.spMin,
       height: 48.spMin,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14.spMin),
-        border: Border.all(
-          color: AppColors.lightGrey,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadowColor,
-            blurRadius: 10.0,
-            offset: Offset(0, 0.0),
-          ),
-        ],
-      ),
       child: Icon(
         Icons.my_location_rounded,
         size: 20.spMin,

@@ -48,7 +48,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.orange,
+              AppColors.orange200,
               AppColors.red200,
             ],
           ),

@@ -63,7 +63,7 @@ class _MapKeysBottomsheetContentState
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.orange,
+            AppColors.orange200,
             AppColors.red200,
           ],
         ),

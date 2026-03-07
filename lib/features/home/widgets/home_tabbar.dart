@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
-import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_theme.dart';
@@ -25,11 +24,15 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: context.theme.scaffoldBackgroundColor,
+        color: AppColors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30.spMin),
+          topRight: Radius.circular(30.spMin),
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.lightGrey.withValues(alpha: 0.8),
-            blurRadius: 0.5,
+            color: AppColors.shadowColor,
+            blurRadius: 10.0,
             offset: const Offset(0, -0.5),
           ),
         ],

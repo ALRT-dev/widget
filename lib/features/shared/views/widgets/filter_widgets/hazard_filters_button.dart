@@ -48,17 +48,17 @@ class _HazardFiltersButtonState extends ConsumerState<HazardFiltersButton> {
           width: 48.spMin,
           height: 48.spMin,
           decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(14.spMin),
-            border: Border.all(
-              color: AppColors.lightGrey,
+            gradient: LinearGradient(
+              colors: [
+                AppColors.orange200,
+                AppColors.red200,
+              ],
             ),
-            boxShadow: widget.buttonShadow,
           ),
           child: Icon(
             LucideIcons.slidersHorizontal,
             size: 20.spMin,
-            color: AppColors.black,
+            color: AppColors.white,
           ),
         ),
         Positioned(

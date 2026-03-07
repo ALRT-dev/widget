@@ -113,21 +113,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: Stack(
                     children: [
                       Positioned(
-                        right: 10.spMin,
+                        right: 15.spMin,
                         bottom: 10.spMin,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          spacing: 10.spMin,
-                          children: [
-                            CustomCompassButton(),
-                            HazardFiltersButton(
-                              filtersKey: MapScreen.filtersKey,
-                              onFiltersUpdated: () => _getMapHazards(),
-                            ),
-                            MapKeysButton(),
-                            CustomMyLocationButton(),
-                          ],
-                        ),
+                        child: _mapActionButtons(),
                       ),
                       Positioned(
                         bottom: 10.spMin,
@@ -166,6 +154,42 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _mapActionButtons() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      spacing: 10.spMin,
+      children: [
+        CustomCompassButton(),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(14.spMin),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0, 0.0),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14.spMin),
+            child: Column(
+              children: [
+                HazardFiltersButton(
+                  filtersKey: MapScreen.filtersKey,
+                  onFiltersUpdated: () => _getMapHazards(),
+                ),
+                MapKeysButton(),
+                CustomMyLocationButton(),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

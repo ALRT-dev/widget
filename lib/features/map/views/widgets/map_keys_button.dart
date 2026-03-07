@@ -20,23 +20,17 @@ class _MapKeysButtonState extends ConsumerState<MapKeysButton> {
       width: 48.spMin,
       height: 48.spMin,
       decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14.spMin),
-        border: Border.all(
-          color: AppColors.lightGrey,
+        gradient: LinearGradient(
+          colors: [
+            AppColors.blue,
+            AppColors.darkBlue,
+          ],
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadowColor,
-            blurRadius: 10.0,
-            offset: Offset(0, 0.0),
-          ),
-        ],
       ),
       child: Icon(
         LucideIcons.key,
-        size: 20.spMin,
-        color: AppColors.black,
+        size: 18.spMin,
+        color: AppColors.white,
       ),
     ).onPressed(_handleTap);
   }
