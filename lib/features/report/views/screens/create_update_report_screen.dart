@@ -82,7 +82,6 @@ class _CreateUpdateReportScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.extraLightGrey,
       appBar: AppBar(
         backgroundColor: AppColors.transparent,
         surfaceTintColor: AppColors.transparent,

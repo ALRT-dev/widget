@@ -12,7 +12,7 @@ class AppTheme {
     );
 
     return ThemeData(
-      scaffoldBackgroundColor: AppColors.white,
+      scaffoldBackgroundColor: AppColors.extraLightGrey,
       fontFamily: defaultFontFamily,
       splashColor: AppColors.primary.withValues(alpha: 0.1),
       elevatedButtonTheme: ElevatedButtonThemeData(

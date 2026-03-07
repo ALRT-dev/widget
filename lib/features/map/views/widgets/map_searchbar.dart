@@ -68,7 +68,7 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
                 color: AppColors.black,
               ),
               decoration: InputDecoration(
-                hintText: 'Search place, locality, area...',
+                hintText: 'Search the location...',
                 contentPadding: EdgeInsets.only(
                   top: 5.spMin,
                   bottom: 5.spMin,
