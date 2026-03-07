@@ -21,7 +21,8 @@ mixin _$CreateUpdateReportProviderState {
  bool get reportSubmitted;/// The list of [CreatingUpdatingHazardReport.id]s that have been acknowledged.
 ///
 /// i.e A success or error toast has been shown for these reports.
- List<String> get acknowledgedReportIds;/// The state of getting categories to select.
+ List<String> get acknowledgedReportIds;/// Whether to show the categories selector.
+ bool get showCategoriesSelector;/// The state of getting categories to select.
  GetCategoriesToSelectState get getCategoriesToSelectState;/// The state of creating or updating hazard reports.
  List<CreatingUpdatingHazardReport> get creatingUpdatingHazardReports;
 /// Create a copy of CreateUpdateReportProviderState
@@ -34,16 +35,16 @@ $CreateUpdateReportProviderStateCopyWith<CreateUpdateReportProviderState> get co
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateUpdateReportProviderState&&(identical(other.hazardToCreateOrUpdate, hazardToCreateOrUpdate) || other.hazardToCreateOrUpdate == hazardToCreateOrUpdate)&&const DeepCollectionEquality().equals(other.categoriesToSelect, categoriesToSelect)&&const DeepCollectionEquality().equals(other.medias, medias)&&(identical(other.reportSubmitted, reportSubmitted) || other.reportSubmitted == reportSubmitted)&&const DeepCollectionEquality().equals(other.acknowledgedReportIds, acknowledgedReportIds)&&(identical(other.getCategoriesToSelectState, getCategoriesToSelectState) || other.getCategoriesToSelectState == getCategoriesToSelectState)&&const DeepCollectionEquality().equals(other.creatingUpdatingHazardReports, creatingUpdatingHazardReports));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateUpdateReportProviderState&&(identical(other.hazardToCreateOrUpdate, hazardToCreateOrUpdate) || other.hazardToCreateOrUpdate == hazardToCreateOrUpdate)&&const DeepCollectionEquality().equals(other.categoriesToSelect, categoriesToSelect)&&const DeepCollectionEquality().equals(other.medias, medias)&&(identical(other.reportSubmitted, reportSubmitted) || other.reportSubmitted == reportSubmitted)&&const DeepCollectionEquality().equals(other.acknowledgedReportIds, acknowledgedReportIds)&&(identical(other.showCategoriesSelector, showCategoriesSelector) || other.showCategoriesSelector == showCategoriesSelector)&&(identical(other.getCategoriesToSelectState, getCategoriesToSelectState) || other.getCategoriesToSelectState == getCategoriesToSelectState)&&const DeepCollectionEquality().equals(other.creatingUpdatingHazardReports, creatingUpdatingHazardReports));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,hazardToCreateOrUpdate,const DeepCollectionEquality().hash(categoriesToSelect),const DeepCollectionEquality().hash(medias),reportSubmitted,const DeepCollectionEquality().hash(acknowledgedReportIds),getCategoriesToSelectState,const DeepCollectionEquality().hash(creatingUpdatingHazardReports));
+int get hashCode => Object.hash(runtimeType,hazardToCreateOrUpdate,const DeepCollectionEquality().hash(categoriesToSelect),const DeepCollectionEquality().hash(medias),reportSubmitted,const DeepCollectionEquality().hash(acknowledgedReportIds),showCategoriesSelector,getCategoriesToSelectState,const DeepCollectionEquality().hash(creatingUpdatingHazardReports));
 
 @override
 String toString() {
-  return 'CreateUpdateReportProviderState(hazardToCreateOrUpdate: $hazardToCreateOrUpdate, categoriesToSelect: $categoriesToSelect, medias: $medias, reportSubmitted: $reportSubmitted, acknowledgedReportIds: $acknowledgedReportIds, getCategoriesToSelectState: $getCategoriesToSelectState, creatingUpdatingHazardReports: $creatingUpdatingHazardReports)';
+  return 'CreateUpdateReportProviderState(hazardToCreateOrUpdate: $hazardToCreateOrUpdate, categoriesToSelect: $categoriesToSelect, medias: $medias, reportSubmitted: $reportSubmitted, acknowledgedReportIds: $acknowledgedReportIds, showCategoriesSelector: $showCategoriesSelector, getCategoriesToSelectState: $getCategoriesToSelectState, creatingUpdatingHazardReports: $creatingUpdatingHazardReports)';
 }
 
 
@@ -54,7 +55,7 @@ abstract mixin class $CreateUpdateReportProviderStateCopyWith<$Res>  {
   factory $CreateUpdateReportProviderStateCopyWith(CreateUpdateReportProviderState value, $Res Function(CreateUpdateReportProviderState) _then) = _$CreateUpdateReportProviderStateCopyWithImpl;
 @useResult
 $Res call({
- Hazard hazardToCreateOrUpdate, List<HazardCategory> categoriesToSelect, List<AlrtMedia> medias, bool reportSubmitted, List<String> acknowledgedReportIds, GetCategoriesToSelectState getCategoriesToSelectState, List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports
+ Hazard hazardToCreateOrUpdate, List<HazardCategory> categoriesToSelect, List<AlrtMedia> medias, bool reportSubmitted, List<String> acknowledgedReportIds, bool showCategoriesSelector, GetCategoriesToSelectState getCategoriesToSelectState, List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports
 });
 
 
@@ -71,14 +72,15 @@ class _$CreateUpdateReportProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of CreateUpdateReportProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? hazardToCreateOrUpdate = null,Object? categoriesToSelect = null,Object? medias = null,Object? reportSubmitted = null,Object? acknowledgedReportIds = null,Object? getCategoriesToSelectState = null,Object? creatingUpdatingHazardReports = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? hazardToCreateOrUpdate = null,Object? categoriesToSelect = null,Object? medias = null,Object? reportSubmitted = null,Object? acknowledgedReportIds = null,Object? showCategoriesSelector = null,Object? getCategoriesToSelectState = null,Object? creatingUpdatingHazardReports = null,}) {
   return _then(_self.copyWith(
 hazardToCreateOrUpdate: null == hazardToCreateOrUpdate ? _self.hazardToCreateOrUpdate : hazardToCreateOrUpdate // ignore: cast_nullable_to_non_nullable
 as Hazard,categoriesToSelect: null == categoriesToSelect ? _self.categoriesToSelect : categoriesToSelect // ignore: cast_nullable_to_non_nullable
 as List<HazardCategory>,medias: null == medias ? _self.medias : medias // ignore: cast_nullable_to_non_nullable
 as List<AlrtMedia>,reportSubmitted: null == reportSubmitted ? _self.reportSubmitted : reportSubmitted // ignore: cast_nullable_to_non_nullable
 as bool,acknowledgedReportIds: null == acknowledgedReportIds ? _self.acknowledgedReportIds : acknowledgedReportIds // ignore: cast_nullable_to_non_nullable
-as List<String>,getCategoriesToSelectState: null == getCategoriesToSelectState ? _self.getCategoriesToSelectState : getCategoriesToSelectState // ignore: cast_nullable_to_non_nullable
+as List<String>,showCategoriesSelector: null == showCategoriesSelector ? _self.showCategoriesSelector : showCategoriesSelector // ignore: cast_nullable_to_non_nullable
+as bool,getCategoriesToSelectState: null == getCategoriesToSelectState ? _self.getCategoriesToSelectState : getCategoriesToSelectState // ignore: cast_nullable_to_non_nullable
 as GetCategoriesToSelectState,creatingUpdatingHazardReports: null == creatingUpdatingHazardReports ? _self.creatingUpdatingHazardReports : creatingUpdatingHazardReports // ignore: cast_nullable_to_non_nullable
 as List<CreatingUpdatingHazardReport>,
   ));
@@ -183,10 +185,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Hazard hazardToCreateOrUpdate,  List<HazardCategory> categoriesToSelect,  List<AlrtMedia> medias,  bool reportSubmitted,  List<String> acknowledgedReportIds,  GetCategoriesToSelectState getCategoriesToSelectState,  List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Hazard hazardToCreateOrUpdate,  List<HazardCategory> categoriesToSelect,  List<AlrtMedia> medias,  bool reportSubmitted,  List<String> acknowledgedReportIds,  bool showCategoriesSelector,  GetCategoriesToSelectState getCategoriesToSelectState,  List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateUpdateReportProviderState() when $default != null:
-return $default(_that.hazardToCreateOrUpdate,_that.categoriesToSelect,_that.medias,_that.reportSubmitted,_that.acknowledgedReportIds,_that.getCategoriesToSelectState,_that.creatingUpdatingHazardReports);case _:
+return $default(_that.hazardToCreateOrUpdate,_that.categoriesToSelect,_that.medias,_that.reportSubmitted,_that.acknowledgedReportIds,_that.showCategoriesSelector,_that.getCategoriesToSelectState,_that.creatingUpdatingHazardReports);case _:
   return orElse();
 
 }
@@ -204,10 +206,10 @@ return $default(_that.hazardToCreateOrUpdate,_that.categoriesToSelect,_that.medi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Hazard hazardToCreateOrUpdate,  List<HazardCategory> categoriesToSelect,  List<AlrtMedia> medias,  bool reportSubmitted,  List<String> acknowledgedReportIds,  GetCategoriesToSelectState getCategoriesToSelectState,  List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Hazard hazardToCreateOrUpdate,  List<HazardCategory> categoriesToSelect,  List<AlrtMedia> medias,  bool reportSubmitted,  List<String> acknowledgedReportIds,  bool showCategoriesSelector,  GetCategoriesToSelectState getCategoriesToSelectState,  List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports)  $default,) {final _that = this;
 switch (_that) {
 case _CreateUpdateReportProviderState():
-return $default(_that.hazardToCreateOrUpdate,_that.categoriesToSelect,_that.medias,_that.reportSubmitted,_that.acknowledgedReportIds,_that.getCategoriesToSelectState,_that.creatingUpdatingHazardReports);case _:
+return $default(_that.hazardToCreateOrUpdate,_that.categoriesToSelect,_that.medias,_that.reportSubmitted,_that.acknowledgedReportIds,_that.showCategoriesSelector,_that.getCategoriesToSelectState,_that.creatingUpdatingHazardReports);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -224,10 +226,10 @@ return $default(_that.hazardToCreateOrUpdate,_that.categoriesToSelect,_that.medi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Hazard hazardToCreateOrUpdate,  List<HazardCategory> categoriesToSelect,  List<AlrtMedia> medias,  bool reportSubmitted,  List<String> acknowledgedReportIds,  GetCategoriesToSelectState getCategoriesToSelectState,  List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Hazard hazardToCreateOrUpdate,  List<HazardCategory> categoriesToSelect,  List<AlrtMedia> medias,  bool reportSubmitted,  List<String> acknowledgedReportIds,  bool showCategoriesSelector,  GetCategoriesToSelectState getCategoriesToSelectState,  List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateUpdateReportProviderState() when $default != null:
-return $default(_that.hazardToCreateOrUpdate,_that.categoriesToSelect,_that.medias,_that.reportSubmitted,_that.acknowledgedReportIds,_that.getCategoriesToSelectState,_that.creatingUpdatingHazardReports);case _:
+return $default(_that.hazardToCreateOrUpdate,_that.categoriesToSelect,_that.medias,_that.reportSubmitted,_that.acknowledgedReportIds,_that.showCategoriesSelector,_that.getCategoriesToSelectState,_that.creatingUpdatingHazardReports);case _:
   return null;
 
 }
@@ -239,7 +241,7 @@ return $default(_that.hazardToCreateOrUpdate,_that.categoriesToSelect,_that.medi
 
 
 class _CreateUpdateReportProviderState implements CreateUpdateReportProviderState {
-  const _CreateUpdateReportProviderState({this.hazardToCreateOrUpdate = const Hazard(), final  List<HazardCategory> categoriesToSelect = const <HazardCategory>[], final  List<AlrtMedia> medias = const <AlrtMedia>[], this.reportSubmitted = false, final  List<String> acknowledgedReportIds = const <String>[], this.getCategoriesToSelectState = const GetCategoriesToSelectState.initial(), final  List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports = const <CreatingUpdatingHazardReport>[]}): _categoriesToSelect = categoriesToSelect,_medias = medias,_acknowledgedReportIds = acknowledgedReportIds,_creatingUpdatingHazardReports = creatingUpdatingHazardReports;
+  const _CreateUpdateReportProviderState({this.hazardToCreateOrUpdate = const Hazard(), final  List<HazardCategory> categoriesToSelect = const <HazardCategory>[], final  List<AlrtMedia> medias = const <AlrtMedia>[], this.reportSubmitted = false, final  List<String> acknowledgedReportIds = const <String>[], this.showCategoriesSelector = true, this.getCategoriesToSelectState = const GetCategoriesToSelectState.initial(), final  List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports = const <CreatingUpdatingHazardReport>[]}): _categoriesToSelect = categoriesToSelect,_medias = medias,_acknowledgedReportIds = acknowledgedReportIds,_creatingUpdatingHazardReports = creatingUpdatingHazardReports;
   
 
 /// The hazard to create or update.
@@ -277,6 +279,8 @@ class _CreateUpdateReportProviderState implements CreateUpdateReportProviderStat
   return EqualUnmodifiableListView(_acknowledgedReportIds);
 }
 
+/// Whether to show the categories selector.
+@override@JsonKey() final  bool showCategoriesSelector;
 /// The state of getting categories to select.
 @override@JsonKey() final  GetCategoriesToSelectState getCategoriesToSelectState;
 /// The state of creating or updating hazard reports.
@@ -299,16 +303,16 @@ _$CreateUpdateReportProviderStateCopyWith<_CreateUpdateReportProviderState> get 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateUpdateReportProviderState&&(identical(other.hazardToCreateOrUpdate, hazardToCreateOrUpdate) || other.hazardToCreateOrUpdate == hazardToCreateOrUpdate)&&const DeepCollectionEquality().equals(other._categoriesToSelect, _categoriesToSelect)&&const DeepCollectionEquality().equals(other._medias, _medias)&&(identical(other.reportSubmitted, reportSubmitted) || other.reportSubmitted == reportSubmitted)&&const DeepCollectionEquality().equals(other._acknowledgedReportIds, _acknowledgedReportIds)&&(identical(other.getCategoriesToSelectState, getCategoriesToSelectState) || other.getCategoriesToSelectState == getCategoriesToSelectState)&&const DeepCollectionEquality().equals(other._creatingUpdatingHazardReports, _creatingUpdatingHazardReports));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateUpdateReportProviderState&&(identical(other.hazardToCreateOrUpdate, hazardToCreateOrUpdate) || other.hazardToCreateOrUpdate == hazardToCreateOrUpdate)&&const DeepCollectionEquality().equals(other._categoriesToSelect, _categoriesToSelect)&&const DeepCollectionEquality().equals(other._medias, _medias)&&(identical(other.reportSubmitted, reportSubmitted) || other.reportSubmitted == reportSubmitted)&&const DeepCollectionEquality().equals(other._acknowledgedReportIds, _acknowledgedReportIds)&&(identical(other.showCategoriesSelector, showCategoriesSelector) || other.showCategoriesSelector == showCategoriesSelector)&&(identical(other.getCategoriesToSelectState, getCategoriesToSelectState) || other.getCategoriesToSelectState == getCategoriesToSelectState)&&const DeepCollectionEquality().equals(other._creatingUpdatingHazardReports, _creatingUpdatingHazardReports));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,hazardToCreateOrUpdate,const DeepCollectionEquality().hash(_categoriesToSelect),const DeepCollectionEquality().hash(_medias),reportSubmitted,const DeepCollectionEquality().hash(_acknowledgedReportIds),getCategoriesToSelectState,const DeepCollectionEquality().hash(_creatingUpdatingHazardReports));
+int get hashCode => Object.hash(runtimeType,hazardToCreateOrUpdate,const DeepCollectionEquality().hash(_categoriesToSelect),const DeepCollectionEquality().hash(_medias),reportSubmitted,const DeepCollectionEquality().hash(_acknowledgedReportIds),showCategoriesSelector,getCategoriesToSelectState,const DeepCollectionEquality().hash(_creatingUpdatingHazardReports));
 
 @override
 String toString() {
-  return 'CreateUpdateReportProviderState(hazardToCreateOrUpdate: $hazardToCreateOrUpdate, categoriesToSelect: $categoriesToSelect, medias: $medias, reportSubmitted: $reportSubmitted, acknowledgedReportIds: $acknowledgedReportIds, getCategoriesToSelectState: $getCategoriesToSelectState, creatingUpdatingHazardReports: $creatingUpdatingHazardReports)';
+  return 'CreateUpdateReportProviderState(hazardToCreateOrUpdate: $hazardToCreateOrUpdate, categoriesToSelect: $categoriesToSelect, medias: $medias, reportSubmitted: $reportSubmitted, acknowledgedReportIds: $acknowledgedReportIds, showCategoriesSelector: $showCategoriesSelector, getCategoriesToSelectState: $getCategoriesToSelectState, creatingUpdatingHazardReports: $creatingUpdatingHazardReports)';
 }
 
 
@@ -319,7 +323,7 @@ abstract mixin class _$CreateUpdateReportProviderStateCopyWith<$Res> implements 
   factory _$CreateUpdateReportProviderStateCopyWith(_CreateUpdateReportProviderState value, $Res Function(_CreateUpdateReportProviderState) _then) = __$CreateUpdateReportProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- Hazard hazardToCreateOrUpdate, List<HazardCategory> categoriesToSelect, List<AlrtMedia> medias, bool reportSubmitted, List<String> acknowledgedReportIds, GetCategoriesToSelectState getCategoriesToSelectState, List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports
+ Hazard hazardToCreateOrUpdate, List<HazardCategory> categoriesToSelect, List<AlrtMedia> medias, bool reportSubmitted, List<String> acknowledgedReportIds, bool showCategoriesSelector, GetCategoriesToSelectState getCategoriesToSelectState, List<CreatingUpdatingHazardReport> creatingUpdatingHazardReports
 });
 
 
@@ -336,14 +340,15 @@ class __$CreateUpdateReportProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of CreateUpdateReportProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? hazardToCreateOrUpdate = null,Object? categoriesToSelect = null,Object? medias = null,Object? reportSubmitted = null,Object? acknowledgedReportIds = null,Object? getCategoriesToSelectState = null,Object? creatingUpdatingHazardReports = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? hazardToCreateOrUpdate = null,Object? categoriesToSelect = null,Object? medias = null,Object? reportSubmitted = null,Object? acknowledgedReportIds = null,Object? showCategoriesSelector = null,Object? getCategoriesToSelectState = null,Object? creatingUpdatingHazardReports = null,}) {
   return _then(_CreateUpdateReportProviderState(
 hazardToCreateOrUpdate: null == hazardToCreateOrUpdate ? _self.hazardToCreateOrUpdate : hazardToCreateOrUpdate // ignore: cast_nullable_to_non_nullable
 as Hazard,categoriesToSelect: null == categoriesToSelect ? _self._categoriesToSelect : categoriesToSelect // ignore: cast_nullable_to_non_nullable
 as List<HazardCategory>,medias: null == medias ? _self._medias : medias // ignore: cast_nullable_to_non_nullable
 as List<AlrtMedia>,reportSubmitted: null == reportSubmitted ? _self.reportSubmitted : reportSubmitted // ignore: cast_nullable_to_non_nullable
 as bool,acknowledgedReportIds: null == acknowledgedReportIds ? _self._acknowledgedReportIds : acknowledgedReportIds // ignore: cast_nullable_to_non_nullable
-as List<String>,getCategoriesToSelectState: null == getCategoriesToSelectState ? _self.getCategoriesToSelectState : getCategoriesToSelectState // ignore: cast_nullable_to_non_nullable
+as List<String>,showCategoriesSelector: null == showCategoriesSelector ? _self.showCategoriesSelector : showCategoriesSelector // ignore: cast_nullable_to_non_nullable
+as bool,getCategoriesToSelectState: null == getCategoriesToSelectState ? _self.getCategoriesToSelectState : getCategoriesToSelectState // ignore: cast_nullable_to_non_nullable
 as GetCategoriesToSelectState,creatingUpdatingHazardReports: null == creatingUpdatingHazardReports ? _self._creatingUpdatingHazardReports : creatingUpdatingHazardReports // ignore: cast_nullable_to_non_nullable
 as List<CreatingUpdatingHazardReport>,
   ));

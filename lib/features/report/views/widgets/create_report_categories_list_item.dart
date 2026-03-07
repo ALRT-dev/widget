@@ -38,75 +38,73 @@ class _CreateReportCategoriesListItemState
 
     final categoryColor = widget.category.color ?? AppColors.orange;
 
-    return Container(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20.spMin),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected
-                  ? categoryColor.withValues(alpha: 0.7)
-                  : AppColors.shadowColor,
-              blurRadius: 6.0,
-              offset: Offset(0.0, 0.0),
-            ),
-          ],
-          border: Border.all(
-            color: isSelected ? categoryColor : AppColors.transparent,
-            width: 1.5,
-          ),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20.spMin),
+        boxShadow: [
+          BoxShadow(
             color: isSelected
-                ? widget.category.color?.withValues(alpha: 0.25)
-                : AppColors.white,
-            borderRadius: BorderRadius.circular(18.spMin),
+                ? categoryColor.withValues(alpha: 0.7)
+                : AppColors.shadowColor,
+            blurRadius: 6.0,
+            offset: Offset(0.0, 0.0),
           ),
-          padding: EdgeInsets.all(18.spMin),
-          child: Row(
-            children: [
-              Image.asset(
-                'assets/images/hazards/non_aws/${widget.category.id}_user.png',
-                width: 45.spMin,
-                height: 45.spMin,
-                fit: BoxFit.contain,
-              ),
-              12.wSizedBox,
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.category.name ?? 'Unnamed Category',
-                      style: TextStyle(
-                        fontSize: 16.spMin,
-                        fontWeight: FontWeight.w500,
-                      ),
+        ],
+        border: Border.all(
+          color: isSelected ? categoryColor : AppColors.transparent,
+          width: 1.5,
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isSelected
+              ? widget.category.color?.withValues(alpha: 0.25)
+              : AppColors.white,
+          borderRadius: BorderRadius.circular(18.spMin),
+        ),
+        padding: EdgeInsets.all(18.spMin),
+        child: Row(
+          children: [
+            Image.asset(
+              'assets/images/hazards/non_aws/${widget.category.id}_user.png',
+              width: 45.spMin,
+              height: 45.spMin,
+              fit: BoxFit.contain,
+            ),
+            12.wSizedBox,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.category.name ?? 'Unnamed Category',
+                    style: TextStyle(
+                      fontSize: 16.spMin,
+                      fontWeight: FontWeight.w500,
                     ),
-                    if (widget.category.description != null)
-                      Padding(
-                        padding: EdgeInsets.only(top: 3.spMin),
-                        child: Text(
-                          widget.category.description!,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: TextStyle(
-                            fontSize: 12.spMin,
-                            color: Colors.grey[700],
-                          ),
+                  ),
+                  if (widget.category.description != null)
+                    Padding(
+                      padding: EdgeInsets.only(top: 3.spMin),
+                      child: Text(
+                        widget.category.description!,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontSize: 12.spMin,
+                          color: Colors.grey[700],
                         ),
                       ),
-                  ],
-                ),
+                    ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ).onPressed(_handleSelection),
-    );
+      ),
+    ).onPressed(_handleSelection);
   }
 
   /// Handles the selection of the category.

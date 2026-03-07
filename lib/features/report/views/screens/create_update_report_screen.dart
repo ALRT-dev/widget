@@ -54,7 +54,6 @@ class _CreateUpdateReportScreenState
     extends ConsumerState<CreateUpdateReportScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _scrollController = ScrollController();
 
   MediaService get _mediaService => ref.read(providerOfMediaService);
 
@@ -71,12 +70,6 @@ class _CreateUpdateReportScreenState
         '';
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   @override
@@ -142,7 +135,6 @@ class _CreateUpdateReportScreenState
 
   Widget _formBuilder() {
     return SingleChildScrollView(
-      controller: _scrollController,
       padding: EdgeInsets.all(20.spMin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,9 +145,7 @@ class _CreateUpdateReportScreenState
             isRequired: true,
           ),
           10.hSizedBox,
-          CreateReportCategoriesList(
-            onCategorySelected: (_) => _scrollToEnd(),
-          ),
+          _categoriesBuilder(),
           24.hSizedBox,
           Consumer(
             builder: (context, ref, child) {
@@ -186,6 +176,99 @@ class _CreateUpdateReportScreenState
           _submitButtonBuilder(),
         ],
       ),
+    );
+  }
+
+  Widget _categoriesBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final showCategoriesSelector = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.showCategoriesSelector,
+          ),
+        );
+        final selectedCategory = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.hazardToCreateOrUpdate.category,
+          ),
+        );
+        if (showCategoriesSelector || selectedCategory == null) {
+          return CreateReportCategoriesList(
+            onCategorySelected: (_) => _updateShowCategoriesSelector(false),
+          );
+        }
+
+        final categoryColor = selectedCategory.color ?? AppColors.orange;
+
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: categoryColor.withValues(alpha: 0.4),
+                blurRadius: 6.0,
+                offset: Offset(0.0, 0.0),
+              ),
+            ],
+            border: Border.all(
+              color: categoryColor,
+              width: 1.5,
+            ),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(18.spMin),
+            ),
+            padding: EdgeInsets.all(15.spMin),
+            child: Row(
+              children: [
+                Image.asset(
+                  'assets/images/hazards/non_aws/${selectedCategory.id}_user.png',
+                  width: 45.spMin,
+                  height: 45.spMin,
+                  fit: BoxFit.contain,
+                ),
+                12.wSizedBox,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        selectedCategory.name ?? 'Unnamed Category',
+                        style: TextStyle(
+                          fontSize: 16.spMin,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.extraLightGrey,
+                    borderRadius: BorderRadius.circular(10.spMin),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.spMin,
+                    vertical: 5.spMin,
+                  ),
+                  child: Text(
+                    'Change',
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.orange,
+                    ),
+                  ),
+                ).onPressed(() => _updateShowCategoriesSelector(true)),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -743,20 +826,6 @@ class _CreateUpdateReportScreenState
     ref.read(providerOfCreateReport.notifier).updateReportSubmitted(false);
   }
 
-  /// Scrolls to the end of the screen.
-  void _scrollToEnd() {
-    Future.delayed(const Duration(milliseconds: 200), () {
-      if (!mounted) return;
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
-  }
-
   Future<void> _handleCameraPress() async {
     final result = await _mediaService.pickImage(
       source: ImageSource.camera,
@@ -791,5 +860,12 @@ class _CreateUpdateReportScreenState
         );
       },
     );
+  }
+
+  /// Updates the show categories selector in the state.
+  void _updateShowCategoriesSelector(final bool showCategoriesSelector) {
+    ref
+        .read(providerOfCreateReport.notifier)
+        .updateShowCategoriesSelector(showCategoriesSelector);
   }
 }
