@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
+import 'package:hazard_app/features/search/views/widgets/hazard_search_subscribed_locations_list.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
@@ -53,6 +54,11 @@ class _HazardSearchResultsListState
               (value) => value.searchString.isNotEmpty,
             ),
           );
+
+          if (!isSearchActive) {
+            return HazardSearchSubscribedLocationsList();
+          }
+
           final selectedLocation = ref.watch(
             providerOfMainSearch.select(
               (value) => value.searchedLocation,

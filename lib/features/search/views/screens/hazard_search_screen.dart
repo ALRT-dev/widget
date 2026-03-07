@@ -37,6 +37,7 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.extraLightGrey,
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [

@@ -62,7 +62,7 @@ class _AllLocationSubscriptionsListState
           ),
           5.hSizedBox,
           Text(
-            'You have not subscribed to any locations yet. Subscribe to locations to receive notifications about hazards in those areas.',
+            'You have not subscribed to any locations yet. Subscribe to locations to receive alerts in those areas.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14.spMin,
