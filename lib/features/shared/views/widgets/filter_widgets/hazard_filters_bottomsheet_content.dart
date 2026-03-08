@@ -74,7 +74,7 @@ class _HazardFiltersBottomsheetContentState
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.orange200,
+            AppColors.orange300,
             AppColors.red200,
           ],
         ),

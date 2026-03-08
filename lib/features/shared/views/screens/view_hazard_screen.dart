@@ -928,6 +928,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
         if (!shouldShow) return const SizedBox.shrink();
 
+        final color = AppColors.orange200;
+
         return Container(
           decoration: BoxDecoration(
             color: AppColors.white,
@@ -942,23 +944,23 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           ),
           child: Container(
             decoration: BoxDecoration(
-              color: AppColors.orange200.withValues(alpha: 0.05),
+              color: color.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12.spMin),
               border: Border(
                 left: BorderSide(
-                  color: AppColors.orange200,
+                  color: color,
                   width: 4,
                 ),
                 right: BorderSide(
-                  color: AppColors.orange200,
+                  color: color,
                   width: 1,
                 ),
                 bottom: BorderSide(
-                  color: AppColors.orange200,
+                  color: color,
                   width: 1,
                 ),
                 top: BorderSide(
-                  color: AppColors.orange200,
+                  color: color,
                   width: 1,
                 ),
               ),

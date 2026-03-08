@@ -38,7 +38,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         controller: _scrollController,
         slivers: [
           NotificationsAppBar(),
-          10.hSizedBox.sliverBox,
+          20.hSizedBox.sliverBox,
           HazardNotificationsList(),
           10.hSizedBox.sliverBox,
         ],

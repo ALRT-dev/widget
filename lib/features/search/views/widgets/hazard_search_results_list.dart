@@ -11,7 +11,6 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/common_hazards_list_item.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
-import 'package:hazard_app/others/app_colors.dart';
 
 class HazardSearchResultsList extends ConsumerStatefulWidget {
   const HazardSearchResultsList({super.key});
@@ -141,12 +140,11 @@ class _HazardSearchResultsListState
 
         return SizedBox(
           height: 40.spMin,
-          child: Button.filled(
+          child: Button.gradient(
             width: 150.spMin,
             isLoading: isLoading,
             onPressed: _handleSubscribePressed,
             padding: EdgeInsets.zero,
-            color: isSubscribed ? AppColors.grey : null,
             icon: isLoading
                 ? null
                 : Icon(

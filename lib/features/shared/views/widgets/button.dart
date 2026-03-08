@@ -190,7 +190,7 @@ class Button extends StatelessWidget {
         gradient ??
         LinearGradient(
           colors: [
-            AppColors.orange200,
+            AppColors.orange300,
             AppColors.red200,
           ],
         );

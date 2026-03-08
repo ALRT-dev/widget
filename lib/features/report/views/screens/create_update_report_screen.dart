@@ -82,7 +82,7 @@ class _CreateUpdateReportScreenState
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                AppColors.orange200,
+                AppColors.orange300,
                 AppColors.red200,
               ],
             ),
@@ -110,6 +110,7 @@ class _CreateUpdateReportScreenState
                   : 'Report an ALRT',
               style: TextStyle(
                 color: AppColors.white,
+                fontSize: 25.spMin,
               ),
             );
           },

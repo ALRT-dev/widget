@@ -48,7 +48,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.orange200,
+              AppColors.orange300,
               AppColors.red200,
             ],
           ),
@@ -60,10 +60,12 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
       leadingWidth: 0.0,
       toolbarHeight: 50.spMin,
       centerTitle: false,
+      expandedHeight: 120.spMin,
       title: Text(
         'ALRT Search',
         style: TextStyle(
           color: AppColors.white,
+          fontSize: 25.spMin,
         ),
       ),
       bottom: PreferredSize(

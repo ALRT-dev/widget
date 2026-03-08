@@ -2,6 +2,7 @@ import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
@@ -11,7 +12,6 @@ import 'package:hazard_app/features/map/views/widgets/places_search_results_menu
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
 import 'package:hazard_app/others/app_colors.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MapSearchbar extends ConsumerStatefulWidget {
   const MapSearchbar({super.key});
@@ -69,6 +69,9 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
               ),
               decoration: InputDecoration(
                 hintText: 'Search the location...',
+                hintStyle: TextStyle(
+                  color: AppColors.grey.withValues(alpha: 0.7),
+                ),
                 contentPadding: EdgeInsets.only(
                   top: 5.spMin,
                   bottom: 5.spMin,
@@ -80,10 +83,11 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
                 prefixIcon: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      LucideIcons.search,
-                      color: AppColors.grey,
-                      size: 22.spMin,
+                    SvgPicture.asset(
+                      'assets/icons/search.svg',
+                      width: 25.spMin,
+                      height: 25.spMin,
+                      color: AppColors.grey.withValues(alpha: 0.6),
                     ).pL(15.0),
                   ],
                 ),
