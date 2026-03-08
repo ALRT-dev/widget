@@ -78,7 +78,7 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
             'ALRT Feed',
             style: TextStyle(
               color: AppColors.white,
-              fontSize: 25.spMin,
+              fontSize: 24.spMin,
             ),
           ),
           bottom: !isHazardsPresent && !isHazardsLoading && !hasFiltersSelected

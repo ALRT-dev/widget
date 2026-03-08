@@ -302,8 +302,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadowColorLight,
-                blurRadius: 5.0,
-                offset: Offset(0.0, 4.0),
+                blurRadius: 2.0,
+                offset: Offset(0.0, 0.0),
               ),
             ],
           ),
@@ -328,8 +328,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         boxShadow: [
           BoxShadow(
             color: AppColors.shadowColorLight,
-            blurRadius: 5.0,
-            offset: Offset(0.0, 4.0),
+            blurRadius: 2.0,
+            offset: Offset(0.0, 0.0),
           ),
         ],
       ),
@@ -374,8 +374,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadowColorLight,
-                blurRadius: 5.0,
-                offset: Offset(0.0, 4.0),
+                blurRadius: 2.0,
+                offset: Offset(0.0, 0.0),
               ),
             ],
           ),
@@ -655,7 +655,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadowColorLight,
-                blurRadius: 5.0,
+                blurRadius: 2.0,
                 offset: Offset(0.0, 0.0),
               ),
             ],
@@ -855,8 +855,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadowColorLight,
-                blurRadius: 5.0,
-                offset: Offset(0.0, 4.0),
+                blurRadius: 2.0,
+                offset: Offset(0.0, 0.0),
               ),
             ],
           ),
@@ -937,8 +937,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadowColorLight,
-                blurRadius: 5.0,
-                offset: Offset(0.0, 4.0),
+                blurRadius: 2.0,
+                offset: Offset(0.0, 0.0),
               ),
             ],
           ),
@@ -1137,8 +1137,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadowColorLight,
-                blurRadius: 5.0,
-                offset: Offset(0.0, 4.0),
+                blurRadius: 2.0,
+                offset: Offset(0.0, 0.0),
               ),
             ],
           ),

@@ -65,7 +65,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
         'ALRT Search',
         style: TextStyle(
           color: AppColors.white,
-          fontSize: 25.spMin,
+          fontSize: 24.spMin,
         ),
       ),
       bottom: PreferredSize(

@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/shared/converters/date_time_converter.dart';
+import 'package:hazard_app/features/shared/enums/user_badge_enum.dart';
 import 'package:hazard_app/features/shared/enums/user_reports_status_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 
@@ -85,6 +86,15 @@ abstract class AppUser with _$AppUser {
     } else {
       return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
     }
+  }
+
+  /// Returns the user badge based on the user's XP points.
+  UserBadge get userBadge {
+    // Use lastWhere to get the last badge that the user has reached.
+    return UserBadge.values.lastWhere(
+      (badge) => xpPoints >= badge.requiredXpPoints,
+      orElse: () => UserBadge.watcher,
+    );
   }
 
   factory AppUser.fromJson(Map<String, dynamic> json) =>

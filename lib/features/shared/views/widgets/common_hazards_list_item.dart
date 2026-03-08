@@ -99,7 +99,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           boxShadow: [
             BoxShadow(
               color: AppColors.shadowColor,
-              blurRadius: 8.0,
+              blurRadius: 5.0,
               offset: const Offset(0.0, 0.0),
             ),
           ],

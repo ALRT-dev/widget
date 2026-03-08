@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
 import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
 import 'package:hazard_app/features/profile/views/screens/support_request_screen.dart';
@@ -11,17 +13,18 @@ import 'package:hazard_app/features/profile/providers/states/profile_provider_st
 import 'package:hazard_app/features/profile/views/screens/delete_account_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/profile/views/widgets/accepted_hazards_widgets/my_accepted_hazards_list.dart';
+import 'package:hazard_app/features/profile/views/widgets/profile_xp_progress.dart';
 import 'package:hazard_app/features/profile/views/widgets/rejected_hazards_widgets/my_rejected_hazards_list.dart';
+import 'package:hazard_app/features/shared/enums/user_badge_enum.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
-import 'package:hazard_app/features/shared/views/widgets/avatar.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_wrapper.dart';
-import 'package:timeago/timeago.dart' as timeago;
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -46,21 +49,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildManageNotificationsSection(),
-                  24.spMin.hSizedBox,
-                  _buildUserInfoSection(),
-                  24.spMin.hSizedBox,
-                  _buildScoresSection(),
-                  24.spMin.hSizedBox,
                   _buildStatsSection(),
                   24.spMin.hSizedBox,
                   _buildSubmittedHazardsSection(),
                   _buildFailedReviewsSection(),
-                  24.spMin.hSizedBox,
-                  _buildSupportRequestSection(),
-                  16.spMin.hSizedBox,
-                  _buildDeleteAccountSection(),
-                  50.spMin.hSizedBox,
+                  _buildAccountSettingsSection(),
+                  30.spMin.hSizedBox,
                   _buildLogoutSection(),
                   10.spMin.hSizedBox,
                 ],
@@ -74,11 +68,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Widget _buildAppBar() {
     return SliverAppBar(
-      expandedHeight: 200.spMin,
+      expandedHeight: 220.spMin,
       floating: false,
       pinned: true,
-      backgroundColor: AppColors.white,
-      foregroundColor: AppColors.black,
       elevation: 0,
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
@@ -103,9 +95,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     children: [
                       _buildUserAvatar(
                         size: 40.0,
-                        backgroundColor: AppColors.black,
-                        borderWidth: 2.0,
-                        uploadProgressPadding: 8.0,
+                        fontSize: 20.0,
+                        borderRadius: 10.0,
                       ),
                       _buildUserName(
                         color: AppColors.black,
@@ -116,47 +107,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 : null,
             background: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    AppColors.orange.withValues(alpha: 0.8),
-                    AppColors.orange,
-                  ],
-                ),
+                color: AppColors.black.withValues(alpha: 0.9),
               ),
-              child: Center(
-                child: Consumer(
-                  builder: (context, ref, child) {
-                    final userEmail = ref.watch(
-                      providerOfLoggedInUser.select(
-                        (value) => value?.email,
-                      ),
-                    );
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+              padding: EdgeInsets.all(20.spMin),
+              child: SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      spacing: 10.spMin,
                       children: [
-                        40.hSizedBox,
-                        _buildUserAvatar(
-                          borderColor: AppColors.white.withValues(alpha: 0.7),
-                        ),
-                        12.hSizedBox,
-                        _buildUserName(
-                          color: AppColors.white.withValues(alpha: 0.9),
-                        ),
-                        if (userEmail != null) 2.hSizedBox,
-                        if (userEmail != null)
-                          Text(
-                            userEmail,
-                            style: TextStyle(
-                              fontSize: 16.spMin,
-                              color: AppColors.white.withValues(alpha: 0.8),
-                              fontWeight: FontWeight.w500,
-                            ),
+                        Expanded(
+                          child: Row(
+                            spacing: 15.spMin,
+                            children: [
+                              _buildUserAvatar(),
+                              _buildUserName(
+                                color: AppColors.white.withValues(alpha: 0.9),
+                              ),
+                            ],
                           ),
+                        ),
+                        _buildUserBadge(),
                       ],
-                    );
-                  },
+                    ),
+                    20.hSizedBox,
+                    ProfileXpProgress().pB(10.0),
+                  ],
                 ),
               ),
             ),
@@ -167,7 +144,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildUserName({
-    final double fontSize = 24.0,
+    final double fontSize = 20.0,
     final Color color = AppColors.white,
   }) {
     return Consumer(
@@ -190,12 +167,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Widget _buildUserAvatar({
-    final double size = 80.0,
-    final Color? backgroundColor,
-    final Color foregroundColor = AppColors.white,
-    final Color borderColor = AppColors.white,
-    final double borderWidth = 3,
-    final double uploadProgressPadding = 20.0,
+    final double size = 65.0,
+    final double fontSize = 30.0,
+    final double borderRadius = 20.0,
   }) {
     return Consumer(
       builder: (context, ref, child) {
@@ -204,304 +178,128 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             (value) => value?.name ?? 'User',
           ),
         );
-        final profilePicture = ref.watch(
-          providerOfProfile.select(
-            (value) => value.profilePicture,
-          ),
-        );
-        final showUpdateButton = ref.watch(
-          providerOfProfile.select(
-            (value) => value.showUpdateProfilePictureButton,
-          ),
-        );
-
-        return Stack(
-          children: [
-            Builder(
-              builder: (context) {
-                if (profilePicture == null) {
-                  return Avatar.initials(
-                    initials: _getInitials(userName),
-                    size: size,
-                    backgroundColor:
-                        backgroundColor ??
-                        AppColors.black.withValues(
-                          alpha: 0.2,
-                        ),
-                    foregroundColor: foregroundColor,
-                    borderWidth: borderWidth,
-                    borderColor: borderColor,
-                  );
-                } else {
-                  return Stack(
-                    children: [
-                      Avatar.profileMedia(
-                        profileMedia: profilePicture,
-                        size: size,
-                        backgroundColor:
-                            backgroundColor ??
-                            AppColors.black.withValues(
-                              alpha: 0.2,
-                            ),
-                        foregroundColor: foregroundColor,
-                        borderWidth: borderWidth,
-                        borderColor: borderColor,
-                      ),
-                      Positioned.fill(
-                        child: Center(
-                          child: _profilePictureUploadProgress(
-                            padding: uploadProgressPadding,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ).onPressed(_showUpdateProfilePictureButton),
-            if (showUpdateButton)
-              Positioned.fill(
-                child: _changeProfilePictureButton().onPressed(
-                  _uploadNewProfilePicture,
-                ),
+        return Container(
+          width: size.spMin,
+          height: size.spMin,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.orange300,
+                AppColors.red200,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(borderRadius.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.orange300.withValues(alpha: 0.6),
+                blurRadius: 10.0,
+                offset: Offset(0.0, 0.0),
               ),
-          ],
+            ],
+          ),
+          child: Center(
+            child: Text(
+              _getInitials(userName),
+              style: TextStyle(
+                fontSize: fontSize.spMin,
+                fontWeight: FontWeight.w700,
+                color: AppColors.white,
+              ),
+            ),
+          ),
         );
       },
     );
   }
 
-  Widget _buildUserInfoSection() {
-    return _buildSection(
-      title: 'Account Information',
-      icon: Icons.person_outline,
-      child: Container(
-        padding: EdgeInsets.all(16.spMin),
-        decoration: BoxDecoration(
-          color: AppColors.extraLightGrey,
-          borderRadius: BorderRadius.circular(12.spMin),
-        ),
-        child: Consumer(
-          builder: (context, ref, child) {
-            final userCreatedAt = ref.watch(
-              providerOfLoggedInUser.select(
-                (value) => value?.createdAt,
-              ),
-            );
-            return Column(
-              spacing: 12.spMin,
-              children: [
-                if (userCreatedAt != null)
-                  _buildInfoRow(
-                    'Joined',
-                    timeago.format(userCreatedAt),
-                    Icons.calendar_today_outlined,
-                  ),
-                _buildInfoRow(
-                  'Membership',
-                  'Pilot Participant',
-                  Icons.verified_outlined,
-                  valueColor: AppColors.black,
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildScoresSection() {
-    return _buildSection(
-      title: 'Performance Metrics',
-      icon: Icons.trending_up_outlined,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Consumer(
-                  builder: (context, ref, child) {
-                    final xpPoints = ref.watch(
-                      providerOfLoggedInUser.select(
-                        (value) => value?.xpPoints ?? 0,
-                      ),
-                    );
-                    return _buildScoreCard(
-                      'XP Score',
-                      xpPoints.toString(),
-                      Icons.star_outline,
-                      AppColors.orange,
-                      'Level 1 - Watcher',
-                    );
-                  },
-                ),
-              ),
-              // 16.wSizedBox,
-              // Expanded(
-              //   child: Consumer(
-              //     builder: (context, ref, child) {
-              //       final reliabilityScore = ref.watch(
-              //         providerOfLoggedInUser.select(
-              //           (value) => (value?.reliabilityScore ?? 0.0) * 100,
-              //         ),
-              //       );
-
-              //       return _buildScoreCard(
-              //         'Reliability',
-              //         '${reliabilityScore.toStringAsFixed(0)}%',
-              //         Icons.shield_outlined,
-              //         AppColors.green,
-              //         _reliabilityDescription(reliabilityScore / 100),
-              //       );
-              //     },
-              //   ),
-              // ),
-            ],
+  Widget _buildUserBadge() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final userBadge = ref.watch(
+          providerOfLoggedInUser.select(
+            (value) => value?.userBadge ?? UserBadge.watcher,
           ),
-          16.hSizedBox,
-          _buildBadgeCard(),
-        ],
-      ),
-    );
-  }
+        );
 
-  Widget _buildBadgeCard() {
-    return Container(
-      padding: EdgeInsets.all(16.spMin),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.orange500.withValues(alpha: 0.8),
-            AppColors.orange500,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16.spMin),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.orange500.withValues(alpha: 0.1),
-            blurRadius: 15.spMin,
-            offset: const Offset(0, 8),
+        return Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: 10.spMin,
+            vertical: 5.spMin,
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48.spMin,
-            height: 48.spMin,
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(12.spMin),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.shadowColor,
-                  blurRadius: 8.spMin,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                '🏅',
-                style: TextStyle(fontSize: 24.spMin),
-              ),
+          decoration: BoxDecoration(
+            color: AppColors.orange.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20.spMin),
+            border: Border.all(
+              color: AppColors.orange.withValues(alpha: 0.3),
+              width: 1.0,
             ),
           ),
-          16.wSizedBox,
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'New Achievement',
-                style: TextStyle(
-                  fontSize: 12.spMin,
-                  color: AppColors.white,
-                ),
-              ),
-              Text(
-                'Safety Explorer',
-                style: TextStyle(
-                  fontSize: 16.spMin,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.white,
-                ),
-              ),
-            ],
+          child: Text(
+            '⚡️ ${userBadge.title}',
+            style: TextStyle(
+              fontSize: 12.spMin,
+              fontWeight: FontWeight.w600,
+              color: AppColors.orange300,
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildStatsSection() {
-    return _buildSection(
-      title: 'Activity Stats',
-      icon: Icons.analytics_outlined,
-      child: Container(
-        padding: EdgeInsets.all(16.spMin),
-        decoration: BoxDecoration(
-          color: AppColors.extraLightGrey,
-          borderRadius: BorderRadius.circular(12.spMin),
+    return Row(
+      spacing: 8.spMin,
+      children: [
+        Expanded(
+          child: Consumer(
+            builder: (context, ref, child) {
+              final alertsMade = ref.watch(
+                providerOfLoggedInUser.select(
+                  (value) => value?.hazardsReportedCount ?? 0,
+                ),
+              );
+              return _buildStatItem(
+                value: alertsMade,
+                label: 'ALRTs Made',
+                valueColor: const Color(0xFFFF7F44),
+              );
+            },
+          ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Consumer(
-              builder: (context, ref, child) {
-                final alertsViewed = ref.watch(
-                  providerOfLoggedInUser.select(
-                    (value) => value?.hazardsViewedCount ?? 0,
-                  ),
-                );
-                return _buildStatItem(
-                  'Alrts Viewed',
-                  alertsViewed.toString(),
-                  Icons.visibility_outlined,
-                );
-              },
-            ),
-            Container(
-              width: 1,
-              height: 40.spMin,
-              color: AppColors.lightGrey,
-            ),
-            Consumer(
-              builder: (context, ref, child) {
-                final alertsMade = ref.watch(
-                  providerOfLoggedInUser.select(
-                    (value) => value?.hazardsReportedCount ?? 0,
-                  ),
-                );
-                return _buildStatItem(
-                  'Alrts Made',
-                  alertsMade.toString(),
-                  Icons.report_outlined,
-                );
-              },
-            ),
-            Container(
-              width: 1,
-              height: 40.spMin,
-              color: AppColors.lightGrey,
-            ),
-            Consumer(
-              builder: (context, ref, child) {
-                final upvotesReceived = ref.watch(
-                  providerOfLoggedInUser.select(
-                    (value) => value?.upvotesReceivedCount ?? 0,
-                  ),
-                );
-                return _buildStatItem(
-                  'Upvotes Received',
-                  upvotesReceived.toString(),
-                  Icons.thumb_up_alt_outlined,
-                );
-              },
-            ),
-          ],
+        Expanded(
+          child: Consumer(
+            builder: (context, ref, child) {
+              final alertsViewed = ref.watch(
+                providerOfLoggedInUser.select(
+                  (value) => value?.hazardsViewedCount ?? 0,
+                ),
+              );
+              return _buildStatItem(
+                value: alertsViewed,
+                label: 'Viewed',
+                valueColor: const Color(0xFF6199FF),
+              );
+            },
+          ),
         ),
-      ),
+        Expanded(
+          child: Consumer(
+            builder: (context, ref, child) {
+              final upvotesReceived = ref.watch(
+                providerOfLoggedInUser.select(
+                  (value) => value?.upvotesReceivedCount ?? 0,
+                ),
+              );
+              return _buildStatItem(
+                value: upvotesReceived,
+                label: 'Upvotes',
+                valueColor: const Color(0xFF39C05D),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -515,23 +313,28 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         );
         if (isEmpty) return const SizedBox();
 
-        return _buildSection(
-          title: 'Your Recent Alrts',
-          icon: Icons.list_alt_outlined,
-          child: Column(
-            spacing: 12.spMin,
-            children: [
-              MyAcceptedHazardsList(
-                limit: 3,
-                shinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 10.spMin,
+          children: [
+            Text(
+              'Recent ALRTs'.toUpperCase(),
+              style: TextStyle(
+                fontSize: 14.spMin,
+                fontWeight: FontWeight.w600,
+                color: AppColors.grey.withValues(alpha: 0.6),
               ),
-              _buildViewAllButton(
-                text: 'View All Alrts',
-                onPressed: _gotoMyAcceptedReportsScreen,
-              ),
-            ],
-          ),
+            ),
+            MyAcceptedHazardsList(
+              limit: 3,
+              shinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+            ),
+            _buildViewAllButton(
+              text: 'View All ALRTs',
+              onPressed: _gotoMyAcceptedReportsScreen,
+            ),
+          ],
         ).pB(24.0);
       },
     );
@@ -547,255 +350,98 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         );
         if (isEmpty) return const SizedBox();
 
-        return _buildSection(
-          title: 'Needs Update',
-          icon: Icons.warning_amber_outlined,
-          child: Column(
-            spacing: 12.spMin,
-            children: [
-              MyRejectedHazardsList(
-                limit: 3,
-                shinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+        return Column(
+          spacing: 10.spMin,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Needs Update'.toUpperCase(),
+              style: TextStyle(
+                fontSize: 14.spMin,
+                fontWeight: FontWeight.w600,
+                color: AppColors.grey.withValues(alpha: 0.6),
               ),
-              _buildViewAllButton(
-                text: 'View All Pending',
-                onPressed: _gotoMyRejectedReportsScreen,
-              ),
-            ],
-          ),
+            ),
+            MyRejectedHazardsList(
+              limit: 3,
+              shinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+            ),
+            _buildViewAllButton(
+              text: 'View All Pending',
+              onPressed: _gotoMyRejectedReportsScreen,
+            ),
+          ],
         ).pB(24.0);
       },
     );
   }
 
-  // ignore: unused_element
-  Widget _buildEmergencyContactsSection() {
-    return _buildSection(
-      title: 'Emergency Contacts',
-      icon: Icons.contact_phone_outlined,
-      child: Column(
-        children: [
-          _buildContactItem(
-            'Local Emergency Services',
-            '911',
-            Icons.local_hospital_outlined,
-            AppColors.red,
+  Widget _buildAccountSettingsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10.spMin,
+      children: [
+        Text(
+          'Account'.toUpperCase(),
+          style: TextStyle(
+            fontSize: 14.spMin,
+            fontWeight: FontWeight.w600,
+            color: AppColors.grey.withValues(alpha: 0.6),
           ),
-          12.spMin.hSizedBox,
-          _buildContactItem(
-            'Fire Department',
-            '(555) 123-4567',
-            Icons.fire_truck_outlined,
-            AppColors.orange,
-          ),
-          12.spMin.hSizedBox,
-          _buildContactItem(
-            'Non-Emergency Police',
-            '(555) 987-6543',
-            Icons.local_police_outlined,
-            AppColors.blue,
-          ),
-          12.spMin.hSizedBox,
-          InkWell(
-            onTap: () {
-              // Navigate to manage contacts
-            },
-            borderRadius: BorderRadius.circular(8.spMin),
-            child: Container(
-              padding: EdgeInsets.all(12.spMin),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: AppColors.lightGrey,
-                  style: BorderStyle.solid,
-                ),
-                borderRadius: BorderRadius.circular(8.spMin),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 2.0,
+                offset: Offset(0.0, 0.0),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add,
-                    size: 16.spMin,
-                    color: AppColors.blue,
-                  ),
-                  8.spMin.wSizedBox,
-                  Text(
-                    'Add Emergency Contact',
-                    style: TextStyle(
-                      fontSize: 14.spMin,
-                      color: AppColors.blue,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+            ],
+          ),
+          child: Column(
+            children: [
+              _buildAccountSettingsItem(
+                title: 'Notifications',
+                subtitle: 'Alert preferences & push settings',
+                icon: LucideIcons.bell,
+                color: AppColors.orange,
+                onTap: _gotoManageNotificationsScreen,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildManageNotificationsSection() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12.spMin),
-        border: Border.all(
-          color: AppColors.extraLightGrey,
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowColor,
-            blurRadius: 8.spMin,
-            offset: Offset(0, 2.0),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12.spMin),
-          onTap: _gotoManageNotificationsScreen,
-          child: Padding(
-            padding: EdgeInsets.all(16.spMin),
-
-            child: Row(
-              children: [
-                Container(
-                  width: 48.spMin,
-                  height: 48.spMin,
-                  decoration: BoxDecoration(
-                    color: AppColors.orange.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12.spMin),
-                  ),
-                  child: Icon(
-                    Icons.notifications_active_outlined,
-                    color: AppColors.orange,
-                    size: 24.spMin,
-                  ),
-                ),
-                16.spMin.wSizedBox,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Manage Notifications',
-                        style: TextStyle(
-                          fontSize: 16.spMin,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.black,
-                        ),
-                      ),
-                      4.spMin.hSizedBox,
-                      Text(
-                        'Control your notification preferences and stay updated',
-                        style: TextStyle(
-                          fontSize: 13.spMin,
-                          color: AppColors.grey,
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: AppColors.grey,
-                  size: 20.spMin,
-                ),
-              ],
-            ),
+              _buildAccountSettingsItem(
+                title: 'Subscribed Locations',
+                subtitle: 'Manage your subscribed locations',
+                icon: LucideIcons.mapPin,
+                color: AppColors.blue,
+                onTap: _gotoSubscribedLocationsScreen,
+              ),
+              _buildAccountSettingsItem(
+                title: 'Support Request',
+                subtitle: 'Get help or submit feedback',
+                icon: LucideIcons.messageSquare,
+                color: AppColors.green,
+                onTap: _gotoSupportRequestScreen,
+              ),
+              _buildAccountSettingsItem(
+                title: 'Delete Account',
+                subtitle: 'Permanently delete your account and data',
+                icon: LucideIcons.trash2,
+                color: AppColors.red,
+                onTap: _gotoDeleteAccountScreen,
+              ),
+            ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSupportRequestSection() {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12.spMin),
-        border: Border.all(
-          color: AppColors.extraLightGrey,
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowColor,
-            blurRadius: 8.spMin,
-            offset: Offset(0, 2.0),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12.spMin),
-          onTap: _gotoSupportRequestScreen,
-          child: Padding(
-            padding: EdgeInsets.all(16.spMin),
-            child: Row(
-              children: [
-                Container(
-                  width: 48.spMin,
-                  height: 48.spMin,
-                  decoration: BoxDecoration(
-                    color: AppColors.blue.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12.spMin),
-                  ),
-                  child: Icon(
-                    Icons.support_agent_outlined,
-                    color: AppColors.blue,
-                    size: 24.spMin,
-                  ),
-                ),
-                16.spMin.wSizedBox,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Support Request',
-                        style: TextStyle(
-                          fontSize: 16.spMin,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.black,
-                        ),
-                      ),
-                      4.spMin.hSizedBox,
-                      Text(
-                        'Need help? Submit a support request or feedback',
-                        style: TextStyle(
-                          fontSize: 13.spMin,
-                          color: AppColors.grey,
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: AppColors.blue,
-                  size: 20.spMin,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      ],
     );
   }
 
   Widget _buildLogoutSection() {
-    return Button.filled(
+    return Button.gradient(
       value: 'Logout',
-      color: AppColors.red,
       icon: Icon(Icons.logout),
       onPressed: () {
         _showLogoutDialog();
@@ -803,204 +449,45 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildDeleteAccountSection() {
+  Widget _buildStatItem({
+    required final int value,
+    required final String label,
+    required final Color valueColor,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(12.spMin),
-        border: Border.all(
-          color: AppColors.extraLightGrey,
-          width: 1.5,
-        ),
+        borderRadius: BorderRadius.circular(20.spMin),
         boxShadow: [
           BoxShadow(
-            color: AppColors.shadowColor,
-            blurRadius: 8.spMin,
-            offset: Offset(0, 2.0),
+            color: AppColors.shadowColorLight,
+            blurRadius: 2.0,
+            offset: Offset(0.0, 0.0),
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12.spMin),
-          onTap: _gotoDeleteAccountScreen,
-          child: Padding(
-            padding: EdgeInsets.all(16.spMin),
-            child: Row(
-              children: [
-                Container(
-                  width: 48.spMin,
-                  height: 48.spMin,
-                  decoration: BoxDecoration(
-                    color: AppColors.red.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12.spMin),
-                  ),
-                  child: Icon(
-                    Icons.delete_forever_outlined,
-                    color: AppColors.red,
-                    size: 24.spMin,
-                  ),
-                ),
-                16.spMin.wSizedBox,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Delete Account',
-                        style: TextStyle(
-                          fontSize: 16.spMin,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.red,
-                        ),
-                      ),
-                      4.spMin.hSizedBox,
-                      Text(
-                        'Permanently delete your account and all associated data',
-                        style: TextStyle(
-                          fontSize: 13.spMin,
-                          color: AppColors.grey,
-                          height: 1.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: AppColors.red.withValues(alpha: 0.7),
-                  size: 20.spMin,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSection({
-    required String title,
-    required IconData icon,
-    required Widget child,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(
-              icon,
-              size: 20.spMin,
-              color: AppColors.grey,
-            ),
-            8.spMin.wSizedBox,
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 18.spMin,
-                fontWeight: FontWeight.bold,
-                color: AppColors.black,
-              ),
-            ),
-          ],
-        ),
-        12.spMin.hSizedBox,
-        child,
-      ],
-    );
-  }
-
-  Widget _buildInfoRow(
-    String label,
-    String value,
-    IconData icon, {
-    Color? valueColor,
-  }) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 18.spMin,
-          color: AppColors.grey,
-        ),
-        12.spMin.wSizedBox,
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12.spMin,
-                  color: AppColors.grey,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              2.spMin.hSizedBox,
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 14.spMin,
-                  fontWeight: FontWeight.w600,
-                  color: valueColor ?? AppColors.black,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildScoreCard(
-    String title,
-    String score,
-    IconData icon,
-    Color color,
-    String subtitle,
-  ) {
-    return Container(
-      padding: EdgeInsets.all(16.spMin),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12.spMin),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-        ),
+      padding: EdgeInsets.symmetric(
+        vertical: 14.spMin,
+        horizontal: 10.spMin,
       ),
       child: Column(
+        spacing: 2.spMin,
         children: [
-          Icon(
-            icon,
-            size: 24.spMin,
-            color: color,
-          ),
-          8.spMin.hSizedBox,
           Text(
-            score,
-            style: TextStyle(
-              fontSize: 24.spMin,
+            NumberFormat.compact().format(value),
+            style: GoogleFonts.poppins(
+              fontSize: 30.spMin,
               fontWeight: FontWeight.bold,
-              color: color,
+              color: valueColor,
+              height: 1.0,
             ),
           ),
-          4.spMin.hSizedBox,
           Text(
-            title,
+            label.toUpperCase(),
             style: TextStyle(
               fontSize: 12.spMin,
+              color: AppColors.grey.withValues(alpha: 0.5),
               fontWeight: FontWeight.w600,
-              color: AppColors.black,
-            ),
-          ),
-          2.spMin.hSizedBox,
-          Text(
-            subtitle,
-            style: TextStyle(
-              fontSize: 10.spMin,
-              color: AppColors.grey,
             ),
             textAlign: TextAlign.center,
           ),
@@ -1009,102 +496,65 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(
-          icon,
-          size: 20.spMin,
-          color: AppColors.orange,
-        ),
-        4.spMin.hSizedBox,
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18.spMin,
-            fontWeight: FontWeight.bold,
-            color: AppColors.black,
-          ),
-        ),
-        2.spMin.hSizedBox,
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10.spMin,
-            color: AppColors.grey,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildContactItem(
-    String name,
-    String number,
-    IconData icon,
-    Color color,
-  ) {
+  Widget _buildAccountSettingsItem({
+    required final String title,
+    required final String subtitle,
+    required final IconData icon,
+    required final Color color,
+    required final VoidCallback onTap,
+  }) {
     return Container(
-      padding: EdgeInsets.all(12.spMin),
-      decoration: BoxDecoration(
-        color: AppColors.extraLightGrey,
-        borderRadius: BorderRadius.circular(8.spMin),
-      ),
+      padding: EdgeInsets.all(16.0),
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.all(8.spMin),
+            width: 48.spMin,
+            height: 48.spMin,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8.spMin),
+              borderRadius: BorderRadius.circular(14.spMin),
             ),
-            child: Icon(
-              icon,
-              size: 20.spMin,
-              color: color,
+            child: Center(
+              child: Icon(
+                icon,
+                size: 20.spMin,
+                color: color,
+              ),
             ),
           ),
-          12.spMin.wSizedBox,
+          16.wSizedBox,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  title,
                   style: TextStyle(
-                    fontSize: 14.spMin,
+                    fontSize: 16.spMin,
                     fontWeight: FontWeight.w600,
+                    color: AppColors.black,
                   ),
                 ),
                 2.spMin.hSizedBox,
                 Text(
-                  number,
+                  subtitle,
                   style: TextStyle(
-                    fontSize: 12.spMin,
+                    fontSize: 13.spMin,
                     color: AppColors.grey,
+                    height: 1.3,
                   ),
                 ),
               ],
             ),
           ),
-          IconButton(
-            onPressed: () {
-              // Call emergency contact
-            },
-            icon: Icon(
-              Icons.call,
-              size: 20.spMin,
-              color: AppColors.green,
-            ),
-            style: IconButton.styleFrom(
-              backgroundColor: AppColors.green.withValues(alpha: 0.1),
-              minimumSize: Size(32.spMin, 32.spMin),
-            ),
+          Icon(
+            Icons.chevron_right,
+            color: AppColors.lightGrey,
+            size: 20.spMin,
           ),
         ],
       ),
-    );
+    ).onPressed(onTap);
   }
 
   Widget _buildViewAllButton({
@@ -1113,15 +563,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }) {
     return InkWell(
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(8.spMin),
+      borderRadius: BorderRadius.circular(16.spMin),
       child: Container(
-        padding: EdgeInsets.all(12.spMin),
+        padding: EdgeInsets.all(16.spMin),
         decoration: BoxDecoration(
+          color: AppColors.white,
           border: Border.all(
-            color: AppColors.lightGrey,
+            color: AppColors.lightGrey.withValues(alpha: 0.5),
             style: BorderStyle.solid,
           ),
-          borderRadius: BorderRadius.circular(8.spMin),
+          borderRadius: BorderRadius.circular(16.spMin),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowColorLight,
+              blurRadius: 2.0,
+              offset: Offset(0.0, 0.0),
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1130,75 +588,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               text,
               style: TextStyle(
                 fontSize: 14.spMin,
-                color: AppColors.orange,
-                fontWeight: FontWeight.w500,
+                color: AppColors.grey.withValues(alpha: 0.7),
+                fontWeight: FontWeight.bold,
               ),
             ),
             8.spMin.wSizedBox,
             Icon(
-              Icons.arrow_forward_ios,
-              size: 12.spMin,
-              color: AppColors.orange,
+              LucideIcons.arrowRight500,
+              size: 16.spMin,
+              color: AppColors.grey.withValues(alpha: 0.7),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _profilePictureUploadProgress({
-    final double padding = 20.0,
-  }) {
-    return Consumer(
-      builder: (context, ref, child) {
-        final progress = ref
-            .watch(
-              providerOfProfile.select(
-                (value) => value.profilePictureUpdateState,
-              ),
-            )
-            .maybeWhen(
-              loading: (progress) => progress,
-              orElse: () => 0.0,
-            );
-
-        if (progress == 0.0) {
-          return const SizedBox();
-        }
-
-        return Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.black.withValues(alpha: 0.5),
-          ),
-          padding: EdgeInsets.all(padding.spMin),
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
-            strokeCap: StrokeCap.round,
-            value: progress,
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _changeProfilePictureButton({
-    final double padding = 8.0,
-  }) {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.black.withValues(alpha: 0.5),
-      ),
-      padding: EdgeInsets.all(padding.spMin),
-      child: Icon(
-        Icons.edit_rounded,
-        color: AppColors.white,
-        size: 24.spMin,
       ),
     );
   }
@@ -1294,7 +695,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   /// Navigates to the Manage Notifications screen.
   void _gotoManageNotificationsScreen() {
-    context.push(ManageNotificationsScreen.route);
+    context.push(
+      ManageNotificationsScreen.route,
+      extra: const ManageNotificationsScreenArgs(initialTab: 0),
+    );
+  }
+
+  /// Navigates to the Subscribed Locations screen.
+  void _gotoSubscribedLocationsScreen() {
+    context.push(
+      ManageNotificationsScreen.route,
+      extra: const ManageNotificationsScreenArgs(initialTab: 1),
+    );
   }
 
   /// Navigates to the Support Request screen.
@@ -1305,17 +717,5 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   /// Navigates to the Delete Account screen.
   void _gotoDeleteAccountScreen() {
     context.push(DeleteAccountScreen.route);
-  }
-
-  /// Shows the update profile picture button.
-  void _showUpdateProfilePictureButton() {
-    // ref
-    //     .read(providerOfProfile.notifier)
-    //     .updateShowUpdateProfilePictureButton(true);
-  }
-
-  /// Uploads a new profile picture.
-  void _uploadNewProfilePicture() async {
-    await ref.read(providerOfProfile.notifier).updateProfilePicture();
   }
 }

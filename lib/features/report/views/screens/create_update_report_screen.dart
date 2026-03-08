@@ -110,7 +110,7 @@ class _CreateUpdateReportScreenState
                   : 'Report an ALRT',
               style: TextStyle(
                 color: AppColors.white,
-                fontSize: 25.spMin,
+                fontSize: 24.spMin,
               ),
             );
           },
@@ -732,7 +732,10 @@ class _CreateUpdateReportScreenState
 
     ref.read(providerOfCreateReport.notifier)
       ..updateHazardToCreateOrUpdate(widget.args?.hazardToUpdate ?? Hazard())
-      ..updateMedias(widget.args?.hazardToUpdate?.processedMedias ?? []);
+      ..updateMedias(widget.args?.hazardToUpdate?.processedMedias ?? [])
+      ..updateShowCategoriesSelector(
+        widget.args?.hazardToUpdate?.category == null,
+      );
   }
 
   /// Navigates to the Select Location screen.
