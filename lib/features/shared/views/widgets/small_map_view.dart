@@ -13,7 +13,6 @@ class SmallMapView extends ConsumerStatefulWidget {
     super.key,
     required this.hazard,
     this.height = 200,
-    this.borderRadius = 12,
     this.onTap,
   });
 
@@ -22,9 +21,6 @@ class SmallMapView extends ConsumerStatefulWidget {
 
   /// The height of the map view
   final double height;
-
-  /// The border radius of the map view
-  final double borderRadius;
 
   /// Optional callback when the map is tapped
   final VoidCallback? onTap;
@@ -99,93 +95,83 @@ class _SmallMapViewState extends ConsumerState<SmallMapView> {
       },
     );
 
-    return Container(
+    return SizedBox(
       height: widget.height.spMin,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(widget.borderRadius.spMin),
-        border: Border.all(
-          color: AppColors.lightGrey,
-          width: 1,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular((widget.borderRadius - 1.0).spMin),
-        child: Stack(
-          children: [
-            // Wrap in a Listener to handle gesture conflicts better
-            Listener(
-              onPointerDown: (_) {
-                // This helps prevent parent scroll views from intercepting gestures
+      child: Stack(
+        children: [
+          // Wrap in a Listener to handle gesture conflicts better
+          Listener(
+            onPointerDown: (_) {
+              // This helps prevent parent scroll views from intercepting gestures
+            },
+            child: GoogleMap(
+              onMapCreated: (GoogleMapController controller) {
+                _mapController = controller;
               },
-              child: GoogleMap(
-                onMapCreated: (GoogleMapController controller) {
-                  _mapController = controller;
-                },
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(
-                    widget.hazard.latitude!,
-                    widget.hazard.longitude!,
-                  ),
-                  zoom: 7.0,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(
+                  widget.hazard.latitude!,
+                  widget.hazard.longitude!,
                 ),
-                markers: _markers,
-                zoomControlsEnabled: false,
-                scrollGesturesEnabled: true,
-                zoomGesturesEnabled: true,
-                rotateGesturesEnabled: false,
-                tiltGesturesEnabled: false,
-                myLocationButtonEnabled: false,
-                mapToolbarEnabled: false,
-                compassEnabled: false,
-                buildingsEnabled: true,
-                trafficEnabled: false,
-                mapType: MapType.normal,
-                onTap: (_) {
-                  // Call the optional tap callback
-                  widget.onTap?.call();
-                },
-                gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                  Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
-                  Factory<ScaleGestureRecognizer>(
-                    () => ScaleGestureRecognizer(),
-                  ),
-                  Factory<TapGestureRecognizer>(() => TapGestureRecognizer()),
-                  Factory<VerticalDragGestureRecognizer>(
-                    () => VerticalDragGestureRecognizer(),
-                  ),
-                  Factory<HorizontalDragGestureRecognizer>(
-                    () => HorizontalDragGestureRecognizer(),
-                  ),
-                },
+                zoom: 7.0,
+              ),
+              markers: _markers,
+              zoomControlsEnabled: false,
+              scrollGesturesEnabled: true,
+              zoomGesturesEnabled: true,
+              rotateGesturesEnabled: false,
+              tiltGesturesEnabled: false,
+              myLocationButtonEnabled: false,
+              mapToolbarEnabled: false,
+              compassEnabled: false,
+              buildingsEnabled: true,
+              trafficEnabled: false,
+              mapType: MapType.normal,
+              onTap: (_) {
+                // Call the optional tap callback
+                widget.onTap?.call();
+              },
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
+                Factory<ScaleGestureRecognizer>(
+                  () => ScaleGestureRecognizer(),
+                ),
+                Factory<TapGestureRecognizer>(() => TapGestureRecognizer()),
+                Factory<VerticalDragGestureRecognizer>(
+                  () => VerticalDragGestureRecognizer(),
+                ),
+                Factory<HorizontalDragGestureRecognizer>(
+                  () => HorizontalDragGestureRecognizer(),
+                ),
+              },
+            ),
+          ),
+          // Add subtle overlay if onTap is provided
+          if (widget.onTap != null)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: EdgeInsets.all(6.spMin),
+                decoration: BoxDecoration(
+                  color: AppColors.white.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(6.spMin),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadowColor,
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.open_in_new,
+                  size: 16.spMin,
+                  color: AppColors.grey,
+                ),
               ),
             ),
-            // Add subtle overlay if onTap is provided
-            if (widget.onTap != null)
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: EdgeInsets.all(6.spMin),
-                  decoration: BoxDecoration(
-                    color: AppColors.white.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(6.spMin),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.shadowColor,
-                        blurRadius: 4,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.open_in_new,
-                    size: 16.spMin,
-                    color: AppColors.grey,
-                  ),
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }

@@ -9,6 +9,7 @@ import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/video_priority_types.dart';
+import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
@@ -22,11 +23,12 @@ import 'package:hazard_app/features/shared/providers/video_preview_lifecycle_pro
 import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/utils/open_link.dart';
-import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'dart:math' as math;
+
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ViewHazardScreenArgs {
   ViewHazardScreenArgs({required this.hazard});
@@ -65,6 +67,14 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     if (widget.args.hazard.id == null) {
       throw Exception('Hazard ID is required to view hazard.');
     }
+    final hasHazard = ref.watch(
+      provider.select(
+        (value) => value.hazard != null,
+      ),
+    );
+    if (!hasHazard) {
+      return const SizedBox.shrink();
+    }
 
     // register this provider to the lifecycle of this widget
     ref.watch(provider.select((value) => null));
@@ -74,6 +84,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
     final loggedInUserId = ref.watch(
       providerOfLoggedInUser.select((value) => value?.id),
+    );
+
+    final isMyReport = ref.watch(
+      provider.select(
+        (value) => value.hazard?.reportedBy?.id == loggedInUserId,
+      ),
     );
 
     return Scaffold(
@@ -86,8 +102,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (isMyReport) ...[
+                    _buildEditDeleteRow(),
+                    16.hSizedBox,
+                  ],
                   _buildHeaderV2(),
-                  24.hSizedBox,
+                  16.hSizedBox,
 
                   // Review feedback section (if applicable)
                   Consumer(
@@ -132,75 +152,138 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   }
 
   Widget _buildAppBar() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final hazardColor = ref.watch(
-          provider.select(
-            (value) => value.hazard?.color == AppColors.transparent
-                ? AppColors.white
-                : value.hazard?.color,
-          ),
-        );
-        final isAwsCompliant = ref.watch(
-          provider.select(
-            (value) => value.hazard?.isAwsCompliant ?? false,
-          ),
-        );
-        final isUserReported = ref.watch(
-          provider.select(
-            (value) => value.hazard?.isUserReported ?? false,
-          ),
-        );
-        final isMyReport = ref.watch(
-          provider.select(
-            (value) =>
-                value.hazard?.reportedBy?.id ==
-                ref.watch(
-                  providerOfLoggedInUser.select(
-                    (value) => value?.id,
-                  ),
-                ),
-          ),
-        );
+    final isUserReported = ref.watch(
+      provider.select(
+        (value) => value.hazard!.isUserReported,
+      ),
+    );
+    final isAwsCompliant = ref.watch(
+      provider.select(
+        (value) => value.hazard!.isAwsCompliant ?? false,
+      ),
+    );
+    final severityTitle = ref.watch(
+      provider.select(
+        (value) => value.hazard!.severityTitle,
+      ),
+    );
+    final source = ref.watch(
+      provider.select(
+        (value) => value.hazard!.source,
+      ),
+    );
+    final hazardColor = ref.watch(
+      provider.select(
+        (value) => value.hazard?.color ?? AppColors.black,
+      ),
+    );
+    final isVerified = source != null;
 
-        return SliverAppBar(
-          pinned: true,
-          backgroundColor: hazardColor,
-          foregroundColor: AppColors.black,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          leadingWidth: 80.spMin,
-          leading: Center(
-            child: _buildBackButton().pB(7.0),
+    final pillForegroundColor = hazardColor.isLight
+        ? AppColors.grey
+        : AppColors.white;
+    final pillBackgroundColor = isUserReported
+        ? AppColors.white
+        : hazardColor.isLight
+        ? AppColors.grey
+        : AppColors.black;
+    final pillBackgroundColorAlpha = isUserReported
+        ? 0.6
+        : hazardColor == AppColors.transparent
+        ? 0.06
+        : 0.2;
+    final pillBorderColor = hazardColor == AppColors.transparent
+        ? AppColors.lightGrey
+        : null;
+
+    return SliverAppBar(
+      pinned: true,
+      backgroundColor: hazardColor == AppColors.transparent
+          ? AppColors.white
+          : hazardColor,
+      foregroundColor: AppColors.black,
+      elevation: 0,
+      automaticallyImplyLeading: false,
+      leadingWidth: 80.spMin,
+      title: Row(
+        spacing: 10.spMin,
+        children: [
+          if (severityTitle.isNotEmpty && severityTitle != 'Unknown')
+            _headerPillBuilder(
+              label: severityTitle.toUpperCase(),
+              foregroundColor: pillForegroundColor,
+              backgroundColor: pillBackgroundColor,
+              backgroundColorAlpha: pillBackgroundColorAlpha,
+              borderColor: pillBorderColor,
+            ),
+          if (isUserReported)
+            _headerPillBuilder(
+              label: 'USER',
+              foregroundColor: pillForegroundColor,
+              backgroundColor: pillBackgroundColor,
+              backgroundColorAlpha: pillBackgroundColorAlpha,
+              borderColor: pillBorderColor,
+            ),
+          if (isAwsCompliant)
+            _headerPillBuilder(
+              label: 'AWS',
+              foregroundColor: pillForegroundColor,
+              backgroundColor: pillBackgroundColor,
+              backgroundColorAlpha: pillBackgroundColorAlpha,
+              borderColor: pillBorderColor,
+            ),
+          if (isVerified)
+            _headerPillBuilder(
+              label: 'OFFICIAL',
+              foregroundColor: pillForegroundColor,
+              backgroundColor: pillBackgroundColor,
+              backgroundColorAlpha: pillBackgroundColorAlpha,
+              borderColor: pillBorderColor,
+            ),
+          Spacer(),
+          _buildBackButton(
+            backgroundColor: pillBackgroundColor,
+            backgroundColorAlpha: pillBackgroundColorAlpha,
+            foregroundColor: pillForegroundColor,
+            borderColor: pillBorderColor,
           ),
-          actions: [
-            if (!isUserReported)
-              _buildPill(isAwsCompliant ? 'AWS' : 'Official'),
-            if (!isUserReported) _buildBlueTick().pL(10.0),
-            if (isMyReport) _buildEditButton().pL(10.0),
-            if (isMyReport) _buildDeleteButton().pL(10.0),
-            20.wSizedBox,
-          ],
-        );
-      },
+        ],
+      ),
     );
   }
 
-  Widget _buildBackButton() {
+  Widget _buildBackButton({
+    required final Color backgroundColor,
+    required final Color foregroundColor,
+    required final double backgroundColorAlpha,
+    required final Color? borderColor,
+  }) {
     return Container(
-      margin: EdgeInsets.only(right: 16.spMin, top: 8.spMin),
-      child: RoundButton(
-        icon: Icon(
-          Icons.close,
-          color: AppColors.black,
+      width: 35.spMin,
+      height: 35.spMin,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: backgroundColor.withValues(alpha: backgroundColorAlpha),
+        border: Border.all(
+          color: borderColor ?? AppColors.transparent,
+          width: 1,
         ),
-        backgroundColor: AppColors.white,
-        borderSide: BorderSide(
-          color: AppColors.black,
-          width: 2,
-        ),
-        onPressed: () => context.pop(),
       ),
+      child: Icon(
+        LucideIcons.x500,
+        color: foregroundColor,
+        size: 22.spMin,
+      ),
+    ).onPressed(() => context.pop());
+  }
+
+  Widget _buildEditDeleteRow() {
+    return Row(
+      spacing: 12.spMin,
+      children: [
+        Expanded(child: _buildEditButton()),
+        Expanded(child: _buildDeleteButton()),
+      ],
     );
   }
 
@@ -212,35 +295,51 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             (value) => value.hazard?.isExpired ?? false,
           ),
         );
-        return RoundButton(
-          icon: Icon(
-            Icons.edit_rounded,
-            color: isExpired ? AppColors.grey : AppColors.black,
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 5.0,
+                offset: Offset(0.0, 4.0),
+              ),
+            ],
           ),
-          backgroundColor: AppColors.white,
-          borderSide: BorderSide(
-            color: isExpired ? AppColors.grey : AppColors.black,
-            width: 2,
+          padding: EdgeInsets.all(16.spMin),
+          child: Icon(
+            LucideIcons.pencil,
+            color: isExpired
+                ? AppColors.grey.withValues(alpha: 0.5)
+                : AppColors.black,
+            size: 20.spMin,
           ),
-          onPressed: _handleEditHazard,
-        );
+        ).onPressed(() => _handleEditHazard());
       },
     );
   }
 
   Widget _buildDeleteButton() {
-    return RoundButton(
-      icon: Icon(
-        Icons.delete_outline_rounded,
-        color: AppColors.black,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(16.spMin),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColorLight,
+            blurRadius: 5.0,
+            offset: Offset(0.0, 4.0),
+          ),
+        ],
       ),
-      backgroundColor: AppColors.white,
-      borderSide: BorderSide(
-        color: AppColors.black,
-        width: 2,
+      padding: EdgeInsets.all(16.spMin),
+      child: Icon(
+        LucideIcons.trash2,
+        color: AppColors.red,
+        size: 20.spMin,
       ),
-      onPressed: _handleDeleteHazard,
-    );
+    ).onPressed(() => _handleDeleteHazard());
   }
 
   Widget _buildHeaderV2() {
@@ -268,57 +367,71 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           ),
         );
 
-        return Column(
-          children: [
-            Row(
-              spacing: 12.spMin,
-              children: [
-                _buildIcon(),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 6.spMin,
-                    children: [
-                      // Title of the hazard
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.spMin,
-                        ),
-                      ),
-
-                      // Category Pill
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16.spMin,
-                          vertical: 6.spMin,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(20.spMin),
-                          border: Border.all(
-                            color: categoryColor,
-                            width: 2,
-                          ),
-                        ),
-                        child: Text(
-                          categoryName,
-                          overflow: TextOverflow.ellipsis,
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 5.0,
+                offset: Offset(0.0, 4.0),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.all(16.spMin),
+          child: Column(
+            children: [
+              Row(
+                spacing: 12.spMin,
+                children: [
+                  _buildIcon(),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 6.spMin,
+                      children: [
+                        // Title of the hazard
+                        Text(
+                          title,
                           style: TextStyle(
-                            fontSize: 12.spMin,
-                            color: AppColors.black,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.spMin,
                           ),
                         ),
-                      ),
-                    ],
+
+                        // Category Pill
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16.spMin,
+                            vertical: 6.spMin,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.white,
+                            borderRadius: BorderRadius.circular(20.spMin),
+                            border: Border.all(
+                              color: categoryColor,
+                              width: 2,
+                            ),
+                          ),
+                          child: Text(
+                            categoryName,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12.spMin,
+                              color: AppColors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            _buildAwsAlertLevel(),
-          ],
+                ],
+              ),
+              _buildAwsAlertLevel(),
+            ],
+          ),
         );
       },
     );
@@ -415,42 +528,48 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
-  Widget _buildPill(String label) {
+  Widget _headerPillBuilder({
+    required final String label,
+    final Color backgroundColor = AppColors.black,
+    final Color foregroundColor = AppColors.white,
+    final Color? borderColor,
+    final double backgroundColorAlpha = 0.2,
+  }) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 16.spMin,
-        vertical: 4.spMin,
-      ),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: backgroundColor.withValues(
+          alpha: backgroundColorAlpha,
+        ),
         borderRadius: BorderRadius.circular(20.spMin),
-        border: Border.all(
-          color: AppColors.black,
-          width: 2,
-        ),
+        border: borderColor != null
+            ? Border.all(color: borderColor, width: 1.0)
+            : null,
       ),
-      child: Text(
-        label,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-          fontSize: 14.spMin,
-          color: AppColors.black,
-          fontWeight: FontWeight.w500,
-        ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.spMin,
+        vertical: 5.spMin,
       ),
-    );
-  }
-
-  Widget _buildBlueTick() {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.white,
-      ),
-      child: Icon(
-        Icons.verified_rounded,
-        color: AppColors.blue,
-        size: 24.spMin,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6.spMin,
+            height: 6.spMin,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: foregroundColor,
+            ),
+          ),
+          5.wSizedBox,
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13.spMin,
+              fontWeight: FontWeight.w700,
+              color: foregroundColor,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -461,7 +580,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       children: [
         // Map Preview Card
         _buildMapPreviewCard(),
-        24.hSizedBox,
+        16.hSizedBox,
 
         // What We Know Section
         _buildWhatWeKnowSection(),
@@ -494,13 +613,13 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         final locationName = ref.watch(
           provider.select((value) => value.hazard?.locationName),
         );
-        final dateTime = ref.watch(
+        final createdAt = ref.watch(
           provider.select(
-            (value) =>
-                value.hazard?.updatedAt ??
-                value.hazard?.occurredAt ??
-                value.hazard?.createdAt,
+            (value) => value.hazard?.createdAt,
           ),
+        );
+        final updatedAt = ref.watch(
+          provider.select((value) => value.hazard?.updatedAt),
         );
         final hazard = ref.watch(
           provider.select((value) => value.hazard),
@@ -527,109 +646,155 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.extraLightGrey.withValues(alpha: 0.4),
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(16.spMin),
             border: Border.all(
               color: AppColors.lightGrey.withValues(alpha: 0.5),
               width: 2,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 5.0,
+                offset: Offset(0.0, 0.0),
+              ),
+            ],
           ),
-          padding: EdgeInsets.all(12.spMin),
-          child: Column(
-            children: [
-              // Map placeholder or actual map
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12.spMin),
-                child: Container(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(15.spMin),
+            child: Column(
+              children: [
+                // Map placeholder or actual map
+                Container(
                   height: 220.spMin,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.spMin),
-                    color: AppColors.lightGrey.withValues(alpha: 0.3),
-                    border: Border.all(
-                      color: AppColors.lightGrey.withValues(alpha: 0.7),
-                      width: 1.0,
-                    ),
+                    color: AppColors.extraLightGrey,
                   ),
                   child: SmallMapView(
                     hazard: hazard!,
                     height: 220.0,
-                    borderRadius: 11.0,
                   ),
                 ),
-              ),
-              12.spMin.hSizedBox,
 
-              // Address and Time Info
-              Column(
-                children: [
-                  // Address
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.location_on_outlined,
-                        size: 16.spMin,
-                      ),
-                      8.spMin.wSizedBox,
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (locationName != null) ...[
+                // Address and Time Info
+                Column(
+                  children: [
+                    // Address
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          LucideIcons.mapPin,
+                          size: 14.spMin,
+                          color: AppColors.grey.withValues(alpha: 0.8),
+                        ).pT(1.0),
+                        8.spMin.wSizedBox,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                locationName,
+                                'Location'.toUpperCase(),
                                 style: TextStyle(
-                                  color: AppColors.black,
-                                  fontSize: 14.spMin,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.grey.withValues(alpha: 0.7),
+                                  fontSize: 12.spMin,
                                 ),
                               ),
                               4.spMin.hSizedBox,
-                              if (!isUserReported)
+                              if (locationName != null) ...[
                                 Text(
-                                  '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} from your location',
-                                  style: TextStyle(
-                                    fontSize: 12.spMin,
-                                    color: AppColors.grey,
-                                  ),
-                                ),
-                            ] else ...[
-                              if (!isUserReported)
-                                Text(
-                                  '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} from your location',
+                                  locationName,
                                   style: TextStyle(
                                     color: AppColors.black,
                                     fontSize: 14.spMin,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
+                                2.spMin.hSizedBox,
+                                if (!isUserReported)
+                                  Text(
+                                    '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} from your location',
+                                    style: TextStyle(
+                                      fontSize: 12.spMin,
+                                      color: AppColors.grey.withValues(
+                                        alpha: 0.9,
+                                      ),
+                                    ),
+                                  ),
+                              ] else ...[
+                                if (!isUserReported)
+                                  Text(
+                                    '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} from your location',
+                                    style: TextStyle(
+                                      color: AppColors.black,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14.spMin,
+                                    ),
+                                  ),
+                              ],
                             ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  12.spMin.hSizedBox,
-
-                  // Time
-                  if (dateTime != null)
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.access_time,
-                          size: 16.spMin,
-                        ),
-                        8.spMin.wSizedBox,
-                        Text(
-                          dateTime.formattedWithTime,
-                          style: TextStyle(
-                            fontSize: 14.spMin,
                           ),
                         ),
                       ],
                     ),
-                ],
-              ),
-            ],
+
+                    Divider(
+                      color: AppColors.extraLightGrey,
+                      height: 30.spMin,
+                    ),
+
+                    // Time
+                    if (createdAt != null)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            LucideIcons.clock,
+                            size: 14.spMin,
+                            color: AppColors.grey.withValues(alpha: 0.7),
+                          ).pT(1.0),
+                          8.spMin.wSizedBox,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Posted'.toUpperCase(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.grey.withValues(alpha: 0.7),
+                                  fontSize: 12.spMin,
+                                ),
+                              ),
+                              4.spMin.hSizedBox,
+                              Text(
+                                createdAt.timeAgo,
+                                style: TextStyle(
+                                  fontSize: 14.spMin,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              2.spMin.hSizedBox,
+                              if (updatedAt != null)
+                                Text(
+                                  'Updated ${updatedAt.timeAgo}',
+                                  style: TextStyle(
+                                    fontSize: 12.spMin,
+                                    color: AppColors.grey.withValues(
+                                      alpha: 0.9,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                  ],
+                ).pad(16.0),
+              ],
+            ),
           ),
         );
       },
@@ -667,7 +832,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               videoPriority: VideoPriority.level1,
               registerVideoLifecycle: true,
             ),
-            24.hSizedBox,
+            16.hSizedBox,
           ],
         );
       },
@@ -685,44 +850,69 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.red.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(12.spMin),
-            border: Border(
-              left: BorderSide(
-                color: AppColors.red,
-                width: 4,
-              ),
-            ),
-          ),
-          padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 8.spMin, 16.spMin),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'What We Know',
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontSize: 16.spMin,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    12.spMin.hSizedBox,
-                    Text(
-                      aiSummary!,
-                      style: TextStyle(
-                        fontSize: 14.spMin,
-                        height: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 5.0,
+                offset: Offset(0.0, 4.0),
               ),
             ],
           ),
-        ).pB(24.0);
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.yellow.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(16.spMin),
+              border: Border(
+                left: BorderSide(
+                  color: AppColors.yellow,
+                  width: 4,
+                ),
+                right: BorderSide(
+                  color: AppColors.yellow,
+                  width: 1,
+                ),
+                bottom: BorderSide(
+                  color: AppColors.yellow,
+                  width: 1,
+                ),
+                top: BorderSide(
+                  color: AppColors.yellow,
+                  width: 1,
+                ),
+              ),
+            ),
+            padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 8.spMin, 16.spMin),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'What We Know',
+                        style: TextStyle(
+                          color: AppColors.black,
+                          fontSize: 16.spMin,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      12.spMin.hSizedBox,
+                      Text(
+                        aiSummary!,
+                        style: TextStyle(
+                          fontSize: 14.spMin,
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ).pB(16.0);
       },
     );
   }
@@ -740,71 +930,98 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.red.withValues(alpha: 0.05),
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(12.spMin),
-            border: Border(
-              left: BorderSide(
-                color: AppColors.red,
-                width: 4,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 5.0,
+                offset: Offset(0.0, 4.0),
+              ),
+            ],
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.orange200.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12.spMin),
+              border: Border(
+                left: BorderSide(
+                  color: AppColors.orange200,
+                  width: 4,
+                ),
+                right: BorderSide(
+                  color: AppColors.orange200,
+                  width: 1,
+                ),
+                bottom: BorderSide(
+                  color: AppColors.orange200,
+                  width: 1,
+                ),
+                top: BorderSide(
+                  color: AppColors.orange200,
+                  width: 1,
+                ),
               ),
             ),
-          ),
-          padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 8.spMin, 16.spMin),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'What To Do',
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontSize: 16.spMin,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    12.spMin.hSizedBox,
-                    ...callsToAction!.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final action = entry.value;
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          bottom: index < callsToAction.length - 1
-                              ? 8.spMin
-                              : 0,
+            padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 8.spMin, 16.spMin),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'What To Do',
+                        style: TextStyle(
+                          color: AppColors.black,
+                          fontSize: 16.spMin,
+                          fontWeight: FontWeight.w600,
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '• ',
-                              style: TextStyle(
-                                color: AppColors.black.withValues(alpha: 0.9),
-                                fontSize: 14.spMin,
-                                height: 1.5,
-                              ),
-                            ),
-                            Expanded(
-                              child: Text(
-                                action,
+                      ),
+                      12.spMin.hSizedBox,
+                      ...callsToAction!.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final action = entry.value;
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            bottom: index < callsToAction.length - 1
+                                ? 8.spMin
+                                : 0,
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '• ',
                                 style: TextStyle(
                                   color: AppColors.black.withValues(alpha: 0.9),
                                   fontSize: 14.spMin,
                                   height: 1.5,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                  ],
+                              Expanded(
+                                child: Text(
+                                  action,
+                                  style: TextStyle(
+                                    color: AppColors.black.withValues(
+                                      alpha: 0.9,
+                                    ),
+                                    fontSize: 14.spMin,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ).pB(24.0);
+        ).pB(16.0);
       },
     );
   }
@@ -909,254 +1126,284 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           ),
         );
 
+        final color = const Color(0xFF37CAFF);
+
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.blue.withValues(alpha: 0.03),
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(12.spMin),
-            border: Border(
-              left: BorderSide(
-                color: AppColors.blue,
-                width: 4,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 5.0,
+                offset: Offset(0.0, 4.0),
               ),
-            ),
+            ],
           ),
-          padding: EdgeInsets.all(16.spMin),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Attribution Title
-              Text(
-                'DATA ATTRIBUTION',
-                style: TextStyle(
-                  color: AppColors.grey,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12.spMin,
+          child: Container(
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.03),
+              borderRadius: BorderRadius.circular(12.spMin),
+              border: Border(
+                left: BorderSide(
+                  color: color,
+                  width: 4,
+                ),
+                right: BorderSide(
+                  color: color,
+                  width: 1,
+                ),
+                bottom: BorderSide(
+                  color: color,
+                  width: 1,
+                ),
+                top: BorderSide(
+                  color: color,
+                  width: 1,
                 ),
               ),
-              12.spMin.hSizedBox,
-
-              // Source Row
-              GestureDetector(
-                onTap: sourceLink != null
-                    ? () => openLink(
-                        context: context,
-                        link: sourceLink,
-                      )
-                    : null,
-                child: Container(
-                  padding: EdgeInsets.only(bottom: 12.spMin),
-                  decoration: BoxDecoration(
-                    border:
-                        isUserReported ||
-                            (license == null && (advisoryText?.isEmpty ?? true))
-                        ? null
-                        : Border(
-                            bottom: BorderSide(
-                              color: AppColors.lightGrey,
-                              width: 1,
-                            ),
-                          ),
+            ),
+            padding: EdgeInsets.all(16.spMin),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Attribution Title
+                Text(
+                  'DATA ATTRIBUTION',
+                  style: TextStyle(
+                    color: AppColors.grey,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12.spMin,
                   ),
-                  child: Row(
-                    children: [
-                      // Source Icon
-                      Container(
-                        width: 40.spMin,
-                        height: 40.spMin,
-                        decoration: BoxDecoration(
-                          color: AppColors.blue.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8.spMin),
-                        ),
-                        child: Center(
-                          child: isUserReported == true
-                              ? Icon(
-                                  Icons.person_outline_rounded,
-                                  size: 24.spMin,
-                                  color: AppColors.blue,
-                                )
-                              : SvgPicture.asset(
-                                  'assets/icons/shield.svg',
-                                  width: 24.spMin,
-                                  height: 24.spMin,
-                                  colorFilter: ColorFilter.mode(
-                                    AppColors.blue,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      12.spMin.wSizedBox,
+                ),
+                12.spMin.hSizedBox,
 
-                      // Source Info
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              source?.name ?? 'Community Report',
-                              style: TextStyle(
-                                fontSize: 15.spMin,
-                                color: AppColors.black,
-                                fontWeight: FontWeight.w600,
+                // Source Row
+                GestureDetector(
+                  onTap: sourceLink != null
+                      ? () => openLink(
+                          context: context,
+                          link: sourceLink,
+                        )
+                      : null,
+                  child: Container(
+                    padding: EdgeInsets.only(bottom: 12.spMin),
+                    decoration: BoxDecoration(
+                      border:
+                          isUserReported ||
+                              (license == null &&
+                                  (advisoryText?.isEmpty ?? true))
+                          ? null
+                          : Border(
+                              bottom: BorderSide(
+                                color: AppColors.lightGrey,
+                                width: 1,
                               ),
                             ),
-                            2.spMin.hSizedBox,
-                            Text(
-                              isUserReported ? 'Community' : 'Official Source',
+                    ),
+                    child: Row(
+                      children: [
+                        // Source Icon
+                        Container(
+                          width: 40.spMin,
+                          height: 40.spMin,
+                          decoration: BoxDecoration(
+                            color: AppColors.blue.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8.spMin),
+                          ),
+                          child: Center(
+                            child: isUserReported == true
+                                ? Icon(
+                                    Icons.person_outline_rounded,
+                                    size: 24.spMin,
+                                    color: AppColors.blue,
+                                  )
+                                : SvgPicture.asset(
+                                    'assets/icons/shield.svg',
+                                    width: 24.spMin,
+                                    height: 24.spMin,
+                                    colorFilter: ColorFilter.mode(
+                                      AppColors.blue,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        12.spMin.wSizedBox,
+
+                        // Source Info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                source?.name ?? 'Community Report',
+                                style: TextStyle(
+                                  fontSize: 15.spMin,
+                                  color: AppColors.black,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              2.spMin.hSizedBox,
+                              Text(
+                                isUserReported
+                                    ? 'Community'
+                                    : 'Official Source',
+                                style: TextStyle(
+                                  fontSize: 12.spMin,
+                                  color: AppColors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // External Link Icon
+                        if (sourceLink != null)
+                          Container(
+                            width: 32.spMin,
+                            height: 32.spMin,
+                            decoration: BoxDecoration(
+                              color: AppColors.lightGrey.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(8.spMin),
+                            ),
+                            child: Icon(
+                              Icons.open_in_new,
+                              size: 16.spMin,
+                              color: AppColors.grey,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // License Row (only for non-user-reported)
+                if (!isUserReported) ...[
+                  if (license != null) ...[
+                    12.spMin.hSizedBox,
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.spMin,
+                        vertical: 10.spMin,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.lightGrey.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8.spMin),
+                      ),
+                      child: Row(
+                        children: [
+                          // License Badge
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.spMin,
+                              vertical: 4.spMin,
+                            ),
+                            decoration: BoxDecoration(
+                              color: license.backgroundColor,
+                              borderRadius: BorderRadius.circular(4.spMin),
+                            ),
+                            child: Text(
+                              license.badgeText,
+                              style: TextStyle(
+                                fontSize: 11.spMin,
+                                fontWeight: FontWeight.w600,
+                                color: license.foregroundColor,
+                              ),
+                            ),
+                          ),
+                          10.spMin.wSizedBox,
+
+                          // License Text
+                          Expanded(
+                            child: Text(
+                              license.licenseText,
                               style: TextStyle(
                                 fontSize: 12.spMin,
                                 color: AppColors.grey,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
 
-                      // External Link Icon
-                      if (sourceLink != null)
-                        Container(
-                          width: 32.spMin,
-                          height: 32.spMin,
-                          decoration: BoxDecoration(
-                            color: AppColors.lightGrey.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(8.spMin),
-                          ),
-                          child: Icon(
-                            Icons.open_in_new,
-                            size: 16.spMin,
-                            color: AppColors.grey,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // License Row (only for non-user-reported)
-              if (!isUserReported) ...[
-                if (license != null) ...[
-                  12.spMin.hSizedBox,
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.spMin,
-                      vertical: 10.spMin,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.lightGrey.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(8.spMin),
-                    ),
-                    child: Row(
-                      children: [
-                        // License Badge
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.spMin,
-                            vertical: 4.spMin,
-                          ),
-                          decoration: BoxDecoration(
-                            color: license.backgroundColor,
-                            borderRadius: BorderRadius.circular(4.spMin),
-                          ),
-                          child: Text(
-                            license.badgeText,
-                            style: TextStyle(
-                              fontSize: 11.spMin,
-                              fontWeight: FontWeight.w600,
-                              color: license.foregroundColor,
-                            ),
-                          ),
-                        ),
-                        10.spMin.wSizedBox,
-
-                        // License Text
-                        Expanded(
-                          child: Text(
-                            license.licenseText,
-                            style: TextStyle(
-                              fontSize: 12.spMin,
-                              color: AppColors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-
-                        // View Link
-                        if (copyrightLink != null || license.link != null)
-                          GestureDetector(
-                            onTap: () => openLink(
-                              context: context,
-                              link: copyrightLink ?? license.link!,
-                            ),
-                            child: Text(
-                              'View',
-                              style: TextStyle(
-                                fontSize: 12.spMin,
-                                color: AppColors.blue,
-                                fontWeight: FontWeight.w600,
+                          // View Link
+                          if (copyrightLink != null || license.link != null)
+                            GestureDetector(
+                              onTap: () => openLink(
+                                context: context,
+                                link: copyrightLink ?? license.link!,
+                              ),
+                              child: Text(
+                                'View',
+                                style: TextStyle(
+                                  fontSize: 12.spMin,
+                                  color: AppColors.blue,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
 
-                // Advisory Text
-                if (advisoryText?.isNotEmpty ?? false) ...[
-                  10.hSizedBox,
-                  Text(
-                    advisoryText!,
-                    style: TextStyle(
-                      fontSize: 11.spMin,
-                      color: AppColors.grey,
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-
-                // Copyright Notice
-                if (copyrightText?.isNotEmpty ?? false) ...[
-                  10.hSizedBox,
-                  Text.rich(
-                    TextSpan(
+                  // Advisory Text
+                  if (advisoryText?.isNotEmpty ?? false) ...[
+                    10.hSizedBox,
+                    Text(
+                      advisoryText!,
                       style: TextStyle(
                         fontSize: 11.spMin,
                         color: AppColors.grey,
                         height: 1.5,
                       ),
-                      children: [
-                        TextSpan(
-                          text: copyrightText,
+                    ),
+                  ],
+
+                  // Copyright Notice
+                  if (copyrightText?.isNotEmpty ?? false) ...[
+                    10.hSizedBox,
+                    Text.rich(
+                      TextSpan(
+                        style: TextStyle(
+                          fontSize: 11.spMin,
+                          color: AppColors.grey,
+                          height: 1.5,
                         ),
-                        if (license?.link?.isNotEmpty ?? false) ...[
+                        children: [
                           TextSpan(
-                            text: ' Used under ',
+                            text: copyrightText,
                           ),
-                          WidgetSpan(
-                            child: GestureDetector(
-                              onTap: () => openLink(
-                                context: context,
-                                link: license.link!,
-                              ),
-                              child: Text(
-                                license!.badgeText,
-                                style: TextStyle(
-                                  fontSize: 11.spMin,
-                                  color: AppColors.blue,
-                                  decoration: TextDecoration.none,
+                          if (license?.link?.isNotEmpty ?? false) ...[
+                            TextSpan(
+                              text: ' Used under ',
+                            ),
+                            WidgetSpan(
+                              child: GestureDetector(
+                                onTap: () => openLink(
+                                  context: context,
+                                  link: license.link!,
+                                ),
+                                child: Text(
+                                  license!.badgeText,
+                                  style: TextStyle(
+                                    fontSize: 11.spMin,
+                                    color: AppColors.blue,
+                                    decoration: TextDecoration.none,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          TextSpan(text: ' license.'),
+                            TextSpan(text: ' license.'),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ],
-            ],
+            ),
           ),
         );
       },
