@@ -486,7 +486,7 @@ class _HazardFiltersBottomsheetContentState
         vertical: 8.spMin,
       ),
       decoration: BoxDecoration(
-        color: isSelected ? color.withValues(alpha: 0.05) : Colors.transparent,
+        color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
         borderRadius: BorderRadius.circular(20.spMin),
         border: Border.all(
           color: isSelected ? color : AppColors.lightGrey,

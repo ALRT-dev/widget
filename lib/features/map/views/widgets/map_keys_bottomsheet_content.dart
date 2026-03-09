@@ -77,7 +77,7 @@ class _MapKeysBottomsheetContentState
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'MAP KEY',
+            'ALRT Key',
             style: TextStyle(
               fontSize: 22.spMin,
               fontWeight: FontWeight.w700,

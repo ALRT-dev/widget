@@ -54,7 +54,6 @@ class _SupportRequestScreenState extends ConsumerState<SupportRequestScreen> {
             color: AppColors.black,
           ),
         ),
-        backgroundColor: context.theme.scaffoldBackgroundColor,
         foregroundColor: AppColors.black,
         actions: [
           _clearAllBuilder(),
@@ -198,6 +197,8 @@ class _SupportRequestScreenState extends ConsumerState<SupportRequestScreen> {
           fontWeight: FontWeight.normal,
         ),
         contentPadding: contentPadding,
+        filled: true,
+        fillColor: AppColors.white,
         disabledBorder: context.theme.inputDecorationTheme.border?.copyWith(
           borderSide: BorderSide(
             color: AppColors.lightGrey,
@@ -230,13 +231,24 @@ class _SupportRequestScreenState extends ConsumerState<SupportRequestScreen> {
                 padding: EdgeInsets.all(16.spMin),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? typeInfo['color'].withValues(alpha: 0.1)
-                      : AppColors.extraLightGrey.withValues(alpha: 0.5),
+                      ? typeInfo['color'].withValues(alpha: 0.005)
+                      : AppColors.white,
                   borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(
-                    color: isSelected ? typeInfo['color'] : AppColors.lightGrey,
-                    width: isSelected ? 2.0 : 1.0,
+                    color: isSelected
+                        ? typeInfo['color']
+                        : AppColors.transparent,
+                    width: 1.0,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: isSelected
+                          ? typeInfo['color'].withValues(alpha: 0.1)
+                          : AppColors.shadowColorLight,
+                      blurRadius: 5.0,
+                      offset: Offset(0.0, 0.0),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [

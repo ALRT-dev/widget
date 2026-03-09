@@ -208,7 +208,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       title: Row(
         spacing: 10.spMin,
         children: [
-          if (severityTitle.isNotEmpty && severityTitle != 'Unknown')
+          if (isAwsCompliant &&
+              severityTitle.isNotEmpty &&
+              severityTitle != 'Unknown')
             _headerPillBuilder(
               label: severityTitle.toUpperCase(),
               foregroundColor: pillForegroundColor,
@@ -352,6 +354,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 : value.hazard?.title ?? 'Alert',
           ),
         );
+        final categoryId = ref.watch(
+          provider.select(
+            (value) => value.hazard?.category?.id,
+          ),
+        );
         final categoryName = ref.watch(
           provider.select(
             (value) =>
@@ -366,6 +373,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 value.hazard?.category?.effectiveColor ?? AppColors.black,
           ),
         );
+        final darkenCategoryColor = categoryId == 'utilitiesAndInfrastructure'
+            ? categoryColor.darken(0.3)
+            : categoryColor.darken(0.2);
 
         return Container(
           decoration: BoxDecoration(
@@ -403,24 +413,23 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                         // Category Pill
                         Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: 16.spMin,
+                            horizontal: 14.spMin,
                             vertical: 6.spMin,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.white,
+                            color: categoryColor.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20.spMin),
                             border: Border.all(
-                              color: categoryColor,
-                              width: 2,
+                              color: darkenCategoryColor,
+                              width: 1.0,
                             ),
                           ),
                           child: Text(
                             categoryName,
-                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12.spMin,
-                              color: AppColors.black,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w600,
+                              color: darkenCategoryColor,
                             ),
                           ),
                         ),

@@ -116,7 +116,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
               onChanged: _handleSearchChanged,
               textAlignVertical: TextAlignVertical.center,
               decoration: InputDecoration(
-                hintText: 'Search alerts in any location...',
+                hintText: 'Search ALRTs in any location...',
                 hintStyle: TextStyle(
                   color: AppColors.grey.withValues(alpha: 0.7),
                 ),

@@ -328,7 +328,9 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           child: Row(
             spacing: 10.spMin,
             children: [
-              if (severityTitle.isNotEmpty && severityTitle != 'Unknown')
+              if (isAwsCompliant &&
+                  severityTitle.isNotEmpty &&
+                  severityTitle != 'Unknown')
                 _headerPillBuilder(
                   label: severityTitle.toUpperCase(),
                   foregroundColor: pillForegroundColor,
@@ -557,8 +559,8 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         final distanceText = distance == null
             ? null
             : distance < 1000
-            ? '${distance.toStringAsFixed(1)} m away'
-            : '${(distance / 1000).toStringAsFixed(1)} km away';
+            ? '${distance.toStringAsFixed(1)} m'
+            : '${(distance / 1000).toStringAsFixed(1)} km';
 
         final hasExpired = ref.watch(
           provider.select(
