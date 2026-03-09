@@ -15,9 +15,11 @@ import 'package:hazard_app/features/map/views/widgets/route_source_and_destinati
 import 'package:hazard_app/features/map/views/widgets/selected_location_preview.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -98,8 +100,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     return RouteSourceAndDestination();
                   }
                   return Row(
+                    spacing: 10.spMin,
                     children: [
                       Expanded(child: MapSearchbar()),
+                      _xpPointsBuilder(),
                     ],
                   );
                 },
@@ -154,6 +158,58 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _xpPointsBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final xpPoints = ref.watch(
+          providerOfLoggedInUser.select(
+            (value) => value?.xpPoints ?? 0,
+          ),
+        );
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.spMin),
+            gradient: LinearGradient(
+              colors: [
+                AppColors.orange300,
+                AppColors.red200,
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0, 0.0),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 12.spMin,
+            vertical: 7.spMin,
+          ),
+          child: Row(
+            spacing: 4.spMin,
+            children: [
+              Icon(
+                LucideIcons.star,
+                size: 12.spMin,
+                color: AppColors.white,
+              ),
+              Text(
+                xpPoints.toString(),
+                style: TextStyle(
+                  fontSize: 12.spMin,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.white,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
