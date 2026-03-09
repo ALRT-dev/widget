@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart' hide DatePickerTheme;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,6 +17,7 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
@@ -274,36 +277,158 @@ class _CreateUpdateReportScreenState
   }
 
   Widget _submittedBuilder() {
+    final line = Center(
+      child: Container(
+        height: 15.spMin,
+        width: 2.5,
+        decoration: BoxDecoration(
+          color: const Color(0xFF3CBE5F),
+          borderRadius: BorderRadius.circular(10.spMin),
+        ),
+      ),
+    );
+    final offset = 6.spMin;
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 86.spMin,
-            height: 86.spMin,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.green.withValues(alpha: 0.8),
-                  AppColors.darkGreen.withValues(alpha: 0.8),
-                ],
-              ),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.white.withValues(alpha: 0.4),
-                  blurRadius: 20.spMin,
-                  offset: const Offset(0, 10),
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                height: 110.spMin,
+                width: 110.spMin,
+                decoration: BoxDecoration(
+                  color: Color(0xFF3CBE5F).withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadowColorLight,
+                      blurRadius: 6.0,
+                      offset: const Offset(0.0, 0.0),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Icon(
-              Icons.check_rounded,
-              size: 50.spMin,
-              color: AppColors.white,
-            ),
+                child: Center(
+                  child: Container(
+                    width: 80.spMin,
+                    height: 80.spMin,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFF3CBE5F).withValues(alpha: 0.8),
+                          AppColors.darkGreen.withValues(alpha: 0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.white.withValues(alpha: 0.4),
+                          blurRadius: 20.spMin,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.check_rounded,
+                      size: 50.spMin,
+                      color: AppColors.white,
+                    ),
+                  ),
+                ),
+              ),
+
+              /// Top line
+              Positioned(
+                top: -offset,
+                left: 0.0,
+                right: 0.0,
+                child: line,
+              ),
+
+              /// Bottom line
+              Positioned(
+                bottom: -offset,
+                left: 0.0,
+                right: 0.0,
+                child: line,
+              ),
+
+              /// Left line
+              Positioned(
+                top: 0.0,
+                bottom: 0.0,
+                left: -offset,
+                child: RotatedBox(
+                  quarterTurns: 1,
+                  child: line,
+                ),
+              ),
+
+              /// Right line
+              Positioned(
+                top: 0.0,
+                bottom: 0.0,
+                right: -offset,
+                child: RotatedBox(
+                  quarterTurns: 1,
+                  child: line,
+                ),
+              ),
+
+              /// Top-left corner line
+              Positioned(
+                top: offset + 6.0,
+                left: offset + 6.0,
+                child: Center(
+                  child: Transform.rotate(
+                    angle: -pi / 4,
+                    child: line,
+                  ),
+                ),
+              ),
+
+              /// Top-right corner line
+              Positioned(
+                top: offset + 6.0,
+                right: offset + 6.0,
+                child: Center(
+                  child: Transform.rotate(
+                    angle: pi / 4,
+                    child: line,
+                  ),
+                ),
+              ),
+
+              /// Bottom-left corner line
+              Positioned(
+                bottom: offset + 6.0,
+                left: offset + 6.0,
+                child: Center(
+                  child: Transform.rotate(
+                    angle: pi / 4,
+                    child: line,
+                  ),
+                ),
+              ),
+
+              /// Bottom-right corner line
+              Positioned(
+                bottom: offset + 6.0,
+                right: offset + 6.0,
+                child: Center(
+                  child: Transform.rotate(
+                    angle: -pi / 4,
+                    child: line,
+                  ),
+                ),
+              ),
+            ],
           ),
-          20.hSizedBox,
+          30.hSizedBox,
           Text(
             'ALRT Submitted!',
             style: TextStyle(
@@ -322,6 +447,8 @@ class _CreateUpdateReportScreenState
             textAlign: TextAlign.center,
           ),
           20.hSizedBox,
+          _xpPointsBuilder(),
+          12.hSizedBox,
           _submitAnotherButtonBuilder(),
           12.hSizedBox,
           _seeActiveReportsButtonBuilder(),
@@ -567,6 +694,111 @@ class _CreateUpdateReportScreenState
           value: 'Submit Report',
           icon: Icon(Icons.check_rounded),
           onPressed: _handleSubmitReport,
+        );
+      },
+    );
+  }
+
+  Widget _xpPointsBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final xpPointsAfterSubmission = ref.watch(
+          providerOfLoggedInUser.select(
+            (value) => (value?.xpPoints ?? 0) + 10,
+          ),
+        );
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 6.0,
+                offset: const Offset(0.0, 0.0),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.all(16.spMin),
+          child: Row(
+            spacing: 14.spMin,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.spMin),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.orange300,
+                      AppColors.red200,
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadowColor,
+                      blurRadius: 10.0,
+                      offset: Offset(0, 0.0),
+                    ),
+                  ],
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.spMin,
+                  vertical: 7.spMin,
+                ),
+                child: Row(
+                  spacing: 5.spMin,
+                  children: [
+                    Icon(
+                      LucideIcons.star,
+                      size: 16.spMin,
+                      color: AppColors.white,
+                    ),
+                    Text(
+                      '+10',
+                      style: TextStyle(
+                        fontSize: 16.spMin,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Points pending approval',
+                      style: TextStyle(
+                        fontSize: 12.spMin,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          'Your total: ',
+                          style: TextStyle(
+                            fontSize: 12.spMin,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.grey.withValues(alpha: 0.6),
+                          ),
+                        ),
+                        Text(
+                          '$xpPointsAfterSubmission',
+                          style: TextStyle(
+                            fontSize: 14.spMin,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.orange,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
       },
     );
