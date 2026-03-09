@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_provider.dart';
@@ -24,6 +25,7 @@ import 'package:hazard_app/features/profile/views/screens/profile_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
 import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
+import 'package:hazard_app/features/report/views/widgets/alrt_approved_toast.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/views/screens/hazard_search_screen.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
@@ -34,6 +36,7 @@ import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dar
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/providers/user_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
+import 'package:toastification/toastification.dart';
 
 class HomeScreenArgs {
   final HomeTab initialTab;
@@ -154,10 +157,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             report.state.maybeWhen(
               success: (hazard) {
                 if (hazard.reviewStatus == HazardReviewStatus.accepted) {
-                  context.showSuccessToast(
-                    message:
-                        'Your alrt report has been reviewed and posted successfully.',
-                  );
+                  _showAlrtApprovedToast();
                 } else if (hazard.reviewStatus == HazardReviewStatus.rejected) {
                   context.showErrorToast(
                     message:
@@ -205,6 +205,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   void _handleError(AppError error) {
     context.showErrorToast(
       message: error.message,
+    );
+  }
+
+  void _showAlrtApprovedToast() {
+    Toastification().showCustom(
+      context: context,
+      alignment: Alignment.topCenter,
+      autoCloseDuration: const Duration(seconds: 5),
+      animationDuration: const Duration(milliseconds: 400),
+      builder: (context, holder) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(top: 8.spMin),
+            child: AlrtApprovedToast(
+              autoCloseDuration: const Duration(seconds: 5),
+              onDismiss: () => Toastification().dismiss(holder),
+            ),
+          ),
+        );
+      },
     );
   }
 
