@@ -756,12 +756,11 @@ class _CreateUpdateReportScreenState
         if (reportSubmitted) return const SizedBox.shrink();
 
         final hasAllRequiredDataEntered = _hasAllRequiredDataEntered(ref);
-        if (!hasAllRequiredDataEntered) return const SizedBox.shrink();
 
         return Button.gradient(
           value: 'Submit Report',
           icon: Icon(Icons.check_rounded),
-          onPressed: _handleSubmitReport,
+          onPressed: !hasAllRequiredDataEntered ? null : _handleSubmitReport,
         );
       },
     );
