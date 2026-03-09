@@ -46,7 +46,7 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
             fontFamily: AppTheme.defaultFontFamily,
             fontWeight: FontWeight.w600,
           ),
-          unselectedLabelColor: AppColors.grey.withValues(alpha: 0.7),
+          unselectedLabelColor: AppColors.grey.withValues(alpha: 0.8),
           indicatorColor: Colors.transparent,
           dividerColor: Colors.transparent,
           dividerHeight: 0.0,

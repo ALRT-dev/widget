@@ -136,7 +136,7 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
             textAlignVertical: TextAlignVertical.center,
             onChanged: _handleSearchChanged,
             decoration: InputDecoration(
-              hintText: 'Search hazards around you...',
+              hintText: 'Search alerts around you...',
               contentPadding: EdgeInsets.only(
                 top: 5.spMin,
                 bottom: 5.spMin,

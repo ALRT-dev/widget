@@ -306,7 +306,7 @@ class _HazardFiltersBottomsheetContentState
             title,
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              color: AppColors.orange,
+              color: AppColors.black,
             ),
           ),
           3.hSizedBox,

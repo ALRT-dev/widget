@@ -144,8 +144,7 @@ class _CreateUpdateReportScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _sectionTitleBuilder(
-            title: 'Select Category'.toUpperCase(),
-            color: AppColors.orange,
+            title: 'Select Category',
             isRequired: true,
           ),
           10.hSizedBox,
