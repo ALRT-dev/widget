@@ -5,12 +5,17 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000195">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.000192">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: upload_to_testflight" time="467.2139">
+      <testcase classname="fastlane.lanes" name="1: fvm flutter build ipa --flavor prod -t lib/main_prod.dart" time="135.4887">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: upload_to_testflight" time="539.91407">
         
       </testcase>
     
