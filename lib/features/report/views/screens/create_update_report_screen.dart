@@ -24,6 +24,7 @@ import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/dotted_border_container.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:hazard_app/others/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -104,13 +105,12 @@ class _CreateUpdateReportScreenState
                 (value) => value.reportSubmitted,
               ),
             );
+            if (reportSubmitted) {
+              return _submittedAppbarTitleBuilder();
+            }
 
             return Text(
-              reportSubmitted
-                  ? 'ALRT Submitted'
-                  : isUpdating
-                  ? 'Update an ALRT'
-                  : 'Report an ALRT',
+              isUpdating ? 'Update an ALRT' : 'Report an ALRT',
               style: TextStyle(
                 color: AppColors.white,
                 fontSize: 24.spMin,
@@ -272,6 +272,75 @@ class _CreateUpdateReportScreenState
           ),
         );
       },
+    );
+  }
+
+  Widget _submittedAppbarTitleBuilder() {
+    return Row(
+      children: [
+        Container(
+          width: 38.spMin,
+          height: 38.spMin,
+          decoration: BoxDecoration(
+            color: AppColors.white.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            LucideIcons.star,
+            size: 16.spMin,
+            color: AppColors.white,
+          ),
+        ),
+        8.wSizedBox,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Your ALRT has been submitted!',
+                style: TextStyle(
+                  fontSize: 14.spMin,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  height: 1.4,
+                  letterSpacing: -0.5,
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text.rich(
+                TextSpan(
+                  style: TextStyle(
+                    fontFamily: AppTheme.defaultFontFamily,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'Once approved you will gain ',
+                    ),
+                    TextSpan(
+                      text: '+10 points ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.white,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '- keep it up!',
+                    ),
+                  ],
+                ),
+                style: TextStyle(
+                  fontSize: 12.spMin,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withValues(
+                    alpha: 0.7,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

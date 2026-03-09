@@ -176,7 +176,7 @@ class _AlrtApprovedToastState extends State<AlrtApprovedToast>
                                     'ALRT Approved! 🎉',
                                     style: TextStyle(
                                       fontSize: 14.spMin,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w600,
                                       color: Colors.white,
                                       height: 1.4,
                                       letterSpacing: -0.5,
@@ -188,7 +188,7 @@ class _AlrtApprovedToastState extends State<AlrtApprovedToast>
                                   Text(
                                     'Your alert is now live - community notified',
                                     style: TextStyle(
-                                      fontSize: 12.spMin,
+                                      fontSize: 11.spMin,
                                       fontWeight: FontWeight.w500,
                                       color: Colors.white.withValues(
                                         alpha: 0.7,
