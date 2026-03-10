@@ -46,7 +46,7 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
             fontFamily: AppTheme.defaultFontFamily,
             fontWeight: FontWeight.w600,
           ),
-          unselectedLabelColor: AppColors.grey.withValues(alpha: 0.8),
+          unselectedLabelColor: AppColors.grey,
           indicatorColor: Colors.transparent,
           dividerColor: Colors.transparent,
           dividerHeight: 0.0,
@@ -75,9 +75,8 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
                   size: 24.spMin,
                   color: ref.watch(
                     providerOfHomeTab.select(
-                      (value) => value == tab
-                          ? AppColors.orange
-                          : AppColors.grey.withValues(alpha: 0.7),
+                      (value) =>
+                          value == tab ? AppColors.orange : AppColors.grey,
                     ),
                   ),
                 ),
