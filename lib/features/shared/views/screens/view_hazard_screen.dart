@@ -377,6 +377,20 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             ? categoryColor.darken(0.3)
             : categoryColor.darken(0.2);
 
+        final latitude = ref.watch(
+          provider.select((value) => value.hazard?.latitude),
+        );
+        final longitude = ref.watch(
+          provider.select((value) => value.hazard?.longitude),
+        );
+        final distance = latitude == null || longitude == null
+            ? null
+            : ref.watch(
+                providerOfLocation.select(
+                  (value) => value.distanceTo(latitude, longitude),
+                ),
+              );
+
         return Container(
           decoration: BoxDecoration(
             color: AppColors.white,
@@ -411,31 +425,70 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                         ),
 
                         // Category Pill
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 14.spMin,
-                            vertical: 6.spMin,
-                          ),
-                          decoration: BoxDecoration(
-                            color: categoryColor.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20.spMin),
-                            border: Border.all(
-                              color: darkenCategoryColor,
-                              width: 1.0,
-                            ),
-                          ),
-                          child: Text(
-                            categoryName,
-                            style: TextStyle(
-                              fontSize: 12.spMin,
-                              fontWeight: FontWeight.w600,
-                              color: darkenCategoryColor,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
+                ],
+              ),
+              10.hSizedBox,
+              Row(
+                spacing: 10.spMin,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 14.spMin,
+                      vertical: 6.spMin,
+                    ),
+                    decoration: BoxDecoration(
+                      color: categoryColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20.spMin),
+                      border: Border.all(
+                        color: darkenCategoryColor,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Text(
+                      categoryName,
+                      style: TextStyle(
+                        fontSize: 12.spMin,
+                        fontWeight: FontWeight.w600,
+                        color: darkenCategoryColor,
+                      ),
+                    ),
+                  ),
+                  if (distance != null)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.extraLightGrey,
+                        border: Border.all(
+                          color: AppColors.grey.withValues(alpha: 0.5),
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(20.spMin),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 14.spMin,
+                        vertical: 6.spMin,
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            LucideIcons.mapPin,
+                            size: 14.spMin,
+                            color: AppColors.grey.withValues(alpha: 0.8),
+                          ),
+                          4.wSizedBox,
+                          Text(
+                            '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} away',
+                            style: TextStyle(
+                              fontSize: 12.spMin,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.grey.withValues(alpha: 0.8),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                 ],
               ),
               _buildAwsAlertLevel(),
