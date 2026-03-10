@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -10,16 +11,16 @@ import 'package:hazard_app/features/shared/providers/main_categories_provider.da
 import 'package:hazard_app/features/shared/views/widgets/base_bottomsheet_v2.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
-class MapKeysBottomsheetContent extends ConsumerStatefulWidget {
-  const MapKeysBottomsheetContent({super.key});
+class AlrtKeysBottomsheetContent extends ConsumerStatefulWidget {
+  const AlrtKeysBottomsheetContent({super.key});
 
   @override
-  ConsumerState<MapKeysBottomsheetContent> createState() =>
-      _MapKeysBottomsheetContentState();
+  ConsumerState<AlrtKeysBottomsheetContent> createState() =>
+      _AlrtKeysBottomsheetContentState();
 }
 
-class _MapKeysBottomsheetContentState
-    extends ConsumerState<MapKeysBottomsheetContent> {
+class _AlrtKeysBottomsheetContentState
+    extends ConsumerState<AlrtKeysBottomsheetContent> {
   @override
   Widget build(BuildContext context) {
     return BaseBottomsheetV2(
@@ -43,6 +44,8 @@ class _MapKeysBottomsheetContentState
                   children: [
                     20.hSizedBox,
                     _awsWarningsSection(),
+                    16.hSizedBox,
+                    _officialWarningsSection(),
                     16.hSizedBox,
                     _globalWarningsSection(),
                     16.hSizedBox,
@@ -157,6 +160,59 @@ class _MapKeysBottomsheetContentState
                 indicatorText: 'Yellow triangle',
               ),
             ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _officialWarningsSection() {
+    final colors = [
+      AppColors.black,
+      AppColors.advice,
+      AppColors.watchAndAct,
+      AppColors.emergency,
+    ];
+
+    return Consumer(
+      builder: (context, ref, child) {
+        return _sectionContainerBuilder(
+          title: 'Official Alerts'.toUpperCase(),
+          subtitle:
+              "Verified alerts from recognised public agencies and emergency services.",
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            spacing: 10.spMin,
+            children: colors.map((e) {
+              return Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+                    return Container(
+                      height: width,
+                      decoration: BoxDecoration(
+                        color: AppColors.extraLightGrey,
+                        borderRadius: BorderRadius.circular(12.spMin),
+                      ),
+                      padding: EdgeInsets.all(27.spMin),
+                      child: Center(
+                        child: Transform.rotate(
+                          angle: math.pi / 4,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: e,
+                                width: 3.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }).toList(),
           ),
         );
       },
