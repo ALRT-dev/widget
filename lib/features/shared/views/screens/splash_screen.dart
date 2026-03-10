@@ -2,10 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// Splash screen matching the HTML design: orbital rings, corner dots,
-/// logo bars, and ALRT wordmark.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -23,14 +21,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
-  // HTML colors
   static const Color _ring1 = Color(0xFFFFB347);
   static const Color _ring2 = Color(0xFFFF6B01);
   static const Color _ring3 = Color(0xFFFF0004);
   static const Color _dotColor = Color(0xFFFF6B01);
-  static const Color _pillRed = Color(0xFFFF0004);
-  static const Color _pillOrange = Color(0xFFFF6B01);
-  static const Color _taglineGray = Color(0xFF787878);
 
   @override
   void initState() {
@@ -87,13 +81,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   _buildRings(t),
                   _buildCornerDots(t),
                   _buildGlow(),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildLogoIcon(),
-                      _buildWordmark(),
-                    ],
-                  ),
+                  _buildLogoIcon(),
                 ],
               );
             },
@@ -202,124 +190,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Widget _buildLogoIcon() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildBarRow1(),
-          const SizedBox(height: 9),
-          _buildBarRow2(),
-          const SizedBox(height: 9),
-          _buildBarRow3(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBarRow1() {
-    return SizedBox(
-      width: 130 + 18,
-      height: 26,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Positioned(
-            left: 0,
-            top: 2,
-            child: Container(
-              width: 130,
-              height: 22,
-              decoration: BoxDecoration(
-                color: _pillRed,
-                borderRadius: BorderRadius.circular(11),
-              ),
-            ),
-          ),
-          Positioned(
-            right: -8,
-            top: 0,
-            child: Container(
-              width: 26,
-              height: 26,
-              decoration: const BoxDecoration(
-                color: _pillOrange,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBarRow2() {
-    return SizedBox(
-      width: 95 + 22 + 8,
-      height: 22,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 22,
-            height: 22,
-            decoration: const BoxDecoration(
-              color: _pillOrange,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            width: 95,
-            height: 22,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [_pillOrange, Color(0xFFFF3300)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-              borderRadius: BorderRadius.circular(11),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBarRow3() {
-    return _buildBarRow1();
-  }
-
-  Widget _buildWordmark() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.identity()..scale(1.3, 1.0),
-          child: Text(
-            'ALRT',
-            style: GoogleFonts.bebasNeue(
-              fontSize: 44,
-              fontWeight: FontWeight.w400,
-              color: _pillRed,
-              letterSpacing: 10,
-              height: 0.75,
-            ),
-          ),
-        ),
-        const SizedBox(height: 7),
-        Text(
-          'Alert. Location. Real-Time. Travel'.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10.5,
-            fontWeight: FontWeight.w400,
-            letterSpacing: 2.0,
-            color: _taglineGray,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
+    return Image.asset(
+      'assets/logos/alrt_logo_detailed.png',
+      width: 300.spMin,
+      filterQuality: FilterQuality.high,
     );
   }
 }

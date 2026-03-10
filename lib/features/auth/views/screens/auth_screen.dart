@@ -147,7 +147,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           tag: 'app_logo',
           child: Image.asset(
             'assets/logos/alrt_logo_detailed.png',
-            width: 250,
+            width: 250.spMin,
             filterQuality: FilterQuality.high,
           ),
         ),
