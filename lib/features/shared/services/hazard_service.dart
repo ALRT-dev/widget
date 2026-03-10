@@ -279,6 +279,7 @@ class HazardService {
     // Generate bitmaps for each category and severity combination
     for (final category in categories) {
       for (final severityBand in severityBands) {
+        // Generate bitmaps for AWS compliant hazards
         final keyAws = '${category.id}_${severityBand.name}_aws';
         final futureAws = getBitmapDescriptorForHazard(
           categoryId: category.id,
@@ -288,6 +289,7 @@ class HazardService {
         ).then((bitmap) => {keyAws: bitmap});
         futures.add(futureAws);
 
+        // Generate bitmaps for non-AWS compliant hazards
         final keyNonAws = '${category.id}_${severityBand.name}_non_aws';
         final futureNonAws = getBitmapDescriptorForHazard(
           categoryId: category.id,
@@ -298,7 +300,7 @@ class HazardService {
         futures.add(futureNonAws);
       }
 
-      // Generate bitmaps for user markers
+      // Generate bitmaps for user reported hazards
       late String key;
       if (category.parentId != null) {
         key = '${category.parentId}_user';
@@ -308,7 +310,7 @@ class HazardService {
       final future = getBitmapDescriptorForAssetPath(
         assetPath: 'assets/images/hazards/non_aws/$key.png',
         fallbackAssetPath: 'assets/images/hazards/non_aws/other_user.png',
-        size: const Size(30, 30),
+        size: const Size(40, 40),
       ).then((bitmap) => {key: bitmap});
       futures.add(future);
     }
@@ -316,6 +318,7 @@ class HazardService {
     // Generate bitmaps for parent categories
     for (final parentCategoryId in parentCategories) {
       for (final severity in severityBands) {
+        // Generate bitmaps for AWS compliant hazards for parent categories
         final keyAws = '${parentCategoryId}_${severity.name}_aws';
         final futureAws = getBitmapDescriptorForHazard(
           categoryId: parentCategoryId,
@@ -325,6 +328,7 @@ class HazardService {
         ).then((bitmap) => {keyAws: bitmap});
         futures.add(futureAws);
 
+        // Generate bitmaps for non-AWS compliant hazards for parent categories
         final keyNonAws = '${parentCategoryId}_${severity.name}_non_aws';
         final futureNonAws = getBitmapDescriptorForHazard(
           categoryId: parentCategoryId,
