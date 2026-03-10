@@ -128,7 +128,7 @@ class _AlrtKeysBottomsheetContentState
                 icon: TriangleOutline(
                   color: AppColors.emergency,
                   size: Size(24.spMin, 24.spMin),
-                  borderRadius: 2.0,
+                  borderRadius: 1.0,
                 ),
                 color: AppColors.emergency,
                 title: 'Emergency Warning',
@@ -140,7 +140,7 @@ class _AlrtKeysBottomsheetContentState
                 icon: TriangleOutline(
                   color: AppColors.watchAndAct,
                   size: Size(24.spMin, 24.spMin),
-                  borderRadius: 2.0,
+                  borderRadius: 1.0,
                 ),
                 color: AppColors.watchAndAct,
                 title: 'Watch & Act',
@@ -152,7 +152,7 @@ class _AlrtKeysBottomsheetContentState
                 icon: TriangleOutline(
                   color: AppColors.advice,
                   size: Size(24.spMin, 24.spMin),
-                  borderRadius: 2.0,
+                  borderRadius: 1.0,
                 ),
                 color: AppColors.advice,
                 title: 'Advice',
@@ -200,6 +200,7 @@ class _AlrtKeysBottomsheetContentState
                           angle: math.pi / 4,
                           child: Container(
                             decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(1.spMin),
                               border: Border.all(
                                 color: e,
                                 width: 3.0,
