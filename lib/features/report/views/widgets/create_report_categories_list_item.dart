@@ -52,9 +52,11 @@ class _CreateReportCategoriesListItemState
             offset: Offset(0.0, 0.0),
           ),
         ],
-        border: Border.all(
-          color: isSelected ? categoryColor : AppColors.transparent,
-          width: 1.5,
+        border: Border(
+          left: BorderSide(
+            color: categoryColor,
+            width: 5.0,
+          ),
         ),
       ),
       child: Container(
@@ -64,13 +66,13 @@ class _CreateReportCategoriesListItemState
               : AppColors.white,
           borderRadius: BorderRadius.circular(18.spMin),
         ),
-        padding: EdgeInsets.all(18.spMin),
+        padding: EdgeInsets.all(16.spMin),
         child: Row(
           children: [
             Image.asset(
               'assets/images/hazards/non_aws/${widget.category.id}_user.png',
-              width: 45.spMin,
-              height: 45.spMin,
+              width: 50.spMin,
+              height: 50.spMin,
               fit: BoxFit.contain,
             ),
             12.wSizedBox,

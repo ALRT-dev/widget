@@ -146,10 +146,10 @@ class _CreateUpdateReportScreenState
           _sectionTitleBuilder(
             title: 'Select Category',
             isRequired: true,
+            requiredWidget: const SizedBox(),
           ),
           10.hSizedBox,
           _categoriesBuilder(),
-          24.hSizedBox,
           Consumer(
             builder: (context, ref, child) {
               final hasSelectedCategory = ref.watch(
@@ -160,23 +160,18 @@ class _CreateUpdateReportScreenState
               if (!hasSelectedCategory) return const SizedBox.shrink();
 
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 24.spMin,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 24.spMin,
-                    children: [
-                      _locationBuilder(),
-                      // _titleBuilder(),
-                      _descriptionBuilder(),
-                      _mediaBuilder(),
-                    ],
-                  ),
+                  _locationBuilder(),
+                  // _titleBuilder(),
+                  _descriptionBuilder(),
+                  _mediaBuilder(),
+                  _submitButtonBuilder().pT(10.0),
                 ],
-              );
+              ).pT(24.0);
             },
           ),
-          24.hSizedBox,
-          _submitButtonBuilder(),
         ],
       ),
     );
@@ -230,8 +225,8 @@ class _CreateUpdateReportScreenState
               children: [
                 Image.asset(
                   'assets/images/hazards/non_aws/${selectedCategory.id}_user.png',
-                  width: 45.spMin,
-                  height: 45.spMin,
+                  width: 50.spMin,
+                  height: 50.spMin,
                   fit: BoxFit.contain,
                 ),
                 12.wSizedBox,
@@ -529,6 +524,7 @@ class _CreateUpdateReportScreenState
     required final String title,
     final Color? color,
     final bool isRequired = false,
+    final Widget? requiredWidget,
   }) {
     return Row(
       children: [
@@ -540,15 +536,39 @@ class _CreateUpdateReportScreenState
             fontWeight: FontWeight.w600,
           ),
         ),
-        if (!isRequired)
-          Text(
-            ' (Optional)',
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w400,
-              color: AppColors.grey,
-            ),
-          ),
+        isRequired
+            ? requiredWidget ??
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.orange300,
+                          AppColors.red200,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(20.spMin),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.spMin,
+                      vertical: 2.spMin,
+                    ),
+                    child: Text(
+                      'Required',
+                      style: TextStyle(
+                        fontSize: 10.spMin,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.white,
+                      ),
+                    ),
+                  ).pL(5.0)
+            : Text(
+                ' (Optional)',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.grey.withValues(alpha: 0.6),
+                ),
+              ),
       ],
     );
   }
@@ -600,7 +620,7 @@ class _CreateUpdateReportScreenState
   Widget _titleBuilder() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8.h,
+      spacing: 10.spMin,
       children: [
         _sectionTitleBuilder(title: 'Title'),
         _inputBuilder(
@@ -616,7 +636,7 @@ class _CreateUpdateReportScreenState
   Widget _locationBuilder() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8.h,
+      spacing: 10.spMin,
       children: [
         _sectionTitleBuilder(
           title: 'Location',
@@ -644,11 +664,11 @@ class _CreateUpdateReportScreenState
   Widget _descriptionBuilder() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8.h,
+      spacing: 10.spMin,
       children: [
         _sectionTitleBuilder(title: 'Description'),
         _inputBuilder(
-          hintText: 'Provide details...',
+          hintText: "Describe what you're seeing...",
           controller: _descriptionController,
           minLines: 5,
           maxLines: 10,
@@ -664,7 +684,7 @@ class _CreateUpdateReportScreenState
   Widget _mediaBuilder() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8.h,
+      spacing: 10.spMin,
       children: [
         _sectionTitleBuilder(title: 'Upload Media'),
         Consumer(
@@ -754,6 +774,13 @@ class _CreateUpdateReportScreenState
           ),
         );
         if (reportSubmitted) return const SizedBox.shrink();
+
+        final hasSelectedCategory = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.hazardToCreateOrUpdate.category != null,
+          ),
+        );
+        if (!hasSelectedCategory) return const SizedBox.shrink();
 
         final hasAllRequiredDataEntered = _hasAllRequiredDataEntered(ref);
 
