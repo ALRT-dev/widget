@@ -122,6 +122,35 @@ class HazardFiltersProvider extends StateNotifier<HazardFiltersProviderState> {
     }
   }
 
+  /// Updates the selected location subscription IDs.
+  void updateSelectedLocationIds(Set<String> locationIds) {
+    state = state.copyWith(selectedLocationIds: locationIds);
+  }
+
+  /// Adds a location subscription ID to the selected location subscription IDs.
+  void addSelectedLocationId(String locationId) {
+    final updatedSet = Set<String>.from(state.selectedLocationIds);
+    updatedSet.add(locationId);
+    updateSelectedLocationIds(updatedSet);
+  }
+
+  /// Removes a location subscription ID from the selected location subscription IDs.
+  void removeSelectedLocationId(String locationId) {
+    final updatedSet = Set<String>.from(state.selectedLocationIds);
+    updatedSet.remove(locationId);
+    updateSelectedLocationIds(updatedSet);
+  }
+
+  /// Toggles a location subscription ID selection.
+  void toggleLocationId(String locationId) {
+    if (state.selectedLocationIds.contains(locationId)) {
+      removeSelectedLocationId(locationId);
+    } else {
+      // Only allow single selection for location subscriptions for now.
+      updateSelectedLocationIds({locationId});
+    }
+  }
+
   /// Resets all filters to their initial values.
   void resetAllFilters() {
     final allCategoryIds = state.allCategoryIds;

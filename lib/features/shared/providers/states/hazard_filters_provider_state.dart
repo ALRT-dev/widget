@@ -27,6 +27,9 @@ abstract class HazardFiltersProviderState with _$HazardFiltersProviderState {
 
     /// Selected category IDs.
     @Default(<String>{}) final Set<String> selectedCategoryIds,
+
+    /// Selected location subscription IDs.
+    @Default(<String>{}) final Set<String> selectedLocationIds,
   }) = _HazardFiltersProviderState;
 
   /// Indicates whether any filters are currently selected.

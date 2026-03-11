@@ -18,7 +18,8 @@ mixin _$HazardSearchParams {
 /// The search string to filter hazards by their title or description.
  String? get searchString;/// The list of category IDs to filter hazards.
  List<String> get categoryIds;/// The list of source IDs to filter hazards.
- List<String> get sourceIds;/// The id of the user who reported the hazard to filter hazards.
+ List<String> get sourceIds;/// The list of location subscription IDs to filter hazards.
+ List<String> get locationIds;/// The id of the user who reported the hazard to filter hazards.
  String? get reportedById;/// The review status to filter hazards.
 ///
 /// Defaults to [HazardReviewStatus.accepted] to show only accepted hazards.
@@ -49,16 +50,16 @@ $HazardSearchParamsCopyWith<HazardSearchParams> get copyWith => _$HazardSearchPa
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other.categoryIds, categoryIds)&&const DeepCollectionEquality().equals(other.sourceIds, sourceIds)&&(identical(other.reportedById, reportedById) || other.reportedById == reportedById)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.ignoreHazardLatLngBounds, ignoreHazardLatLngBounds) || other.ignoreHazardLatLngBounds == ignoreHazardLatLngBounds)&&(identical(other.showExpired, showExpired) || other.showExpired == showExpired)&&(identical(other.awsEmergency, awsEmergency) || other.awsEmergency == awsEmergency)&&(identical(other.awsWatchAndAct, awsWatchAndAct) || other.awsWatchAndAct == awsWatchAndAct)&&(identical(other.awsAdvice, awsAdvice) || other.awsAdvice == awsAdvice)&&(identical(other.officialNonAws, officialNonAws) || other.officialNonAws == officialNonAws)&&(identical(other.userReported, userReported) || other.userReported == userReported)&&const DeepCollectionEquality().equals(other.sortSettings, sortSettings)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other.categoryIds, categoryIds)&&const DeepCollectionEquality().equals(other.sourceIds, sourceIds)&&const DeepCollectionEquality().equals(other.locationIds, locationIds)&&(identical(other.reportedById, reportedById) || other.reportedById == reportedById)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.ignoreHazardLatLngBounds, ignoreHazardLatLngBounds) || other.ignoreHazardLatLngBounds == ignoreHazardLatLngBounds)&&(identical(other.showExpired, showExpired) || other.showExpired == showExpired)&&(identical(other.awsEmergency, awsEmergency) || other.awsEmergency == awsEmergency)&&(identical(other.awsWatchAndAct, awsWatchAndAct) || other.awsWatchAndAct == awsWatchAndAct)&&(identical(other.awsAdvice, awsAdvice) || other.awsAdvice == awsAdvice)&&(identical(other.officialNonAws, officialNonAws) || other.officialNonAws == officialNonAws)&&(identical(other.userReported, userReported) || other.userReported == userReported)&&const DeepCollectionEquality().equals(other.sortSettings, sortSettings)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,searchString,const DeepCollectionEquality().hash(categoryIds),const DeepCollectionEquality().hash(sourceIds),reportedById,reviewStatus,northeastLat,northeastLng,southwestLat,southwestLng,ignoreHazardLatLngBounds,showExpired,awsEmergency,awsWatchAndAct,awsAdvice,officialNonAws,userReported,const DeepCollectionEquality().hash(sortSettings),page,pageSize]);
+int get hashCode => Object.hashAll([runtimeType,searchString,const DeepCollectionEquality().hash(categoryIds),const DeepCollectionEquality().hash(sourceIds),const DeepCollectionEquality().hash(locationIds),reportedById,reviewStatus,northeastLat,northeastLng,southwestLat,southwestLng,ignoreHazardLatLngBounds,showExpired,awsEmergency,awsWatchAndAct,awsAdvice,officialNonAws,userReported,const DeepCollectionEquality().hash(sortSettings),page,pageSize]);
 
 @override
 String toString() {
-  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, sourceIds: $sourceIds, reportedById: $reportedById, reviewStatus: $reviewStatus, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, ignoreHazardLatLngBounds: $ignoreHazardLatLngBounds, showExpired: $showExpired, awsEmergency: $awsEmergency, awsWatchAndAct: $awsWatchAndAct, awsAdvice: $awsAdvice, officialNonAws: $officialNonAws, userReported: $userReported, sortSettings: $sortSettings, page: $page, pageSize: $pageSize)';
+  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, sourceIds: $sourceIds, locationIds: $locationIds, reportedById: $reportedById, reviewStatus: $reviewStatus, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, ignoreHazardLatLngBounds: $ignoreHazardLatLngBounds, showExpired: $showExpired, awsEmergency: $awsEmergency, awsWatchAndAct: $awsWatchAndAct, awsAdvice: $awsAdvice, officialNonAws: $officialNonAws, userReported: $userReported, sortSettings: $sortSettings, page: $page, pageSize: $pageSize)';
 }
 
 
@@ -69,7 +70,7 @@ abstract mixin class $HazardSearchParamsCopyWith<$Res>  {
   factory $HazardSearchParamsCopyWith(HazardSearchParams value, $Res Function(HazardSearchParams) _then) = _$HazardSearchParamsCopyWithImpl;
 @useResult
 $Res call({
- String? searchString, List<String> categoryIds, List<String> sourceIds, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool ignoreHazardLatLngBounds, bool showExpired, bool awsEmergency, bool awsWatchAndAct, bool awsAdvice, bool officialNonAws, bool userReported, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
+ String? searchString, List<String> categoryIds, List<String> sourceIds, List<String> locationIds, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool ignoreHazardLatLngBounds, bool showExpired, bool awsEmergency, bool awsWatchAndAct, bool awsAdvice, bool officialNonAws, bool userReported, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
 });
 
 
@@ -86,11 +87,12 @@ class _$HazardSearchParamsCopyWithImpl<$Res>
 
 /// Create a copy of HazardSearchParams
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? sourceIds = null,Object? reportedById = freezed,Object? reviewStatus = null,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? ignoreHazardLatLngBounds = null,Object? showExpired = null,Object? awsEmergency = null,Object? awsWatchAndAct = null,Object? awsAdvice = null,Object? officialNonAws = null,Object? userReported = null,Object? sortSettings = null,Object? page = null,Object? pageSize = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? sourceIds = null,Object? locationIds = null,Object? reportedById = freezed,Object? reviewStatus = null,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? ignoreHazardLatLngBounds = null,Object? showExpired = null,Object? awsEmergency = null,Object? awsWatchAndAct = null,Object? awsAdvice = null,Object? officialNonAws = null,Object? userReported = null,Object? sortSettings = null,Object? page = null,Object? pageSize = null,}) {
   return _then(_self.copyWith(
 searchString: freezed == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
 as String?,categoryIds: null == categoryIds ? _self.categoryIds : categoryIds // ignore: cast_nullable_to_non_nullable
 as List<String>,sourceIds: null == sourceIds ? _self.sourceIds : sourceIds // ignore: cast_nullable_to_non_nullable
+as List<String>,locationIds: null == locationIds ? _self.locationIds : locationIds // ignore: cast_nullable_to_non_nullable
 as List<String>,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
 as String?,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
 as HazardReviewStatus,northeastLat: freezed == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
@@ -192,10 +194,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  List<String> sourceIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool ignoreHazardLatLngBounds,  bool showExpired,  bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  List<String> sourceIds,  List<String> locationIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool ignoreHazardLatLngBounds,  bool showExpired,  bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardSearchParams() when $default != null:
-return $default(_that.searchString,_that.categoryIds,_that.sourceIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.ignoreHazardLatLngBounds,_that.showExpired,_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.sortSettings,_that.page,_that.pageSize);case _:
+return $default(_that.searchString,_that.categoryIds,_that.sourceIds,_that.locationIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.ignoreHazardLatLngBounds,_that.showExpired,_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.sortSettings,_that.page,_that.pageSize);case _:
   return orElse();
 
 }
@@ -213,10 +215,10 @@ return $default(_that.searchString,_that.categoryIds,_that.sourceIds,_that.repor
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  List<String> sourceIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool ignoreHazardLatLngBounds,  bool showExpired,  bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? searchString,  List<String> categoryIds,  List<String> sourceIds,  List<String> locationIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool ignoreHazardLatLngBounds,  bool showExpired,  bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)  $default,) {final _that = this;
 switch (_that) {
 case _HazardSearchParams():
-return $default(_that.searchString,_that.categoryIds,_that.sourceIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.ignoreHazardLatLngBounds,_that.showExpired,_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.sortSettings,_that.page,_that.pageSize);case _:
+return $default(_that.searchString,_that.categoryIds,_that.sourceIds,_that.locationIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.ignoreHazardLatLngBounds,_that.showExpired,_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.sortSettings,_that.page,_that.pageSize);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -233,10 +235,10 @@ return $default(_that.searchString,_that.categoryIds,_that.sourceIds,_that.repor
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? searchString,  List<String> categoryIds,  List<String> sourceIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool ignoreHazardLatLngBounds,  bool showExpired,  bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? searchString,  List<String> categoryIds,  List<String> sourceIds,  List<String> locationIds,  String? reportedById,  HazardReviewStatus reviewStatus,  double? northeastLat,  double? northeastLng,  double? southwestLat,  double? southwestLng,  bool ignoreHazardLatLngBounds,  bool showExpired,  bool awsEmergency,  bool awsWatchAndAct,  bool awsAdvice,  bool officialNonAws,  bool userReported,  List<Map<SortCategory, SortOrder>> sortSettings,  int page,  int pageSize)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardSearchParams() when $default != null:
-return $default(_that.searchString,_that.categoryIds,_that.sourceIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.ignoreHazardLatLngBounds,_that.showExpired,_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.sortSettings,_that.page,_that.pageSize);case _:
+return $default(_that.searchString,_that.categoryIds,_that.sourceIds,_that.locationIds,_that.reportedById,_that.reviewStatus,_that.northeastLat,_that.northeastLng,_that.southwestLat,_that.southwestLng,_that.ignoreHazardLatLngBounds,_that.showExpired,_that.awsEmergency,_that.awsWatchAndAct,_that.awsAdvice,_that.officialNonAws,_that.userReported,_that.sortSettings,_that.page,_that.pageSize);case _:
   return null;
 
 }
@@ -248,7 +250,7 @@ return $default(_that.searchString,_that.categoryIds,_that.sourceIds,_that.repor
 @JsonSerializable()
 
 class _HazardSearchParams implements HazardSearchParams {
-  const _HazardSearchParams({this.searchString, final  List<String> categoryIds = const <String>[], final  List<String> sourceIds = const <String>[], this.reportedById, this.reviewStatus = HazardReviewStatus.accepted, this.northeastLat, this.northeastLng, this.southwestLat, this.southwestLng, this.ignoreHazardLatLngBounds = false, this.showExpired = false, this.awsEmergency = true, this.awsWatchAndAct = true, this.awsAdvice = true, this.officialNonAws = true, this.userReported = true, final  List<Map<SortCategory, SortOrder>> sortSettings = const <Map<SortCategory, SortOrder>>[{SortCategory.severityBand : SortOrder.desc}, {SortCategory.distance : SortOrder.asc}, {SortCategory.createdAt : SortOrder.desc}, {SortCategory.confidenceScore : SortOrder.desc}], this.page = 1, this.pageSize = 20}): _categoryIds = categoryIds,_sourceIds = sourceIds,_sortSettings = sortSettings;
+  const _HazardSearchParams({this.searchString, final  List<String> categoryIds = const <String>[], final  List<String> sourceIds = const <String>[], final  List<String> locationIds = const <String>[], this.reportedById, this.reviewStatus = HazardReviewStatus.accepted, this.northeastLat, this.northeastLng, this.southwestLat, this.southwestLng, this.ignoreHazardLatLngBounds = false, this.showExpired = false, this.awsEmergency = true, this.awsWatchAndAct = true, this.awsAdvice = true, this.officialNonAws = true, this.userReported = true, final  List<Map<SortCategory, SortOrder>> sortSettings = const <Map<SortCategory, SortOrder>>[{SortCategory.severityBand : SortOrder.desc}, {SortCategory.distance : SortOrder.asc}, {SortCategory.createdAt : SortOrder.desc}, {SortCategory.confidenceScore : SortOrder.desc}], this.page = 1, this.pageSize = 20}): _categoryIds = categoryIds,_sourceIds = sourceIds,_locationIds = locationIds,_sortSettings = sortSettings;
   factory _HazardSearchParams.fromJson(Map<String, dynamic> json) => _$HazardSearchParamsFromJson(json);
 
 /// The search string to filter hazards by their title or description.
@@ -269,6 +271,15 @@ class _HazardSearchParams implements HazardSearchParams {
   if (_sourceIds is EqualUnmodifiableListView) return _sourceIds;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_sourceIds);
+}
+
+/// The list of location subscription IDs to filter hazards.
+ final  List<String> _locationIds;
+/// The list of location subscription IDs to filter hazards.
+@override@JsonKey() List<String> get locationIds {
+  if (_locationIds is EqualUnmodifiableListView) return _locationIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_locationIds);
 }
 
 /// The id of the user who reported the hazard to filter hazards.
@@ -326,16 +337,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other._categoryIds, _categoryIds)&&const DeepCollectionEquality().equals(other._sourceIds, _sourceIds)&&(identical(other.reportedById, reportedById) || other.reportedById == reportedById)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.ignoreHazardLatLngBounds, ignoreHazardLatLngBounds) || other.ignoreHazardLatLngBounds == ignoreHazardLatLngBounds)&&(identical(other.showExpired, showExpired) || other.showExpired == showExpired)&&(identical(other.awsEmergency, awsEmergency) || other.awsEmergency == awsEmergency)&&(identical(other.awsWatchAndAct, awsWatchAndAct) || other.awsWatchAndAct == awsWatchAndAct)&&(identical(other.awsAdvice, awsAdvice) || other.awsAdvice == awsAdvice)&&(identical(other.officialNonAws, officialNonAws) || other.officialNonAws == officialNonAws)&&(identical(other.userReported, userReported) || other.userReported == userReported)&&const DeepCollectionEquality().equals(other._sortSettings, _sortSettings)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardSearchParams&&(identical(other.searchString, searchString) || other.searchString == searchString)&&const DeepCollectionEquality().equals(other._categoryIds, _categoryIds)&&const DeepCollectionEquality().equals(other._sourceIds, _sourceIds)&&const DeepCollectionEquality().equals(other._locationIds, _locationIds)&&(identical(other.reportedById, reportedById) || other.reportedById == reportedById)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.northeastLat, northeastLat) || other.northeastLat == northeastLat)&&(identical(other.northeastLng, northeastLng) || other.northeastLng == northeastLng)&&(identical(other.southwestLat, southwestLat) || other.southwestLat == southwestLat)&&(identical(other.southwestLng, southwestLng) || other.southwestLng == southwestLng)&&(identical(other.ignoreHazardLatLngBounds, ignoreHazardLatLngBounds) || other.ignoreHazardLatLngBounds == ignoreHazardLatLngBounds)&&(identical(other.showExpired, showExpired) || other.showExpired == showExpired)&&(identical(other.awsEmergency, awsEmergency) || other.awsEmergency == awsEmergency)&&(identical(other.awsWatchAndAct, awsWatchAndAct) || other.awsWatchAndAct == awsWatchAndAct)&&(identical(other.awsAdvice, awsAdvice) || other.awsAdvice == awsAdvice)&&(identical(other.officialNonAws, officialNonAws) || other.officialNonAws == officialNonAws)&&(identical(other.userReported, userReported) || other.userReported == userReported)&&const DeepCollectionEquality().equals(other._sortSettings, _sortSettings)&&(identical(other.page, page) || other.page == page)&&(identical(other.pageSize, pageSize) || other.pageSize == pageSize));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,searchString,const DeepCollectionEquality().hash(_categoryIds),const DeepCollectionEquality().hash(_sourceIds),reportedById,reviewStatus,northeastLat,northeastLng,southwestLat,southwestLng,ignoreHazardLatLngBounds,showExpired,awsEmergency,awsWatchAndAct,awsAdvice,officialNonAws,userReported,const DeepCollectionEquality().hash(_sortSettings),page,pageSize]);
+int get hashCode => Object.hashAll([runtimeType,searchString,const DeepCollectionEquality().hash(_categoryIds),const DeepCollectionEquality().hash(_sourceIds),const DeepCollectionEquality().hash(_locationIds),reportedById,reviewStatus,northeastLat,northeastLng,southwestLat,southwestLng,ignoreHazardLatLngBounds,showExpired,awsEmergency,awsWatchAndAct,awsAdvice,officialNonAws,userReported,const DeepCollectionEquality().hash(_sortSettings),page,pageSize]);
 
 @override
 String toString() {
-  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, sourceIds: $sourceIds, reportedById: $reportedById, reviewStatus: $reviewStatus, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, ignoreHazardLatLngBounds: $ignoreHazardLatLngBounds, showExpired: $showExpired, awsEmergency: $awsEmergency, awsWatchAndAct: $awsWatchAndAct, awsAdvice: $awsAdvice, officialNonAws: $officialNonAws, userReported: $userReported, sortSettings: $sortSettings, page: $page, pageSize: $pageSize)';
+  return 'HazardSearchParams(searchString: $searchString, categoryIds: $categoryIds, sourceIds: $sourceIds, locationIds: $locationIds, reportedById: $reportedById, reviewStatus: $reviewStatus, northeastLat: $northeastLat, northeastLng: $northeastLng, southwestLat: $southwestLat, southwestLng: $southwestLng, ignoreHazardLatLngBounds: $ignoreHazardLatLngBounds, showExpired: $showExpired, awsEmergency: $awsEmergency, awsWatchAndAct: $awsWatchAndAct, awsAdvice: $awsAdvice, officialNonAws: $officialNonAws, userReported: $userReported, sortSettings: $sortSettings, page: $page, pageSize: $pageSize)';
 }
 
 
@@ -346,7 +357,7 @@ abstract mixin class _$HazardSearchParamsCopyWith<$Res> implements $HazardSearch
   factory _$HazardSearchParamsCopyWith(_HazardSearchParams value, $Res Function(_HazardSearchParams) _then) = __$HazardSearchParamsCopyWithImpl;
 @override @useResult
 $Res call({
- String? searchString, List<String> categoryIds, List<String> sourceIds, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool ignoreHazardLatLngBounds, bool showExpired, bool awsEmergency, bool awsWatchAndAct, bool awsAdvice, bool officialNonAws, bool userReported, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
+ String? searchString, List<String> categoryIds, List<String> sourceIds, List<String> locationIds, String? reportedById, HazardReviewStatus reviewStatus, double? northeastLat, double? northeastLng, double? southwestLat, double? southwestLng, bool ignoreHazardLatLngBounds, bool showExpired, bool awsEmergency, bool awsWatchAndAct, bool awsAdvice, bool officialNonAws, bool userReported, List<Map<SortCategory, SortOrder>> sortSettings, int page, int pageSize
 });
 
 
@@ -363,11 +374,12 @@ class __$HazardSearchParamsCopyWithImpl<$Res>
 
 /// Create a copy of HazardSearchParams
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? sourceIds = null,Object? reportedById = freezed,Object? reviewStatus = null,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? ignoreHazardLatLngBounds = null,Object? showExpired = null,Object? awsEmergency = null,Object? awsWatchAndAct = null,Object? awsAdvice = null,Object? officialNonAws = null,Object? userReported = null,Object? sortSettings = null,Object? page = null,Object? pageSize = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? searchString = freezed,Object? categoryIds = null,Object? sourceIds = null,Object? locationIds = null,Object? reportedById = freezed,Object? reviewStatus = null,Object? northeastLat = freezed,Object? northeastLng = freezed,Object? southwestLat = freezed,Object? southwestLng = freezed,Object? ignoreHazardLatLngBounds = null,Object? showExpired = null,Object? awsEmergency = null,Object? awsWatchAndAct = null,Object? awsAdvice = null,Object? officialNonAws = null,Object? userReported = null,Object? sortSettings = null,Object? page = null,Object? pageSize = null,}) {
   return _then(_HazardSearchParams(
 searchString: freezed == searchString ? _self.searchString : searchString // ignore: cast_nullable_to_non_nullable
 as String?,categoryIds: null == categoryIds ? _self._categoryIds : categoryIds // ignore: cast_nullable_to_non_nullable
 as List<String>,sourceIds: null == sourceIds ? _self._sourceIds : sourceIds // ignore: cast_nullable_to_non_nullable
+as List<String>,locationIds: null == locationIds ? _self._locationIds : locationIds // ignore: cast_nullable_to_non_nullable
 as List<String>,reportedById: freezed == reportedById ? _self.reportedById : reportedById // ignore: cast_nullable_to_non_nullable
 as String?,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
 as HazardReviewStatus,northeastLat: freezed == northeastLat ? _self.northeastLat : northeastLat // ignore: cast_nullable_to_non_nullable
