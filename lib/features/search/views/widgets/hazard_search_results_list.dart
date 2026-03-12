@@ -45,32 +45,34 @@ class _HazardSearchResultsListState
   }
 
   Widget _emptyBuilder() {
-    return SliverFillRemaining(
-      child: Consumer(
-        builder: (context, ref, child) {
-          final isSearchActive = ref.watch(
-            providerOfPlacesForSearch.select(
-              (value) => value.searchString.isNotEmpty,
-            ),
+    return Consumer(
+      builder: (context, ref, child) {
+        final isSearchActive = ref.watch(
+          providerOfPlacesForSearch.select(
+            (value) => value.searchString.isNotEmpty,
+          ),
+        );
+
+        if (!isSearchActive) {
+          return SliverToBoxAdapter(
+            child: HazardSearchSubscribedLocationsList(),
           );
+        }
 
-          if (!isSearchActive) {
-            return HazardSearchSubscribedLocationsList();
-          }
+        final selectedLocation = ref.watch(
+          providerOfMainSearch.select(
+            (value) => value.searchedLocation,
+          ),
+        );
 
-          final selectedLocation = ref.watch(
-            providerOfMainSearch.select(
-              (value) => value.searchedLocation,
-            ),
-          );
+        final isSubscribed = ref.watch(
+          providerOfMainSearch.select(
+            (value) => value.subscriptionId != null,
+          ),
+        );
 
-          final isSubscribed = ref.watch(
-            providerOfMainSearch.select(
-              (value) => value.subscriptionId != null,
-            ),
-          );
-
-          return Column(
+        return SliverFillRemaining(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 10.spMin,
             children: [
@@ -110,9 +112,9 @@ class _HazardSearchResultsListState
               ),
               if (selectedLocation != null) _subscribeButtonBuilder(),
             ],
-          ).pad(20.0);
-        },
-      ),
+          ).pad(20.0),
+        );
+      },
     );
   }
 
