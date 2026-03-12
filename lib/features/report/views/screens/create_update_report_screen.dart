@@ -133,7 +133,7 @@ class _CreateUpdateReportScreenState
           );
           return reportSubmitted ? _submittedBuilder() : _formBuilder();
         },
-      ),
+      ).pB(20.0),
     ).keyboardDismisser(context);
   }
 

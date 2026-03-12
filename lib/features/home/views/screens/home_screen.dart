@@ -30,6 +30,7 @@ import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/views/screens/hazard_search_screen.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
+import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
@@ -110,19 +111,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     _listenToTheMessageRecievedFromThePushNotification();
 
     return Scaffold(
-      body: TabBarView(
-        controller: _tabController,
-        physics: const NeverScrollableScrollPhysics(),
+      body: Stack(
         children: [
-          const MapScreen(),
-          const HazardSearchScreen(),
-          const CreateUpdateReportScreen(),
-          const NotificationsScreen(),
-          const ProfileScreen(),
+          SafeArea(
+            top: false,
+            child: TabBarView(
+              controller: _tabController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                const MapScreen(),
+                const HazardSearchScreen(),
+                const CreateUpdateReportScreen(),
+                const NotificationsScreen(),
+                const ProfileScreen(),
+              ],
+            ).pB(HomeTabbar.height - 20.0),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: HomeTabbar(
+              tabController: _tabController,
+            ),
+          ),
         ],
-      ),
-      bottomNavigationBar: HomeTabbar(
-        tabController: _tabController,
       ),
     );
   }

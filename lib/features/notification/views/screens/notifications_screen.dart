@@ -43,7 +43,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           SubscribedLocationsFiltersList().sliverBox,
           10.hSizedBox.sliverBox,
           HazardNotificationsList(),
-          10.hSizedBox.sliverBox,
+          30.hSizedBox.sliverBox,
         ],
       ),
     ).keyboardDismisser(context);

@@ -13,7 +13,11 @@ class HomeTabbar extends ConsumerStatefulWidget {
     required this.tabController,
   });
 
+  /// The tab controller.
   final TabController tabController;
+
+  /// The height of the tabbar.
+  static const double height = 63.0;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _HomeTabbarState();
@@ -38,25 +42,29 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
         ],
       ),
       child: SafeArea(
-        child: TabBar(
-          controller: widget.tabController,
-          labelColor: AppColors.orange,
-          labelStyle: TextStyle(
-            fontSize: 12.spMin,
-            fontFamily: AppTheme.defaultFontFamily,
-            fontWeight: FontWeight.w600,
-          ),
-          unselectedLabelColor: AppColors.grey,
-          indicatorColor: Colors.transparent,
-          dividerColor: Colors.transparent,
-          dividerHeight: 0.0,
-          onTap: (index) => _onTabChanged(HomeTab.values[index]),
-          labelPadding: EdgeInsets.zero,
-          padding: EdgeInsets.symmetric(vertical: 5.spMin),
-          tabs: HomeTab.values
-              .map((tab) => Tab(icon: _tabBuilder(tab)))
-              .toList(),
-        ).pT(5.0),
+        top: false,
+        child: SizedBox(
+          height: HomeTabbar.height.spMin,
+          child: TabBar(
+            controller: widget.tabController,
+            labelColor: AppColors.orange,
+            labelStyle: TextStyle(
+              fontSize: 12.spMin,
+              fontFamily: AppTheme.defaultFontFamily,
+              fontWeight: FontWeight.w600,
+            ),
+            unselectedLabelColor: AppColors.grey,
+            indicatorColor: Colors.transparent,
+            dividerColor: Colors.transparent,
+            dividerHeight: 0.0,
+            onTap: (index) => _onTabChanged(HomeTab.values[index]),
+            labelPadding: EdgeInsets.zero,
+            padding: EdgeInsets.symmetric(vertical: 5.spMin),
+            tabs: HomeTab.values
+                .map((tab) => Tab(icon: _tabBuilder(tab)))
+                .toList(),
+          ).pT(5.0),
+        ),
       ),
     );
   }

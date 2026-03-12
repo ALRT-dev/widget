@@ -56,6 +56,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             myLocationButtonEnabled: false,
             compassEnabled: false,
             zoomControlsEnabled: false,
+            padding: EdgeInsets.only(bottom: 22.spMin, left: 8.spMin),
             buildingsEnabled: ref.watch(
               providerOfMap.select(
                 (value) => !(value.currentRoutePlan?.isNavigating ?? false),
@@ -118,11 +119,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     children: [
                       Positioned(
                         right: 15.spMin,
-                        bottom: 10.spMin,
+                        bottom: 0.0,
                         child: _mapActionButtons(),
                       ),
                       Positioned(
-                        bottom: 10.spMin,
+                        bottom: 0.0,
                         left: 0.0,
                         right: 0.0,
                         child: _viewListButtonBuilder(),
@@ -138,7 +139,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ),
                     );
                     if (isRoutePresent) {
-                      return RoutePlanning().pB(20.0);
+                      return RoutePlanning().pT(10.0);
                     }
 
                     final isSelectedLocationPresent = ref.watch(
@@ -147,7 +148,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ),
                     );
                     if (isSelectedLocationPresent) {
-                      return SelectedLocationPreview().pB(20.0);
+                      return SelectedLocationPreview().pT(10.0);
                     }
 
                     return const SizedBox();
@@ -157,7 +158,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
           ),
         ],
-      ),
+      ).pB(30.0),
     );
   }
 

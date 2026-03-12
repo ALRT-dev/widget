@@ -56,7 +56,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   _buildAccountSettingsSection(),
                   30.spMin.hSizedBox,
                   _buildLogoutSection(),
-                  10.spMin.hSizedBox,
+                  30.spMin.hSizedBox,
                 ],
               ),
             ),

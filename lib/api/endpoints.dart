@@ -1,5 +1,5 @@
-const kUrlBase = 'https://api.safetyalrt.com';
-// const kUrlBase = 'http://192.168.1.67:9000';
+// const kUrlBase = 'https://api.safetyalrt.com';
+const kUrlBase = 'http://192.168.1.67:9000';
 const kUrlBaseDev = 'http://192.168.1.67:9000';
 
 const kUrlApi = '/api';
