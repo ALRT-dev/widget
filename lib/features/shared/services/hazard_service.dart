@@ -296,6 +296,9 @@ class HazardService {
           parentCategoryId: category.parentId,
           severityBand: severityBand,
           isAwsCompliant: false,
+          size: category.id == 'powerOutage'
+              ? const Size(32, 32)
+              : const Size(40, 40),
         ).then((bitmap) => {keyNonAws: bitmap});
         futures.add(futureNonAws);
       }

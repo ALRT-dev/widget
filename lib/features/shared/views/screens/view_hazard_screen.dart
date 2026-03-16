@@ -995,7 +995,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         return Container(
           decoration: BoxDecoration(
             color: AppColors.white,
-            borderRadius: BorderRadius.circular(12.spMin),
+            borderRadius: BorderRadius.circular(16.spMin),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadowColorLight,
@@ -1007,7 +1007,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(12.spMin),
+              borderRadius: BorderRadius.circular(16.spMin),
               border: Border(
                 left: BorderSide(
                   color: color,
@@ -1110,7 +1110,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         return Container(
           decoration: BoxDecoration(
             color: AppColors.blue.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(12.spMin),
+            borderRadius: BorderRadius.circular(16.spMin),
             border: Border(
               left: BorderSide(
                 color: AppColors.blue,
@@ -1195,7 +1195,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         return Container(
           decoration: BoxDecoration(
             color: AppColors.white,
-            borderRadius: BorderRadius.circular(12.spMin),
+            borderRadius: BorderRadius.circular(16.spMin),
             boxShadow: [
               BoxShadow(
                 color: AppColors.shadowColorLight,
@@ -1207,7 +1207,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(12.spMin),
+              borderRadius: BorderRadius.circular(16.spMin),
               border: Border(
                 left: BorderSide(
                   color: color,
