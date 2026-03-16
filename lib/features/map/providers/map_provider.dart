@@ -231,6 +231,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     final requestedBounds = visibleBounds;
 
+    final stopwatch = Stopwatch()..start();
     final result = await _hazardService.getAllHazards(
       cancelToken: state.getMapHazardsCancelToken,
       searchParams: HazardSearchParams(
@@ -279,15 +280,19 @@ class MapProvider extends StateNotifier<MapProviderState> {
               _matchesFilters(hazard, currentFilterState) &&
               !responseIds.contains(id),
         );
+        updateHazardCache(updatedCache);
 
         final visibleHazards = _getHazardsInBounds(
           requestedBounds,
           currentFilterState,
         );
 
+        log(
+          'getAllHazards time: ${stopwatch.elapsedMilliseconds / 1000} seconds, fetched hazards: ${hazards.length}, visibleHazards: ${visibleHazards.length}',
+        );
+
         state = state.copyWith(
           getMapHazardsState: GetMapHazardsState.success(hazards),
-          hazardCache: updatedCache,
           hazards: visibleHazards,
         );
 
@@ -1045,12 +1050,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final updatedHazards = state.hazards
         .where((hazard) => hazard.id != hazardId)
         .toList();
-    final updatedCache = Map<String, Hazard>.from(state.hazardCache)
-      ..remove(hazardId);
-    state = state.copyWith(
-      hazards: updatedHazards,
-      hazardCache: updatedCache,
-    );
+    final updatedCache = Map<String, Hazard>.from(
+      state.hazardCache,
+    )..remove(hazardId);
+    updateHazards(updatedHazards);
+    updateHazardCache(updatedCache);
 
     // If the removed hazard was the selected one, clear selection
     if (state.selectedHazard?.id == hazardId) {
@@ -1059,6 +1063,13 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     // Regenerate markers after removal
     generateMarkers();
+  }
+
+  /// Updates the [MapProviderState.hazardCache] to the given [hazardCache].
+  void updateHazardCache(final Map<String, Hazard> hazardCache) {
+    state = state.copyWith(
+      hazardCache: hazardCache,
+    );
   }
 
   /// Updates [MapProviderState.selectedHazard] to the given [hazard].
