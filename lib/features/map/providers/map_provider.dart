@@ -68,6 +68,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
   StreamSubscription? _positionStreamSubscription;
   int _hazardRequestId = 0;
 
+  /// The page size for fetching hazards.
+  int get _pageSize => 5000;
+
   void _onInit() {
     final currentUserLocation = _ref.read(providerOfLocation).location;
     updateCameraPosition(
@@ -129,9 +132,16 @@ class MapProvider extends StateNotifier<MapProviderState> {
     HazardFiltersProviderState filters,
   ) {
     // Category filter
+    final categoryId = hazard.categoryId;
+    final parentCategoryId = hazard.category?.parentId;
+    final isCategorySelected =
+        categoryId != null && filters.selectedCategoryIds.contains(categoryId);
+    final isParentCategorySelected =
+        parentCategoryId != null &&
+        filters.selectedCategoryIds.contains(parentCategoryId);
     if (filters.selectedCategoryIds.isNotEmpty &&
-        hazard.categoryId != null &&
-        !filters.selectedCategoryIds.contains(hazard.categoryId)) {
+        !isCategorySelected &&
+        !isParentCategorySelected) {
       return false;
     }
 
@@ -239,7 +249,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
           {SortCategory.severityBand: SortOrder.desc},
           {SortCategory.createdAt: SortOrder.desc},
         ],
-        pageSize: 20,
+        pageSize: _pageSize,
       ),
     );
     if (!mounted) return;
@@ -375,7 +385,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
           {SortCategory.severityBand: SortOrder.desc},
           {SortCategory.createdAt: SortOrder.desc},
         ],
-        pageSize: 20,
+        pageSize: _pageSize,
       ),
     );
 
