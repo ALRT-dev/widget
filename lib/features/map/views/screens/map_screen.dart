@@ -301,7 +301,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     EasyDebounce.debounce(
       'map-debouncer',
-      const Duration(milliseconds: 100),
+      const Duration(milliseconds: 300),
       () {
         if (!mounted) return;
 

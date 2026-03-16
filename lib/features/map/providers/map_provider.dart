@@ -23,11 +23,13 @@ import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/states/hazard_filters_provider_state.dart';
 import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
@@ -64,6 +66,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
   StreamSubscription<double>? _headingStreamSubscription;
   StreamSubscription? _positionStreamSubscription;
+  int _hazardRequestId = 0;
 
   void _onInit() {
     final currentUserLocation = _ref.read(providerOfLocation).location;
@@ -110,12 +113,58 @@ class MapProvider extends StateNotifier<MapProviderState> {
     }
   }
 
-  /// Fetches hazards for the map and updates the state accordingly.
-  Future<void> getMapHazards() async {
-    state = state.copyWith(
-      getMapHazardsState: const GetMapHazardsState.loading(),
-    );
+  bool _isInBounds(Hazard hazard, LatLngBounds bounds) {
+    final lat = hazard.latitude;
+    final lng = hazard.longitude;
+    if (lat == null || lng == null) return false;
+    return lat >= bounds.southwest.latitude &&
+        lat <= bounds.northeast.latitude &&
+        lng >= bounds.southwest.longitude &&
+        lng <= bounds.northeast.longitude;
+  }
 
+  /// Returns true if [hazard] passes the given source/category filters.
+  bool _matchesFilters(
+    Hazard hazard,
+    HazardFiltersProviderState filters,
+  ) {
+    // Category filter
+    if (filters.selectedCategoryIds.isNotEmpty &&
+        hazard.categoryId != null &&
+        !filters.selectedCategoryIds.contains(hazard.categoryId)) {
+      return false;
+    }
+
+    // Source-type filters
+    if (hazard.isUserReported) return filters.userReported;
+
+    if (hazard.isAwsCompliant == true) {
+      return switch (hazard.severityBand) {
+        HazardSeverityBand.critical => filters.awsEmergency,
+        HazardSeverityBand.action => filters.awsWatchAndAct,
+        _ => filters.awsAdvice,
+      };
+    }
+
+    return filters.officialNonAws;
+  }
+
+  List<Hazard> _getHazardsInBounds(
+    LatLngBounds bounds,
+    HazardFiltersProviderState filters,
+  ) {
+    return state.hazardCache.values
+        .where((h) => _isInBounds(h, bounds) && _matchesFilters(h, filters))
+        .toList();
+  }
+
+  /// Fetches hazards for the map and updates the state accordingly.
+  ///
+  /// 1. Immediately renders cached hazards (filtered) within the visible bounds.
+  /// 2. Calls the API in the background (no loading indicator).
+  /// 3. On response, reconciles the cache for the requested bounds
+  ///    and refreshes visible markers.
+  Future<void> getMapHazards() async {
     final visibleBoundsResult = await _mapService.getVisibleRegion();
     if (!mounted) return;
 
@@ -133,25 +182,44 @@ class MapProvider extends StateNotifier<MapProviderState> {
       return;
     }
 
-    final selectedCategoryIds = _ref
-        .read(providerOfHazardFiltersForMap)
-        .selectedCategoryIds
-        .toList();
-    final awsEmergency = _ref.read(providerOfHazardFiltersForMap).awsEmergency;
-    final awsWatchAndAct = _ref
-        .read(providerOfHazardFiltersForMap)
-        .awsWatchAndAct;
-    final awsAdvice = _ref.read(providerOfHazardFiltersForMap).awsAdvice;
-    final officialNonAws = _ref
-        .read(providerOfHazardFiltersForMap)
-        .officialNonAws;
-    final userReported = _ref.read(providerOfHazardFiltersForMap).userReported;
+    final currentFilterState = _ref.read(providerOfHazardFiltersForMap);
 
-    // cancel the old requests before making new requests
+    // Immediately show cached hazards that match the current filters
+    final cachedVisible = _getHazardsInBounds(
+      visibleBounds,
+      currentFilterState,
+    );
+    state = state.copyWith(hazards: cachedVisible);
+    if (cachedVisible.isEmpty) {
+      removeAllHazardMarkers();
+    } else {
+      generateMarkers();
+    }
+
+    // Show loading state only on the very first fetch (empty cache)
+    if (state.hazardCache.isEmpty) {
+      state = state.copyWith(
+        getMapHazardsState: const GetMapHazardsState.loading(),
+      );
+    }
+
+    // Stale request protection
+    final currentRequestId = ++_hazardRequestId;
+
+    final selectedCategoryIds = currentFilterState.selectedCategoryIds.toList();
+    final awsEmergency = currentFilterState.awsEmergency;
+    final awsWatchAndAct = currentFilterState.awsWatchAndAct;
+    final awsAdvice = currentFilterState.awsAdvice;
+    final officialNonAws = currentFilterState.officialNonAws;
+    final userReported = currentFilterState.userReported;
+
+    // Cancel the old requests before making new requests
     if (state.getMapHazardsCancelToken.requestOptions != null) {
       state.getMapHazardsCancelToken.cancel();
       state = state.copyWith(getMapHazardsCancelToken: CancelToken());
     }
+
+    final requestedBounds = visibleBounds;
 
     final result = await _hazardService.getAllHazards(
       cancelToken: state.getMapHazardsCancelToken,
@@ -162,10 +230,10 @@ class MapProvider extends StateNotifier<MapProviderState> {
         awsAdvice: awsAdvice,
         officialNonAws: officialNonAws,
         userReported: userReported,
-        northeastLat: visibleBounds.northeast.latitude,
-        northeastLng: visibleBounds.northeast.longitude,
-        southwestLat: visibleBounds.southwest.latitude,
-        southwestLng: visibleBounds.southwest.longitude,
+        northeastLat: requestedBounds.northeast.latitude,
+        northeastLng: requestedBounds.northeast.longitude,
+        southwestLat: requestedBounds.southwest.latitude,
+        southwestLng: requestedBounds.southwest.longitude,
         ignoreHazardLatLngBounds: true,
         sortSettings: [
           {SortCategory.severityBand: SortOrder.desc},
@@ -176,28 +244,57 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
     if (!mounted) return;
 
+    // Discard stale responses
+    if (currentRequestId != _hazardRequestId) return;
+
     result.when(
       (hazards) {
-        state = state.copyWith(
-          getMapHazardsState: GetMapHazardsState.success(hazards),
-          hazards: hazards,
+        // Reconcile cache: start from existing cache
+        final updatedCache = Map<String, Hazard>.from(state.hazardCache);
+
+        // Build a set of IDs from the API response for fast lookup
+        final responseIds = <String>{};
+        for (final hazard in hazards) {
+          if (hazard.id == null) continue;
+          responseIds.add(hazard.id!);
+          updatedCache[hazard.id!] = hazard;
+        }
+
+        // Only remove in-bounds hazards that match the current filters
+        // but are missing from the API response. Hazards that don't match
+        // the active filters stay in cache for other filter states.
+        updatedCache.removeWhere(
+          (id, hazard) =>
+              _isInBounds(hazard, requestedBounds) &&
+              _matchesFilters(hazard, currentFilterState) &&
+              !responseIds.contains(id),
         );
 
-        final selectedHazard = hazards.firstWhereOrNull(
+        final visibleHazards = _getHazardsInBounds(
+          requestedBounds,
+          currentFilterState,
+        );
+
+        state = state.copyWith(
+          getMapHazardsState: GetMapHazardsState.success(hazards),
+          hazardCache: updatedCache,
+          hazards: visibleHazards,
+        );
+
+        final selectedHazard = visibleHazards.firstWhereOrNull(
           (hazard) => hazard.id == state.selectedHazard?.id,
         );
         if (selectedHazard != null) {
           updateSelectedHazard(selectedHazard);
         }
 
-        // Update all the hazards in the hazard item providers
         for (final hazard in hazards) {
           if (hazard.id == null) continue;
           final hazardItemProvider = providerOfHazardItem(hazard.id!);
           _ref.read(hazardItemProvider.notifier).updateHazard(hazard);
         }
 
-        if (hazards.isEmpty) {
+        if (visibleHazards.isEmpty) {
           removeAllHazardMarkers();
         } else {
           generateMarkers();
@@ -933,12 +1030,17 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
-  /// Removes a hazard by its [hazardId] from the state.
+  /// Removes a hazard by its [hazardId] from the state and cache.
   void removeFromHazards(final String hazardId) {
     final updatedHazards = state.hazards
         .where((hazard) => hazard.id != hazardId)
         .toList();
-    updateHazards(updatedHazards);
+    final updatedCache = Map<String, Hazard>.from(state.hazardCache)
+      ..remove(hazardId);
+    state = state.copyWith(
+      hazards: updatedHazards,
+      hazardCache: updatedCache,
+    );
 
     // If the removed hazard was the selected one, clear selection
     if (state.selectedHazard?.id == hazardId) {
