@@ -48,7 +48,7 @@ platform :ios do
 
   desc "Deploy the PROD application to TestFlight"
   lane :beta_release do
-    sh 'fvm flutter build ipa --flavor prod -t lib/main_prod.dart'
+    sh 'flutter build ipa --flavor prod -t lib/main_prod.dart'
     upload_to_testflight(
       changelog: my_release_note,
       ipa: "../build/ios/ipa/ALRT.ipa"
