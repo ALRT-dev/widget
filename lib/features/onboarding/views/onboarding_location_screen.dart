@@ -9,7 +9,6 @@ import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart'
 import 'package:hazard_app/features/onboarding/providers/onboarding_provider.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/gradient_button.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/progress_bar.dart';
-import 'package:hazard_app/features/onboarding/views/widgets/logo.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/confirmation_popup.dart';
 import 'package:hazard_app/features/onboarding/views/widgets/manual_location_popup.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -139,6 +138,7 @@ class _OnboardingLocationScreenState
 
     return Scaffold(
       body: Container(
+        height: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -192,12 +192,31 @@ class _OnboardingLocationScreenState
           padding: EdgeInsets.all(20.spMin),
           child: Column(
             children: [
-              const Logo(),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => context.pop(),
+                    child: Container(
+                      width: 40.spMin,
+                      height: 40.spMin,
+                      decoration: BoxDecoration(
+                        color: AppColors.extraLightGrey,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.arrow_back_ios_new,
+                        size: 18.spMin,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               24.hSizedBox,
               ProgressBar(
-                currentStep: 1,
-                totalSteps: 5,
-                label: 'Step 1 of 5',
+                currentStep: 3,
+                totalSteps: OnboardingStep.values.length - 1,
+                label: 'Step 3 of ${OnboardingStep.values.length - 1}',
               ),
               40.hSizedBox,
               _buildHeaderSection(),
@@ -489,7 +508,7 @@ class _OnboardingLocationScreenState
               ),
               24.hSizedBox,
               Text(
-                'We can\'t access your location',
+                'Location Permission Request',
                 style: TextStyle(
                   fontSize: 20.spMin,
                   fontWeight: FontWeight.w600,
@@ -499,7 +518,7 @@ class _OnboardingLocationScreenState
               ),
               12.hSizedBox,
               Text(
-                'To post alerts or get local updates, allow location access in your phone settings.',
+                'We need your location to provide you with the most relevant alerts and updates.',
                 style: TextStyle(
                   fontSize: 16.spMin,
                   color: AppColors.grey,
@@ -547,8 +566,8 @@ class _OnboardingLocationScreenState
               ),
               24.hSizedBox,
               _buildIconButton(
-                title: "Open Device Settings",
-                icon: Icons.settings,
+                title: "Yes, allow location access",
+                icon: Icons.location_on,
                 onPressed: () async {
                   await ref
                       .read(providerOfOnboarding.notifier)
@@ -561,7 +580,7 @@ class _OnboardingLocationScreenState
               ),
               12.hSizedBox,
               _buildIconButton(
-                title: "Search by Suburb",
+                title: "No, I'll search by suburb",
                 icon: Icons.search,
                 onPressed: () {
                   setState(() {
@@ -720,7 +739,7 @@ class _OnboardingLocationScreenState
       _showConfirmation = false;
     });
 
-    context.push(OnboardingStep.location.nextStep.route);
+    // context.push(OnboardingStep.location.nextStep.route);
   }
 
   void _onNext() async {

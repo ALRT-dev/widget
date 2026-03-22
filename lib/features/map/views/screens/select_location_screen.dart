@@ -133,7 +133,7 @@ class _SelectLocationScreenState extends ConsumerState<SelectLocationScreen> {
         onChanged: _handleSearchChanged,
         autofocus: true,
         decoration: InputDecoration(
-          hintText: 'Search place, locality, area...',
+          hintText: 'Search the location...',
           contentPadding: EdgeInsets.only(
             top: 5.spMin,
             bottom: 5.spMin,

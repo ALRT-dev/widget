@@ -1,6 +1,14 @@
 import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 extension DateTimeExt on DateTime {
+  /// Returns a formatted string representation of the DateTime object.
+  ///
+  /// Eg. 5 minutes ago
+  String get timeAgo {
+    return timeago.format(this);
+  }
+
   /// Returns a formatted string representation of the DateTime object.
   ///
   /// Eg. 5th June 2023 at 5:30pm

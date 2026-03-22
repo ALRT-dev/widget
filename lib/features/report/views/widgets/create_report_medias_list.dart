@@ -6,6 +6,7 @@ import 'package:hazard_app/features/report/views/widgets/create_report_medias_li
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
+import 'package:hazard_app/features/shared/views/widgets/dotted_border_container.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class CreateReportMediasList extends ConsumerStatefulWidget {
@@ -47,19 +48,22 @@ class _CreateReportMediasListState
   }
 
   Widget _addButtonBuilder() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14.spMin),
-        border: Border.all(
-          color: AppColors.lightGrey,
+    return DottedBorderContainer(
+      borderColor: AppColors.lightGrey,
+      borderRadius: 14.spMin,
+      strokeWidth: 1.2,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(14.spMin),
         ),
-      ),
-      child: Icon(
-        Icons.add_rounded,
-        size: 30.spMin,
-        color: AppColors.black,
-      ),
-    ).onPressed(_pickMedias);
+        child: Icon(
+          Icons.add_rounded,
+          size: 30.spMin,
+          color: AppColors.grey.withValues(alpha: 0.8),
+        ),
+      ).onPressed(_pickMedias),
+    );
   }
 
   /// Handles the action of picking multiple media files when the add button is pressed.

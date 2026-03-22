@@ -4,7 +4,7 @@ platform :ios do
   require 'date'
 
   my_release_note = <<~NOTE
-    * Bug fixes and improvements.
+    * UI Updates
   NOTE
 
   desc "Automatically increment the version name and version code. Also prepare the changelogs and release note from git commits."
@@ -12,7 +12,7 @@ platform :ios do
     # Increment the version code and version name in pubspec.yaml
     pubspec_path = '../../pubspec.yaml'
     # version_name = increment_version_name(pubspec_path) # Eg. 1.0.0
-    version_name = "1.0.0"
+    version_name = "1.0.1"
     version_code = increment_version_code(pubspec_path) # Eg. 23
 
     # Generate 2 files: CHANGELOG.md and release_notes.txt from git commits
@@ -30,7 +30,7 @@ platform :ios do
     firebase_app_distribution(
       app: "1:841565771679:ios:9b500f20dcdaa31dde0faa",
       release_notes_file: '../release_note.txt',
-      ipa_path: "../build/ios/ipa/[Dev] Alrt.ipa",
+      ipa_path: "../build/ios/ipa/[Dev] ALRT.ipa",
       groups: 'alrt',
     )
   end
@@ -41,23 +41,17 @@ platform :ios do
     firebase_app_distribution(
       app: "1:841565771679:ios:45b8377b1d906f78de0faa",
       release_notes_file: '../release_note.txt',
-      ipa_path: "../build/ios/ipa/Alrt.ipa",
+      ipa_path: "../build/ios/ipa/ALRT.ipa",
       groups: 'alrt',
     )
   end
 
   desc "Deploy the PROD application to TestFlight"
   lane :beta_release do
-    # sh 'fvm flutter build ipa --flavor prod -t lib/main_prod.dart'
-    match(type: "appstore")
-    gym(
-      scheme: "prod",
-      export_method: "app-store",
-      output_directory: "./build",
-      output_name: "Runner"
-    )
+    sh 'flutter build ipa --flavor prod -t lib/main_prod.dart'
     upload_to_testflight(
-      changelog: my_release_note
+      changelog: my_release_note,
+      ipa: "../build/ios/ipa/ALRT.ipa"
     )
   end
 

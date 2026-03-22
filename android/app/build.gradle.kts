@@ -60,12 +60,12 @@ android {
     productFlavors {
         create("dev") {
             dimension = "default"
-            resValue("string", "app_name", "[Dev] Alrt")
+            resValue("string", "app_name", "[Dev] ALRT")
             applicationIdSuffix = ".dev"
         }
         create("prod") {
             dimension = "default"
-            resValue("string", "app_name", "Alrt")
+            resValue("string", "app_name", "ALRT")
             applicationIdSuffix = ""
         }
     }

@@ -13,6 +13,8 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/shared/utils/app_links.dart';
+import 'package:hazard_app/features/shared/utils/open_link.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_theme.dart';
@@ -59,7 +61,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       body: Stack(
         children: [
           _buildBackground(),
-          _buildAnimatedBlobs(),
+          // _buildAnimatedBlobs(),
           _buildContent(),
         ],
       ),
@@ -82,6 +84,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
   }
 
+  // ignore: unused_element
   Widget _buildAnimatedBlobs() {
     return AnimatedBuilder(
       animation: _backgroundAnimationController,
@@ -145,8 +148,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           tag: 'app_logo',
           child: Image.asset(
             'assets/logos/alrt_logo_detailed.png',
-            width: 250,
-            filterQuality: FilterQuality.high,
+            width: 300.spMin,
           ),
         ),
         Text(
@@ -426,25 +428,37 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           fontWeight: FontWeight.w500,
           fontFamily: AppTheme.defaultFontFamily,
         ),
-        children: <TextSpan>[
+        children: [
           TextSpan(
             text: '${'agree_to_tos_and_privacy_policy'.tr()}\n',
           ),
-          TextSpan(
-            text: 'terms_of_service'.tr(),
-            style: TextStyle(
-              color: AppColors.black,
-              decoration: TextDecoration.underline,
+          WidgetSpan(
+            child: GestureDetector(
+              onTap: () => _gotoTermsOfService(),
+              child: Text(
+                'terms_of_service'.tr(),
+                style: TextStyle(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w600,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
           ),
           TextSpan(
             text: ' ${'and'.tr()} ',
           ),
-          TextSpan(
-            text: 'privacy_policy'.tr(),
-            style: TextStyle(
-              color: AppColors.black,
-              decoration: TextDecoration.underline,
+          WidgetSpan(
+            child: GestureDetector(
+              onTap: () => _gotoPrivacyPolicy(),
+              child: Text(
+                'privacy_policy'.tr(),
+                style: TextStyle(
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w600,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
             ),
           ),
         ],
@@ -514,6 +528,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   /// Navigates to the app wrapper screen.
   void _gotoWrapper() {
     context.go(AppWrapper.route);
+  }
+
+  /// Navigates to the terms of service page.
+  void _gotoTermsOfService() {
+    openLink(
+      context: context,
+      link: AppLinks.termsOfUse,
+    );
+  }
+
+  /// Navigates to the privacy policy page.
+  void _gotoPrivacyPolicy() {
+    openLink(
+      context: context,
+      link: AppLinks.privacyPolicy,
+    );
   }
 }
 

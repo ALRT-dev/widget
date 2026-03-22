@@ -192,6 +192,33 @@ class ProfileProvider extends StateNotifier<ProfileProviderState> {
     );
   }
 
+  /// Deletes the current user's account.
+  Future<void> deleteAccount() async {
+    state = state.copyWith(
+      deleteAccountState: const DeleteAccountState.loading(),
+    );
+
+    final result = await _userService.deleteAccount();
+    if (!mounted) return;
+
+    await result.when(
+      (_) async {
+        // Clear local tokens after successful account deletion
+        await _authService.logout();
+        if (!mounted) return;
+
+        state = state.copyWith(
+          deleteAccountState: const DeleteAccountState.success(),
+        );
+      },
+      (error) async {
+        state = state.copyWith(
+          deleteAccountState: DeleteAccountState.error(error),
+        );
+      },
+    );
+  }
+
   /// Updates the [ProfileProviderState.profilePicture] with the given [profilePicture].
   void updateProfilePictureInTheState(final AlrtMedia? profilePicture) {
     state = state.copyWith(profilePicture: profilePicture);

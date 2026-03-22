@@ -72,7 +72,7 @@ class _HazardNotificationsListState
                   Text(
                     isSearchActive
                         ? 'No results found for your search. Please try changing it.'
-                        : 'There are no notifications at the moment. Please check back later.',
+                        : 'There are no alerts at the moment. Please check back later.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14.sp,

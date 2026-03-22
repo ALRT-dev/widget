@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/providers/states/notifications_feed_provider_state.dart';
-import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
@@ -56,17 +55,30 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
           ),
         );
         return SliverAppBar(
-          backgroundColor: context.theme.scaffoldBackgroundColor,
+          backgroundColor: AppColors.transparent,
           surfaceTintColor: AppColors.transparent,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.orange300,
+                  AppColors.red200,
+                ],
+              ),
+            ),
+          ),
           floating: true,
           pinned: true,
           leading: const SizedBox(),
-          leadingWidth: 0.0,
+          leadingWidth: 5.spMin,
           toolbarHeight: 50.spMin,
+          expandedHeight: 120.spMin,
+          centerTitle: false,
           title: Text(
             'ALRT Feed',
             style: TextStyle(
-              color: AppColors.black,
+              color: AppColors.white,
+              fontSize: 24.spMin,
             ),
           ),
           bottom: !isHazardsPresent && !isHazardsLoading && !hasFiltersSelected
@@ -86,12 +98,8 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
                           Expanded(child: _searchbarBuilder()),
                           _filtersButtonBuilder(),
                         ],
-                      ).pX(20.0),
-                      15.hSizedBox,
-                      Divider(
-                        height: 0.0,
-                        color: AppColors.lightGrey.withValues(alpha: 0.5),
-                      ),
+                      ).pX(18.0),
+                      13.hSizedBox,
                     ],
                   ),
                 ),
@@ -108,44 +116,66 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
             (value) => value.searchString.isNotEmpty,
           ),
         );
-        return TextFormField(
-          focusNode: _searchFocusNode,
-          controller: _searchController,
-          textInputAction: TextInputAction.search,
-          onChanged: _handleSearchChanged,
-          decoration: InputDecoration(
-            hintText: 'Search hazards around you...',
-            contentPadding: EdgeInsets.only(
-              top: 5.spMin,
-              bottom: 5.spMin,
-              left: 20.spMin,
-              right: 10.spMin,
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(14.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0, 2.0),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.symmetric(vertical: 1.spMin),
+          child: TextFormField(
+            focusNode: _searchFocusNode,
+            controller: _searchController,
+            textInputAction: TextInputAction.search,
+            textAlignVertical: TextAlignVertical.center,
+            onChanged: _handleSearchChanged,
+            decoration: InputDecoration(
+              hintText: 'Search alerts around you...',
+              contentPadding: EdgeInsets.only(
+                top: 5.spMin,
+                bottom: 5.spMin,
+                left: 20.spMin,
+                right: 10.spMin,
+              ),
+              hintStyle: TextStyle(
+                color: AppColors.grey.withValues(alpha: 0.7),
+              ),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              prefixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SvgPicture.asset(
+                    'assets/icons/search.svg',
+                    width: 25.spMin,
+                    height: 25.spMin,
+                    color: AppColors.grey.withValues(alpha: 0.6),
+                  ).pL(15.0),
+                ],
+              ),
+              suffixIcon: !isSearchActive
+                  ? null
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: _handleClearSearchPressed,
+                          icon: Icon(
+                            Icons.close_rounded,
+                            size: 20.spMin,
+                            color: AppColors.black,
+                          ),
+                        ).pR(5.0),
+                      ],
+                    ),
             ),
-            prefixIcon: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(
-                  'assets/icons/search.svg',
-                  width: 25.spMin,
-                  height: 25.spMin,
-                ).pL(15.0),
-              ],
-            ),
-            suffixIcon: !isSearchActive
-                ? null
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        onPressed: _handleClearSearchPressed,
-                        icon: Icon(
-                          Icons.close_rounded,
-                          size: 20.spMin,
-                          color: AppColors.black,
-                        ),
-                      ).pR(5.0),
-                    ],
-                  ),
           ),
         );
       },
@@ -157,6 +187,7 @@ class _NotificationsAppBarState extends ConsumerState<NotificationsAppBar> {
       filtersKey: NotificationsAppBar.filtersKey,
       onFiltersUpdated: () => _getHazards(),
       buttonShadow: [],
+      useTransparentStyle: true,
     ).pL(10.0);
   }
 

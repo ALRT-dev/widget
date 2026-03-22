@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hazard_app/features/shared/providers/app_info_provider.dart';
 import 'package:hazard_app/features/shared/providers/base_url_provider.dart';
+import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/firebase_options.dart';
 import 'package:hazard_app/others/app.dart';
 import 'package:hazard_app/others/app_flavor_types.dart';
@@ -24,11 +26,10 @@ class AppBootstrap {
     MediaKit.ensureInitialized();
 
     await Future.wait([
-      EasyLocalization.ensureInitialized(),
-      Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      ),
-      dotenv.load(fileName: '.env'),
+      _initializeEasyLocalization(),
+      _initializeFirebase(),
+      _loadEnvironmentVariables(),
+      _initializeGoogleFonts(),
     ]);
 
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -56,6 +57,50 @@ class AppBootstrap {
           child: const MyApp(),
         ),
       ),
+    );
+  }
+
+  Future<void> _initializeEasyLocalization() async {
+    return runAsyncCall(
+      name: 'initializeEasyLocalization',
+      future: () async {
+        await EasyLocalization.ensureInitialized();
+      },
+      onError: (_) {},
+    );
+  }
+
+  Future<void> _loadEnvironmentVariables() async {
+    return runAsyncCall(
+      name: 'loadEnvironmentVariables',
+      future: () async {
+        await dotenv.load(fileName: '.env');
+      },
+      onError: (_) {},
+    );
+  }
+
+  Future<void> _initializeGoogleFonts() async {
+    return runAsyncCall(
+      name: 'initializeGoogleFonts',
+      future: () async {
+        await GoogleFonts.pendingFonts([
+          GoogleFonts.bebasNeue(),
+        ]);
+      },
+      onError: (_) {},
+    );
+  }
+
+  Future<void> _initializeFirebase() async {
+    return runAsyncCall(
+      name: 'initializeFirebase',
+      future: () async {
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+      },
+      onError: (_) {},
     );
   }
 }

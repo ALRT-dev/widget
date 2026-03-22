@@ -342,11 +342,6 @@ class MyLocationSubscriptionsProvider
 
   /// Updates the user's own location subscription based on the logged in user's location and radius.
   void updateOwnLocationSubscription() {
-    final index = state.locationSubscriptions.indexWhere(
-      (subscription) => subscription.isOwnLocation,
-    );
-    if (index == -1) return;
-
     final latitude = _ref.read(providerOfLoggedInUser)?.latitude;
     final longitude = _ref.read(providerOfLoggedInUser)?.longitude;
     final locationName = _ref.read(providerOfLoggedInUser)?.locationName;
@@ -379,21 +374,41 @@ class MyLocationSubscriptionsProvider
       final southwestLat = latitude - latDelta;
       final southwestLng = longitude - lngDelta;
 
-      final updatedSubscription = state.locationSubscriptions[index].copyWith(
-        northeastLat: northeastLat,
-        northeastLng: northeastLng,
-        southwestLat: southwestLat,
-        southwestLng: southwestLng,
-        name: locationName,
+      final index = state.locationSubscriptions.indexWhere(
+        (subscription) => subscription.isOwnLocation,
       );
-      updateLocationSubscriptions(
-        locationSubscriptions: state.locationSubscriptions.map((subscription) {
-          if (subscription.isOwnLocation) {
-            return updatedSubscription;
-          }
-          return subscription;
-        }).toList(),
-      );
+      if (index != -1) {
+        final updatedLocationSubscription = state.locationSubscriptions[index]
+            .copyWith(
+              northeastLat: northeastLat,
+              northeastLng: northeastLng,
+              southwestLat: southwestLat,
+              southwestLng: southwestLng,
+              name: locationName,
+            );
+        updateLocationSubscriptions(
+          locationSubscriptions: state.locationSubscriptions.map((
+            subscription,
+          ) {
+            if (subscription.isOwnLocation) {
+              return updatedLocationSubscription;
+            }
+            return subscription;
+          }).toList(),
+        );
+      } else {
+        addLocationSubscription(
+          LocationSubscription(
+            isOwnLocation: true,
+            northeastLat: northeastLat,
+            northeastLng: northeastLng,
+            southwestLat: southwestLat,
+            southwestLng: southwestLng,
+            name: locationName,
+            createdAt: DateTime.now(),
+          ),
+        );
+      }
     }
   }
 }

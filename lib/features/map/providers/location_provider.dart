@@ -91,6 +91,8 @@ class LocationProvider extends StateNotifier<LocationProviderState> {
   /// Gets the device location and compares it with the user's location,
   /// if the locations are different then update the user's location with the device location.
   Future<void> _updateUserLocation() async {
+    if (_loggedInUser == null) return;
+
     state = state.copyWith(
       updateUserLocationState: UpdateUserLocationState.loading(),
     );
@@ -106,12 +108,6 @@ class LocationProvider extends StateNotifier<LocationProviderState> {
       return;
     }
 
-    // cancel the old requests before making new requests
-    if (state.updateLocationCancelToken.requestOptions != null) {
-      state.updateLocationCancelToken.cancel();
-      state = state.copyWith(updateLocationCancelToken: CancelToken());
-    }
-
     final addressResult = await _locationService
         .getAddressFromCoordinatesPlugin(
           coordinates: state.location.latLng,
@@ -122,6 +118,12 @@ class LocationProvider extends StateNotifier<LocationProviderState> {
       (success) => success,
       (failure) => null,
     );
+
+    // cancel the old requests before making new requests
+    if (state.updateLocationCancelToken.requestOptions != null) {
+      state.updateLocationCancelToken.cancel();
+      state = state.copyWith(updateLocationCancelToken: CancelToken());
+    }
 
     // if device location is different than the user's location then update the user's location
     final updateUserResult = await _userService.updateCurrentUser(

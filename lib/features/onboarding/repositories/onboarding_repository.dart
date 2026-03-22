@@ -5,6 +5,10 @@ import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 
 abstract class OnboardingRepository {
+  Future<Either<void, AppError>> acceptOnboardingDisclaimer();
+
+  Future<Either<void, AppError>> acceptOnboardingTermsOfService();
+
   Future<Either<void, AppError>> setOnboardingLocation({
     required final double latitude,
     required final double longitude,
@@ -18,8 +22,6 @@ abstract class OnboardingRepository {
   Future<Either<void, AppError>> setOnboardingNotificationPreferences({
     required final PushNotificationPreference pushNotificationPreference,
   });
-
-  Future<Either<void, AppError>> acceptOnboardingTermsOfService();
 }
 
 class OnboardingRepositoryImpl implements OnboardingRepository {
@@ -28,6 +30,30 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   }) : _restClient = restClient;
 
   final RestClient _restClient;
+
+  @override
+  Future<Either<void, AppError>> acceptOnboardingDisclaimer() {
+    return runAsyncCall(
+      name: 'acceptOnboardingDisclaimer',
+      future: () async {
+        final result = await _restClient.acceptOnboardingDisclaimer();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> acceptOnboardingTermsOfService() {
+    return runAsyncCall(
+      name: 'acceptOnboardingTermsOfService',
+      future: () async {
+        final result = await _restClient.acceptOnboardingTermsOfService();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
 
   @override
   Future<Either<void, AppError>> setOnboardingLocation({
@@ -75,18 +101,6 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
         final result = await _restClient.setOnboardingNotificationPreferences(
           pushNotificationPreference: pushNotificationPreference.name,
         );
-        return Success(result);
-      },
-      onError: Failure.new,
-    );
-  }
-
-  @override
-  Future<Either<void, AppError>> acceptOnboardingTermsOfService() {
-    return runAsyncCall(
-      name: 'acceptOnboardingTermsOfService',
-      future: () async {
-        final result = await _restClient.acceptOnboardingTermsOfService();
         return Success(result);
       },
       onError: Failure.new,

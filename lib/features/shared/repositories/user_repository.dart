@@ -58,6 +58,10 @@ abstract class UserRepository {
   updatePushNotificationSettings({
     required final PushNotificationSettings pushNotificationSettings,
   });
+
+  Future<Either<void, AppError>> deleteAccount();
+
+  Future<Either<void, AppError>> cancelAccountDeletion();
 }
 
 class UserRepositoryImpl implements UserRepository {
@@ -236,6 +240,30 @@ class UserRepositoryImpl implements UserRepository {
           radiusKm: radiusKm,
         );
         return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> deleteAccount() {
+    return runAsyncCall(
+      name: 'deleteAccount',
+      future: () async {
+        await _restClient.deleteAccount();
+        return Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> cancelAccountDeletion() {
+    return runAsyncCall(
+      name: 'cancelAccountDeletion',
+      future: () async {
+        await _restClient.cancelAccountDeletion();
+        return Success(null);
       },
       onError: Failure.new,
     );

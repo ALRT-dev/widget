@@ -19,6 +19,7 @@ class HazardFiltersButton extends ConsumerStatefulWidget {
       ),
     ],
     this.onFiltersUpdated,
+    this.useTransparentStyle = false,
   });
 
   /// The key to identify the specific hazard filters instance.
@@ -26,6 +27,9 @@ class HazardFiltersButton extends ConsumerStatefulWidget {
 
   /// The box shadow to apply to the dropdown button.
   final List<BoxShadow> buttonShadow;
+
+  /// Whether to use a transparent style for the button.
+  final bool useTransparentStyle;
 
   /// Callback when the filters are updated.
   final void Function()? onFiltersUpdated;
@@ -48,17 +52,31 @@ class _HazardFiltersButtonState extends ConsumerState<HazardFiltersButton> {
           width: 48.spMin,
           height: 48.spMin,
           decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(14.spMin),
-            border: Border.all(
-              color: AppColors.lightGrey,
-            ),
-            boxShadow: widget.buttonShadow,
+            color: widget.useTransparentStyle
+                ? AppColors.white.withValues(alpha: 0.2)
+                : null,
+            borderRadius: widget.useTransparentStyle
+                ? BorderRadius.circular(14.spMin)
+                : null,
+            border: widget.useTransparentStyle
+                ? Border.all(
+                    color: AppColors.white.withValues(alpha: 0.3),
+                    width: 1.0,
+                  )
+                : null,
+            gradient: widget.useTransparentStyle
+                ? null
+                : LinearGradient(
+                    colors: [
+                      AppColors.orange300,
+                      AppColors.red200,
+                    ],
+                  ),
           ),
           child: Icon(
             LucideIcons.slidersHorizontal,
             size: 20.spMin,
-            color: AppColors.black,
+            color: AppColors.white,
           ),
         ),
         Positioned(

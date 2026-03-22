@@ -29,7 +29,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auth/oauth/google',
+            '/api/auth/oauth/google',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -66,7 +66,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auth/oauth/apple',
+            '/api/auth/oauth/apple',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -93,7 +93,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auth/oauth/microsoft',
+            '/api/auth/oauth/microsoft',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -120,7 +120,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/auth/refresh-token',
+            '/api/auth/refresh-token',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -135,6 +135,44 @@ class _RestClient implements RestClient {
       rethrow;
     }
     return _value;
+  }
+
+  @override
+  Future<void> acceptOnboardingDisclaimer() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<void>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/onboarding/accept-disclaimer',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
+  Future<void> acceptOnboardingTermsOfService() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<void>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/onboarding/accept-tos',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
   }
 
   @override
@@ -157,7 +195,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/onboarding/location',
+            '/api/onboarding/location',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -176,7 +214,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/onboarding/radius',
+            '/api/onboarding/radius',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -197,26 +235,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/onboarding/notifications',
-            queryParameters: queryParameters,
-            data: _data,
-          )
-          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
-    );
-    await _dio.fetch<void>(_options);
-  }
-
-  @override
-  Future<void> acceptOnboardingTermsOfService() async {
-    final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
-    final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<void>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
-          .compose(
-            _dio.options,
-            '/onboarding/accept-tos',
+            '/api/onboarding/notifications',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -235,7 +254,7 @@ class _RestClient implements RestClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/user',
+            '/api/user',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -266,7 +285,7 @@ class _RestClient implements RestClient {
       Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/user',
+            '/api/user',
             queryParameters: queryParameters,
             data: _data,
             cancelToken: cancelToken,
@@ -312,7 +331,7 @@ class _RestClient implements RestClient {
           )
           .compose(
             _dio.options,
-            '/user/profile-picture',
+            '/api/user/profile-picture',
             queryParameters: queryParameters,
             data: _data,
             onSendProgress: onSendProgress,
@@ -356,7 +375,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/user/subscribe-location',
+            '/api/user/subscribe-location',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -383,7 +402,7 @@ class _RestClient implements RestClient {
       Options(method: 'DELETE', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/user/unsubscribe-location/${subscriptionId}',
+            '/api/user/unsubscribe-location/${subscriptionId}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -402,7 +421,7 @@ class _RestClient implements RestClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/user/location-subscriptions',
+            '/api/user/location-subscriptions',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -444,7 +463,7 @@ class _RestClient implements RestClient {
       Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/user/own-location-subscription',
+            '/api/user/own-location-subscription',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -473,7 +492,7 @@ class _RestClient implements RestClient {
       Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/user/own-location-subscription-radius',
+            '/api/user/own-location-subscription-radius',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -500,7 +519,7 @@ class _RestClient implements RestClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/user/push-notification-settings',
+            '/api/user/push-notification-settings',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -529,7 +548,7 @@ class _RestClient implements RestClient {
       Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/user/push-notification-settings',
+            '/api/user/push-notification-settings',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -547,6 +566,44 @@ class _RestClient implements RestClient {
   }
 
   @override
+  Future<void> deleteAccount() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<void>(
+      Options(method: 'DELETE', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/user/account',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
+  Future<void> cancelAccountDeletion() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<void>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/user/account/cancel-deletion',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
+  }
+
+  @override
   Future<List<Hazard>> getHazards({
     required HazardSearchParams searchParams,
     CancelToken? cancelToken,
@@ -561,7 +618,7 @@ class _RestClient implements RestClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazards',
+            '/api/hazards',
             queryParameters: queryParameters,
             data: _data,
             cancelToken: cancelToken,
@@ -594,7 +651,7 @@ class _RestClient implements RestClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazards/hazards-with-subscription-id',
+            '/api/hazards/hazards-with-subscription-id',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -621,7 +678,7 @@ class _RestClient implements RestClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazard-categories',
+            '/api/hazard-categories',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -652,7 +709,7 @@ class _RestClient implements RestClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazard-categories/parent',
+            '/api/hazard-categories/parent',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -683,7 +740,7 @@ class _RestClient implements RestClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazard-categories/sub',
+            '/api/hazard-categories/sub',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -737,7 +794,7 @@ class _RestClient implements RestClient {
           )
           .compose(
             _dio.options,
-            '/hazards',
+            '/api/hazards',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -792,7 +849,7 @@ class _RestClient implements RestClient {
           )
           .compose(
             _dio.options,
-            '/hazards/${hazardId}',
+            '/api/hazards/${hazardId}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -819,7 +876,7 @@ class _RestClient implements RestClient {
       Options(method: 'DELETE', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazards/${hazardId}',
+            '/api/hazards/${hazardId}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -841,7 +898,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazards/${hazardId}/vote',
+            '/api/hazards/${hazardId}/vote',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -863,7 +920,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/hazards/${hazardId}/view',
+            '/api/hazards/${hazardId}/view',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -894,7 +951,7 @@ class _RestClient implements RestClient {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/notifications/feed',
+            '/api/notifications/feed',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -925,7 +982,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/notifications/push-notification-token',
+            '/api/notifications/push-notification-token',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -959,7 +1016,7 @@ class _RestClient implements RestClient {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/support',
+            '/api/support',
             queryParameters: queryParameters,
             data: _data,
           )

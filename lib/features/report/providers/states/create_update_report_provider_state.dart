@@ -27,6 +27,9 @@ abstract class CreateUpdateReportProviderState
     /// i.e A success or error toast has been shown for these reports.
     @Default(<String>[]) final List<String> acknowledgedReportIds,
 
+    /// Whether to show the categories selector.
+    @Default(true) final bool showCategoriesSelector,
+
     /// The state of getting categories to select.
     @Default(GetCategoriesToSelectState.initial())
     final GetCategoriesToSelectState getCategoriesToSelectState,

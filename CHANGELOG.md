@@ -1,3 +1,31 @@
+## v1.0.1+27 - 2026/03/12
+* UI Updates
+
+
+## v1.0.1+26 - 2026/03/09
+* Bug fixes and improvements
+
+
+## v1.0.0+25 - 2026/02/04
+* Bug fixes and improvements
+
+
+## v1.0.0+24 - 2026/02/03
+* App name updated from "Alrt" to "ALRT"
+
+
+## v1.0.0+23 - 2026/02/02
+* Icons updated.
+* Bug fixes and improvements.
+
+
+## v1.0.0+22 - 2026/01/28
+* Onboarding Screens Updated.
+* Location Permission Request Improved.
+* Deleted Account Feature Added.
+* Bug fixes and improvements.
+
+
 ## v1.0.0+21 - 2026/01/12
 * Bug fixes and improvements.
 

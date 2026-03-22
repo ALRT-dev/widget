@@ -20,6 +20,10 @@ abstract class ProfileProviderState with _$ProfileProviderState {
 
     /// The state of logging out the user.
     @Default(LogoutState.initial()) final LogoutState logoutState,
+
+    /// The state of deleting the user's account.
+    @Default(DeleteAccountState.initial())
+    final DeleteAccountState deleteAccountState,
   }) = _ProfileProviderState;
 }
 
@@ -46,4 +50,14 @@ class ProfilePictureUpdateState with _$ProfilePictureUpdateState {
   const factory ProfilePictureUpdateState.error(
     final AppError error,
   ) = _ProfilePictureUpdateStateError;
+}
+
+@freezed
+class DeleteAccountState with _$DeleteAccountState {
+  const factory DeleteAccountState.initial() = _DeleteAccountStateInitial;
+  const factory DeleteAccountState.loading() = _DeleteAccountStateLoading;
+  const factory DeleteAccountState.success() = _DeleteAccountStateSuccess;
+  const factory DeleteAccountState.error(
+    final AppError error,
+  ) = _DeleteAccountStateError;
 }

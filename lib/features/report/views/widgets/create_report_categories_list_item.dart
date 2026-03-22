@@ -36,37 +36,43 @@ class _CreateReportCategoriesListItemState
       ),
     );
 
+    final categoryColor = widget.category.color ?? AppColors.orange;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(20.spMin),
-        boxShadow: isSelected
-            ? [
-                BoxShadow(
-                  color: AppColors.shadowColor,
-                  blurRadius: 6.0,
-                  offset: Offset(0, 4.0),
-                ),
-              ]
-            : null,
-        border: Border.all(
-          color: isSelected ? AppColors.primary : AppColors.transparent,
-          width: 2.spMin,
+        boxShadow: [
+          BoxShadow(
+            color: isSelected
+                ? categoryColor.withValues(alpha: 0.7)
+                : AppColors.shadowColor,
+            blurRadius: 6.0,
+            offset: Offset(0.0, 0.0),
+          ),
+        ],
+        border: Border(
+          left: BorderSide(
+            color: categoryColor,
+            width: 5.0,
+          ),
         ),
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: widget.category.color?.withValues(alpha: 0.5),
+          color: isSelected
+              ? widget.category.color?.withValues(alpha: 0.25)
+              : AppColors.white,
           borderRadius: BorderRadius.circular(18.spMin),
         ),
-        padding: EdgeInsets.all(20.spMin),
+        padding: EdgeInsets.all(16.spMin),
         child: Row(
           children: [
             Image.asset(
               'assets/images/hazards/non_aws/${widget.category.id}_user.png',
-              width: 40.spMin,
-              height: 40.spMin,
+              width: 50.spMin,
+              height: 50.spMin,
               fit: BoxFit.contain,
             ),
             12.wSizedBox,

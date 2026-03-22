@@ -14,8 +14,12 @@ import 'package:hazard_app/features/onboarding/views/onboarding_complete_screen.
 import 'package:hazard_app/features/onboarding/views/onboarding_emergency_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_location_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_radius_screen.dart';
+import 'package:hazard_app/features/onboarding/views/onboarding_disclaimer_screen.dart';
+import 'package:hazard_app/features/onboarding/views/onboarding_legal_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_welcome_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/delete_account_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/deleted_account_info_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/support_request_screen.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
@@ -55,6 +59,18 @@ class AppRouter {
           path: OnboardingWelcomeScreen.route,
           builder: (context, state) {
             return const OnboardingWelcomeScreen();
+          },
+        ),
+        GoRoute(
+          path: OnboardingDisclaimerScreen.route,
+          builder: (context, state) {
+            return const OnboardingDisclaimerScreen();
+          },
+        ),
+        GoRoute(
+          path: OnboardingLegalScreen.route,
+          builder: (context, state) {
+            return const OnboardingLegalScreen();
           },
         ),
         GoRoute(
@@ -168,13 +184,29 @@ class AppRouter {
         GoRoute(
           path: ManageNotificationsScreen.route,
           builder: (context, state) {
-            return ManageNotificationsScreen();
+            return ManageNotificationsScreen(
+              args:
+                  (state.extra as ManageNotificationsScreenArgs?) ??
+                  const ManageNotificationsScreenArgs(),
+            );
           },
         ),
         GoRoute(
           path: SupportRequestScreen.route,
           builder: (context, state) {
             return const SupportRequestScreen();
+          },
+        ),
+        GoRoute(
+          path: DeleteAccountScreen.route,
+          builder: (context, state) {
+            return const DeleteAccountScreen();
+          },
+        ),
+        GoRoute(
+          path: DeletedAccountInfoScreen.route,
+          builder: (context, state) {
+            return const DeletedAccountInfoScreen();
           },
         ),
       ],

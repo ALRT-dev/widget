@@ -310,6 +310,11 @@ class CreateReportProvider
     );
   }
 
+  /// Updates [CreateUpdateReportProviderState.showCategoriesSelector] with the given [showCategoriesSelector].
+  void updateShowCategoriesSelector(final bool showCategoriesSelector) {
+    state = state.copyWith(showCategoriesSelector: showCategoriesSelector);
+  }
+
   /// Resets all fields in the state to their initial values.
   void resetAllFields() {
     state = state.copyWith(
@@ -322,6 +327,7 @@ class CreateReportProvider
         description: null,
       ),
       medias: [],
+      showCategoriesSelector: true,
     );
   }
 

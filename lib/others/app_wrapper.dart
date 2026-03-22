@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/views/screens/auth_screen.dart';
 import 'package:hazard_app/features/home/views/screens/home_screen.dart';
 import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
+import 'package:hazard_app/features/profile/views/screens/deleted_account_info_screen.dart';
 import 'package:hazard_app/features/shared/providers/app_initialization_provider.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/splash_screen.dart';
@@ -72,7 +73,10 @@ class _AppWrapperState extends ConsumerState<AppWrapper> {
 
     final loggedInUser = ref.read(providerOfLoggedInUser);
     if (loggedInUser != null) {
-      if (!loggedInUser.isOnboardingCompleted) {
+      // Check if account is scheduled for deletion
+      if (loggedInUser.scheduledDeletionAt != null) {
+        _gotoDeletedAccountInfoScreen();
+      } else if (!loggedInUser.isOnboardingCompleted) {
         _gotoOnboardingScreen();
       } else {
         _gotoHomeScreen();
@@ -98,5 +102,10 @@ class _AppWrapperState extends ConsumerState<AppWrapper> {
       HomeScreen.route,
       extra: widget.args.homeScreenArgs,
     );
+  }
+
+  /// Navigates to the deleted account info screen.
+  void _gotoDeletedAccountInfoScreen() {
+    context.go(DeletedAccountInfoScreen.route);
   }
 }
