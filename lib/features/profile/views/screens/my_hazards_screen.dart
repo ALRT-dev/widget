@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
 import 'package:hazard_app/features/profile/views/widgets/accepted_hazards_widgets/my_accepted_hazards_list.dart';
 import 'package:hazard_app/features/profile/views/widgets/rejected_hazards_widgets/my_rejected_hazards_list.dart';
@@ -55,7 +56,7 @@ class _MyHazardsScreenState extends ConsumerState<MyHazardsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Alrts'),
+        title: const Text('My ALRTs'),
         bottom: TabBar(
           controller: _tabController,
           dividerColor: AppColors.transparent,
@@ -88,7 +89,7 @@ class _MyHazardsScreenState extends ConsumerState<MyHazardsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Accepted Alrts',
+            'Accepted ALRTs',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -96,15 +97,21 @@ class _MyHazardsScreenState extends ConsumerState<MyHazardsScreen>
           ),
           8.hSizedBox,
           Text(
-            'These are your hazard alrts that have been reviewed and accepted.',
+            'These are your alerts that have been reviewed and accepted.',
             style: TextStyle(
               fontSize: 14,
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           16.hSizedBox,
-          const Expanded(
-            child: MyAcceptedHazardsList(),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(bottom: 50.spMin),
+              child: MyAcceptedHazardsList(
+                shinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+              ),
+            ),
           ),
         ],
       ),
@@ -118,7 +125,7 @@ class _MyHazardsScreenState extends ConsumerState<MyHazardsScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Rejected Alrts',
+            'Rejected ALRTs',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -126,7 +133,7 @@ class _MyHazardsScreenState extends ConsumerState<MyHazardsScreen>
           ),
           8.hSizedBox,
           Text(
-            'These alrts need updates before they can be approved.',
+            'These alerts need updates before they can be approved.',
             style: TextStyle(
               fontSize: 14,
               color: Theme.of(context).colorScheme.onSurfaceVariant,

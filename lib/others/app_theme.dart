@@ -12,7 +12,7 @@ class AppTheme {
     );
 
     return ThemeData(
-      scaffoldBackgroundColor: AppColors.white,
+      scaffoldBackgroundColor: AppColors.extraLightGrey,
       fontFamily: defaultFontFamily,
       splashColor: AppColors.primary.withValues(alpha: 0.1),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -20,7 +20,7 @@ class AppTheme {
           backgroundColor: AppColors.orange,
           padding: EdgeInsets.all(15.spMin),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.spMin),
+            borderRadius: BorderRadius.circular(16.spMin),
           ),
           elevation: 0.0,
           disabledBackgroundColor: AppColors.lightGrey,
@@ -254,13 +254,13 @@ class AppTheme {
         focusedBorder: inputBorder.copyWith(
           borderSide: BorderSide(
             color: AppColors.orange,
-            width: 2.0,
+            width: 1.2,
           ),
         ),
         focusedErrorBorder: inputBorder.copyWith(
           borderSide: BorderSide(
             color: AppColors.orange,
-            width: 2.0,
+            width: 1.2,
           ),
         ),
         contentPadding: EdgeInsets.symmetric(

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/notification/views/widgets/change_my_location_subscription_bottomsheet_content.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
@@ -74,8 +75,10 @@ Future<void> showHazardFiltersBottomSheet({
   required final String filtersKey,
   final void Function()? onFiltersUpdated,
 }) {
-  return showCustomCupertinoModalPopup(
+  return showModalBottomSheet(
     context: context,
+    isScrollControlled: true,
+    backgroundColor: AppColors.transparent,
     builder: (_) => HazardFiltersBottomsheetContent(
       filtersKey: filtersKey,
       onFiltersUpdated: onFiltersUpdated,

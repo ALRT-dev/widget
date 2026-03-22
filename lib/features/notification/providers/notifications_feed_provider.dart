@@ -96,6 +96,10 @@ class NotificationsFeedProvider
         .read(providerOfHazardFiltersForNotifications)
         .selectedCategoryIds
         .toList();
+    final selectedLocationIds = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .selectedLocationIds
+        .toList();
     final awsEmergency = _ref
         .read(providerOfHazardFiltersForNotifications)
         .awsEmergency;
@@ -124,6 +128,7 @@ class NotificationsFeedProvider
       searchParams: HazardSearchParams(
         searchString: state.searchString,
         categoryIds: selectedCategoryIds,
+        locationIds: selectedLocationIds,
         awsEmergency: awsEmergency,
         awsWatchAndAct: awsWatchAndAct,
         awsAdvice: awsAdvice,
@@ -167,6 +172,10 @@ class NotificationsFeedProvider
         .read(providerOfHazardFiltersForNotifications)
         .selectedCategoryIds
         .toList();
+    final selectedLocationIds = _ref
+        .read(providerOfHazardFiltersForNotifications)
+        .selectedLocationIds
+        .toList();
     final awsEmergency = _ref
         .read(providerOfHazardFiltersForNotifications)
         .awsEmergency;
@@ -195,6 +204,7 @@ class NotificationsFeedProvider
       searchParams: HazardSearchParams(
         searchString: state.searchString,
         categoryIds: selectedCategoryIds,
+        locationIds: selectedLocationIds,
         awsEmergency: awsEmergency,
         awsWatchAndAct: awsWatchAndAct,
         awsAdvice: awsAdvice,

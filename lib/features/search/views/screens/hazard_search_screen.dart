@@ -41,11 +41,11 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
         controller: _scrollController,
         slivers: [
           HazardSearchAppBar(),
-          10.hSizedBox.sliverBox,
+          15.hSizedBox.sliverBox,
           _showingResultsBuilder().sliverBox,
           20.hSizedBox.sliverBox,
           HazardSearchResultsList(),
-          10.hSizedBox.sliverBox,
+          30.hSizedBox.sliverBox,
         ],
       ),
     ).keyboardDismisser(context);
@@ -80,7 +80,7 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
                   TextSpan(
                     text: 'Showing results for ',
                     style: TextStyle(
-                      color: AppColors.grey.withValues(alpha: 0.8),
+                      color: AppColors.mediumGrey,
                     ),
                   ),
                   TextSpan(
@@ -133,6 +133,7 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
             padding: EdgeInsets.symmetric(
               vertical: 12.spMin,
             ),
+            borderRadius: 14.0,
             color: isSubscribed ? AppColors.grey : null,
             icon: isLoading
                 ? null

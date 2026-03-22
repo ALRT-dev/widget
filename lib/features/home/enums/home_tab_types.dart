@@ -18,7 +18,7 @@ enum HomeTab {
       case HomeTab.list:
         return 'ALRT';
       case HomeTab.notifications:
-        return 'Notifications';
+        return 'Alerts';
       case HomeTab.profile:
         return 'Profile';
     }
@@ -36,7 +36,7 @@ enum HomeTab {
       case HomeTab.notifications:
         return LucideIcons.bell;
       case HomeTab.profile:
-        return LucideIcons.user;
+        return LucideIcons.userRound;
     }
   }
 }

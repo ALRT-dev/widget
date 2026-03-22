@@ -184,7 +184,11 @@ class AppRouter {
         GoRoute(
           path: ManageNotificationsScreen.route,
           builder: (context, state) {
-            return ManageNotificationsScreen();
+            return ManageNotificationsScreen(
+              args:
+                  (state.extra as ManageNotificationsScreenArgs?) ??
+                  const ManageNotificationsScreenArgs(),
+            );
           },
         ),
         GoRoute(

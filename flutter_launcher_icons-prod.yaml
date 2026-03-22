@@ -1,4 +1,4 @@
-# flutter pub run flutter_launcher_icons -f flutter_launcher_icons-prod.yaml
+# dart run flutter_launcher_icons -f flutter_launcher_icons-dev.yaml
 flutter_launcher_icons:
   android: true
   ios: true

@@ -6,8 +6,23 @@ import 'package:hazard_app/features/notification/views/widgets/manage_push_notif
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
+class ManageNotificationsScreenArgs {
+  const ManageNotificationsScreenArgs({
+    this.initialTab = 0,
+  });
+
+  /// The initial tab to display when the screen is opened.
+  final int initialTab;
+}
+
 class ManageNotificationsScreen extends ConsumerStatefulWidget {
-  const ManageNotificationsScreen({super.key});
+  const ManageNotificationsScreen({
+    super.key,
+    required this.args,
+  });
+
+  /// The arguments for the screen.
+  final ManageNotificationsScreenArgs args;
 
   static const route = '/manage-notifications';
 
@@ -26,7 +41,11 @@ class _ManageNotificationsScreenState
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.args.initialTab,
+    );
   }
 
   @override

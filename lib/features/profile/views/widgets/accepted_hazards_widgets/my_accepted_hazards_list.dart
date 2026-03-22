@@ -2,12 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/states/my_hazards_provider_state.dart';
-import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
+import 'package:hazard_app/features/profile/views/widgets/accepted_hazards_widgets/my_accepted_hazards_list_item.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
-import 'package:hazard_app/features/shared/views/widgets/common_hazards_list_item.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
+import 'package:hazard_app/others/app_colors.dart';
 
 class MyAcceptedHazardsList extends ConsumerStatefulWidget {
   const MyAcceptedHazardsList({
@@ -69,26 +70,40 @@ class _MyAcceptedHazardsListState extends ConsumerState<MyAcceptedHazardsList> {
           ),
         );
 
-        return MediaQuery.removePadding(
-          context: context,
-          removeTop: true,
-          removeBottom: true,
-          child: ListView.separated(
-            itemCount: widget.limit == null
-                ? myAcceptedHazards.length
-                : min(myAcceptedHazards.length, widget.limit!),
-            shrinkWrap: widget.shinkWrap,
-            physics: widget.physics,
-            itemBuilder: (context, index) {
-              final hazard = myAcceptedHazards[index];
-              return CommonHazardsListItem(
-                key: ValueKey(hazard.id),
-                showSourceHeader: false,
-                hazard: hazard,
-                horizontalPadding: 0.0,
-              );
-            },
-            separatorBuilder: (context, index) => 15.hSizedBox,
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 2.0,
+                offset: Offset(0.0, 0.0),
+              ),
+            ],
+          ),
+          child: MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            removeBottom: true,
+            child: ListView.separated(
+              itemCount: widget.limit == null
+                  ? myAcceptedHazards.length
+                  : min(myAcceptedHazards.length, widget.limit!),
+              shrinkWrap: widget.shinkWrap,
+              physics: widget.physics,
+              itemBuilder: (context, index) {
+                final hazard = myAcceptedHazards[index];
+                return MyAcceptedHazardsListItem(
+                  key: ValueKey(hazard.id),
+                  hazard: hazard,
+                );
+              },
+              separatorBuilder: (context, index) => Divider(
+                color: AppColors.lightGrey.withValues(alpha: 0.2),
+                height: 1.0,
+              ),
+            ),
           ),
         );
       },

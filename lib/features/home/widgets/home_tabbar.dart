@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
-import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_theme.dart';
@@ -14,7 +13,11 @@ class HomeTabbar extends ConsumerStatefulWidget {
     required this.tabController,
   });
 
+  /// The tab controller.
   final TabController tabController;
+
+  /// The height of the tabbar.
+  static const double height = 63.0;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _HomeTabbarState();
@@ -25,35 +28,43 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: context.theme.scaffoldBackgroundColor,
+        color: AppColors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(30.spMin),
+          topRight: Radius.circular(30.spMin),
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.lightGrey.withValues(alpha: 0.8),
-            blurRadius: 0.5,
+            color: AppColors.shadowColor,
+            blurRadius: 10.0,
             offset: const Offset(0, -0.5),
           ),
         ],
       ),
       child: SafeArea(
-        child: TabBar(
-          controller: widget.tabController,
-          labelColor: AppColors.orange,
-          labelStyle: TextStyle(
-            fontSize: 12.spMin,
-            fontFamily: AppTheme.defaultFontFamily,
-            fontWeight: FontWeight.w600,
-          ),
-          unselectedLabelColor: AppColors.grey.withValues(alpha: 0.7),
-          indicatorColor: Colors.transparent,
-          dividerColor: Colors.transparent,
-          dividerHeight: 0.0,
-          onTap: (index) => _onTabChanged(HomeTab.values[index]),
-          labelPadding: EdgeInsets.zero,
-          padding: EdgeInsets.symmetric(vertical: 5.spMin),
-          tabs: HomeTab.values
-              .map((tab) => Tab(icon: _tabBuilder(tab)))
-              .toList(),
-        ).pT(5.0),
+        top: false,
+        child: SizedBox(
+          height: HomeTabbar.height.spMin,
+          child: TabBar(
+            controller: widget.tabController,
+            labelColor: AppColors.orange,
+            labelStyle: TextStyle(
+              fontSize: 12.spMin,
+              fontFamily: AppTheme.defaultFontFamily,
+              fontWeight: FontWeight.w600,
+            ),
+            unselectedLabelColor: AppColors.grey,
+            indicatorColor: Colors.transparent,
+            dividerColor: Colors.transparent,
+            dividerHeight: 0.0,
+            onTap: (index) => _onTabChanged(HomeTab.values[index]),
+            labelPadding: EdgeInsets.zero,
+            padding: EdgeInsets.symmetric(vertical: 5.spMin),
+            tabs: HomeTab.values
+                .map((tab) => Tab(icon: _tabBuilder(tab)))
+                .toList(),
+          ).pT(5.0),
+        ),
       ),
     );
   }
@@ -72,9 +83,8 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
                   size: 24.spMin,
                   color: ref.watch(
                     providerOfHomeTab.select(
-                      (value) => value == tab
-                          ? AppColors.orange
-                          : AppColors.grey.withValues(alpha: 0.7),
+                      (value) =>
+                          value == tab ? AppColors.orange : AppColors.grey,
                     ),
                   ),
                 ),

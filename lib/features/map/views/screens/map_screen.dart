@@ -8,15 +8,18 @@ import 'package:hazard_app/features/map/utils/dialogs.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_compass_button.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_my_location_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_hazard_info_window.dart';
+import 'package:hazard_app/features/map/views/widgets/map_keys_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
 import 'package:hazard_app/features/map/views/widgets/route_planning.dart';
 import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
 import 'package:hazard_app/features/map/views/widgets/selected_location_preview.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -53,6 +56,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             myLocationButtonEnabled: false,
             compassEnabled: false,
             zoomControlsEnabled: false,
+            padding: EdgeInsets.only(bottom: 22.spMin, left: 8.spMin),
             buildingsEnabled: ref.watch(
               providerOfMap.select(
                 (value) => !(value.currentRoutePlan?.isNavigating ?? false),
@@ -97,8 +101,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     return RouteSourceAndDestination();
                   }
                   return Row(
+                    spacing: 10.spMin,
                     children: [
                       Expanded(child: MapSearchbar()),
+                      _xpPointsBuilder(),
                     ],
                   );
                 },
@@ -112,23 +118,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: Stack(
                     children: [
                       Positioned(
-                        right: 10.spMin,
-                        bottom: 10.spMin,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          spacing: 10.spMin,
-                          children: [
-                            CustomCompassButton(),
-                            HazardFiltersButton(
-                              filtersKey: MapScreen.filtersKey,
-                              onFiltersUpdated: () => _getMapHazards(),
-                            ),
-                            CustomMyLocationButton(),
-                          ],
-                        ),
+                        right: 15.spMin,
+                        bottom: 0.0,
+                        child: _mapActionButtons(),
                       ),
                       Positioned(
-                        bottom: 10.spMin,
+                        bottom: 0.0,
                         left: 0.0,
                         right: 0.0,
                         child: _viewListButtonBuilder(),
@@ -144,7 +139,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ),
                     );
                     if (isRoutePresent) {
-                      return RoutePlanning().pB(20.0);
+                      return RoutePlanning().pT(10.0);
                     }
 
                     final isSelectedLocationPresent = ref.watch(
@@ -153,7 +148,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ),
                     );
                     if (isSelectedLocationPresent) {
-                      return SelectedLocationPreview().pB(20.0);
+                      return SelectedLocationPreview().pT(10.0);
                     }
 
                     return const SizedBox();
@@ -163,7 +158,95 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
           ),
         ],
-      ),
+      ).pB(30.0),
+    );
+  }
+
+  Widget _xpPointsBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final xpPoints = ref.watch(
+          providerOfLoggedInUser.select(
+            (value) => value?.xpPoints ?? 0,
+          ),
+        );
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.spMin),
+            gradient: LinearGradient(
+              colors: [
+                AppColors.orange300,
+                AppColors.red200,
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0, 0.0),
+              ),
+            ],
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 12.spMin,
+            vertical: 7.spMin,
+          ),
+          child: Row(
+            spacing: 4.spMin,
+            children: [
+              Icon(
+                LucideIcons.star,
+                size: 12.spMin,
+                color: AppColors.white,
+              ),
+              Text(
+                xpPoints.toString(),
+                style: TextStyle(
+                  fontSize: 12.spMin,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.white,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _mapActionButtons() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      spacing: 10.spMin,
+      children: [
+        CustomCompassButton(),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(14.spMin),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.shadowColor,
+                blurRadius: 10.0,
+                offset: Offset(0, 0.0),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14.spMin),
+            child: Column(
+              children: [
+                HazardFiltersButton(
+                  filtersKey: MapScreen.filtersKey,
+                  onFiltersUpdated: () => _getMapHazards(),
+                ),
+                MapKeysButton(),
+                CustomMyLocationButton(),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -218,7 +301,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     EasyDebounce.debounce(
       'map-debouncer',
-      const Duration(milliseconds: 100),
+      const Duration(milliseconds: 300),
       () {
         if (!mounted) return;
 

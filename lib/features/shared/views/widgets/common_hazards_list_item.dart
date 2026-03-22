@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/notification/views/widgets/confirmation_buttons.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
+import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -14,8 +15,8 @@ import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
-import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class CommonHazardsListItem extends ConsumerStatefulWidget {
@@ -26,7 +27,7 @@ class CommonHazardsListItem extends ConsumerStatefulWidget {
     this.onClosePressed,
     this.showTrustMeter = true,
     this.showSourceHeader = true,
-    this.horizontalPadding = 10.0,
+    this.horizontalPadding = 20.0,
     this.isInfoWindow = false,
   });
 
@@ -88,110 +89,63 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       return const SizedBox.shrink();
     }
 
-    final hazardColor = ref.watch(
-      provider.select(
-        (value) => value.hazard?.color ?? AppColors.black,
-      ),
-    );
-
     return InkWell(
       onTap: widget.isInfoWindow ? null : _gotoViewHazard,
       borderRadius: BorderRadius.circular(14.spMin),
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(14.spMin),
+          borderRadius: BorderRadius.circular(16.spMin),
           boxShadow: [
             BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.1),
-              blurRadius: 8.0,
-              offset: const Offset(0.0, 4.0),
+              color: AppColors.shadowColor,
+              blurRadius: 5.0,
+              offset: const Offset(0.0, 0.0),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(14.spMin),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14.spMin),
-              border: Border(
-                left: BorderSide(
-                  color: hazardColor == AppColors.transparent
-                      ? AppColors.black
-                      : hazardColor,
-                  width: 4.0,
-                ),
-                top: BorderSide(
-                  color: hazardColor == AppColors.transparent
-                      ? AppColors.black
-                      : hazardColor,
-                  width: 1.0,
-                ),
-                right: BorderSide(
-                  color: hazardColor == AppColors.transparent
-                      ? AppColors.black
-                      : hazardColor,
-                  width: 1.0,
-                ),
-                bottom: BorderSide(
-                  color: hazardColor == AppColors.transparent
-                      ? AppColors.black
-                      : hazardColor,
-                  width: 1.0,
-                ),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _coloredHeaderBuilder(),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _iconBuilder(),
-                    12.wSizedBox,
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _titleBuilder(),
-                                4.hSizedBox,
-                                _dateAndDistanceBuilder(),
-                              ],
-                            ),
+          borderRadius: BorderRadius.circular(16.spMin),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _coloredHeaderBuilder(),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _iconBuilder(),
+                  12.wSizedBox,
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _titleBuilder(),
+                              4.hSizedBox,
+                              _dateAndDistanceBuilder(),
+                            ],
                           ),
-                          if (widget.hazard.isUserReported)
-                            _votesCountBuilder(),
-                        ],
-                      ),
+                        ),
+                        if (widget.hazard.isUserReported) _votesCountBuilder(),
+                      ],
                     ),
-                  ],
-                ).pX(16.0).pT(16.0),
-                if (!widget.isInfoWindow) ...[
-                  8.hSizedBox,
-                  _shortDescriptionBuilder().pX(16.0),
-                ],
-                14.hSizedBox,
-                if (widget.showTrustMeter && widget.hazard.isUserReported) ...[
-                  _confirmationButtonsBuilder().pX(16.0),
-                ],
-                if (widget.isInfoWindow) ...[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      16.0.spMin,
-                      0.0,
-                      16.0.spMin,
-                      14.0.spMin,
-                    ),
-                    child: _viewDetailsButtonBuilder(),
                   ),
                 ],
+              ).pX(16.0).pT(16.0),
+              if (!widget.isInfoWindow) ...[
+                8.hSizedBox,
+                _shortDescriptionBuilder().pX(16.0),
               ],
-            ),
+              14.hSizedBox,
+              if (widget.showTrustMeter && widget.hazard.isUserReported) ...[
+                _confirmationButtonsBuilder().pX(16.0),
+              ],
+              _categoryAndViewDetailsBuilder(),
+            ],
           ),
         ),
       ),
@@ -337,102 +291,127 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
 
         final isVerified = source != null;
 
-        final categoryLabel = isUserReported
-            ? 'USER'
-            : isAwsCompliant
-            ? 'AWS'
-            : 'OFFICIAL';
+        final pillForegroundColor = hazardColor.isLight
+            ? AppColors.grey
+            : AppColors.white;
+        final pillBackgroundColor = isUserReported
+            ? AppColors.white
+            : hazardColor.isLight
+            ? AppColors.grey
+            : AppColors.black;
+        final pillBackgroundColorAlpha = isUserReported
+            ? 0.6
+            : hazardColor == AppColors.transparent
+            ? 0.06
+            : 0.2;
+        final pillBorderColor = hazardColor == AppColors.transparent
+            ? AppColors.lightGrey
+            : null;
 
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: 16.spMin,
-            vertical: 8.spMin,
-          ),
+          padding: EdgeInsets.all(10.spMin),
+
           decoration: BoxDecoration(
-            color: hazardColor,
-            border: Border(
-              bottom: BorderSide(
-                color: hazardColor == AppColors.transparent
-                    ? AppColors.black
-                    : hazardColor,
-                width: 1.0,
-              ),
-            ),
-          ),
-          child: Row(
-            spacing: 8.spMin,
-            children: [
-              // Category Pill
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 12.spMin,
-                  vertical: 4.spMin,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(20.spMin),
-                  border: Border.all(
-                    color: AppColors.black,
-                    width: 1.0,
-                  ),
-                ),
-                child: Text(
-                  categoryLabel,
-                  style: TextStyle(
-                    fontSize: 10.spMin,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.black,
-                  ),
-                ),
-              ),
-              // Severity/Category Text
-              if (isAwsCompliant)
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 12.spMin,
-                    vertical: 4.spMin,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(20.spMin),
-                    border: Border.all(
-                      color: AppColors.black,
+            color: hazardColor == AppColors.transparent
+                ? AppColors.white
+                : hazardColor,
+            border: hazardColor == AppColors.transparent
+                ? Border(
+                    bottom: BorderSide(
+                      color: AppColors.lightGrey.withValues(alpha: 0.5),
                       width: 1.0,
                     ),
-                  ),
-                  child: Text(
-                    severityTitle,
-                    style: TextStyle(
-                      fontSize: 10.spMin,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.black,
-                    ),
-                  ),
+                  )
+                : null,
+          ),
+          child: Row(
+            spacing: 10.spMin,
+            children: [
+              if (isAwsCompliant &&
+                  severityTitle.isNotEmpty &&
+                  severityTitle != 'Unknown')
+                _headerPillBuilder(
+                  label: severityTitle.toUpperCase(),
+                  foregroundColor: pillForegroundColor,
+                  backgroundColor: pillBackgroundColor,
+                  backgroundColorAlpha: pillBackgroundColorAlpha,
+                  borderColor: pillBorderColor,
                 ),
-              // Verification Badge
+              if (isUserReported)
+                _headerPillBuilder(
+                  label: 'USER',
+                  foregroundColor: pillForegroundColor,
+                  backgroundColor: pillBackgroundColor,
+                  backgroundColorAlpha: pillBackgroundColorAlpha,
+                  borderColor: pillBorderColor,
+                ),
+              if (isAwsCompliant)
+                _headerPillBuilder(
+                  label: 'AWS',
+                  foregroundColor: pillForegroundColor,
+                  backgroundColor: pillBackgroundColor,
+                  backgroundColorAlpha: pillBackgroundColorAlpha,
+                  borderColor: pillBorderColor,
+                ),
               if (isVerified)
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.white,
-                      ),
-                      child: Icon(
-                        Icons.verified_rounded,
-                        size: 18.spMin,
-                        color: AppColors.blue,
-                      ),
-                    ),
-                    if (widget.showCloseButton && widget.onClosePressed != null)
-                      33.wSizedBox,
-                  ],
+                _headerPillBuilder(
+                  label: 'OFFICIAL',
+                  foregroundColor: pillForegroundColor,
+                  backgroundColor: pillBackgroundColor,
+                  backgroundColorAlpha: pillBackgroundColorAlpha,
+                  borderColor: pillBorderColor,
                 ),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _headerPillBuilder({
+    required final String label,
+    final Color backgroundColor = AppColors.black,
+    final Color foregroundColor = AppColors.white,
+    final Color? borderColor,
+    final double backgroundColorAlpha = 0.2,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor.withValues(
+          alpha: backgroundColorAlpha,
+        ),
+        borderRadius: BorderRadius.circular(20.spMin),
+        border: borderColor != null
+            ? Border.all(color: borderColor, width: 1.0)
+            : null,
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 10.spMin,
+        vertical: 4.spMin,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6.spMin,
+            height: 6.spMin,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: foregroundColor,
+            ),
+          ),
+          5.wSizedBox,
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11.spMin,
+              fontWeight: FontWeight.w700,
+              color: foregroundColor,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -580,8 +559,8 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         final distanceText = distance == null
             ? null
             : distance < 1000
-            ? '${distance.toStringAsFixed(1)} m away'
-            : '${(distance / 1000).toStringAsFixed(1)} km away';
+            ? '${distance.toStringAsFixed(1)} m'
+            : '${(distance / 1000).toStringAsFixed(1)} km';
 
         final hasExpired = ref.watch(
           provider.select(
@@ -596,9 +575,11 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               Row(
                 children: [
                   Icon(
-                    Icons.access_time_outlined,
-                    size: 14.spMin,
-                    color: hasExpired ? AppColors.red : AppColors.grey,
+                    LucideIcons.clock,
+                    size: 12.spMin,
+                    color: hasExpired
+                        ? AppColors.red
+                        : AppColors.grey.withValues(alpha: 0.6),
                   ),
                   4.wSizedBox,
                   Text(
@@ -606,6 +587,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     style: TextStyle(
                       fontSize: 12.spMin,
                       color: hasExpired ? AppColors.red : AppColors.grey,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -615,9 +597,9 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               Row(
                 children: [
                   Icon(
-                    Icons.location_on_outlined,
-                    size: 14.spMin,
-                    color: AppColors.grey,
+                    LucideIcons.mapPin,
+                    size: 12.spMin,
+                    color: AppColors.grey.withValues(alpha: 0.6),
                   ),
                   4.wSizedBox,
                   Text(
@@ -625,6 +607,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                     style: TextStyle(
                       fontSize: 12.spMin,
                       color: AppColors.grey,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -656,23 +639,13 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard!.aiSummary?.trim(),
           ),
         );
-        final callsToAction = ref.watch(
-          provider.select(
-            (value) => value.hazard!.callsToAction,
-          ),
-        );
-        final callToActionText = callsToAction
-            ?.where((s) => s.trim().isNotEmpty)
-            .join(' ');
 
         final text = isUserReported
             ? [
                 if (aiSummary?.isNotEmpty ?? false) aiSummary,
-                if (callToActionText?.isNotEmpty ?? false) callToActionText!,
               ].join(' ')
             : [
                 if (shortDescription.isNotEmpty) shortDescription,
-                if (callToActionText?.isNotEmpty ?? false) callToActionText!,
               ].join(' ');
 
         if (text.isEmpty) {
@@ -762,25 +735,111 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     );
   }
 
-  Widget _viewDetailsButtonBuilder() {
-    return Button.filled(
-      value: 'View Details',
-      padding: EdgeInsets.symmetric(
-        vertical: 8.spMin,
-      ),
-      color: AppColors.primary,
-      isIconLeft: false,
-      valueStyle: TextStyle(
-        fontSize: 14.spMin,
-        fontWeight: FontWeight.w600,
-        color: AppColors.white,
-      ),
-      icon: Icon(
-        Icons.arrow_forward_ios_rounded,
-        size: 14.spMin,
-        color: AppColors.white,
-      ),
-      onPressed: _gotoViewHazard,
+  Widget _categoryAndViewDetailsBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final categoryId = ref.watch(
+          provider.select(
+            (value) => value.hazard!.category?.id,
+          ),
+        );
+        final categoryName = ref.watch(
+          provider.select(
+            (value) =>
+                value.hazard!.category?.parent?.name ??
+                value.hazard!.category?.name ??
+                'Other',
+          ),
+        );
+        final categoryColor = ref.watch(
+          provider.select(
+            (value) =>
+                value.hazard!.category?.effectiveColor ?? AppColors.black,
+          ),
+        );
+        final darkenCategoryColor = categoryId == 'utilitiesAndInfrastructure'
+            ? categoryColor.darken(0.3)
+            : categoryColor.darken(0.2);
+
+        return Column(
+          children: [
+            Divider(
+              color: AppColors.lightGrey.withValues(alpha: 0.5),
+              height: 1.0,
+              thickness: 1.0,
+            ).pX(10.0),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 16.spMin,
+                vertical: 12.spMin,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 14.spMin,
+                      vertical: 6.spMin,
+                    ),
+                    decoration: BoxDecoration(
+                      color: categoryColor.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(20.spMin),
+                      border: Border.all(
+                        color: darkenCategoryColor,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Text(
+                      categoryName,
+                      style: TextStyle(
+                        fontSize: 12.spMin,
+                        fontWeight: FontWeight.w600,
+                        color: darkenCategoryColor,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _gotoViewHazard,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IntrinsicWidth(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'View Details',
+                                style: TextStyle(
+                                  fontSize: 14.spMin,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.black,
+                                  height: 1.0,
+                                ),
+                              ),
+                              0.6.hSizedBox,
+                              Container(
+                                height: 1.0,
+                                color: AppColors.black,
+                              ),
+                            ],
+                          ),
+                        ),
+                        6.wSizedBox,
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 16.spMin,
+                          color: AppColors.black,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

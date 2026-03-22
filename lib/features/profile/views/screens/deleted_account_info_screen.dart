@@ -188,7 +188,7 @@ class _DeletedAccountInfoScreenState
         _buildStatusItem(
           icon: Icons.visibility_off_outlined,
           title: 'Content Hidden',
-          description: 'Your Alrts and content are not visible to other users.',
+          description: 'Your ALRTs and content are not visible to other users.',
           color: AppColors.orange,
         ),
         12.hSizedBox,

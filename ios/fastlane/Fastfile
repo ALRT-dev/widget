@@ -4,7 +4,7 @@ platform :ios do
   require 'date'
 
   my_release_note = <<~NOTE
-    * Bug fixes and improvements
+    * UI Updates
   NOTE
 
   desc "Automatically increment the version name and version code. Also prepare the changelogs and release note from git commits."
@@ -12,7 +12,7 @@ platform :ios do
     # Increment the version code and version name in pubspec.yaml
     pubspec_path = '../../pubspec.yaml'
     # version_name = increment_version_name(pubspec_path) # Eg. 1.0.0
-    version_name = "1.0.0"
+    version_name = "1.0.1"
     version_code = increment_version_code(pubspec_path) # Eg. 23
 
     # Generate 2 files: CHANGELOG.md and release_notes.txt from git commits
@@ -48,8 +48,7 @@ platform :ios do
 
   desc "Deploy the PROD application to TestFlight"
   lane :beta_release do
-    # match(type: "appstore")
-    # sh 'fvm flutter build ipa --flavor prod -t lib/main_prod.dart'
+    sh 'flutter build ipa --flavor prod -t lib/main_prod.dart'
     upload_to_testflight(
       changelog: my_release_note,
       ipa: "../build/ios/ipa/ALRT.ipa"

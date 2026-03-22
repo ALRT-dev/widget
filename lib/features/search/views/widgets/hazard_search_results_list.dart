@@ -5,12 +5,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
+import 'package:hazard_app/features/search/views/widgets/hazard_search_subscribed_locations_list.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/common_hazards_list_item.dart';
 import 'package:hazard_app/features/shared/views/widgets/spinner.dart';
-import 'package:hazard_app/others/app_colors.dart';
 
 class HazardSearchResultsList extends ConsumerStatefulWidget {
   const HazardSearchResultsList({super.key});
@@ -45,27 +45,34 @@ class _HazardSearchResultsListState
   }
 
   Widget _emptyBuilder() {
-    return SliverFillRemaining(
-      child: Consumer(
-        builder: (context, ref, child) {
-          final isSearchActive = ref.watch(
-            providerOfPlacesForSearch.select(
-              (value) => value.searchString.isNotEmpty,
-            ),
-          );
-          final selectedLocation = ref.watch(
-            providerOfMainSearch.select(
-              (value) => value.searchedLocation,
-            ),
-          );
+    return Consumer(
+      builder: (context, ref, child) {
+        final isSearchActive = ref.watch(
+          providerOfPlacesForSearch.select(
+            (value) => value.searchString.isNotEmpty,
+          ),
+        );
 
-          final isSubscribed = ref.watch(
-            providerOfMainSearch.select(
-              (value) => value.subscriptionId != null,
-            ),
+        if (!isSearchActive) {
+          return SliverToBoxAdapter(
+            child: HazardSearchSubscribedLocationsList(),
           );
+        }
 
-          return Column(
+        final selectedLocation = ref.watch(
+          providerOfMainSearch.select(
+            (value) => value.searchedLocation,
+          ),
+        );
+
+        final isSubscribed = ref.watch(
+          providerOfMainSearch.select(
+            (value) => value.subscriptionId != null,
+          ),
+        );
+
+        return SliverFillRemaining(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 10.spMin,
             children: [
@@ -105,9 +112,9 @@ class _HazardSearchResultsListState
               ),
               if (selectedLocation != null) _subscribeButtonBuilder(),
             ],
-          ).pad(20.0);
-        },
-      ),
+          ).pad(20.0),
+        );
+      },
     );
   }
 
@@ -135,12 +142,11 @@ class _HazardSearchResultsListState
 
         return SizedBox(
           height: 40.spMin,
-          child: Button.filled(
+          child: Button.gradient(
             width: 150.spMin,
             isLoading: isLoading,
             onPressed: _handleSubscribePressed,
             padding: EdgeInsets.zero,
-            color: isSubscribed ? AppColors.grey : null,
             icon: isLoading
                 ? null
                 : Icon(

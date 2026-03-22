@@ -61,7 +61,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
       body: Stack(
         children: [
           _buildBackground(),
-          _buildAnimatedBlobs(),
+          // _buildAnimatedBlobs(),
           _buildContent(),
         ],
       ),
@@ -84,6 +84,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
   }
 
+  // ignore: unused_element
   Widget _buildAnimatedBlobs() {
     return AnimatedBuilder(
       animation: _backgroundAnimationController,
@@ -147,8 +148,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
           tag: 'app_logo',
           child: Image.asset(
             'assets/logos/alrt_logo_detailed.png',
-            width: 250,
-            filterQuality: FilterQuality.high,
+            width: 300.spMin,
           ),
         ),
         Text(

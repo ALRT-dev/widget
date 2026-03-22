@@ -82,6 +82,9 @@ abstract class MapProviderState with _$MapProviderState {
 
     /// Whether to show route hazards
     @Default(false) final bool showRouteHazards,
+
+    /// In-memory hazard cache keyed by hazard ID.
+    @Default(<String, Hazard>{}) final Map<String, Hazard> hazardCache,
   }) = _MapProviderState;
 }
 
