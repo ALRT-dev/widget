@@ -28,8 +28,9 @@ Future<T> runAsyncCall<T>({
 
     return response;
   } catch (e, stkTrace) {
-    final stackTrace =
-        stkTrace == StackTrace.empty ? StackTrace.current : stkTrace;
+    final stackTrace = stkTrace == StackTrace.empty
+        ? StackTrace.current
+        : stkTrace;
 
     var appError = AppError(
       message: 'unknown_error'.tr(),
@@ -37,10 +38,11 @@ Future<T> runAsyncCall<T>({
     );
 
     if (e is DioException) {
-      var message = 'unknown_error'.tr();
+      var message = e.message ?? 'unknown_error'.tr();
 
       if (e.response?.data is Map) {
-        message = (e.response?.data['message']?.toString() ??
+        message =
+            (e.response?.data['message']?.toString() ??
             e.response?.data['error']?.toString() ??
             'unknown_error'.tr());
       }
