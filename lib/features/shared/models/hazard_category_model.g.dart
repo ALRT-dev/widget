@@ -17,6 +17,9 @@ _HazardCategory _$HazardCategoryFromJson(Map<String, dynamic> json) =>
           ? null
           : HazardCategory.fromJson(json['parent'] as Map<String, dynamic>),
       hazardsCount: (json['hazardsCount'] as num?)?.toInt() ?? 0,
+      images: (json['images'] as List<dynamic>?)
+          ?.map((e) => CategoryImage.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$HazardCategoryToJson(_HazardCategory instance) =>
@@ -28,4 +31,5 @@ Map<String, dynamic> _$HazardCategoryToJson(_HazardCategory instance) =>
       'parentId': ?instance.parentId,
       'parent': ?instance.parent?.toJson(),
       'hazardsCount': instance.hazardsCount,
+      'images': ?instance.images?.map((e) => e.toJson()).toList(),
     };
