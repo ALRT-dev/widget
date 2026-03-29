@@ -513,6 +513,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             (value) => value.hazard?.color ?? AppColors.black,
           ),
         );
+        final fallbackIconPath = ref.watch(
+          provider.select(
+            (value) => value.hazard?.fallbackIconPath ?? '',
+          ),
+        );
 
         return SizedBox(
           height: 70.spMin,
@@ -521,19 +526,21 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             imageUrl: categoryImage?.url ?? '',
             cacheKey: categoryImage?.s3Key,
             fit: BoxFit.contain,
-            errorWidget: (context, url, error) => Container(
-              decoration: BoxDecoration(
-                color: hazardColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12.spMin),
-              ),
-              child: Icon(
-                Icons.error,
-                size: 24.spMin,
-                color: hazardColor == AppColors.transparent
-                    ? AppColors.grey
-                    : hazardColor.isLight
-                    ? hazardColor.darken(0.5)
-                    : hazardColor,
+            errorWidget: (context, url, error) => Image.asset(
+              fallbackIconPath,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Container(
+                decoration: BoxDecoration(
+                  color: hazardColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12.spMin),
+                ),
+                child: Icon(
+                  Icons.error,
+                  size: 24.spMin,
+                  color: hazardColor == AppColors.transparent
+                      ? AppColors.grey
+                      : hazardColor,
+                ),
               ),
             ),
           ),

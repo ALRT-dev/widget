@@ -242,10 +242,11 @@ abstract class Hazard with _$Hazard {
     }
 
     if (isAwsCompliant == true) {
-      return switch (severity) {
-        HazardSeverity.advice => CategoryImageType.advice,
-        HazardSeverity.watchAndAct => CategoryImageType.watchAndAct,
-        HazardSeverity.emergency => CategoryImageType.emergency,
+      return switch (severityBand) {
+        HazardSeverityBand.info => CategoryImageType.advice,
+        HazardSeverityBand.monitor => CategoryImageType.advice,
+        HazardSeverityBand.action => CategoryImageType.watchAndAct,
+        HazardSeverityBand.critical => CategoryImageType.emergency,
         _ => CategoryImageType.info,
       };
     }
@@ -262,6 +263,14 @@ abstract class Hazard with _$Hazard {
   /// The category image of the hazard.
   CategoryImage? get categoryImage =>
       category?.categoryImageByType(categoryImageType);
+
+  /// The fallback icon path for the hazard.
+  String get fallbackIconPath {
+    if (isAwsCompliant == true) {
+      return 'assets/images/hazards/aws/other_${severityBand?.name ?? HazardSeverityBand.info.name}.png';
+    }
+    return 'assets/images/hazards/non_aws/other_${severityBand?.name ?? HazardSeverityBand.info.name}.png';
+  }
 
   factory Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);
 }

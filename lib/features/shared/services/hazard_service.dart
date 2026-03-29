@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/category_image_type.dart';
 import 'package:hazard_app/features/shared/enums/fire_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
@@ -22,6 +23,16 @@ import 'package:hazard_app/features/shared/utils/hazard_util.dart';
 
 class HazardService {
   HazardService(final Ref ref) : _ref = ref;
+
+  /// No auth interceptors — presigned image URLs must not receive API headers.
+  static final Dio _markerImageDio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(minutes: 2),
+      receiveTimeout: const Duration(minutes: 2),
+      validateStatus: (final status) =>
+          status != null && status >= 200 && status < 300,
+    ),
+  );
 
   final Ref _ref;
   HazardRepository get _hazardRepository =>
@@ -258,12 +269,34 @@ class HazardService {
     );
   }
 
+  /// Populates a hazard with any required data before processing.
+  Future<Hazard> populateHazardWithRequiredData(final Hazard hazard) async {
+    return hazard.copyWith(
+      processedMedias: await _mediaService.convertS3MediaToAlrtMedia(
+        s3Medias: hazard.medias,
+      ),
+    );
+  }
+
+  /// Populates a list of hazards with any required data before processing.
+  Future<List<Hazard>> populateHazardsWithRequiredData(
+    final List<Hazard> hazards,
+  ) async {
+    final futures = hazards.map(populateHazardWithRequiredData).toList();
+    return Future.wait(futures);
+  }
+
   /// Generates marker bitmaps for all hazard categories and severities.
   Future<Either<Map<String, BitmapDescriptor>, AppError>>
   generateHazardMarkerBitmaps() async {
     final categoriesResult = await getAllSubHazardCategories();
-    final categories = categoriesResult.whenSuccess((cats) => cats) ?? [];
+    if (categoriesResult.isFailure) {
+      return Failure(categoriesResult.failure);
+    }
+
+    final categories = List<HazardCategory>.from(categoriesResult.success);
     final severityBands = HazardSeverityBand.values;
+    final categoriesById = _hazardCategoriesById(categories);
 
     // Ensure the "other" category is included
     categories.add(HazardCategory(id: 'other'));
@@ -274,16 +307,20 @@ class HazardService {
         .map((cat) => cat.parentId)
         .where((parentId) => parentId != null)
         .cast<String>()
+        .toSet()
         .toList();
 
     // Generate bitmaps for each category and severity combination
     for (final category in categories) {
+      final categoryForBitmaps = _categoryWithLinkedParents(
+        category,
+        categoriesById,
+      );
       for (final severityBand in severityBands) {
         // Generate bitmaps for AWS compliant hazards
         final keyAws = '${category.id}_${severityBand.name}_aws';
         final futureAws = getBitmapDescriptorForHazard(
-          categoryId: category.id,
-          parentCategoryId: category.parentId,
+          category: categoryForBitmaps,
           severityBand: severityBand,
           isAwsCompliant: true,
         ).then((bitmap) => {keyAws: bitmap});
@@ -292,8 +329,7 @@ class HazardService {
         // Generate bitmaps for non-AWS compliant hazards
         final keyNonAws = '${category.id}_${severityBand.name}_non_aws';
         final futureNonAws = getBitmapDescriptorForHazard(
-          categoryId: category.id,
-          parentCategoryId: category.parentId,
+          category: categoryForBitmaps,
           severityBand: severityBand,
           isAwsCompliant: false,
           size: category.id == 'powerOutage'
@@ -304,28 +340,28 @@ class HazardService {
       }
 
       // Generate bitmaps for user reported hazards
-      late String key;
-      if (category.parentId != null) {
-        key = '${category.parentId}_user';
-      } else {
-        key = '${category.id}_user';
-      }
-      final future = getBitmapDescriptorForAssetPath(
-        assetPath: 'assets/images/hazards/non_aws/$key.png',
-        fallbackAssetPath: 'assets/images/hazards/non_aws/other_user.png',
+      final userMarkerKey = category.parentId != null
+          ? '${category.parentId}_user'
+          : '${category.id}_user';
+      final future = getBitmapDescriptorForCategoryUserMarker(
+        category: categoryForBitmaps,
         size: const Size(40, 40),
-      ).then((bitmap) => {key: bitmap});
+      ).then((bitmap) => {userMarkerKey: bitmap});
       futures.add(future);
     }
 
     // Generate bitmaps for parent categories
     for (final parentCategoryId in parentCategories) {
+      final parentCategory = _categoryWithLinkedParents(
+        categoriesById[parentCategoryId] ??
+            HazardCategory(id: parentCategoryId),
+        categoriesById,
+      );
       for (final severity in severityBands) {
         // Generate bitmaps for AWS compliant hazards for parent categories
         final keyAws = '${parentCategoryId}_${severity.name}_aws';
         final futureAws = getBitmapDescriptorForHazard(
-          categoryId: parentCategoryId,
-          parentCategoryId: null,
+          category: parentCategory,
           severityBand: severity,
           isAwsCompliant: true,
         ).then((bitmap) => {keyAws: bitmap});
@@ -334,8 +370,7 @@ class HazardService {
         // Generate bitmaps for non-AWS compliant hazards for parent categories
         final keyNonAws = '${parentCategoryId}_${severity.name}_non_aws';
         final futureNonAws = getBitmapDescriptorForHazard(
-          categoryId: parentCategoryId,
-          parentCategoryId: null,
+          category: parentCategory,
           severityBand: severity,
           isAwsCompliant: false,
         ).then((bitmap) => {keyNonAws: bitmap});
@@ -368,112 +403,188 @@ class HazardService {
 
   /// Gets a BitmapDescriptor for the given hazard category and severity.
   Future<BitmapDescriptor> getBitmapDescriptorForHazard({
-    required final String categoryId,
-    required final String? parentCategoryId,
+    required final HazardCategory category,
     required final HazardSeverityBand severityBand,
     final bool isAwsCompliant = false,
     final Size size = const Size(40, 40),
   }) async {
     try {
-      // Check for child category asset
-      final key = '${categoryId}_${severityBand.name}';
-      final assetPath =
-          'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}$key.png';
-
-      var exists = await assetExists(assetPath: assetPath);
-      if (exists) {
-        return BitmapDescriptor.asset(
-          ImageConfiguration(size: size),
-          assetPath,
+      final imageType = _categoryImageTypeForSeverityBand(
+        severityBand,
+        isAwsCompliant: isAwsCompliant,
+      );
+      final image = category.categoryImageByType(imageType);
+      final url = image?.url;
+      if (url != null && url.isNotEmpty) {
+        final fromNetwork = await getBitmapDescriptorFromUrl(
+          url: url,
+          logicalSize: size,
         );
-      }
-
-      // If child category asset doesn't exist, check for parent category asset
-      if (parentCategoryId != null) {
-        final parentKey = '${parentCategoryId}_${severityBand.name}';
-        final parentAssetPath =
-            'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}$parentKey.png';
-        exists = await assetExists(assetPath: parentAssetPath);
-        if (exists) {
-          return BitmapDescriptor.asset(
-            ImageConfiguration(size: size),
-            parentAssetPath,
-          );
+        if (fromNetwork != null) {
+          return fromNetwork;
         }
       }
 
-      // If neither exists, use the generic "other" asset for the severity
-      exists = await assetExists(
-        assetPath:
-            'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
+      return _bitmapDescriptorOtherSeverity(
+        severityBand: severityBand,
+        isAwsCompliant: isAwsCompliant,
+        size: size,
       );
-      if (exists) {
-        return BitmapDescriptor.asset(
-          ImageConfiguration(size: size),
-          'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
+    } catch (e) {
+      return _bitmapDescriptorOtherSeverity(
+        severityBand: severityBand,
+        isAwsCompliant: isAwsCompliant,
+        size: size,
+      );
+    }
+  }
+
+  /// User-report marker: [CategoryImageType.user] from the category API, else [other_info].
+  Future<BitmapDescriptor> getBitmapDescriptorForCategoryUserMarker({
+    required final HazardCategory category,
+    final Size size = const Size(40, 40),
+  }) async {
+    try {
+      final image = category.categoryImageByType(CategoryImageType.user);
+      final url = image?.url;
+      if (url != null && url.isNotEmpty) {
+        final fromNetwork = await getBitmapDescriptorFromUrl(
+          url: url,
+          logicalSize: size,
         );
+        if (fromNetwork != null) {
+          return fromNetwork;
+        }
       }
 
-      return BitmapDescriptor.defaultMarker;
+      return _bitmapDescriptorOtherSeverity(
+        severityBand: HazardSeverityBand.info,
+        isAwsCompliant: false,
+        size: size,
+      );
+    } catch (e) {
+      return _bitmapDescriptorOtherSeverity(
+        severityBand: HazardSeverityBand.info,
+        isAwsCompliant: false,
+        size: size,
+      );
+    }
+  }
+
+  Future<BitmapDescriptor?> getBitmapDescriptorFromUrl({
+    required final String url,
+    required final Size logicalSize,
+  }) async {
+    try {
+      final response = await _markerImageDio.get<List<int>>(
+        url,
+        options: Options(responseType: ResponseType.bytes),
+      );
+      final data = response.data;
+      if (data == null) {
+        return null;
+      }
+      if (data.isEmpty) {
+        return null;
+      }
+      final bytes = data is Uint8List ? data : Uint8List.fromList(data);
+      return BitmapDescriptor.bytes(
+        bytes,
+        width: logicalSize.width,
+        height: logicalSize.height,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Map<String, HazardCategory> _hazardCategoriesById(
+    final List<HazardCategory> categories,
+  ) {
+    final map = <String, HazardCategory>{};
+    for (final c in categories) {
+      map[c.id] = c;
+      var walk = c.parent;
+      while (walk != null) {
+        map[walk.id] = walk;
+        walk = walk.parent;
+      }
+    }
+    return map;
+  }
+
+  HazardCategory _categoryWithLinkedParents(
+    final HazardCategory category,
+    final Map<String, HazardCategory> byId,
+  ) {
+    if (category.parent != null || category.parentId == null) {
+      return category;
+    }
+    final parent = byId[category.parentId!];
+    if (parent == null) {
+      return category;
+    }
+    return category.copyWith(
+      parent: _categoryWithLinkedParents(parent, byId),
+    );
+  }
+
+  CategoryImageType _categoryImageTypeForSeverityBand(
+    final HazardSeverityBand band, {
+    required final bool isAwsCompliant,
+  }) {
+    if (isAwsCompliant) {
+      return switch (band) {
+        HazardSeverityBand.info => CategoryImageType.advice,
+        HazardSeverityBand.monitor => CategoryImageType.advice,
+        HazardSeverityBand.action => CategoryImageType.watchAndAct,
+        HazardSeverityBand.critical => CategoryImageType.emergency,
+      };
+    }
+    return switch (band) {
+      HazardSeverityBand.info => CategoryImageType.info,
+      HazardSeverityBand.monitor => CategoryImageType.monitor,
+      HazardSeverityBand.action => CategoryImageType.action,
+      HazardSeverityBand.critical => CategoryImageType.critical,
+    };
+  }
+
+  /// Local fallback markers: only the generic `other_*` assets are kept on disk.
+  Future<BitmapDescriptor> _bitmapDescriptorOtherSeverity({
+    required final HazardSeverityBand severityBand,
+    required final bool isAwsCompliant,
+    required final Size size,
+  }) async {
+    try {
+      return BitmapDescriptor.asset(
+        ImageConfiguration(size: size),
+        'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
+      );
     } catch (e) {
       return BitmapDescriptor.defaultMarker;
     }
   }
 
-  /// Gets a BitmapDescriptor for the given asset path, with a fallback option.
+  /// Fire-status markers only (bundled assets); [fallbackAssetPath] when primary is missing.
   Future<BitmapDescriptor> getBitmapDescriptorForAssetPath({
     required final String assetPath,
     final Size size = const Size(40, 40),
-    final String fallbackAssetPath =
-        'assets/images/hazards/non_aws/other_unknown.png',
+    required final String fallbackAssetPath,
   }) async {
     try {
-      var exists = await assetExists(assetPath: assetPath);
-      if (exists) {
-        return BitmapDescriptor.asset(
+      try {
+        return await BitmapDescriptor.asset(
           ImageConfiguration(size: size),
           assetPath,
         );
-      }
-
-      exists = await assetExists(assetPath: fallbackAssetPath);
-      if (exists) {
-        return BitmapDescriptor.asset(
+      } catch (e) {
+        return await BitmapDescriptor.asset(
           ImageConfiguration(size: size),
           fallbackAssetPath,
         );
       }
-
-      return BitmapDescriptor.defaultMarker;
     } catch (e) {
       return BitmapDescriptor.defaultMarker;
-    }
-  }
-
-  /// Populates a hazard with any required data before processing.
-  Future<Hazard> populateHazardWithRequiredData(final Hazard hazard) async {
-    return hazard.copyWith(
-      processedMedias: await _mediaService.convertS3MediaToAlrtMedia(
-        s3Medias: hazard.medias,
-      ),
-    );
-  }
-
-  /// Populates a list of hazards with any required data before processing.
-  Future<List<Hazard>> populateHazardsWithRequiredData(
-    final List<Hazard> hazards,
-  ) async {
-    final futures = hazards.map(populateHazardWithRequiredData).toList();
-    return Future.wait(futures);
-  }
-
-  /// Checks if an asset exists at the given path.
-  Future<bool> assetExists({required final String assetPath}) async {
-    try {
-      await rootBundle.load(assetPath);
-      return true;
-    } catch (e) {
-      return false;
     }
   }
 }
