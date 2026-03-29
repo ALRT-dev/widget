@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart' show ImageConfiguration, Size;
 import 'package:flutter/services.dart';
@@ -408,67 +409,65 @@ class HazardService {
     final bool isAwsCompliant = false,
     final Size size = const Size(40, 40),
   }) async {
-    try {
-      final imageType = _categoryImageTypeForSeverityBand(
-        severityBand,
-        isAwsCompliant: isAwsCompliant,
-      );
-      final image = category.categoryImageByType(imageType);
-      final url = image?.url;
-      if (url != null && url.isNotEmpty) {
-        final fromNetwork = await getBitmapDescriptorFromUrl(
-          url: url,
-          logicalSize: size,
-        );
-        if (fromNetwork != null) {
-          return fromNetwork;
-        }
-      }
-
-      return _bitmapDescriptorOtherSeverity(
-        severityBand: severityBand,
-        isAwsCompliant: isAwsCompliant,
-        size: size,
-      );
-    } catch (e) {
-      return _bitmapDescriptorOtherSeverity(
-        severityBand: severityBand,
-        isAwsCompliant: isAwsCompliant,
-        size: size,
-      );
-    }
+    final imageType = _categoryImageTypeForSeverityBand(
+      severityBand,
+      isAwsCompliant: isAwsCompliant,
+    );
+    return _bitmapDescriptorFromCategoryImageChain(
+      category: category,
+      imageType: imageType,
+      severityBandForOtherFallback: severityBand,
+      isAwsCompliantForOtherFallback: isAwsCompliant,
+      size: size,
+    );
   }
 
-  /// User-report marker: [CategoryImageType.user] from the category API, else [other_info].
+  /// User-report marker: own [CategoryImageType.user], then parent chain, then [other_info].
   Future<BitmapDescriptor> getBitmapDescriptorForCategoryUserMarker({
     required final HazardCategory category,
     final Size size = const Size(40, 40),
   }) async {
+    return _bitmapDescriptorFromCategoryImageChain(
+      category: category,
+      imageType: CategoryImageType.user,
+      severityBandForOtherFallback: HazardSeverityBand.info,
+      isAwsCompliantForOtherFallback: false,
+      size: size,
+    );
+  }
+
+  /// Uses this category's image for [imageType], then each ancestor's own image, then `other_*`.
+  Future<BitmapDescriptor> _bitmapDescriptorFromCategoryImageChain({
+    required final HazardCategory category,
+    required final CategoryImageType imageType,
+    required final HazardSeverityBand severityBandForOtherFallback,
+    required final bool isAwsCompliantForOtherFallback,
+    required final Size size,
+  }) async {
     try {
-      final image = category.categoryImageByType(CategoryImageType.user);
-      final url = image?.url;
-      if (url != null && url.isNotEmpty) {
-        final fromNetwork = await getBitmapDescriptorFromUrl(
-          url: url,
-          logicalSize: size,
+      for (HazardCategory? node = category; node != null; node = node.parent) {
+        final slot = node.images?.firstWhereOrNull(
+          (final image) => image.imageType == imageType,
         );
-        if (fromNetwork != null) {
-          return fromNetwork;
+        final url = slot?.url;
+        if (url != null && url.isNotEmpty) {
+          final bitmap = await getBitmapDescriptorFromUrl(
+            url: url,
+            logicalSize: size,
+          );
+          if (bitmap != null) {
+            return bitmap;
+          }
         }
       }
-
-      return _bitmapDescriptorOtherSeverity(
-        severityBand: HazardSeverityBand.info,
-        isAwsCompliant: false,
-        size: size,
-      );
-    } catch (e) {
-      return _bitmapDescriptorOtherSeverity(
-        severityBand: HazardSeverityBand.info,
-        isAwsCompliant: false,
-        size: size,
-      );
+    } catch (_) {
+      // Fall through to bundled `other_*` marker.
     }
+    return _bitmapDescriptorOtherSeverity(
+      severityBand: severityBandForOtherFallback,
+      isAwsCompliant: isAwsCompliantForOtherFallback,
+      size: size,
+    );
   }
 
   Future<BitmapDescriptor?> getBitmapDescriptorFromUrl({
