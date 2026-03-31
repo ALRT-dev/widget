@@ -10,6 +10,7 @@ import 'package:hazard_app/features/shared/enums/fire_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
+import 'package:hazard_app/features/shared/models/category_image_model.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
@@ -333,9 +334,7 @@ class HazardService {
           category: categoryForBitmaps,
           severityBand: severityBand,
           isAwsCompliant: false,
-          size: category.id == 'powerOutage'
-              ? const Size(32, 32)
-              : const Size(40, 40),
+          size: const Size(40, 40),
         ).then((bitmap) => {keyNonAws: bitmap});
         futures.add(futureNonAws);
       }
@@ -449,10 +448,11 @@ class HazardService {
           (final image) => image.imageType == imageType,
         );
         final url = slot?.url;
-        if (url != null && url.isNotEmpty) {
+        if (slot != null && url != null && url.isNotEmpty) {
+          final logicalSize = _markerLogicalSizeForCategoryImage(slot, size);
           final bitmap = await getBitmapDescriptorFromUrl(
             url: url,
-            logicalSize: size,
+            logicalSize: logicalSize,
           );
           if (bitmap != null) {
             return bitmap;
@@ -479,11 +479,51 @@ class HazardService {
     if (fromNet != null) {
       return fromNet;
     }
+    final assetSize = _markerLogicalSizeFromCategoryChainForType(
+      category,
+      imageType,
+      size,
+    );
     return _bitmapDescriptorOtherSeverity(
       severityBand: severityBandForOtherFallback,
       isAwsCompliant: isAwsCompliantForOtherFallback,
-      size: size,
+      size: assetSize,
     );
+  }
+
+  /// Uses [image] width/height when both are set and positive; otherwise [defaultSize].
+  Size _markerLogicalSizeForCategoryImage(
+    final CategoryImage image,
+    final Size defaultSize,
+  ) {
+    final w = image.width;
+    final h = image.height;
+    if (w != null && h != null && w > 0 && h > 0) {
+      return Size(w.toDouble(), h.toDouble());
+    }
+    return defaultSize;
+  }
+
+  /// First matching [imageType] in category → parent chain with valid width/height, else [defaultSize].
+  Size _markerLogicalSizeFromCategoryChainForType(
+    final HazardCategory category,
+    final CategoryImageType imageType,
+    final Size defaultSize,
+  ) {
+    for (HazardCategory? node = category; node != null; node = node.parent) {
+      final slot = node.images?.firstWhereOrNull(
+        (final image) => image.imageType == imageType,
+      );
+      if (slot == null) {
+        continue;
+      }
+      final w = slot.width;
+      final h = slot.height;
+      if (w != null && h != null && w > 0 && h > 0) {
+        return Size(w.toDouble(), h.toDouble());
+      }
+    }
+    return defaultSize;
   }
 
   Future<BitmapDescriptor?> getBitmapDescriptorFromUrl({
