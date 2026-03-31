@@ -8,6 +8,10 @@ enum CategoryImageType {
   watchAndAct,
   emergency,
   user,
+  fireActive,
+  fireBeingControlled,
+  fireUnderControl,
+  fireClosed,
 }
 
 extension CategoryImageTypeExtension on CategoryImageType {
@@ -30,6 +34,14 @@ extension CategoryImageTypeExtension on CategoryImageType {
         return 'emergencyImage';
       case CategoryImageType.user:
         return 'userImage';
+      case CategoryImageType.fireActive:
+        return 'fireActiveImage';
+      case CategoryImageType.fireBeingControlled:
+        return 'fireBeingControlledImage';
+      case CategoryImageType.fireUnderControl:
+        return 'fireUnderControlImage';
+      case CategoryImageType.fireClosed:
+        return 'fireClosedImage';
     }
   }
 
@@ -52,6 +64,14 @@ extension CategoryImageTypeExtension on CategoryImageType {
         return 'Emergency';
       case CategoryImageType.user:
         return 'User';
+      case CategoryImageType.fireActive:
+        return 'Fire (active)';
+      case CategoryImageType.fireBeingControlled:
+        return 'Fire (being controlled)';
+      case CategoryImageType.fireUnderControl:
+        return 'Fire (under control)';
+      case CategoryImageType.fireClosed:
+        return 'Fire (closed)';
     }
   }
 }

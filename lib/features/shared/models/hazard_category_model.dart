@@ -34,6 +34,9 @@ abstract class HazardCategory with _$HazardCategory {
     /// The number of hazards associated with this category.
     @Default(0) final int hazardsCount,
 
+    /// Whether the hazard category is fire-related.
+    @Default(false) final bool isFireRelated,
+
     /// The images associated with the hazard category.
     final List<CategoryImage>? images,
   }) = _HazardCategory;

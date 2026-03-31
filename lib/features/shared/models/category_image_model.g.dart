@@ -39,4 +39,8 @@ const _$CategoryImageTypeEnumMap = {
   CategoryImageType.watchAndAct: 'watchAndAct',
   CategoryImageType.emergency: 'emergency',
   CategoryImageType.user: 'user',
+  CategoryImageType.fireActive: 'fireActive',
+  CategoryImageType.fireBeingControlled: 'fireBeingControlled',
+  CategoryImageType.fireUnderControl: 'fireUnderControl',
+  CategoryImageType.fireClosed: 'fireClosed',
 };

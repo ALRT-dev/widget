@@ -349,6 +349,12 @@ class HazardService {
         size: const Size(40, 40),
       ).then((bitmap) => {userMarkerKey: bitmap});
       futures.add(future);
+
+      _scheduleFireStatusMarkerBitmaps(
+        futures: futures,
+        bitmapKeyCategoryId: category.id,
+        categoryWithImages: categoryForBitmaps,
+      );
     }
 
     // Generate bitmaps for parent categories
@@ -377,17 +383,12 @@ class HazardService {
         ).then((bitmap) => {keyNonAws: bitmap});
         futures.add(futureNonAws);
       }
-    }
 
-    // Generate bitmaps for bushfire markers
-    for (final fireStatus in FireStatus.values) {
-      final key = 'fireStatus_${fireStatus.name}';
-      final future = getBitmapDescriptorForAssetPath(
-        assetPath: 'assets/images/hazards/non_aws/$key.png',
-        fallbackAssetPath:
-            'assets/images/hazards/non_aws/fireStatus_underControl.png',
-      ).then((bitmap) => {key: bitmap});
-      futures.add(future);
+      _scheduleFireStatusMarkerBitmaps(
+        futures: futures,
+        bitmapKeyCategoryId: parentCategoryId,
+        categoryWithImages: parentCategory,
+      );
     }
 
     final markerBitmaps = await Future.wait(futures);
@@ -436,12 +437,10 @@ class HazardService {
     );
   }
 
-  /// Uses this category's image for [imageType], then each ancestor's own image, then `other_*`.
-  Future<BitmapDescriptor> _bitmapDescriptorFromCategoryImageChain({
+  /// Category → parent chain via network only; null if nothing loaded.
+  Future<BitmapDescriptor?> _bitmapDescriptorFromNetworkChainOnly({
     required final HazardCategory category,
     required final CategoryImageType imageType,
-    required final HazardSeverityBand severityBandForOtherFallback,
-    required final bool isAwsCompliantForOtherFallback,
     required final Size size,
   }) async {
     try {
@@ -460,8 +459,25 @@ class HazardService {
           }
         }
       }
-    } catch (_) {
-      // Fall through to bundled `other_*` marker.
+    } catch (_) {}
+    return null;
+  }
+
+  /// Uses this category's image for [imageType], then each ancestor's own image, then `other_*`.
+  Future<BitmapDescriptor> _bitmapDescriptorFromCategoryImageChain({
+    required final HazardCategory category,
+    required final CategoryImageType imageType,
+    required final HazardSeverityBand severityBandForOtherFallback,
+    required final bool isAwsCompliantForOtherFallback,
+    required final Size size,
+  }) async {
+    final fromNet = await _bitmapDescriptorFromNetworkChainOnly(
+      category: category,
+      imageType: imageType,
+      size: size,
+    );
+    if (fromNet != null) {
+      return fromNet;
     }
     return _bitmapDescriptorOtherSeverity(
       severityBand: severityBandForOtherFallback,
@@ -528,6 +544,37 @@ class HazardService {
     );
   }
 
+  CategoryImageType _categoryImageTypeForFireStatus(final FireStatus status) {
+    return switch (status) {
+      FireStatus.active => CategoryImageType.fireActive,
+      FireStatus.beingControlled => CategoryImageType.fireBeingControlled,
+      FireStatus.underControl => CategoryImageType.fireUnderControl,
+      FireStatus.closed => CategoryImageType.fireClosed,
+    };
+  }
+
+  void _scheduleFireStatusMarkerBitmaps({
+    required final List<Future<Map<String, BitmapDescriptor>>> futures,
+    required final String bitmapKeyCategoryId,
+    required final HazardCategory categoryWithImages,
+  }) {
+    for (final fireStatus in FireStatus.values) {
+      final fireKey = '${bitmapKeyCategoryId}_fireStatus_${fireStatus.name}';
+      futures.add(
+        _bitmapDescriptorFromNetworkChainOnly(
+          category: categoryWithImages,
+          imageType: _categoryImageTypeForFireStatus(fireStatus),
+          size: const Size(40, 40),
+        ).then((bitmap) {
+          if (bitmap == null) {
+            return <String, BitmapDescriptor>{};
+          }
+          return {fireKey: bitmap};
+        }),
+      );
+    }
+  }
+
   CategoryImageType _categoryImageTypeForSeverityBand(
     final HazardSeverityBand band, {
     required final bool isAwsCompliant,
@@ -559,29 +606,6 @@ class HazardService {
         ImageConfiguration(size: size),
         'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
       );
-    } catch (e) {
-      return BitmapDescriptor.defaultMarker;
-    }
-  }
-
-  /// Fire-status markers only (bundled assets); [fallbackAssetPath] when primary is missing.
-  Future<BitmapDescriptor> getBitmapDescriptorForAssetPath({
-    required final String assetPath,
-    final Size size = const Size(40, 40),
-    required final String fallbackAssetPath,
-  }) async {
-    try {
-      try {
-        return await BitmapDescriptor.asset(
-          ImageConfiguration(size: size),
-          assetPath,
-        );
-      } catch (e) {
-        return await BitmapDescriptor.asset(
-          ImageConfiguration(size: size),
-          fallbackAssetPath,
-        );
-      }
     } catch (e) {
       return BitmapDescriptor.defaultMarker;
     }

@@ -158,62 +158,33 @@ abstract class Hazard with _$Hazard {
     return DateTime.now().isAfter(expiresAt!);
   }
 
-  // /// The file path for the hazard icon based on its category and severity.
-  // String get iconPath {
-  //   if (source?.id == 'smartraveller') {
-  //     final severityBandName =
-  //         severityBand?.name ?? HazardSeverityBand.info.name;
-  //     return 'assets/images/hazards/non_aws/other_$severityBandName.png';
-  //   }
-
-  //   if (fireStatus != null) {
-  //     if ((categoryId == "bushfire" && isAwsCompliant == false) ||
-  //         categoryId == "otherFire") {
-  //       return 'assets/images/hazards/non_aws/fireStatus_${fireStatus!.name}.png';
-  //     }
-  //   }
-
-  //   if (reportedBy != null) {
-  //     return 'assets/images/hazards/non_aws/${categoryId}_user.png';
-  //   }
-
-  //   final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
-  //   return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${categoryId}_$severityBandName.png';
-  // }
-
   /// Gets the appropriate BitmapDescriptor for the hazard marker.
   BitmapDescriptor? getMarkerBitmapDescriptor(
     Map<String, BitmapDescriptor> bitmapMap,
   ) {
-    var key =
-        '${categoryId}_${severityBand?.name ?? HazardSeverityBand.info.name}${isAwsCompliant == true ? '_aws' : '_non_aws'}';
-
-    if (source?.id == 'smartraveller') {
-      final severityBandName =
-          severityBand?.name ?? HazardSeverityBand.info.name;
-      key = 'other_${severityBandName}_non_aws';
+    if (isUserReported) {
+      return bitmapMap['${categoryId}_user'];
     }
 
-    // Check for fire status override
-    if (fireStatus != null) {
-      if ((categoryId == "bushfire" && isAwsCompliant == false) ||
-          categoryId == "otherFire") {
-        key = 'fireStatus_${fireStatus!.name}';
+    if (fireStatus != null && isAwsCompliant == false) {
+      final fireKey = '${categoryId}_fireStatus_${fireStatus!.name}';
+      final fireBitmap = bitmapMap[fireKey];
+      if (fireBitmap != null) {
+        return fireBitmap;
       }
     }
 
-    // Check for user-reported override
-    if (reportedBy != null) {
-      key = '${categoryId}_user';
-    }
+    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
+    var severityKey =
+        '${categoryId}_$severityBandName${isAwsCompliant == true ? '_aws' : '_non_aws'}';
 
-    return bitmapMap[key];
+    return bitmapMap[severityKey];
   }
 
   /// The color associated with the hazard's severity band.
   Color get color {
     // If the hazard is user-reported, use the user report status color
-    if (reportedBy != null) {
+    if (isUserReported) {
       final reportsStatus = reportedBy!.reportsStatus;
       return reportsStatus.color;
     }
@@ -239,6 +210,19 @@ abstract class Hazard with _$Hazard {
   CategoryImageType get categoryImageType {
     if (isUserReported) {
       return CategoryImageType.user;
+    }
+
+    if (fireStatus != null && isAwsCompliant == false) {
+      final firestatus = switch (fireStatus!) {
+        FireStatus.active => CategoryImageType.fireActive,
+        FireStatus.beingControlled => CategoryImageType.fireBeingControlled,
+        FireStatus.underControl => CategoryImageType.fireUnderControl,
+        FireStatus.closed => CategoryImageType.fireClosed,
+      };
+      final hasImage = category?.categoryImageByType(firestatus) != null;
+      if (hasImage) {
+        return firestatus;
+      }
     }
 
     if (isAwsCompliant == true) {
