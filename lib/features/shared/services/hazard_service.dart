@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart' show ImageConfiguration, Size;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -19,9 +20,35 @@ import 'package:hazard_app/features/shared/models/view_hazard_response_model.dar
 import 'package:hazard_app/features/shared/providers/repository_providers.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/repositories/hazard_repository.dart';
+import 'package:hazard_app/features/shared/services/cache_manager_service.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 import 'package:hazard_app/features/shared/utils/hazard_util.dart';
+
+/// Limits concurrent async tasks to prevent network/socket saturation.
+class _ConcurrencyPool {
+  _ConcurrencyPool(this.maxConcurrent);
+  final int maxConcurrent;
+  int _active = 0;
+  final _waiting = <Completer<void>>[];
+
+  Future<T> run<T>(Future<T> Function() task) async {
+    if (_active >= maxConcurrent) {
+      final completer = Completer<void>();
+      _waiting.add(completer);
+      await completer.future;
+    }
+    _active++;
+    try {
+      return await task();
+    } finally {
+      _active--;
+      if (_waiting.isNotEmpty) {
+        _waiting.removeAt(0).complete();
+      }
+    }
+  }
+}
 
 class HazardService {
   HazardService(final Ref ref) : _ref = ref;
@@ -36,10 +63,23 @@ class HazardService {
     ),
   );
 
+  static final _downloadPool = _ConcurrencyPool(30);
+
   final Ref _ref;
   HazardRepository get _hazardRepository =>
       _ref.read(providerOfHazardRepository);
   MediaService get _mediaService => _ref.read(providerOfMediaService);
+  CacheManagerService get _cacheManagerService =>
+      _ref.read(providerOfCacheManagerService);
+
+  /// Caches in-flight URL downloads so the same image is fetched only once.
+  final _urlBytesCache = <String, Future<Uint8List?>>{};
+
+  /// Caches asset-based fallback bitmaps to avoid redundant disk I/O.
+  final _assetBitmapCache = <String, Future<BitmapDescriptor>>{};
+
+  /// Caches network BitmapDescriptors by s3Key+size to deduplicate identical images.
+  final _bitmapByS3KeyCache = <String, Future<BitmapDescriptor?>>{};
 
   /// Fetches the list of hazards from the server.
   Future<Either<List<Hazard>, AppError>> getHazards({
@@ -288,9 +328,35 @@ class HazardService {
     return Future.wait(futures);
   }
 
+  /// Finds the first image matching [imageType] walking up the parent chain.
+  CategoryImage? _findFirstImageInChain(
+    final HazardCategory category,
+    final CategoryImageType imageType,
+  ) {
+    for (HazardCategory? node = category; node != null; node = node.parent) {
+      final slot = node.images?.firstWhereOrNull(
+        (final image) => image.imageType == imageType,
+      );
+      if (slot != null && slot.url.isNotEmpty) {
+        return slot;
+      }
+    }
+    return null;
+  }
+
   /// Generates marker bitmaps for all hazard categories and severities.
+  ///
+  /// Uses a three-phase approach to minimize async overhead:
+  /// 1. Resolve all image chains synchronously
+  /// 2. Batch-download unique images + pre-load fallback assets
+  /// 3. Build bitmap map with minimal async
   Future<Either<Map<String, BitmapDescriptor>, AppError>>
   generateHazardMarkerBitmaps() async {
+    _urlBytesCache.clear();
+    _assetBitmapCache.clear();
+    _bitmapByS3KeyCache.clear();
+
+    final stopwatch = Stopwatch()..start();
     final categoriesResult = await getAllSubHazardCategories();
     if (categoriesResult.isFailure) {
       return Failure(categoriesResult.failure);
@@ -300,106 +366,276 @@ class HazardService {
     final severityBands = HazardSeverityBand.values;
     final categoriesById = _hazardCategoriesById(categories);
 
-    // Ensure the "other" category is included
     categories.add(HazardCategory(id: 'other'));
 
-    final futures = <Future<Map<String, BitmapDescriptor>>>[];
+    final scheduledKeys = <String>{};
+    const defaultSize = Size(40, 40);
 
-    final parentCategories = categories
+    final parentCategoryIds = categories
         .map((cat) => cat.parentId)
         .where((parentId) => parentId != null)
         .cast<String>()
         .toSet()
         .toList();
 
-    // Generate bitmaps for each category and severity combination
+    // Pre-compute linked categories once
+    final linked = <String, HazardCategory>{};
     for (final category in categories) {
-      final categoryForBitmaps = _categoryWithLinkedParents(
+      linked[category.id] = _categoryWithLinkedParents(
         category,
         categoriesById,
       );
-      for (final severityBand in severityBands) {
-        // Generate bitmaps for AWS compliant hazards
-        final keyAws = '${category.id}_${severityBand.name}_aws';
-        final futureAws = getBitmapDescriptorForHazard(
-          category: categoryForBitmaps,
-          severityBand: severityBand,
-          isAwsCompliant: true,
-        ).then((bitmap) => {keyAws: bitmap});
-        futures.add(futureAws);
+    }
+    for (final parentId in parentCategoryIds) {
+      linked.putIfAbsent(
+        parentId,
+        () => _categoryWithLinkedParents(
+          categoriesById[parentId] ?? HazardCategory(id: parentId),
+          categoriesById,
+        ),
+      );
+    }
 
-        // Generate bitmaps for non-AWS compliant hazards
-        final keyNonAws = '${category.id}_${severityBand.name}_non_aws';
-        final futureNonAws = getBitmapDescriptorForHazard(
-          category: categoryForBitmaps,
-          severityBand: severityBand,
-          isAwsCompliant: false,
-          size: const Size(40, 40),
-        ).then((bitmap) => {keyNonAws: bitmap});
-        futures.add(futureNonAws);
+    // ── Phase 1: Resolve all bitmap entries synchronously ──
+    // Network entries: (bitmapKey, slot, netSize, fallbackSeverity, fallbackIsAws, fallbackSize)
+    final networkEntries =
+        <(String, CategoryImage, Size, HazardSeverityBand, bool, Size)>[];
+    // Asset-only entries: (bitmapKey, severity, isAws, size)
+    final assetEntries = <(String, HazardSeverityBand, bool, Size)>[];
+    // Fire status entries (nullable, no fallback): (bitmapKey, slot, size)
+    final fireEntries = <(String, CategoryImage, Size)>[];
+
+    void resolveHazard(
+      final String key,
+      final HazardCategory cat,
+      final HazardSeverityBand severity,
+      final bool isAws,
+    ) {
+      if (!scheduledKeys.add(key)) return;
+      final imageType = _categoryImageTypeForSeverityBand(
+        severity,
+        isAwsCompliant: isAws,
+      );
+      final slot = _findFirstImageInChain(cat, imageType);
+      if (slot != null) {
+        networkEntries.add((
+          key,
+          slot,
+          _markerLogicalSizeForCategoryImage(slot, defaultSize),
+          severity,
+          isAws,
+          _markerLogicalSizeFromCategoryChainForType(
+            cat,
+            imageType,
+            defaultSize,
+          ),
+        ));
+      } else {
+        assetEntries.add((
+          key,
+          severity,
+          isAws,
+          _markerLogicalSizeFromCategoryChainForType(
+            cat,
+            imageType,
+            defaultSize,
+          ),
+        ));
       }
+    }
 
-      // Generate bitmaps for user reported hazards
-      final userMarkerKey = category.parentId != null
+    void resolveUser(final String key, final HazardCategory cat) {
+      if (!scheduledKeys.add(key)) return;
+      final slot = _findFirstImageInChain(cat, CategoryImageType.user);
+      if (slot != null) {
+        networkEntries.add((
+          key,
+          slot,
+          _markerLogicalSizeForCategoryImage(slot, defaultSize),
+          HazardSeverityBand.info,
+          false,
+          _markerLogicalSizeFromCategoryChainForType(
+            cat,
+            CategoryImageType.user,
+            defaultSize,
+          ),
+        ));
+      } else {
+        assetEntries.add((
+          key,
+          HazardSeverityBand.info,
+          false,
+          _markerLogicalSizeFromCategoryChainForType(
+            cat,
+            CategoryImageType.user,
+            defaultSize,
+          ),
+        ));
+      }
+    }
+
+    void resolveFireStatus(
+      final String key,
+      final HazardCategory cat,
+      final FireStatus status,
+    ) {
+      if (!scheduledKeys.add(key)) return;
+      final imageType = _categoryImageTypeForFireStatus(status);
+      final slot = _findFirstImageInChain(cat, imageType);
+      if (slot != null) {
+        fireEntries.add((
+          key,
+          slot,
+          _markerLogicalSizeForCategoryImage(slot, defaultSize),
+        ));
+      }
+    }
+
+    for (final category in categories) {
+      final cat = linked[category.id]!;
+      for (final severity in severityBands) {
+        resolveHazard(
+          '${category.id}_${severity.name}_aws',
+          cat,
+          severity,
+          true,
+        );
+        resolveHazard(
+          '${category.id}_${severity.name}_non_aws',
+          cat,
+          severity,
+          false,
+        );
+      }
+      final userKey = category.parentId != null
           ? '${category.parentId}_user'
           : '${category.id}_user';
-      final future = getBitmapDescriptorForCategoryUserMarker(
-        category: categoryForBitmaps,
-        size: const Size(40, 40),
-      ).then((bitmap) => {userMarkerKey: bitmap});
-      futures.add(future);
-
-      _scheduleFireStatusMarkerBitmaps(
-        futures: futures,
-        bitmapKeyCategoryId: category.id,
-        categoryWithImages: categoryForBitmaps,
-      );
-    }
-
-    // Generate bitmaps for parent categories
-    for (final parentCategoryId in parentCategories) {
-      final parentCategory = _categoryWithLinkedParents(
-        categoriesById[parentCategoryId] ??
-            HazardCategory(id: parentCategoryId),
-        categoriesById,
-      );
-      for (final severity in severityBands) {
-        // Generate bitmaps for AWS compliant hazards for parent categories
-        final keyAws = '${parentCategoryId}_${severity.name}_aws';
-        final futureAws = getBitmapDescriptorForHazard(
-          category: parentCategory,
-          severityBand: severity,
-          isAwsCompliant: true,
-        ).then((bitmap) => {keyAws: bitmap});
-        futures.add(futureAws);
-
-        // Generate bitmaps for non-AWS compliant hazards for parent categories
-        final keyNonAws = '${parentCategoryId}_${severity.name}_non_aws';
-        final futureNonAws = getBitmapDescriptorForHazard(
-          category: parentCategory,
-          severityBand: severity,
-          isAwsCompliant: false,
-        ).then((bitmap) => {keyNonAws: bitmap});
-        futures.add(futureNonAws);
+      resolveUser(userKey, cat);
+      for (final fireStatus in FireStatus.values) {
+        resolveFireStatus(
+          '${category.id}_fireStatus_${fireStatus.name}',
+          cat,
+          fireStatus,
+        );
       }
+    }
 
-      _scheduleFireStatusMarkerBitmaps(
-        futures: futures,
-        bitmapKeyCategoryId: parentCategoryId,
-        categoryWithImages: parentCategory,
+    for (final parentId in parentCategoryIds) {
+      final cat = linked[parentId]!;
+      for (final severity in severityBands) {
+        resolveHazard('${parentId}_${severity.name}_aws', cat, severity, true);
+        resolveHazard(
+          '${parentId}_${severity.name}_non_aws',
+          cat,
+          severity,
+          false,
+        );
+      }
+      for (final fireStatus in FireStatus.values) {
+        resolveFireStatus(
+          '${parentId}_fireStatus_${fireStatus.name}',
+          cat,
+          fireStatus,
+        );
+      }
+    }
+
+    // ── Phase 2: Batch-download unique images + pre-load fallback assets ──
+    final uniqueDownloads = <String, String>{}; // s3Key → url
+    for (final (_, slot, _, _, _, _) in networkEntries) {
+      uniqueDownloads.putIfAbsent(slot.s3Key, () => slot.url);
+    }
+    for (final (_, slot, _) in fireEntries) {
+      uniqueDownloads.putIfAbsent(slot.s3Key, () => slot.url);
+    }
+
+    // Collect unique asset fallbacks (including fallbacks for network entries
+    // in case a download fails).
+    final assetFutures = <String, Future<BitmapDescriptor>>{};
+    void ensureAsset(HazardSeverityBand sev, bool isAws, Size size) {
+      final k = '${isAws}_${sev.name}_${size.width}_${size.height}';
+      assetFutures.putIfAbsent(
+        k,
+        () => _bitmapDescriptorOtherSeverity(
+          severityBand: sev,
+          isAwsCompliant: isAws,
+          size: size,
+        ),
       );
     }
 
-    final markerBitmaps = await Future.wait(futures);
-    return Success(
-      markerBitmaps.fold<Map<String, BitmapDescriptor>>(
-        {},
-        (acc, map) {
-          acc.addAll(map);
-          return acc;
-        },
+    for (final (_, sev, isAws, size) in assetEntries) {
+      ensureAsset(sev, isAws, size);
+    }
+    for (final (_, _, _, fallbackSev, fallbackAws, fallbackSize)
+        in networkEntries) {
+      ensureAsset(fallbackSev, fallbackAws, fallbackSize);
+    }
+
+    // Run all downloads and asset loads concurrently
+    await Future.wait(<Future<void>>[
+      ...uniqueDownloads.entries.map(
+        (e) => _downloadImageBytes(e.value, cacheKey: e.key),
       ),
-    );
+      ...assetFutures.values,
+    ]);
+
+    // Resolve cached results into sync maps
+    final downloadedBytes = <String, Uint8List>{};
+    for (final s3Key in uniqueDownloads.keys) {
+      final bytes = await _urlBytesCache[s3Key]!;
+      if (bytes != null) {
+        downloadedBytes[s3Key] = bytes;
+      }
+    }
+    final resolvedAssets = <String, BitmapDescriptor>{};
+    for (final entry in assetFutures.entries) {
+      resolvedAssets[entry.key] = await entry.value;
+    }
+
+    // ── Phase 3: Build bitmap map (fully sync except resolved cache lookups) ──
+    final bitmapMap = <String, BitmapDescriptor>{};
+    final descriptorCache = <String, BitmapDescriptor>{};
+
+    BitmapDescriptor? networkBitmap(CategoryImage slot, Size size) {
+      final cacheKey = '${slot.s3Key}|${size.width}|${size.height}';
+      final cached = descriptorCache[cacheKey];
+      if (cached != null) return cached;
+      final bytes = downloadedBytes[slot.s3Key];
+      if (bytes == null) return null;
+      final descriptor = BitmapDescriptor.bytes(
+        bytes,
+        width: size.width,
+        height: size.height,
+      );
+      descriptorCache[cacheKey] = descriptor;
+      return descriptor;
+    }
+
+    for (final (key, slot, size, fallbackSev, fallbackAws, fallbackSize)
+        in networkEntries) {
+      final bitmap = networkBitmap(slot, size);
+      final assetKey =
+          '${fallbackAws}_${fallbackSev.name}_${fallbackSize.width}_${fallbackSize.height}';
+      bitmapMap[key] = bitmap ?? resolvedAssets[assetKey]!;
+    }
+
+    for (final (key, sev, isAws, size) in assetEntries) {
+      final assetKey = '${isAws}_${sev.name}_${size.width}_${size.height}';
+      bitmapMap[key] = resolvedAssets[assetKey]!;
+    }
+
+    for (final (key, slot, size) in fireEntries) {
+      final bitmap = networkBitmap(slot, size);
+      if (bitmap != null) {
+        bitmapMap[key] = bitmap;
+      }
+    }
+
+    _urlBytesCache.clear();
+    _bitmapByS3KeyCache.clear();
+    stopwatch.stop();
+    return Success(bitmapMap);
   }
 
   /// Gets a BitmapDescriptor for the given hazard category and severity.
@@ -436,6 +672,29 @@ class HazardService {
     );
   }
 
+  /// Resolves a [CategoryImage] slot to a [BitmapDescriptor], cached by s3Key+size.
+  Future<BitmapDescriptor?> _bitmapForCategoryImage(
+    final CategoryImage slot,
+    final Size defaultSize,
+  ) {
+    final url = slot.url;
+    if (url.isEmpty) return Future.value(null);
+    final logicalSize = _markerLogicalSizeForCategoryImage(slot, defaultSize);
+    final cacheKey = '${slot.s3Key}|${logicalSize.width}|${logicalSize.height}';
+    return _bitmapByS3KeyCache.putIfAbsent(
+      cacheKey,
+      () async {
+        final bytes = await _downloadImageBytes(url, cacheKey: slot.s3Key);
+        if (bytes == null) return null;
+        return BitmapDescriptor.bytes(
+          bytes,
+          width: logicalSize.width,
+          height: logicalSize.height,
+        );
+      },
+    );
+  }
+
   /// Category → parent chain via network only; null if nothing loaded.
   Future<BitmapDescriptor?> _bitmapDescriptorFromNetworkChainOnly({
     required final HazardCategory category,
@@ -447,13 +706,8 @@ class HazardService {
         final slot = node.images?.firstWhereOrNull(
           (final image) => image.imageType == imageType,
         );
-        final url = slot?.url;
-        if (slot != null && url != null && url.isNotEmpty) {
-          final logicalSize = _markerLogicalSizeForCategoryImage(slot, size);
-          final bitmap = await getBitmapDescriptorFromUrl(
-            url: url,
-            logicalSize: logicalSize,
-          );
+        if (slot != null && slot.url.isNotEmpty) {
+          final bitmap = await _bitmapForCategoryImage(slot, size);
           if (bitmap != null) {
             return bitmap;
           }
@@ -526,31 +780,63 @@ class HazardService {
     return defaultSize;
   }
 
+  Future<Uint8List?> _downloadImageBytes(
+    final String url, {
+    final String? cacheKey,
+  }) {
+    final key = cacheKey ?? url;
+    return _urlBytesCache.putIfAbsent(
+      key,
+      () async {
+        // Check disk cache first (fast local lookup)
+        try {
+          final cacheResult = await _cacheManagerService.getSingleFileFromCache(
+            key: key,
+          );
+          final file = cacheResult.when((f) => f, (_) => null);
+          if (file != null) {
+            return file.readAsBytes();
+          }
+        } catch (_) {}
+
+        // Cache miss — download from network
+        return _downloadPool.run(() async {
+          try {
+            final response = await _markerImageDio.get<List<int>>(
+              url,
+              options: Options(responseType: ResponseType.bytes),
+            );
+            final data = response.data;
+            if (data == null || data.isEmpty) return null;
+            final bytes = data is Uint8List ? data : Uint8List.fromList(data);
+
+            // Fire-and-forget: cache for next app launch
+            _cacheManagerService.getSingleFile(
+              url: url,
+              key: key,
+              fileExtension: 'png',
+            );
+
+            return bytes;
+          } catch (e) {
+            return null;
+          }
+        });
+      },
+    );
+  }
+
   Future<BitmapDescriptor?> getBitmapDescriptorFromUrl({
     required final String url,
     required final Size logicalSize,
   }) async {
-    try {
-      final response = await _markerImageDio.get<List<int>>(
-        url,
-        options: Options(responseType: ResponseType.bytes),
-      );
-      final data = response.data;
-      if (data == null) {
-        return null;
-      }
-      if (data.isEmpty) {
-        return null;
-      }
-      final bytes = data is Uint8List ? data : Uint8List.fromList(data);
-      return BitmapDescriptor.bytes(
-        bytes,
-        width: logicalSize.width,
-        height: logicalSize.height,
-      );
-    } catch (e) {
-      return null;
-    }
+    final bytes = await _downloadImageBytes(url);
+    if (bytes == null) return null;
+    return BitmapDescriptor.bytes(
+      bytes,
+      width: logicalSize.width,
+      height: logicalSize.height,
+    );
   }
 
   Map<String, HazardCategory> _hazardCategoriesById(
@@ -593,28 +879,6 @@ class HazardService {
     };
   }
 
-  void _scheduleFireStatusMarkerBitmaps({
-    required final List<Future<Map<String, BitmapDescriptor>>> futures,
-    required final String bitmapKeyCategoryId,
-    required final HazardCategory categoryWithImages,
-  }) {
-    for (final fireStatus in FireStatus.values) {
-      final fireKey = '${bitmapKeyCategoryId}_fireStatus_${fireStatus.name}';
-      futures.add(
-        _bitmapDescriptorFromNetworkChainOnly(
-          category: categoryWithImages,
-          imageType: _categoryImageTypeForFireStatus(fireStatus),
-          size: const Size(40, 40),
-        ).then((bitmap) {
-          if (bitmap == null) {
-            return <String, BitmapDescriptor>{};
-          }
-          return {fireKey: bitmap};
-        }),
-      );
-    }
-  }
-
   CategoryImageType _categoryImageTypeForSeverityBand(
     final HazardSeverityBand band, {
     required final bool isAwsCompliant,
@@ -640,14 +904,25 @@ class HazardService {
     required final HazardSeverityBand severityBand,
     required final bool isAwsCompliant,
     required final Size size,
-  }) async {
-    try {
-      return BitmapDescriptor.asset(
-        ImageConfiguration(size: size),
-        'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
-      );
-    } catch (e) {
-      return BitmapDescriptor.defaultMarker;
-    }
+  }) {
+    final cacheKey =
+        '${isAwsCompliant}_${severityBand.name}_${size.width}_${size.height}';
+    return _assetBitmapCache.putIfAbsent(
+      cacheKey,
+      () async {
+        try {
+          final data = await rootBundle.load(
+            'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
+          );
+          return BitmapDescriptor.bytes(
+            data.buffer.asUint8List(),
+            width: size.width,
+            height: size.height,
+          );
+        } catch (e) {
+          return BitmapDescriptor.defaultMarker;
+        }
+      },
+    );
   }
 }
