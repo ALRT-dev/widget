@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:widget_to_marker/widget_to_marker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
@@ -593,23 +596,56 @@ class HazardService {
       resolvedAssets[entry.key] = await entry.value;
     }
 
-    // ── Phase 3: Build bitmap map (fully sync except resolved cache lookups) ──
+    // ── Phase 2.5: Render downloaded images via Flutter widgets ─────────
+    // BitmapDescriptor.bytes() relies on the native platform decoder which
+    // silently fails for some images, producing invisible-but-tappable
+    // markers.  Rendering through a Flutter widget + toBitmapDescriptor()
+    // uses Skia on the Dart side, completely bypassing the native decoder.
+    final dpr = ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
+    final renderedDescriptors = <String, BitmapDescriptor?>{};
+    final renderFutures = <Future<void>>[];
+
+    void scheduleRender(String s3Key, Size logicalSize) {
+      final rk = '$s3Key|${logicalSize.width}|${logicalSize.height}';
+      if (renderedDescriptors.containsKey(rk)) return;
+      renderedDescriptors[rk] = null; // placeholder
+      final raw = downloadedBytes[s3Key];
+      if (raw == null) return;
+      renderFutures.add(() async {
+        try {
+          final imageSize = Size(
+            (logicalSize.width * dpr).ceilToDouble(),
+            (logicalSize.height * dpr).ceilToDouble(),
+          );
+          final descriptor = await Image.memory(
+            raw,
+            width: logicalSize.width,
+            height: logicalSize.height,
+            fit: BoxFit.contain,
+            gaplessPlayback: true,
+          ).toBitmapDescriptor(
+            logicalSize: logicalSize,
+            imageSize: imageSize,
+          );
+          renderedDescriptors[rk] = descriptor;
+        } catch (_) {}
+      }());
+    }
+
+    for (final (_, slot, size, _, _, _) in networkEntries) {
+      scheduleRender(slot.s3Key, size);
+    }
+    for (final (_, slot, size) in fireEntries) {
+      scheduleRender(slot.s3Key, size);
+    }
+    await Future.wait(renderFutures);
+
+    // ── Phase 3: Build bitmap map (fully sync) ──
     final bitmapMap = <String, BitmapDescriptor>{};
-    final descriptorCache = <String, BitmapDescriptor>{};
 
     BitmapDescriptor? networkBitmap(CategoryImage slot, Size size) {
       final cacheKey = '${slot.s3Key}|${size.width}|${size.height}';
-      final cached = descriptorCache[cacheKey];
-      if (cached != null) return cached;
-      final bytes = downloadedBytes[slot.s3Key];
-      if (bytes == null) return null;
-      final descriptor = BitmapDescriptor.bytes(
-        bytes,
-        width: size.width,
-        height: size.height,
-      );
-      descriptorCache[cacheKey] = descriptor;
-      return descriptor;
+      return renderedDescriptors[cacheKey];
     }
 
     for (final (key, slot, size, fallbackSev, fallbackAws, fallbackSize)
@@ -832,11 +868,24 @@ class HazardService {
   }) async {
     final bytes = await _downloadImageBytes(url);
     if (bytes == null) return null;
-    return BitmapDescriptor.bytes(
-      bytes,
-      width: logicalSize.width,
-      height: logicalSize.height,
-    );
+    try {
+      final dpr = ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
+      final imageSize = Size(
+        (logicalSize.width * dpr).ceilToDouble(),
+        (logicalSize.height * dpr).ceilToDouble(),
+      );
+      return await Image.memory(
+        bytes,
+        width: logicalSize.width,
+        height: logicalSize.height,
+        fit: BoxFit.contain,
+        gaplessPlayback: true,
+      ).toBitmapDescriptor(
+        logicalSize: logicalSize,
+        imageSize: imageSize,
+      );
+    } catch (_) {}
+    return null;
   }
 
   Map<String, HazardCategory> _hazardCategoriesById(
@@ -911,13 +960,22 @@ class HazardService {
       cacheKey,
       () async {
         try {
-          final data = await rootBundle.load(
-            'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png',
+          final assetPath =
+              'assets/images/hazards/${isAwsCompliant ? 'aws/' : 'non_aws/'}other_${severityBand.name}.png';
+          final dpr =
+              ui.PlatformDispatcher.instance.views.first.devicePixelRatio;
+          final imageSize = Size(
+            (size.width * dpr).ceilToDouble(),
+            (size.height * dpr).ceilToDouble(),
           );
-          return BitmapDescriptor.bytes(
-            data.buffer.asUint8List(),
+          return await Image.asset(
+            assetPath,
             width: size.width,
             height: size.height,
+            fit: BoxFit.contain,
+          ).toBitmapDescriptor(
+            logicalSize: size,
+            imageSize: imageSize,
           );
         } catch (e) {
           return BitmapDescriptor.defaultMarker;
