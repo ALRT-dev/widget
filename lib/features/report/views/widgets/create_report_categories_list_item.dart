@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
+import 'package:hazard_app/features/shared/enums/category_image_type.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class CreateReportCategoriesListItem extends ConsumerStatefulWidget {
@@ -37,6 +39,9 @@ class _CreateReportCategoriesListItemState
     );
 
     final categoryColor = widget.category.color ?? AppColors.orange;
+    final categoryImage = widget.category.categoryImageByType(
+      CategoryImageType.user,
+    );
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -69,8 +74,9 @@ class _CreateReportCategoriesListItemState
         padding: EdgeInsets.all(16.spMin),
         child: Row(
           children: [
-            Image.asset(
-              'assets/images/hazards/non_aws/${widget.category.id}_user.png',
+            AppCachedNetworkImage(
+              imageUrl: categoryImage?.url ?? '',
+              cacheKey: categoryImage?.s3Key,
               width: 50.spMin,
               height: 50.spMin,
               fit: BoxFit.contain,

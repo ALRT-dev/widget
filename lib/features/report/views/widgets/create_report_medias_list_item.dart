@@ -78,6 +78,7 @@ class _CreateReportMediasListItemState
                     ? FileImage(File(widget.media.value))
                     : AppCachedNetworkImageProvider.fromRef(
                         widget.media.value,
+                        cacheKey: widget.media.s3Key,
                         ref: ref,
                       ),
                 fit: BoxFit.cover,

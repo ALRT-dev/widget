@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/shared/converters/date_time_converter.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
+import 'package:hazard_app/features/shared/enums/category_image_type.dart';
 import 'package:hazard_app/features/shared/enums/fire_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
@@ -11,6 +12,7 @@ import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
+import 'package:hazard_app/features/shared/models/category_image_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_source_model.dart';
 import 'package:hazard_app/features/shared/models/s3_media_model.dart';
@@ -156,86 +158,33 @@ abstract class Hazard with _$Hazard {
     return DateTime.now().isAfter(expiresAt!);
   }
 
-  /// The file path for the hazard icon based on its category and severity.
-  String get iconPath {
-    if (source?.id == 'smartraveller') {
-      final severityBandName =
-          severityBand?.name ?? HazardSeverityBand.info.name;
-      return 'assets/images/hazards/non_aws/other_$severityBandName.png';
-    }
-
-    if (fireStatus != null) {
-      if ((categoryId == "bushfire" && isAwsCompliant == false) ||
-          categoryId == "otherFire") {
-        return 'assets/images/hazards/non_aws/fireStatus_${fireStatus!.name}.png';
-      }
-    }
-
-    if (reportedBy != null) {
-      return 'assets/images/hazards/non_aws/${categoryId}_user.png';
-    }
-
-    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
-    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${categoryId}_$severityBandName.png';
-  }
-
-  /// The fallback file path for the hazard icon based on its severity.
-  String get fallbackIconPath {
-    if (reportedBy != null) {
-      return 'assets/images/hazards/non_aws/other_user.png';
-    }
-
-    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
-    final parentCategoryId = category?.parentId;
-    if (parentCategoryId != null) {
-      return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}${parentCategoryId}_$severityBandName.png';
-    }
-    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityBandName.png';
-  }
-
-  /// The second fallback file path for the hazard icon based on its severity.
-  String get fallbackIconPath2 {
-    if (reportedBy != null) {
-      return 'assets/images/hazards/non_aws/other_user.png';
-    }
-
-    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
-    return 'assets/images/hazards/${isAwsCompliant == true ? 'aws/' : 'non_aws/'}other_$severityBandName.png';
-  }
-
   /// Gets the appropriate BitmapDescriptor for the hazard marker.
   BitmapDescriptor? getMarkerBitmapDescriptor(
     Map<String, BitmapDescriptor> bitmapMap,
   ) {
-    var key =
-        '${categoryId}_${severityBand?.name ?? HazardSeverityBand.info.name}${isAwsCompliant == true ? '_aws' : '_non_aws'}';
-
-    if (source?.id == 'smartraveller') {
-      final severityBandName =
-          severityBand?.name ?? HazardSeverityBand.info.name;
-      key = 'other_${severityBandName}_non_aws';
+    if (isUserReported) {
+      return bitmapMap['${categoryId}_user'];
     }
 
-    // Check for fire status override
-    if (fireStatus != null) {
-      if ((categoryId == "bushfire" && isAwsCompliant == false) ||
-          categoryId == "otherFire") {
-        key = 'fireStatus_${fireStatus!.name}';
+    if (fireStatus != null && isAwsCompliant == false) {
+      final fireKey = '${categoryId}_fireStatus_${fireStatus!.name}';
+      final fireBitmap = bitmapMap[fireKey];
+      if (fireBitmap != null) {
+        return fireBitmap;
       }
     }
 
-    // Check for user-reported override
-    if (reportedBy != null) {
-      key = '${categoryId}_user';
-    }
+    final severityBandName = severityBand?.name ?? HazardSeverityBand.info.name;
+    var severityKey =
+        '${categoryId}_$severityBandName${isAwsCompliant == true ? '_aws' : '_non_aws'}';
 
-    return bitmapMap[key];
+    return bitmapMap[severityKey];
   }
 
   /// The color associated with the hazard's severity band.
   Color get color {
     // If the hazard is user-reported, use the user report status color
-    if (reportedBy != null) {
+    if (isUserReported) {
       final reportsStatus = reportedBy!.reportsStatus;
       return reportsStatus.color;
     }
@@ -255,6 +204,56 @@ abstract class Hazard with _$Hazard {
       return severity?.titleAws ?? HazardSeverity.info.titleAws;
     }
     return severity?.titleNonAws ?? HazardSeverity.info.titleNonAws;
+  }
+
+  /// The category image type of the hazard based on the severity and AWS compliance.
+  CategoryImageType get categoryImageType {
+    if (isUserReported) {
+      return CategoryImageType.user;
+    }
+
+    if (fireStatus != null && isAwsCompliant == false) {
+      final firestatus = switch (fireStatus!) {
+        FireStatus.active => CategoryImageType.fireActive,
+        FireStatus.beingControlled => CategoryImageType.fireBeingControlled,
+        FireStatus.underControl => CategoryImageType.fireUnderControl,
+        FireStatus.closed => CategoryImageType.fireClosed,
+      };
+      final hasImage = category?.categoryImageByType(firestatus) != null;
+      if (hasImage) {
+        return firestatus;
+      }
+    }
+
+    if (isAwsCompliant == true) {
+      return switch (severityBand) {
+        HazardSeverityBand.info => CategoryImageType.advice,
+        HazardSeverityBand.monitor => CategoryImageType.advice,
+        HazardSeverityBand.action => CategoryImageType.watchAndAct,
+        HazardSeverityBand.critical => CategoryImageType.emergency,
+        _ => CategoryImageType.info,
+      };
+    }
+
+    return switch (severityBand) {
+      HazardSeverityBand.info => CategoryImageType.info,
+      HazardSeverityBand.monitor => CategoryImageType.monitor,
+      HazardSeverityBand.action => CategoryImageType.action,
+      HazardSeverityBand.critical => CategoryImageType.critical,
+      _ => CategoryImageType.info,
+    };
+  }
+
+  /// The category image of the hazard.
+  CategoryImage? get categoryImage =>
+      category?.categoryImageByType(categoryImageType);
+
+  /// The fallback icon path for the hazard.
+  String get fallbackIconPath {
+    if (isAwsCompliant == true) {
+      return 'assets/images/hazards/aws/other_${severityBand?.name ?? HazardSeverityBand.info.name}.png';
+    }
+    return 'assets/images/hazards/non_aws/other_${severityBand?.name ?? HazardSeverityBand.info.name}.png';
   }
 
   factory Hazard.fromJson(Map<String, dynamic> json) => _$HazardFromJson(json);
