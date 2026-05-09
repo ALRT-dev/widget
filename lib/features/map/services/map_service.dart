@@ -13,6 +13,7 @@ import 'package:hazard_app/features/map/providers/repository_providers.dart';
 import 'package:hazard_app/features/map/repositories/map_repository.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -227,13 +228,31 @@ class MapService {
       return null;
     }
 
-    // Determine the safest route if hazards are provided
+    final hasHazardsToAvoid =
+        hazardsToAvoid != null && hazardsToAvoid.isNotEmpty;
+
+    // Compute the relevant hazards for each route once so the same lists can
+    // be reused for safest-route selection and stored on the returned model.
+    final routeHazards = <Route, List<Hazard>>{
+      for (final route in routes)
+        route:
+            (hasHazardsToAvoid &&
+                route.polylinePoints != null &&
+                route.polylinePoints!.isNotEmpty)
+            ? HazardAvoidanceHelper.getRelevantHazardsForPolyline(
+                hazardsToAvoid,
+                route.polylinePoints!
+                    .map((point) => LatLng(point.latitude, point.longitude))
+                    .toList(),
+              )
+            : const <Hazard>[],
+    };
+
     Route? safestRoute;
-    if (hazardsToAvoid != null && hazardsToAvoid.isNotEmpty) {
-      safestRoute = _chooseSafestRoute(routes, hazardsToAvoid);
+    if (hasHazardsToAvoid) {
+      safestRoute = _chooseSafestRoute(routes, routeHazards);
     }
 
-    // The fastest route based on duration
     Route? fastestRoute;
     for (final route in routes) {
       if (route.duration != null) {
@@ -247,15 +266,17 @@ class MapService {
 
     return SafestFastestRoutes(
       safestRoute: safestRoute ?? fastestRoute,
+      selectedRoute: safestRoute ?? fastestRoute,
       fastestRoute: fastestRoute,
       allRoutes: routes,
+      routeHazards: routeHazards,
     );
   }
 
-  /// Chooses the safest route from available options.
+  /// Chooses the safest route using precomputed [routeHazards] per route.
   Route? _chooseSafestRoute(
     List<Route> routes,
-    List<Hazard> hazards,
+    Map<Route, List<Hazard>> routeHazards,
   ) {
     if (routes.isEmpty) return null;
 
@@ -263,7 +284,8 @@ class MapService {
     double lowestRiskScore = double.infinity;
 
     for (final route in routes) {
-      final riskScore = _calculateRouteRiskScore(route, hazards);
+      final relevantHazards = routeHazards[route] ?? const <Hazard>[];
+      final riskScore = _calculateRouteRiskScore(route, relevantHazards);
       if (riskScore < lowestRiskScore) {
         lowestRiskScore = riskScore;
         safestRoute = route;
@@ -273,44 +295,41 @@ class MapService {
     return safestRoute;
   }
 
-  /// Calculates risk score for a route based on hazard proximity using actual route polyline.
+  /// Calculates risk score for a route from its precomputed [relevantHazards].
   double _calculateRouteRiskScore(
     Route route,
-    List<Hazard> hazards,
+    List<Hazard> relevantHazards,
   ) {
-    try {
-      // Check if polylinePoints are available directly on the route
-      if (route.polylinePoints != null && route.polylinePoints!.isNotEmpty) {
-        // Convert polyline points to LatLng list
-        final routePoints = route.polylinePoints!
-            .map((point) => LatLng(point.latitude, point.longitude))
-            .toList();
-
-        // Use the improved hazard analysis with actual route polyline
-        final routeAnalysis = HazardAvoidanceHelper.analyzeRouteHazards(
-          hazards: hazards,
-          routePoints: routePoints,
-        );
-
-        // Calculate risk score based on hazard severity and count
-        double totalRisk = 0.0;
-        totalRisk +=
-            routeAnalysis.emergencyHazards * 10.0; // Emergency: 10x weight
-        totalRisk +=
-            routeAnalysis.highRiskHazards * 5.0; // High risk: 5x weight
-        totalRisk +=
-            routeAnalysis.mediumRiskHazards * 2.0; // Medium risk: 2x weight
-        totalRisk += routeAnalysis.lowRiskHazards * 1.0; // Low risk: 1x weight
-
-        return totalRisk;
-      } else {
-        // Fallback: assign moderate risk if we can't analyze the route properly
-        return hazards.length * 0.5; // Basic risk assessment
-      }
-    } catch (e) {
-      // If we can't decode the route properly, assign moderate risk
-      return hazards.length * 1.0;
+    if (route.polylinePoints == null || route.polylinePoints!.isEmpty) {
+      // Fallback: assign moderate risk when we cannot analyze the polyline.
+      return relevantHazards.length * 0.5;
     }
+
+    int emergencyCount = 0;
+    int highRiskCount = 0;
+    int mediumRiskCount = 0;
+    int lowRiskCount = 0;
+
+    for (final hazard in relevantHazards) {
+      switch (hazard.severityBand) {
+        case HazardSeverityBand.critical:
+          emergencyCount++;
+        case HazardSeverityBand.action:
+          highRiskCount++;
+        case HazardSeverityBand.monitor:
+          mediumRiskCount++;
+        case HazardSeverityBand.info:
+          lowRiskCount++;
+        case null:
+          break;
+      }
+    }
+
+    // Severity weighting: emergency 10x, high 5x, medium 2x, low 1x.
+    return emergencyCount * 10.0 +
+        highRiskCount * 5.0 +
+        mediumRiskCount * 2.0 +
+        lowRiskCount * 1.0;
   }
 
   /// Gets the screen coordinate for a given [latLng] position on the map.

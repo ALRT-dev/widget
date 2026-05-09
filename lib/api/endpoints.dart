@@ -1,6 +1,6 @@
 const kUrlBase = 'https://api.safetyalrt.com';
 // const kUrlBase = 'http://192.168.1.67:9000';
-const kUrlBaseDev = 'http://192.168.1.66:9000';
+const kUrlBaseDev = 'http://192.168.1.65:9000';
 
 const kUrlApi = '/api';
 

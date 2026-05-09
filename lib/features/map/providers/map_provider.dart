@@ -4,7 +4,7 @@ import 'dart:developer';
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -1161,18 +1161,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
           consumeTapEvents: true,
           onTap: () {
             // Update selected route in the current route plan
-            updateCurrentRoutePlan(
-              state.currentRoutePlan?.copyWith(
-                travelModeRoutes: {
-                  ...state.currentRoutePlan!.travelModeRoutes,
-                  selectedTravelMode: state
-                      .currentRoutePlan!
-                      .travelModeRoutes[selectedTravelMode]!
-                      .copyWith(selectedRoute: route),
-                },
-              ),
-              animateToRouteBounds: false,
-            );
+            handleRouteTap(route);
           },
         );
         polylines.add(polyLine);
@@ -1203,6 +1192,27 @@ class MapProvider extends StateNotifier<MapProviderState> {
         );
       }
     }
+  }
+
+  /// Handles the tap on a route.
+  ///
+  /// Updates the current route plan to the given [route].
+  void handleRouteTap(final Route route) {
+    final selectedTravelMode = state.currentRoutePlan?.selectedTravelMode;
+    if (selectedTravelMode == null) return;
+
+    updateCurrentRoutePlan(
+      state.currentRoutePlan?.copyWith(
+        travelModeRoutes: {
+          ...state.currentRoutePlan!.travelModeRoutes,
+          selectedTravelMode: state
+              .currentRoutePlan!
+              .travelModeRoutes[selectedTravelMode]!
+              .copyWith(selectedRoute: route),
+        },
+      ),
+      animateToRouteBounds: false,
+    );
   }
 
   /// Creates route segments for navigation with different colors for passed and upcoming parts

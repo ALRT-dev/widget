@@ -10,7 +10,8 @@ import 'package:hazard_app/features/map/views/widgets/custom_my_location_button.
 import 'package:hazard_app/features/map/views/widgets/map_hazard_info_window.dart';
 import 'package:hazard_app/features/map/views/widgets/map_keys_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
-import 'package:hazard_app/features/map/views/widgets/route_planning.dart';
+import 'package:hazard_app/features/map/views/widgets/navigation/navigation_route_info_cards_list.dart';
+import 'package:hazard_app/features/map/views/widgets/navigation/navigation_travel_modes_list.dart';
 import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
 import 'package:hazard_app/features/map/views/widgets/selected_location_preview.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -98,7 +99,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   );
 
                   if (isRoutePresent) {
-                    return RouteSourceAndDestination();
+                    return Column(
+                      spacing: 5.spMin,
+                      children: [
+                        RouteSourceAndDestination().pX(20.0),
+                        NavigationTravelModesList(),
+                      ],
+                    );
                   }
                   return Row(
                     spacing: 10.spMin,
@@ -106,9 +113,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       Expanded(child: MapSearchbar()),
                       _xpPointsBuilder(),
                     ],
-                  );
+                  ).pX(20.0);
                 },
-              ).pX(20.0),
+              ),
             ],
           ),
           Expanded(
@@ -139,7 +146,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ),
                     );
                     if (isRoutePresent) {
-                      return RoutePlanning().pT(10.0);
+                      return NavigationRouteInfoCardsList().pT(10.0);
                     }
 
                     final isSelectedLocationPresent = ref.watch(
@@ -148,12 +155,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ),
                     );
                     if (isSelectedLocationPresent) {
-                      return SelectedLocationPreview().pT(10.0);
+                      return SelectedLocationPreview().pT(10.0).pX(20.0);
                     }
 
                     return const SizedBox();
                   },
-                ).pX(20.0),
+                ),
               ],
             ),
           ),

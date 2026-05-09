@@ -18,7 +18,10 @@ mixin _$SafestFastestRoutes {
  Route get safestRoute;/// The fastest route determined by the application.
  Route get fastestRoute;/// The list of all available routes.
  List<Route> get allRoutes;/// The currently selected route amoung the routes.
- Route? get selectedRoute;
+ Route? get selectedRoute;/// The hazards relevant to each route in [allRoutes].
+///
+/// Routes without any nearby hazards map to an empty list.
+ Map<Route, List<Hazard>> get routeHazards;
 /// Create a copy of SafestFastestRoutes
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +32,16 @@ $SafestFastestRoutesCopyWith<SafestFastestRoutes> get copyWith => _$SafestFastes
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SafestFastestRoutes&&(identical(other.safestRoute, safestRoute) || other.safestRoute == safestRoute)&&(identical(other.fastestRoute, fastestRoute) || other.fastestRoute == fastestRoute)&&const DeepCollectionEquality().equals(other.allRoutes, allRoutes)&&(identical(other.selectedRoute, selectedRoute) || other.selectedRoute == selectedRoute));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SafestFastestRoutes&&(identical(other.safestRoute, safestRoute) || other.safestRoute == safestRoute)&&(identical(other.fastestRoute, fastestRoute) || other.fastestRoute == fastestRoute)&&const DeepCollectionEquality().equals(other.allRoutes, allRoutes)&&(identical(other.selectedRoute, selectedRoute) || other.selectedRoute == selectedRoute)&&const DeepCollectionEquality().equals(other.routeHazards, routeHazards));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,safestRoute,fastestRoute,const DeepCollectionEquality().hash(allRoutes),selectedRoute);
+int get hashCode => Object.hash(runtimeType,safestRoute,fastestRoute,const DeepCollectionEquality().hash(allRoutes),selectedRoute,const DeepCollectionEquality().hash(routeHazards));
 
 @override
 String toString() {
-  return 'SafestFastestRoutes(safestRoute: $safestRoute, fastestRoute: $fastestRoute, allRoutes: $allRoutes, selectedRoute: $selectedRoute)';
+  return 'SafestFastestRoutes(safestRoute: $safestRoute, fastestRoute: $fastestRoute, allRoutes: $allRoutes, selectedRoute: $selectedRoute, routeHazards: $routeHazards)';
 }
 
 
@@ -49,7 +52,7 @@ abstract mixin class $SafestFastestRoutesCopyWith<$Res>  {
   factory $SafestFastestRoutesCopyWith(SafestFastestRoutes value, $Res Function(SafestFastestRoutes) _then) = _$SafestFastestRoutesCopyWithImpl;
 @useResult
 $Res call({
- Route safestRoute, Route fastestRoute, List<Route> allRoutes, Route? selectedRoute
+ Route safestRoute, Route fastestRoute, List<Route> allRoutes, Route? selectedRoute, Map<Route, List<Hazard>> routeHazards
 });
 
 
@@ -66,13 +69,14 @@ class _$SafestFastestRoutesCopyWithImpl<$Res>
 
 /// Create a copy of SafestFastestRoutes
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? safestRoute = null,Object? fastestRoute = null,Object? allRoutes = null,Object? selectedRoute = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? safestRoute = null,Object? fastestRoute = null,Object? allRoutes = null,Object? selectedRoute = freezed,Object? routeHazards = null,}) {
   return _then(_self.copyWith(
 safestRoute: null == safestRoute ? _self.safestRoute : safestRoute // ignore: cast_nullable_to_non_nullable
 as Route,fastestRoute: null == fastestRoute ? _self.fastestRoute : fastestRoute // ignore: cast_nullable_to_non_nullable
 as Route,allRoutes: null == allRoutes ? _self.allRoutes : allRoutes // ignore: cast_nullable_to_non_nullable
 as List<Route>,selectedRoute: freezed == selectedRoute ? _self.selectedRoute : selectedRoute // ignore: cast_nullable_to_non_nullable
-as Route?,
+as Route?,routeHazards: null == routeHazards ? _self.routeHazards : routeHazards // ignore: cast_nullable_to_non_nullable
+as Map<Route, List<Hazard>>,
   ));
 }
 
@@ -157,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Route safestRoute,  Route fastestRoute,  List<Route> allRoutes,  Route? selectedRoute)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Route safestRoute,  Route fastestRoute,  List<Route> allRoutes,  Route? selectedRoute,  Map<Route, List<Hazard>> routeHazards)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SafestFastestRoutes() when $default != null:
-return $default(_that.safestRoute,_that.fastestRoute,_that.allRoutes,_that.selectedRoute);case _:
+return $default(_that.safestRoute,_that.fastestRoute,_that.allRoutes,_that.selectedRoute,_that.routeHazards);case _:
   return orElse();
 
 }
@@ -178,10 +182,10 @@ return $default(_that.safestRoute,_that.fastestRoute,_that.allRoutes,_that.selec
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Route safestRoute,  Route fastestRoute,  List<Route> allRoutes,  Route? selectedRoute)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Route safestRoute,  Route fastestRoute,  List<Route> allRoutes,  Route? selectedRoute,  Map<Route, List<Hazard>> routeHazards)  $default,) {final _that = this;
 switch (_that) {
 case _SafestFastestRoutes():
-return $default(_that.safestRoute,_that.fastestRoute,_that.allRoutes,_that.selectedRoute);case _:
+return $default(_that.safestRoute,_that.fastestRoute,_that.allRoutes,_that.selectedRoute,_that.routeHazards);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +202,10 @@ return $default(_that.safestRoute,_that.fastestRoute,_that.allRoutes,_that.selec
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Route safestRoute,  Route fastestRoute,  List<Route> allRoutes,  Route? selectedRoute)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Route safestRoute,  Route fastestRoute,  List<Route> allRoutes,  Route? selectedRoute,  Map<Route, List<Hazard>> routeHazards)?  $default,) {final _that = this;
 switch (_that) {
 case _SafestFastestRoutes() when $default != null:
-return $default(_that.safestRoute,_that.fastestRoute,_that.allRoutes,_that.selectedRoute);case _:
+return $default(_that.safestRoute,_that.fastestRoute,_that.allRoutes,_that.selectedRoute,_that.routeHazards);case _:
   return null;
 
 }
@@ -213,7 +217,7 @@ return $default(_that.safestRoute,_that.fastestRoute,_that.allRoutes,_that.selec
 
 
 class _SafestFastestRoutes extends SafestFastestRoutes {
-  const _SafestFastestRoutes({required this.safestRoute, required this.fastestRoute, required final  List<Route> allRoutes, this.selectedRoute}): _allRoutes = allRoutes,super._();
+  const _SafestFastestRoutes({required this.safestRoute, required this.fastestRoute, required final  List<Route> allRoutes, this.selectedRoute, final  Map<Route, List<Hazard>> routeHazards = const <Route, List<Hazard>>{}}): _allRoutes = allRoutes,_routeHazards = routeHazards,super._();
   
 
 /// The safest route determined by the application.
@@ -231,6 +235,19 @@ class _SafestFastestRoutes extends SafestFastestRoutes {
 
 /// The currently selected route amoung the routes.
 @override final  Route? selectedRoute;
+/// The hazards relevant to each route in [allRoutes].
+///
+/// Routes without any nearby hazards map to an empty list.
+ final  Map<Route, List<Hazard>> _routeHazards;
+/// The hazards relevant to each route in [allRoutes].
+///
+/// Routes without any nearby hazards map to an empty list.
+@override@JsonKey() Map<Route, List<Hazard>> get routeHazards {
+  if (_routeHazards is EqualUnmodifiableMapView) return _routeHazards;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_routeHazards);
+}
+
 
 /// Create a copy of SafestFastestRoutes
 /// with the given fields replaced by the non-null parameter values.
@@ -242,16 +259,16 @@ _$SafestFastestRoutesCopyWith<_SafestFastestRoutes> get copyWith => __$SafestFas
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SafestFastestRoutes&&(identical(other.safestRoute, safestRoute) || other.safestRoute == safestRoute)&&(identical(other.fastestRoute, fastestRoute) || other.fastestRoute == fastestRoute)&&const DeepCollectionEquality().equals(other._allRoutes, _allRoutes)&&(identical(other.selectedRoute, selectedRoute) || other.selectedRoute == selectedRoute));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SafestFastestRoutes&&(identical(other.safestRoute, safestRoute) || other.safestRoute == safestRoute)&&(identical(other.fastestRoute, fastestRoute) || other.fastestRoute == fastestRoute)&&const DeepCollectionEquality().equals(other._allRoutes, _allRoutes)&&(identical(other.selectedRoute, selectedRoute) || other.selectedRoute == selectedRoute)&&const DeepCollectionEquality().equals(other._routeHazards, _routeHazards));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,safestRoute,fastestRoute,const DeepCollectionEquality().hash(_allRoutes),selectedRoute);
+int get hashCode => Object.hash(runtimeType,safestRoute,fastestRoute,const DeepCollectionEquality().hash(_allRoutes),selectedRoute,const DeepCollectionEquality().hash(_routeHazards));
 
 @override
 String toString() {
-  return 'SafestFastestRoutes(safestRoute: $safestRoute, fastestRoute: $fastestRoute, allRoutes: $allRoutes, selectedRoute: $selectedRoute)';
+  return 'SafestFastestRoutes(safestRoute: $safestRoute, fastestRoute: $fastestRoute, allRoutes: $allRoutes, selectedRoute: $selectedRoute, routeHazards: $routeHazards)';
 }
 
 
@@ -262,7 +279,7 @@ abstract mixin class _$SafestFastestRoutesCopyWith<$Res> implements $SafestFaste
   factory _$SafestFastestRoutesCopyWith(_SafestFastestRoutes value, $Res Function(_SafestFastestRoutes) _then) = __$SafestFastestRoutesCopyWithImpl;
 @override @useResult
 $Res call({
- Route safestRoute, Route fastestRoute, List<Route> allRoutes, Route? selectedRoute
+ Route safestRoute, Route fastestRoute, List<Route> allRoutes, Route? selectedRoute, Map<Route, List<Hazard>> routeHazards
 });
 
 
@@ -279,13 +296,14 @@ class __$SafestFastestRoutesCopyWithImpl<$Res>
 
 /// Create a copy of SafestFastestRoutes
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? safestRoute = null,Object? fastestRoute = null,Object? allRoutes = null,Object? selectedRoute = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? safestRoute = null,Object? fastestRoute = null,Object? allRoutes = null,Object? selectedRoute = freezed,Object? routeHazards = null,}) {
   return _then(_SafestFastestRoutes(
 safestRoute: null == safestRoute ? _self.safestRoute : safestRoute // ignore: cast_nullable_to_non_nullable
 as Route,fastestRoute: null == fastestRoute ? _self.fastestRoute : fastestRoute // ignore: cast_nullable_to_non_nullable
 as Route,allRoutes: null == allRoutes ? _self._allRoutes : allRoutes // ignore: cast_nullable_to_non_nullable
 as List<Route>,selectedRoute: freezed == selectedRoute ? _self.selectedRoute : selectedRoute // ignore: cast_nullable_to_non_nullable
-as Route?,
+as Route?,routeHazards: null == routeHazards ? _self._routeHazards : routeHazards // ignore: cast_nullable_to_non_nullable
+as Map<Route, List<Hazard>>,
   ));
 }
 
