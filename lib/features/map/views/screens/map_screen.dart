@@ -10,6 +10,7 @@ import 'package:hazard_app/features/map/views/widgets/custom_my_location_button.
 import 'package:hazard_app/features/map/views/widgets/map_hazard_info_window.dart';
 import 'package:hazard_app/features/map/views/widgets/map_keys_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
+import 'package:hazard_app/features/map/views/widgets/navigation/navigation_mode_overlay.dart';
 import 'package:hazard_app/features/map/views/widgets/navigation/navigation_route_info_cards_list.dart';
 import 'package:hazard_app/features/map/views/widgets/navigation/navigation_travel_modes_list.dart';
 import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
@@ -84,88 +85,101 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Widget _overlayedContentsBuilder() {
-    return SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            children: [
-              Consumer(
-                builder: (context, ref, child) {
-                  final isRoutePresent = ref.watch(
-                    providerOfMap.select(
-                      (value) => value.currentRoutePlan != null,
-                    ),
-                  );
+    return Consumer(
+      builder: (context, ref, child) {
+        final isNavigating = ref.watch(
+          providerOfMap.select(
+            (value) => value.currentRoutePlan?.isNavigating ?? false,
+          ),
+        );
+        if (isNavigating) {
+          return const NavigationModeOverlay();
+        }
 
-                  if (isRoutePresent) {
-                    return Column(
-                      spacing: 5.spMin,
-                      children: [
-                        RouteSourceAndDestination().pX(20.0),
-                        NavigationTravelModesList(),
-                      ],
-                    );
-                  }
-                  return Row(
-                    spacing: 10.spMin,
-                    children: [
-                      Expanded(child: MapSearchbar()),
-                      _xpPointsBuilder(),
-                    ],
-                  ).pX(20.0);
-                },
+        return SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final isRoutePresent = ref.watch(
+                        providerOfMap.select(
+                          (value) => value.currentRoutePlan != null,
+                        ),
+                      );
+
+                      if (isRoutePresent) {
+                        return Column(
+                          spacing: 5.spMin,
+                          children: [
+                            RouteSourceAndDestination().pX(20.0),
+                            NavigationTravelModesList(),
+                          ],
+                        );
+                      }
+                      return Row(
+                        spacing: 10.spMin,
+                        children: [
+                          Expanded(child: MapSearchbar()),
+                          _xpPointsBuilder(),
+                        ],
+                      ).pX(20.0);
+                    },
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            right: 15.spMin,
+                            bottom: 0.0,
+                            child: _mapActionButtons(),
+                          ),
+                          Positioned(
+                            bottom: 0.0,
+                            left: 0.0,
+                            right: 0.0,
+                            child: _viewListButtonBuilder(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final isRoutePresent = ref.watch(
+                          providerOfMap.select(
+                            (value) => value.currentRoutePlan != null,
+                          ),
+                        );
+                        if (isRoutePresent) {
+                          return NavigationRouteInfoCardsList().pT(10.0);
+                        }
+
+                        final isSelectedLocationPresent = ref.watch(
+                          providerOfMap.select(
+                            (value) => value.selectedLocation != null,
+                          ),
+                        );
+                        if (isSelectedLocationPresent) {
+                          return SelectedLocationPreview().pT(10.0).pX(20.0);
+                        }
+
+                        return const SizedBox();
+                      },
+                    ),
+                  ],
+                ),
               ),
             ],
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        right: 15.spMin,
-                        bottom: 0.0,
-                        child: _mapActionButtons(),
-                      ),
-                      Positioned(
-                        bottom: 0.0,
-                        left: 0.0,
-                        right: 0.0,
-                        child: _viewListButtonBuilder(),
-                      ),
-                    ],
-                  ),
-                ),
-                Consumer(
-                  builder: (context, ref, child) {
-                    final isRoutePresent = ref.watch(
-                      providerOfMap.select(
-                        (value) => value.currentRoutePlan != null,
-                      ),
-                    );
-                    if (isRoutePresent) {
-                      return NavigationRouteInfoCardsList().pT(10.0);
-                    }
-
-                    final isSelectedLocationPresent = ref.watch(
-                      providerOfMap.select(
-                        (value) => value.selectedLocation != null,
-                      ),
-                    );
-                    if (isSelectedLocationPresent) {
-                      return SelectedLocationPreview().pT(10.0).pX(20.0);
-                    }
-
-                    return const SizedBox();
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ).pB(30.0),
+          ).pB(30.0),
+        );
+      },
     );
   }
 

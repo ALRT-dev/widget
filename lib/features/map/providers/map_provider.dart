@@ -14,6 +14,7 @@ import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
 import 'package:hazard_app/features/map/extensions/polyline_extension.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
+import 'package:hazard_app/features/map/models/route_step_model.dart';
 import 'package:hazard_app/features/map/providers/hazard_markers_bitmaps_provider.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
@@ -516,6 +517,17 @@ class MapProvider extends StateNotifier<MapProviderState> {
       if (!mounted) return;
     }
 
+    _logStartNavigationSteps();
+
+    // Seed navigation state from the user's last known location so the
+    // overlay has populated step / distance / bearing values on its very
+    // first build. Without this, the geolocator stream in
+    // `_startLocationTracking` (distanceFilter: 5m) can take a long time to
+    // emit while the user is stationary, leaving the UI showing "--" for
+    // current step, next step, ETA, etc.
+    _updateNavigationLocation(currentUserLocation);
+    _updateNavigationStep(currentUserLocation);
+
     updateIsNavigating(true);
 
     final zoom = 18.0;
@@ -584,6 +596,10 @@ class MapProvider extends StateNotifier<MapProviderState> {
     // Update current navigation location and calculate bearing/speed
     _updateNavigationLocation(newLocation);
 
+    // Update current step / next step / distance to next maneuver and log
+    // any meaningful changes for the upcoming navigation UI to consume.
+    _updateNavigationStep(newLocation);
+
     // Check if destination is reached
     if (_checkDestinationReached(newLocation)) {
       _handleNavigationComplete();
@@ -623,6 +639,193 @@ class MapProvider extends StateNotifier<MapProviderState> {
       currentSpeed: speed,
       currentBearing: bearing,
     );
+  }
+
+  /// Distance thresholds (meters) at which we re-emit the "approaching the
+  /// next maneuver" log. Mirrors how Google Maps announces *"In 500 m..."*,
+  /// *"In 200 m..."*, *"Now turn..."*.
+  static const List<double> _maneuverAnnouncementThresholdsMeters = [
+    500.0,
+    200.0,
+    50.0,
+  ];
+
+  /// Locates the user's current step on the active route, computes the
+  /// remaining distance to the next maneuver, and pushes everything into
+  /// state.
+  ///
+  /// Logs are emitted only when the step index advances or the user crosses
+  /// one of [_maneuverAnnouncementThresholdsMeters], so the console isn't
+  /// flooded by per-tick GPS updates.
+  void _updateNavigationStep(AlrtLocation newLocation) {
+    final routePlan = state.currentRoutePlan;
+    final safestFastest = routePlan?.currentRoute;
+    if (safestFastest == null) return;
+
+    final activeRoute = safestFastest.currentRoute;
+    final steps = safestFastest.stepsForRoute(activeRoute);
+    if (steps.isEmpty) return;
+
+    final userLatLng = LatLng(newLocation.latitude, newLocation.longitude);
+
+    // Pick the step whose polyline (or, if missing, whose start/end segment)
+    // is closest to the user. This is robust against GPS noise pushing the
+    // user briefly off the next step.
+    int? bestStepIndex;
+    double bestDistance = double.infinity;
+    for (var i = 0; i < steps.length; i++) {
+      final distance = _distanceFromUserToStep(userLatLng, steps[i]);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestStepIndex = i;
+      }
+    }
+    if (bestStepIndex == null) return;
+
+    final currentStep = steps[bestStepIndex];
+    final nextStep = bestStepIndex + 1 < steps.length
+        ? steps[bestStepIndex + 1]
+        : null;
+    final stepAfterNext = bestStepIndex + 2 < steps.length
+        ? steps[bestStepIndex + 2]
+        : null;
+    final distanceToNextManeuver = _calculateDistanceToStepEnd(
+      userLatLng,
+      currentStep,
+    );
+
+    // Total remaining distance: distance left in the current step plus the
+    // full length of every subsequent step.
+    var remainingDistance = distanceToNextManeuver;
+    for (var i = bestStepIndex + 1; i < steps.length; i++) {
+      remainingDistance += steps[i].distanceMeters.toDouble();
+    }
+
+    // Total remaining duration: pro-rate the current step's duration by how
+    // much of it is left, then add full durations of all subsequent steps.
+    final currentStepDistance = currentStep.distanceMeters;
+    final currentStepRemainingFraction = currentStepDistance > 0
+        ? (distanceToNextManeuver / currentStepDistance).clamp(0.0, 1.0)
+        : 0.0;
+    var remainingDuration =
+        (currentStep.durationSeconds * currentStepRemainingFraction).round();
+    for (var i = bestStepIndex + 1; i < steps.length; i++) {
+      remainingDuration += steps[i].durationSeconds;
+    }
+
+    final previousStepIndex = state.currentStepIndex;
+    final previousDistance = state.distanceToNextManeuverMeters;
+
+    state = state.copyWith(
+      currentStepIndex: bestStepIndex,
+      currentStep: currentStep,
+      nextStep: nextStep,
+      stepAfterNext: stepAfterNext,
+      distanceToNextManeuverMeters: distanceToNextManeuver,
+      remainingDistanceMeters: remainingDistance.round(),
+      remainingDurationSeconds: remainingDuration,
+    );
+
+    final stepChanged = previousStepIndex != bestStepIndex;
+    final crossedThreshold = _crossedAnnouncementThreshold(
+      previousDistance,
+      distanceToNextManeuver,
+    );
+
+    if (stepChanged || crossedThreshold) {
+      log(
+        '[Nav step] #${bestStepIndex + 1}/${steps.length} '
+        '[${currentStep.maneuver.name}] ${currentStep.instruction} '
+        '(${distanceToNextManeuver.toStringAsFixed(0)} m to next maneuver)',
+      );
+      log(
+        '[Nav step]   Then: '
+        '${nextStep == null ? "(arrive)" : "[${nextStep.maneuver.name}] ${nextStep.instruction}"}',
+      );
+    }
+  }
+
+  /// Returns the perpendicular distance, in meters, from [user] to the
+  /// closest segment of [step]'s polyline. Falls back to the start->end
+  /// segment when the polyline is empty.
+  double _distanceFromUserToStep(LatLng user, RouteStep step) {
+    final polyline = step.polylinePoints;
+    if (polyline.length < 2) {
+      return _calculateDistanceToLineSegment(
+        user,
+        step.startLocation,
+        step.endLocation,
+      );
+    }
+
+    var minDistance = double.infinity;
+    for (var i = 0; i < polyline.length - 1; i++) {
+      final distance = _calculateDistanceToLineSegment(
+        user,
+        polyline[i],
+        polyline[i + 1],
+      );
+      if (distance < minDistance) minDistance = distance;
+    }
+    return minDistance;
+  }
+
+  /// Approximates remaining distance from [user] to [step]'s end location by
+  /// walking the step polyline forwards from the closest vertex. Falls back
+  /// to a straight-line haversine measurement when no polyline is available.
+  double _calculateDistanceToStepEnd(LatLng user, RouteStep step) {
+    final polyline = step.polylinePoints;
+    if (polyline.length < 2) {
+      return calculateDistanceInMeters(
+        user.latitude,
+        user.longitude,
+        step.endLocation.latitude,
+        step.endLocation.longitude,
+      );
+    }
+
+    // Find the closest segment to the user, then sum the remaining segment
+    // lengths plus the residual distance from the user to the end of that
+    // closest segment.
+    var minDistance = double.infinity;
+    var closestSegmentIndex = 0;
+    for (var i = 0; i < polyline.length - 1; i++) {
+      final distance = _calculateDistanceToLineSegment(
+        user,
+        polyline[i],
+        polyline[i + 1],
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestSegmentIndex = i;
+      }
+    }
+
+    var remaining = calculateDistanceInMeters(
+      user.latitude,
+      user.longitude,
+      polyline[closestSegmentIndex + 1].latitude,
+      polyline[closestSegmentIndex + 1].longitude,
+    );
+    for (var i = closestSegmentIndex + 1; i < polyline.length - 1; i++) {
+      remaining += calculateDistanceInMeters(
+        polyline[i].latitude,
+        polyline[i].longitude,
+        polyline[i + 1].latitude,
+        polyline[i + 1].longitude,
+      );
+    }
+    return remaining;
+  }
+
+  /// True iff [current] crossed below any of the announcement thresholds
+  /// since the last update represented by [previous].
+  bool _crossedAnnouncementThreshold(double? previous, double current) {
+    if (previous == null) return true;
+    for (final threshold in _maneuverAnnouncementThresholdsMeters) {
+      if (previous > threshold && current <= threshold) return true;
+    }
+    return false;
   }
 
   /// Calculates speed between two locations in m/s
@@ -910,8 +1113,44 @@ class MapProvider extends StateNotifier<MapProviderState> {
     _positionStreamSubscription?.cancel();
     _positionStreamSubscription = null;
 
+    // Clear turn-by-turn step tracking so it doesn't leak into the next
+    // navigation session.
+    state = state.copyWith(
+      currentStepIndex: null,
+      currentStep: null,
+      nextStep: null,
+      stepAfterNext: null,
+      distanceToNextManeuverMeters: null,
+      remainingDistanceMeters: null,
+      remainingDurationSeconds: null,
+    );
+
     // Remove user location marker
     _removeUserLocationMarker();
+  }
+
+  /// Dumps the full ordered step list for the route the user is about to
+  /// navigate. Mirrors how Google Maps recaps the trip in voice and the
+  /// "all steps" sheet at navigation start.
+  void _logStartNavigationSteps() {
+    final routePlan = state.currentRoutePlan;
+    final safestFastest = routePlan?.currentRoute;
+    if (routePlan == null || safestFastest == null) return;
+
+    final activeRoute = safestFastest.currentRoute;
+    final steps = safestFastest.stepsForRoute(activeRoute);
+
+    log(
+      '[Nav start] travelMode=${routePlan.selectedTravelMode.name}, '
+      '${steps.length} step(s) for selected route',
+    );
+    for (var i = 0; i < steps.length; i++) {
+      final s = steps[i];
+      log(
+        '[Nav start]   ${i + 1}. [${s.maneuver.name}] ${s.instruction} '
+        '(${s.distanceMeters} m, ${s.durationSeconds}s)',
+      );
+    }
   }
 
   /// Removes the user location marker

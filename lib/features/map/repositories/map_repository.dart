@@ -206,6 +206,27 @@ class MapRepositoryImpl implements MapRepository {
               : RoutingPreference.unspecified,
           polylineQuality: PolylineQuality.overview,
           computeAlternativeRoutes: true,
+          languageCode: 'en',
+          regionCode: 'AU',
+          // Override the package's default field mask so the Routes API also
+          // returns turn-by-turn step data (instructions, maneuvers, per-step
+          // polylines) for every route — including alternative routes.
+          responseFieldMask: const [
+            'routes.duration',
+            'routes.staticDuration',
+            'routes.distanceMeters',
+            'routes.polyline.encodedPolyline',
+            'routes.legs.distanceMeters',
+            'routes.legs.duration',
+            'routes.legs.steps.distanceMeters',
+            'routes.legs.steps.staticDuration',
+            'routes.legs.steps.polyline.encodedPolyline',
+            'routes.legs.steps.startLocation',
+            'routes.legs.steps.endLocation',
+            'routes.legs.steps.navigationInstruction',
+            'routes.legs.steps.travelMode',
+            'routes.legs.steps.transitDetails',
+          ].join(','),
         );
 
         final result = await _polylinePoints.getRouteBetweenCoordinatesV2(

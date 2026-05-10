@@ -34,10 +34,7 @@ class _SelectedLocationPreviewState
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(14.spMin),
-        border: Border.all(
-          color: AppColors.lightGrey,
-        ),
+        borderRadius: BorderRadius.circular(18.spMin),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadowColor,
@@ -46,13 +43,13 @@ class _SelectedLocationPreviewState
           ),
         ],
       ),
-      padding: EdgeInsets.all(10.spMin),
+      padding: EdgeInsets.all(16.spMin),
       child: Column(
-        spacing: 8.h,
+        spacing: 8.spMin,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 10.w,
+            spacing: 10.spMin,
             children: [
               Expanded(
                 child: Column(
@@ -97,7 +94,7 @@ class _SelectedLocationPreviewState
 
   Widget _actionButtonsBuilder() {
     return Row(
-      spacing: 5.w,
+      spacing: 5.spMin,
       children: [
         Consumer(
           builder: (context, ref, child) {

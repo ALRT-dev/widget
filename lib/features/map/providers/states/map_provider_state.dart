@@ -5,6 +5,7 @@ import 'package:google_maps_cluster_manager_2/google_maps_cluster_manager_2.dart
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
+import 'package:hazard_app/features/map/models/route_step_model.dart';
 import 'package:hazard_app/features/map/utils/constants.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
@@ -85,6 +86,35 @@ abstract class MapProviderState with _$MapProviderState {
 
     /// In-memory hazard cache keyed by hazard ID.
     @Default(<String, Hazard>{}) final Map<String, Hazard> hazardCache,
+
+    // Turn-by-turn navigation step tracking
+    /// Index of the user's current step within the active route's step list,
+    /// or `null` when navigation hasn't started or the route has no steps.
+    final int? currentStepIndex,
+
+    /// The step the user is currently traversing.
+    final RouteStep? currentStep,
+
+    /// The next step the user will traverse, or `null` if [currentStep] is the
+    /// final step (i.e. the user is on the arrival leg).
+    final RouteStep? nextStep,
+
+    /// Remaining distance, in meters, from the user's projected position on
+    /// [currentStep] to that step's `endLocation` (i.e. the next maneuver).
+    final double? distanceToNextManeuverMeters,
+
+    /// The step after [nextStep], used to render the secondary "THEN" preview
+    /// in the navigation overlay. `null` when the user is on the second-to-last
+    /// or last step.
+    final RouteStep? stepAfterNext,
+
+    /// Total remaining distance, in meters, from the user's current position
+    /// to the destination along the active route.
+    final int? remainingDistanceMeters,
+
+    /// Total remaining duration, in seconds, from the user's current position
+    /// to the destination along the active route.
+    final int? remainingDurationSeconds,
   }) = _MapProviderState;
 }
 

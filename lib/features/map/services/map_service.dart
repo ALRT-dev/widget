@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart' hide Route;
@@ -8,6 +9,7 @@ import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
+import 'package:hazard_app/features/map/models/route_step_model.dart';
 import 'package:hazard_app/features/map/models/safest_fastest_routes_model.dart';
 import 'package:hazard_app/features/map/providers/repository_providers.dart';
 import 'package:hazard_app/features/map/repositories/map_repository.dart';
@@ -166,24 +168,28 @@ class MapService {
       (response) => convertRoutesApiResponseToSafestFastestRoutes(
         response: response,
         hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.driving,
       ),
     );
     final travelModeTransit = result[1].whenSuccess(
       (response) => convertRoutesApiResponseToSafestFastestRoutes(
         response: response,
         hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.transit,
       ),
     );
     final travelModeWalking = result[2].whenSuccess(
       (response) => convertRoutesApiResponseToSafestFastestRoutes(
         response: response,
         hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.walking,
       ),
     );
     final travelModeBicycling = result[3].whenSuccess(
       (response) => convertRoutesApiResponseToSafestFastestRoutes(
         response: response,
         hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.bicycling,
       ),
     );
 
@@ -219,9 +225,13 @@ class MapService {
   }
 
   /// Extracts the safest and fastest routes from the [RoutesApiResponse].
+  ///
+  /// [travelMode] is optional and only used to label the parsed-step debug
+  /// log so transit/walking/bicycling/driving entries are easy to distinguish.
   SafestFastestRoutes? convertRoutesApiResponseToSafestFastestRoutes({
     required final RoutesApiResponse response,
     final List<Hazard>? hazardsToAvoid,
+    final TravelMode? travelMode,
   }) {
     final routes = response.routes;
     if (routes.isEmpty) {
@@ -248,6 +258,15 @@ class MapService {
             : const <Hazard>[],
     };
 
+    // Parse turn-by-turn steps for every alternative route, index-aligned
+    // against `response.rawJson['routes']` since the package's own `Route`
+    // model does not surface `legs.steps`.
+    final routeSteps = _parseRouteStepsFromRawJson(
+      response.rawJson,
+      routes,
+    );
+    _logParsedRouteSteps(travelMode, routes, routeSteps);
+
     Route? safestRoute;
     if (hasHazardsToAvoid) {
       safestRoute = _chooseSafestRoute(routes, routeHazards);
@@ -270,7 +289,78 @@ class MapService {
       fastestRoute: fastestRoute,
       allRoutes: routes,
       routeHazards: routeHazards,
+      routeSteps: routeSteps,
     );
+  }
+
+  /// Parses `routes[i].legs[*].steps[*]` from the raw API response into a
+  /// flat `List<RouteStep>` per [Route], aligned by index with [routes].
+  ///
+  /// Routes whose JSON entry is missing or malformed map to an empty list so
+  /// downstream code can rely on `stepsForRoute(route)` always returning a
+  /// non-null list.
+  Map<Route, List<RouteStep>> _parseRouteStepsFromRawJson(
+    Map<String, dynamic> rawJson,
+    List<Route> routes,
+  ) {
+    final rawRoutes = (rawJson['routes'] as List?) ?? const [];
+    final routeSteps = <Route, List<RouteStep>>{};
+
+    for (var i = 0; i < routes.length; i++) {
+      final rawRoute = i < rawRoutes.length
+          ? rawRoutes[i] as Map<String, dynamic>?
+          : null;
+      routeSteps[routes[i]] = _parseStepsForRoute(rawRoute);
+    }
+
+    return routeSteps;
+  }
+
+  /// Walks `legs[*].steps[*]` of a single raw route entry and returns a flat
+  /// list of [RouteStep] (preserving leg order).
+  List<RouteStep> _parseStepsForRoute(Map<String, dynamic>? rawRoute) {
+    if (rawRoute == null) return const <RouteStep>[];
+
+    final legs = (rawRoute['legs'] as List?) ?? const [];
+    final steps = <RouteStep>[];
+    for (final leg in legs) {
+      if (leg is! Map<String, dynamic>) continue;
+      final rawSteps = (leg['steps'] as List?) ?? const [];
+      for (final rawStep in rawSteps) {
+        if (rawStep is! Map<String, dynamic>) continue;
+        final step = RouteStep.fromJson(rawStep);
+        if (step != null) steps.add(step);
+      }
+    }
+    return steps;
+  }
+
+  /// Pretty-prints every parsed step for every route to the debug console so
+  /// the user can iterate on the navigation UI without touching the network
+  /// layer.
+  void _logParsedRouteSteps(
+    TravelMode? travelMode,
+    List<Route> routes,
+    Map<Route, List<RouteStep>> routeSteps,
+  ) {
+    final modeLabel = travelMode?.name ?? 'unknown';
+    log('[Routes] travelMode=$modeLabel, ${routes.length} route(s) parsed');
+    for (var i = 0; i < routes.length; i++) {
+      final route = routes[i];
+      final steps = routeSteps[route] ?? const <RouteStep>[];
+      final distanceKm = route.distanceKm?.toStringAsFixed(2) ?? '-';
+      final durationMin = route.durationMinutes?.toStringAsFixed(1) ?? '-';
+      log(
+        '[Routes]   Route #$i: $distanceKm km, $durationMin min, ${steps.length} step(s)',
+      );
+      for (var j = 0; j < steps.length; j++) {
+        final s = steps[j];
+        log(
+          '[Routes]     ${j + 1}. [${s.maneuver.name}] ${s.instruction} '
+          '(${s.distanceMeters} m, ${s.durationSeconds}s)',
+        );
+      }
+    }
   }
 
   /// Chooses the safest route using precomputed [routeHazards] per route.
