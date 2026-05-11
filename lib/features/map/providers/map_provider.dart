@@ -1171,6 +1171,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
       currentStep: null,
       nextStep: null,
       stepAfterNext: null,
+      currentSpeed: 0.0,
       distanceToNextManeuverMeters: null,
       remainingDistanceMeters: null,
       remainingDurationSeconds: null,

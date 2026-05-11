@@ -1,7 +1,6 @@
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:hazard_app/features/map/models/route_step_model.dart';
-import 'package:hazard_app/features/shared/models/hazard_model.dart';
 
 part 'safest_fastest_routes_model.freezed.dart';
 
@@ -22,12 +21,6 @@ abstract class SafestFastestRoutes with _$SafestFastestRoutes {
     /// The currently selected route amoung the routes.
     final Route? selectedRoute,
 
-    /// The hazards relevant to each route in [allRoutes].
-    ///
-    /// Routes without any nearby hazards map to an empty list.
-    @Default(<Route, List<Hazard>>{})
-    final Map<Route, List<Hazard>> routeHazards,
-
     /// The turn-by-turn navigation steps for each route in [allRoutes].
     ///
     /// Routes without parsable steps map to an empty list.
@@ -37,10 +30,6 @@ abstract class SafestFastestRoutes with _$SafestFastestRoutes {
 
   /// Gets the current route, prioritizing the selected route if available.
   Route get currentRoute => selectedRoute ?? safestRoute;
-
-  /// Returns the hazards relevant to [route], or an empty list if none.
-  List<Hazard> hazardsForRoute(final Route route) =>
-      routeHazards[route] ?? const <Hazard>[];
 
   /// Returns the turn-by-turn steps for [route], or an empty list if none.
   List<RouteStep> stepsForRoute(final Route route) =>

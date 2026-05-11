@@ -7,6 +7,7 @@ import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_theme.dart';
 
@@ -285,13 +286,23 @@ class _NavigationRouteInfoCardsListItemState
               ],
             ],
           ),
-        );
+        ).onPressed(_viewHazards);
       },
     );
   }
 
   void _handleRouteTap() {
     ref.read(providerOfMap.notifier).handleRouteTap(widget.route);
+  }
+
+  void _viewHazards() {
+    final hazards = _getRouteHazardSummary(ref).hazards;
+    if (hazards.isEmpty) return;
+
+    showHazardsBottomsheet(
+      context: context,
+      hazards: hazards,
+    );
   }
 
   /// Returns the route hazard summary from the provider.

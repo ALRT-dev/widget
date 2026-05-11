@@ -288,7 +288,6 @@ class MapService {
       selectedRoute: safestRoute ?? fastestRoute,
       fastestRoute: fastestRoute,
       allRoutes: routes,
-      routeHazards: routeHazards,
       routeSteps: routeSteps,
     );
   }
