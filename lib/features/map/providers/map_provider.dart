@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,6 +23,7 @@ import 'package:hazard_app/features/map/providers/states/hazard_markers_bitmaps_
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
 import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
+import 'package:hazard_app/features/map/utils/navigation_polyline_simulation.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
@@ -68,6 +70,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
   StreamSubscription<double>? _headingStreamSubscription;
   StreamSubscription? _positionStreamSubscription;
   int _hazardRequestId = 0;
+
+  /// After sim framing runs once ([_applySimulationNorthUpCameraFrame]), arrow
+  /// presses only pan with [CameraUpdate.newLatLng] so zoom/bearing/tilt do not
+  /// animate every tick (maps interpolate full [CameraPosition] updates).
+  bool _simulationNorthUpCameraFrameApplied = false;
 
   /// The page size for fetching hazards.
   int get _pageSize => 5000;
@@ -573,6 +580,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
         .listen(
           (position) {
             if (!mounted) return;
+            if (state.navigationSimulationEnabled) return;
 
             final newLocation = AlrtLocation(
               latitude: position.latitude,
@@ -588,13 +596,23 @@ class MapProvider extends StateNotifier<MapProviderState> {
         );
   }
 
-  /// Handles location updates during navigation
-  void _handleLocationUpdate(AlrtLocation newLocation) {
+  /// Handles location updates during navigation.
+  ///
+  /// When [preserveHeadingAndSpeed] is true (cardinal nudge simulation),
+  /// bearing and speed are left unchanged so the follow-camera bearing and
+  /// zoom tiers do not snap on each arrow tap.
+  void _handleLocationUpdate(
+    AlrtLocation newLocation, {
+    bool preserveHeadingAndSpeed = false,
+  }) {
     final currentRoutePlan = state.currentRoutePlan;
     if (currentRoutePlan == null || !currentRoutePlan.isNavigating) return;
 
     // Update current navigation location and calculate bearing/speed
-    _updateNavigationLocation(newLocation);
+    _updateNavigationLocation(
+      newLocation,
+      preserveHeadingAndSpeed: preserveHeadingAndSpeed,
+    );
 
     // Update current step / next step / distance to next maneuver and log
     // any meaningful changes for the upcoming navigation UI to consume.
@@ -617,16 +635,21 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     // Update camera position smoothly
     _updateNavigationCamera(newLocation);
+
+    _syncSimulatedNavigationMarker();
   }
 
   /// Updates navigation location and calculates speed/bearing
-  void _updateNavigationLocation(AlrtLocation newLocation) {
+  void _updateNavigationLocation(
+    AlrtLocation newLocation, {
+    bool preserveHeadingAndSpeed = false,
+  }) {
     final previousLocation = state.currentNavigationLocation;
 
     double bearing = state.currentBearing;
     double speed = state.currentSpeed;
 
-    if (previousLocation != null) {
+    if (previousLocation != null && !preserveHeadingAndSpeed) {
       speed = _calculateSpeed(previousLocation, newLocation);
       bearing = _calculateBearing(
         LatLng(previousLocation.latitude, previousLocation.longitude),
@@ -997,10 +1020,36 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
+  void _applySimulationNorthUpCameraFrame(LatLng target) {
+    animateToCameraUpdate(
+      cameraUpdate: CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: target,
+          zoom: _kSimulationNavigationCameraZoom,
+          bearing: _kSimulationNavigationCameraBearing,
+          tilt: _kSimulationNavigationCameraTilt,
+        ),
+      ),
+    );
+  }
+
   /// Updates camera position during navigation
   void _updateNavigationCamera(AlrtLocation location) {
     // Only update camera if user following is enabled
     if (!state.followUser) return;
+
+    if (state.navigationSimulationEnabled) {
+      final latLng = LatLng(location.latitude, location.longitude);
+      if (!_simulationNorthUpCameraFrameApplied) {
+        _applySimulationNorthUpCameraFrame(latLng);
+        _simulationNorthUpCameraFrameApplied = true;
+      } else {
+        animateToCameraUpdate(
+          cameraUpdate: CameraUpdate.newLatLng(latLng),
+        );
+      }
+      return;
+    }
 
     final currentBearing = state.currentBearing;
     final currentSpeed = state.currentSpeed;
@@ -1043,6 +1092,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
         heading,
       ) {
         if (!mounted) return;
+        if (state.navigationSimulationEnabled) return;
 
         if (lastHeading == null || (heading - (lastHeading ?? 0)).abs() > 6) {
           lastHeading = heading;
@@ -1107,6 +1157,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
   /// Stops navigation and cancels heading updates.
   void stopNavigation() {
+    _simulationNorthUpCameraFrameApplied = false;
     updateIsNavigating(false);
     _headingStreamSubscription?.cancel();
     _headingStreamSubscription = null;
@@ -1123,10 +1174,147 @@ class MapProvider extends StateNotifier<MapProviderState> {
       distanceToNextManeuverMeters: null,
       remainingDistanceMeters: null,
       remainingDurationSeconds: null,
+      navigationSimulationEnabled: false,
     );
 
     // Remove user location marker
     _removeUserLocationMarker();
+    _removeSimulatedNavigationMarker();
+  }
+
+  /// Debug-only: toggles whether GPS is ignored and movement is simulated.
+  void toggleNavigationSimulation() {
+    if (!kDebugMode) return;
+    if (!(state.currentRoutePlan?.isNavigating ?? false)) return;
+    final enablingSim = !state.navigationSimulationEnabled;
+    state = state.copyWith(
+      navigationSimulationEnabled: enablingSim,
+    );
+    _syncSimulatedNavigationMarker();
+
+    if (!enablingSim) {
+      _simulationNorthUpCameraFrameApplied = false;
+      return;
+    }
+
+    _simulationNorthUpCameraFrameApplied = false;
+    final loc = state.currentNavigationLocation;
+    if (loc != null && state.followUser) {
+      _applySimulationNorthUpCameraFrame(
+        LatLng(loc.latitude, loc.longitude),
+      );
+      _simulationNorthUpCameraFrameApplied = true;
+    }
+  }
+
+  /// Desk-testing: stable north-up follow camera (no speed-based zoom/tilt).
+  static const double _kSimulationNavigationCameraZoom = 18.0;
+  static const double _kSimulationNavigationCameraTilt = 0.0;
+  static const double _kSimulationNavigationCameraBearing = 0.0;
+
+  static const double _navigationSimulationNudgeMeters = 2.0;
+  static const String _kSimulatedNavigationMarkerIdValue =
+      'simulated_navigation_location';
+
+  /// Debug-only: move the simulated position by [northMeters] / [eastMeters].
+  void simulateNavigationOffsetMeters({
+    required double northMeters,
+    required double eastMeters,
+  }) {
+    if (!kDebugMode) return;
+    if (!state.navigationSimulationEnabled) return;
+    final plan = state.currentRoutePlan;
+    if (plan == null || !plan.isNavigating) return;
+
+    final base =
+        state.currentNavigationLocation ??
+        _ref.read(providerOfLocation).location;
+    final nextLatLng = offsetByNorthEastMeters(
+      LatLng(base.latitude, base.longitude),
+      northMeters,
+      eastMeters,
+    );
+    _handleLocationUpdate(
+      AlrtLocation(
+        latitude: nextLatLng.latitude,
+        longitude: nextLatLng.longitude,
+        address: 'Simulated',
+      ),
+      preserveHeadingAndSpeed: true,
+    );
+  }
+
+  void simulateNavigationNudgeNorth() => simulateNavigationOffsetMeters(
+    northMeters: _navigationSimulationNudgeMeters,
+    eastMeters: 0,
+  );
+
+  void simulateNavigationNudgeSouth() => simulateNavigationOffsetMeters(
+    northMeters: -_navigationSimulationNudgeMeters,
+    eastMeters: 0,
+  );
+
+  void simulateNavigationNudgeEast() => simulateNavigationOffsetMeters(
+    northMeters: 0,
+    eastMeters: _navigationSimulationNudgeMeters,
+  );
+
+  void simulateNavigationNudgeWest() => simulateNavigationOffsetMeters(
+    northMeters: 0,
+    eastMeters: -_navigationSimulationNudgeMeters,
+  );
+
+  /// Debug-only: advance [meters] along the active route polyline toward the
+  /// destination (realistic step progression for desk testing).
+  void simulateAdvanceAlongRoute(final double meters) {
+    if (!kDebugMode) return;
+    if (!state.navigationSimulationEnabled) return;
+    final plan = state.currentRoutePlan;
+    final safest = plan?.currentRoute;
+    if (plan == null || !plan.isNavigating || safest == null) return;
+
+    final polyPoints = safest.currentRoute.polylinePoints;
+    if (polyPoints == null || polyPoints.isEmpty) return;
+
+    final polyline = polyPoints
+        .map((p) => LatLng(p.latitude, p.longitude))
+        .toList();
+
+    final base =
+        state.currentNavigationLocation ??
+        _ref.read(providerOfLocation).location;
+    final from = LatLng(base.latitude, base.longitude);
+
+    final nextLatLng = advanceAlongPolylineTowardsEnd(
+      polyline: polyline,
+      from: from,
+      meters: meters,
+    );
+    if (nextLatLng == null) return;
+
+    _handleLocationUpdate(
+      AlrtLocation(
+        latitude: nextLatLng.latitude,
+        longitude: nextLatLng.longitude,
+        address: 'Simulated',
+      ),
+    );
+  }
+
+  /// Debug-only: jump to [latLng] (used with map long-press while sim is on).
+  void simulateTeleportToNavigationLocation(final LatLng latLng) {
+    if (!kDebugMode) return;
+    if (!state.navigationSimulationEnabled) return;
+    final plan = state.currentRoutePlan;
+    if (plan == null || !plan.isNavigating) return;
+
+    _handleLocationUpdate(
+      AlrtLocation(
+        latitude: latLng.latitude,
+        longitude: latLng.longitude,
+        address: 'Simulated',
+      ),
+    );
   }
 
   /// Dumps the full ordered step list for the route the user is about to
@@ -1157,6 +1345,50 @@ class MapProvider extends StateNotifier<MapProviderState> {
   void _removeUserLocationMarker() {
     final updatedMarkers = Set<Marker>.from(state.markers)
       ..removeWhere((marker) => marker.markerId.value == 'user_location');
+    updateMarkers(updatedMarkers);
+  }
+
+  /// Debug-only: shows the simulated navigation position as an Azure pin on
+  /// the map (real GPS continues to use the blue-dot pipeline when sim is off).
+  void _syncSimulatedNavigationMarker() {
+    if (!kDebugMode) {
+      _removeSimulatedNavigationMarker();
+      return;
+    }
+    final navigating = state.currentRoutePlan?.isNavigating ?? false;
+    final loc = state.currentNavigationLocation;
+    if (!navigating || !state.navigationSimulationEnabled || loc == null) {
+      _removeSimulatedNavigationMarker();
+      return;
+    }
+    final marker = Marker(
+      markerId: MarkerId(_kSimulatedNavigationMarkerIdValue),
+      position: LatLng(loc.latitude, loc.longitude),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+      rotation: state.currentBearing,
+      flat: true,
+      zIndexInt: 100,
+      consumeTapEvents: false,
+      infoWindow: const InfoWindow(title: 'Simulated position'),
+    );
+    final updatedMarkers = Set<Marker>.from(state.markers)
+      ..removeWhere(
+        (final m) => m.markerId.value == _kSimulatedNavigationMarkerIdValue,
+      )
+      ..add(marker);
+    updateMarkers(updatedMarkers);
+  }
+
+  void _removeSimulatedNavigationMarker() {
+    if (!state.markers.any(
+      (final m) => m.markerId.value == _kSimulatedNavigationMarkerIdValue,
+    )) {
+      return;
+    }
+    final updatedMarkers = Set<Marker>.from(state.markers)
+      ..removeWhere(
+        (final m) => m.markerId.value == _kSimulatedNavigationMarkerIdValue,
+      );
     updateMarkers(updatedMarkers);
   }
 
@@ -1216,6 +1448,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final routeLabelMarkers = state.markers.where(
       (marker) => marker.markerId.value.startsWith('route_label_'),
     );
+    final simulatedNavigationMarker = state.markers.firstWhereOrNull(
+      (marker) => marker.markerId.value == _kSimulatedNavigationMarkerIdValue,
+    );
     final currentUserLocationMarker = state.markers.firstWhereOrNull(
       (marker) => marker.markerId.value == 'user_location',
     );
@@ -1224,6 +1459,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
       ...individualMarkers,
       if (selectedPlaceMarker != null) selectedPlaceMarker,
       ...routeLabelMarkers,
+      if (simulatedNavigationMarker != null) simulatedNavigationMarker,
       if (currentUserLocationMarker != null) currentUserLocationMarker,
     };
 

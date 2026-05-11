@@ -2,7 +2,9 @@ import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -75,15 +77,7 @@ class _NavigationRouteInfoCardsListItemState
   Widget _buildHeaderHazardCount() {
     return Consumer(
       builder: (context, ref, child) {
-        final hazardCount = ref.watch(
-          providerOfMap.select(
-            (value) =>
-                value.currentRoutePlan?.currentRoute
-                    ?.hazardsForRoute(widget.route)
-                    .length ??
-                0,
-          ),
-        );
+        final hazardCount = _getRouteHazardSummary(ref).totalHazards;
 
         return Row(
           mainAxisSize: MainAxisSize.min,
@@ -196,15 +190,7 @@ class _NavigationRouteInfoCardsListItemState
   Widget _buildRouteMetadata() {
     return Consumer(
       builder: (context, ref, child) {
-        final hazardCount = ref.watch(
-          providerOfMap.select(
-            (value) =>
-                value.currentRoutePlan?.currentRoute
-                    ?.hazardsForRoute(widget.route)
-                    .length ??
-                0,
-          ),
-        );
+        final hazardCount = _getRouteHazardSummary(ref).totalHazards;
 
         final fastestRoute = ref.watch(
           providerOfMap.select(
@@ -257,15 +243,7 @@ class _NavigationRouteInfoCardsListItemState
   Widget _buildActionButton() {
     return Consumer(
       builder: (context, ref, child) {
-        final hazardCount = ref.watch(
-          providerOfMap.select(
-            (value) =>
-                value.currentRoutePlan?.currentRoute
-                    ?.hazardsForRoute(widget.route)
-                    .length ??
-                0,
-          ),
-        );
+        final hazardCount = _getRouteHazardSummary(ref).totalHazards;
 
         return Container(
           decoration: BoxDecoration(
@@ -314,5 +292,25 @@ class _NavigationRouteInfoCardsListItemState
 
   void _handleRouteTap() {
     ref.read(providerOfMap.notifier).handleRouteTap(widget.route);
+  }
+
+  /// Returns the route hazard summary from the provider.
+  RouteHazardSummary _getRouteHazardSummary(final WidgetRef ref) {
+    final hazards = ref.watch(
+      providerOfMap.select(
+        (value) => value.currentRoutePlan?.hazardsToAvoid ?? [],
+      ),
+    );
+    final routePoints =
+        widget.route.polylinePoints
+            ?.map((e) => LatLng(e.latitude, e.longitude))
+            .toList() ??
+        [];
+    final sum = HazardAvoidanceHelper.analyzeRouteHazards(
+      hazards: hazards,
+      routePoints: routePoints,
+      otherHazardsBufferKm: 0.5,
+    );
+    return sum;
   }
 }

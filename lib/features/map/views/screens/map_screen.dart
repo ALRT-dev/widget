@@ -1,4 +1,5 @@
 import 'package:easy_debounce/easy_debounce.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +13,7 @@ import 'package:hazard_app/features/map/views/widgets/map_keys_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
 import 'package:hazard_app/features/map/views/widgets/navigation/navigation_mode_overlay.dart';
 import 'package:hazard_app/features/map/views/widgets/navigation/navigation_route_info_cards_list.dart';
+import 'package:hazard_app/features/map/views/widgets/navigation/navigation_simulation_controls.dart';
 import 'package:hazard_app/features/map/views/widgets/navigation/navigation_travel_modes_list.dart';
 import 'package:hazard_app/features/map/views/widgets/route_source_and_destination.dart';
 import 'package:hazard_app/features/map/views/widgets/selected_location_preview.dart';
@@ -74,6 +76,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               context.unfocusInputs();
               ref.read(providerOfMap.notifier).updateSelectedHazard(null);
             },
+            onLongPress: kDebugMode
+                ? (final LatLng position) =>
+                      NavigationSimulationControls.handleMapLongPress(
+                        ref,
+                        position,
+                      )
+                : null,
           ),
           Positioned.fill(
             child: _overlayedContentsBuilder(),

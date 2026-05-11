@@ -115,6 +115,10 @@ abstract class MapProviderState with _$MapProviderState {
     /// Total remaining duration, in seconds, from the user's current position
     /// to the destination along the active route.
     final int? remainingDurationSeconds,
+
+    /// When true (debug only), GPS updates are ignored and position is driven
+    /// by simulation controls ([simulateNavigationOffsetMeters], etc.).
+    @Default(false) final bool navigationSimulationEnabled,
   }) = _MapProviderState;
 }
 

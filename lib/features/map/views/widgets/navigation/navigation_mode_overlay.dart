@@ -1,8 +1,12 @@
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/map/models/route_step_model.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:hazard_app/features/map/views/widgets/custom_compass_button.dart';
+import 'package:hazard_app/features/map/views/widgets/navigation/navigation_simulation_controls.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -25,10 +29,33 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
         spacing: 10.spMin,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildTurnInfo(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _buildTurnInfo(),
+              Consumer(
+                builder: (context, ref, child) {
+                  final showNavigationSimulationPanel =
+                      kDebugMode &&
+                      ref.watch(
+                        providerOfMap.select(
+                          (value) =>
+                              value.currentRoutePlan?.isNavigating ?? false,
+                        ),
+                      );
+                  if (!showNavigationSimulationPanel) {
+                    return const SizedBox.shrink();
+                  }
+                  return const NavigationSimulationControls().pT(10.0);
+                },
+              ),
+            ],
+          ),
           Column(
             spacing: 10.spMin,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
+              CustomCompassButton(),
               _buildRemainingInfo(),
               _buildFooter(),
             ],
@@ -39,156 +66,158 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
   }
 
   Widget _buildTurnInfo() {
-    return IntrinsicHeight(
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF252525),
-          borderRadius: BorderRadius.circular(20.spMin),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowColor,
-              blurRadius: 10.0,
-              offset: Offset(0.0, 0.0),
-            ),
-          ],
-        ),
-        padding: EdgeInsets.all(16.spMin),
-        child: Row(
-          spacing: 16.spMin,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Row(
-                children: [
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final maneuver = ref.watch(
-                        providerOfMap.select(
-                          (s) =>
-                              s.nextStep?.maneuver ?? s.currentStep?.maneuver,
-                        ),
-                      );
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF252525),
+        borderRadius: BorderRadius.circular(20.spMin),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColor,
+            blurRadius: 10.0,
+            offset: Offset(0.0, 0.0),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(16.spMin),
+      child: Row(
+        spacing: 16.spMin,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Consumer(
+                  builder: (context, ref, child) {
+                    final maneuver = ref.watch(
+                      providerOfMap.select(
+                        (s) => s.nextStep?.maneuver ?? s.currentStep?.maneuver,
+                      ),
+                    );
 
-                      return Container(
-                        width: 70.spMin,
-                        height: 70.spMin,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16.spMin),
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.orange300,
-                              AppColors.red200,
-                            ],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.red200,
-                              blurRadius: 10.0,
-                              offset: Offset(0.0, 0.0),
-                            ),
+                    return Container(
+                      width: 70.spMin,
+                      height: 70.spMin,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16.spMin),
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.orange300,
+                            AppColors.red200,
                           ],
                         ),
-                        child: Center(
-                          child: Icon(
-                            _iconForManeuver(maneuver),
-                            size: 44.spMin,
-                            color: AppColors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.red200,
+                            blurRadius: 10.0,
+                            offset: Offset(0.0, 0.0),
                           ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Icon(
+                          _iconForManeuver(maneuver),
+                          size: 44.spMin,
+                          color: AppColors.white,
                         ),
-                      );
-                    },
+                      ),
+                    );
+                  },
+                ),
+                16.wSizedBox,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // "In 400 m" — distance to the next maneuver. Watches just
+                      // distanceToNextManeuverMeters so this Text is the only
+                      // widget that rebuilds on each GPS tick.
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final meters = ref.watch(
+                            providerOfMap.select(
+                              (s) => s.distanceToNextManeuverMeters,
+                            ),
+                          );
+                          return Text(
+                            _formatDistancePrefix(meters),
+                            style: TextStyle(
+                              fontSize: 13.spMin,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF888888),
+                            ),
+                          );
+                        },
+                      ),
+                      5.hSizedBox,
+                      // Primary instruction — the action you're approaching.
+                      // Falls back to currentStep on the final (ARRIVE) step
+                      // where nextStep is null.
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final instruction = ref.watch(
+                            providerOfMap.select(
+                              (s) =>
+                                  s.nextStep?.instruction ??
+                                  s.currentStep?.instruction ??
+                                  '',
+                            ),
+                          );
+                          return AutoSizeText(
+                            instruction.isEmpty ? '--' : instruction,
+                            maxLines: 3,
+                            minFontSize: 8.spMin,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 16.spMin,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.white,
+                            ),
+                          );
+                        },
+                      ),
+                      5.hSizedBox,
+                      // "Continue for X km" — length of the road segment after
+                      // the upcoming maneuver. Hidden when no next step or its
+                      // distance is zero (e.g. ARRIVE step).
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final meters = ref.watch(
+                            providerOfMap.select(
+                              (s) => s.nextStep?.distanceMeters,
+                            ),
+                          );
+                          if (meters == null || meters <= 0) {
+                            return const SizedBox.shrink();
+                          }
+                          return Text(
+                            'Continue for ${_formatDistance(meters)}',
+                            style: TextStyle(
+                              fontSize: 12.spMin,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.grey,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                  16.wSizedBox,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // "In 400 m" — distance to the next maneuver. Watches just
-                        // distanceToNextManeuverMeters so this Text is the only
-                        // widget that rebuilds on each GPS tick.
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final meters = ref.watch(
-                              providerOfMap.select(
-                                (s) => s.distanceToNextManeuverMeters,
-                              ),
-                            );
-                            return Text(
-                              _formatDistancePrefix(meters),
-                              style: TextStyle(
-                                fontSize: 13.spMin,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF888888),
-                              ),
-                            );
-                          },
-                        ),
-                        5.hSizedBox,
-                        // Primary instruction — the action you're approaching.
-                        // Falls back to currentStep on the final (ARRIVE) step
-                        // where nextStep is null.
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final instruction = ref.watch(
-                              providerOfMap.select(
-                                (s) =>
-                                    s.nextStep?.instruction ??
-                                    s.currentStep?.instruction ??
-                                    '',
-                              ),
-                            );
-                            return Text(
-                              instruction.isEmpty ? '--' : instruction,
-                              style: TextStyle(
-                                fontSize: 16.spMin,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.white,
-                              ),
-                            );
-                          },
-                        ),
-                        5.hSizedBox,
-                        // "Continue for X km" — length of the road segment after
-                        // the upcoming maneuver. Hidden when no next step or its
-                        // distance is zero (e.g. ARRIVE step).
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final meters = ref.watch(
-                              providerOfMap.select(
-                                (s) => s.nextStep?.distanceMeters,
-                              ),
-                            );
-                            if (meters == null || meters <= 0) {
-                              return const SizedBox.shrink();
-                            }
-                            return Text(
-                              'Continue for ${_formatDistance(meters)}',
-                              style: TextStyle(
-                                fontSize: 12.spMin,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.grey,
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            // THEN section — the maneuver after the upcoming one. The whole
-            // block is hidden when there's no step-after-next, so the
-            // primary column expands to fill the card.
-            Consumer(
-              builder: (context, ref, child) {
-                final hasStepAfterNext = ref.watch(
-                  providerOfMap.select((s) => s.stepAfterNext != null),
-                );
-                if (!hasStepAfterNext) return const SizedBox.shrink();
+          ),
+          // THEN section — the maneuver after the upcoming one. The whole
+          // block is hidden when there's no step-after-next, so the
+          // primary column expands to fill the card.
+          Consumer(
+            builder: (context, ref, child) {
+              final hasStepAfterNext = ref.watch(
+                providerOfMap.select((s) => s.stepAfterNext != null),
+              );
+              if (!hasStepAfterNext) return const SizedBox.shrink();
 
-                return Row(
+              return IntrinsicHeight(
+                child: Row(
                   children: [
                     _buildDivider(),
                     16.wSizedBox,
@@ -239,11 +268,11 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                       ],
                     ),
                   ],
-                );
-              },
-            ),
-          ],
-        ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

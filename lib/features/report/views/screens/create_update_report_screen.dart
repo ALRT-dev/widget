@@ -13,6 +13,7 @@ import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_categories_list.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
+import 'package:hazard_app/features/shared/enums/category_image_type.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -21,6 +22,7 @@ import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dar
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
+import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/dotted_border_container.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -197,6 +199,9 @@ class _CreateUpdateReportScreenState
         }
 
         final categoryColor = selectedCategory.color ?? AppColors.orange;
+        final categoryImage = selectedCategory.categoryImageByType(
+          CategoryImageType.user,
+        );
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
@@ -223,8 +228,9 @@ class _CreateUpdateReportScreenState
             padding: EdgeInsets.all(15.spMin),
             child: Row(
               children: [
-                Image.asset(
-                  'assets/images/hazards/non_aws/${selectedCategory.id}_user.png',
+                AppCachedNetworkImage(
+                  imageUrl: categoryImage?.url ?? '',
+                  cacheKey: categoryImage?.s3Key,
                   width: 50.spMin,
                   height: 50.spMin,
                   fit: BoxFit.contain,
