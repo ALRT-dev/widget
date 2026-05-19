@@ -14,8 +14,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
 import 'package:hazard_app/features/map/extensions/polyline_extension.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/models/hazard_corridor_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/models/route_step_model.dart';
+import 'package:hazard_app/features/map/models/safest_fastest_routes_model.dart';
 import 'package:hazard_app/features/map/providers/hazard_markers_bitmaps_provider.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
@@ -23,6 +25,8 @@ import 'package:hazard_app/features/map/providers/states/hazard_markers_bitmaps_
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
 import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
+import 'package:hazard_app/features/map/utils/bypass_waypoint_planner.dart';
+import 'package:hazard_app/features/map/utils/hazard_corridor_detector.dart';
 import 'package:hazard_app/features/map/utils/navigation_polyline_simulation.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
@@ -71,6 +75,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
   StreamSubscription? _positionStreamSubscription;
   int _hazardRequestId = 0;
 
+  /// Timer to auto-hide the "Take Alternate Route" button after 10 seconds.
+  Timer? _takeAlternateRouteButtonTimer;
+
   /// After sim framing runs once ([_applySimulationNorthUpCameraFrame]), arrow
   /// presses only pan with [CameraUpdate.newLatLng] so zoom/bearing/tilt do not
   /// animate every tick (maps interpolate full [CameraPosition] updates).
@@ -94,6 +101,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
     _ref.onDispose(() {
       _headingStreamSubscription?.cancel();
       _positionStreamSubscription?.cancel();
+      _takeAlternateRouteButtonTimer?.cancel();
       // Reset map ready state when provider is disposed
       if (mounted) {
         state = state.copyWith(
@@ -537,6 +545,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     updateIsNavigating(true);
 
+    // Seed the hazard corridor list so the alternate-route button can show
+    // immediately if the route already overlaps a hazard cluster, instead
+    // of waiting for the next GPS tick.
+    _recomputeHazardCorridorsAhead();
+
     final zoom = 18.0;
     final tilt = 20.0;
 
@@ -637,6 +650,10 @@ class MapProvider extends StateNotifier<MapProviderState> {
     _updateNavigationCamera(newLocation);
 
     _syncSimulatedNavigationMarker();
+
+    // Refresh the ahead-of-user hazard corridors so the alternate-route
+    // button reflects the user's new position.
+    _recomputeHazardCorridorsAhead();
   }
 
   /// Updates navigation location and calculates speed/bearing
@@ -1155,6 +1172,320 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Hazard-aware alternate route
+  // ---------------------------------------------------------------------------
+
+  /// Distance (in meters) within which a hazard is considered to lie on the
+  /// active route polyline.
+  static const double _kHazardProximityThresholdMeters = 100.0;
+
+  /// Hazards whose pairwise distance is at or below this value collapse into
+  /// the same [HazardCorridor] so a single bypass waypoint can route around
+  /// the entire group.
+  static const double _kHazardClusterDistanceMeters = 100.0;
+
+  /// Buffer (in meters) used when validating that a candidate detour
+  /// polyline doesn't graze a forbidden corridor. Slightly larger than
+  /// [_kHazardProximityThresholdMeters] so a fresh route hugging the edge
+  /// is still rejected.
+  static const double _kForbiddenCorridorBufferMeters = 220.0;
+
+  /// Distance (in meters) within which the user is considered to be near the
+  /// closest hazard corridor.
+  static const double _kUserNearHazardThresholdMeters = 1500.0;
+
+  /// Schedule of (offset meters, side) attempts the [takeAlternateRoute]
+  /// orchestrator iterates through. Order alternates side at the same
+  /// distance so the first detour found is the shortest viable one.
+  static const List<({double offsetMeters, BypassSide side})> _kBypassAttempts =
+      [
+        (offsetMeters: 200.0, side: BypassSide.right),
+        (offsetMeters: 200.0, side: BypassSide.left),
+        (offsetMeters: 500.0, side: BypassSide.right),
+        (offsetMeters: 500.0, side: BypassSide.left),
+        (offsetMeters: 1500.0, side: BypassSide.right),
+        (offsetMeters: 1500.0, side: BypassSide.left),
+        (offsetMeters: 5000.0, side: BypassSide.right),
+        (offsetMeters: 5000.0, side: BypassSide.left),
+      ];
+
+  /// Recomputes [MapProviderState.hazardCorridorsAhead] from the current
+  /// navigation location, the active route polyline, and the route plan's
+  /// `hazardsToAvoid` set.
+  ///
+  /// Called whenever any of those inputs change (new location, new route,
+  /// detour applied, etc.) so the "Take Alternate Route" button visibility
+  /// stays in sync.
+  void _recomputeHazardCorridorsAhead() {
+    final routePlan = state.currentRoutePlan;
+    final user = state.currentNavigationLocation;
+    final polylinePoints = routePlan?.currentRoute?.currentRoute.polylinePoints;
+
+    if (routePlan == null ||
+        !routePlan.isNavigating ||
+        user == null ||
+        polylinePoints == null ||
+        polylinePoints.length < 2) {
+      if (state.hazardCorridorsAhead.isNotEmpty ||
+          state.isUserNearClosestHazard ||
+          state.showTakeAlternateRouteButton) {
+        _takeAlternateRouteButtonTimer?.cancel();
+        _takeAlternateRouteButtonTimer = null;
+        state = state.copyWith(
+          hazardCorridorsAhead: const <HazardCorridor>[],
+          isUserNearClosestHazard: false,
+          showTakeAlternateRouteButton: false,
+          lastAlertedHazardId: null,
+        );
+      }
+      return;
+    }
+
+    final polyline = polylinePoints
+        .map((p) => LatLng(p.latitude, p.longitude))
+        .toList(growable: false);
+
+    final corridors = detectHazardCorridorsAhead(
+      user: user,
+      polyline: polyline,
+      hazards: routePlan.hazardsToAvoid,
+      proximityMeters: _kHazardProximityThresholdMeters,
+      clusterDistanceMeters: _kHazardClusterDistanceMeters,
+      corridorBufferMeters: _kForbiddenCorridorBufferMeters,
+    );
+
+    // Calculate if user is within 300m of the closest hazard corridor
+    bool isUserNear = false;
+    HazardCorridor? closestCorridor;
+    if (corridors.isNotEmpty) {
+      double minDistance = double.infinity;
+
+      for (final corridor in corridors) {
+        final distanceToCenter = calculateDistanceInMeters(
+          user.latitude,
+          user.longitude,
+          corridor.centerPoint.latitude,
+          corridor.centerPoint.longitude,
+        );
+        if (distanceToCenter < minDistance) {
+          minDistance = distanceToCenter;
+          closestCorridor = corridor;
+        }
+      }
+
+      isUserNear = minDistance <= _kUserNearHazardThresholdMeters;
+    }
+
+    // Determine if we should show the button and manage the timer
+    bool shouldShowButton = state.showTakeAlternateRouteButton;
+    String? newLastAlertedHazardId = state.lastAlertedHazardId;
+
+    if (isUserNear && closestCorridor != null) {
+      // Get the first hazard ID from the closest corridor as its identifier
+      final closestHazardId = closestCorridor.hazards.firstOrNull?.id;
+
+      // Check if this is a new/different hazard than the one we last alerted for
+      if (closestHazardId != null &&
+          closestHazardId != state.lastAlertedHazardId) {
+        // New hazard detected - show button and start timer
+        shouldShowButton = true;
+        newLastAlertedHazardId = closestHazardId;
+
+        // Cancel existing timer and start a new one
+        _takeAlternateRouteButtonTimer?.cancel();
+        _takeAlternateRouteButtonTimer = Timer(
+          const Duration(seconds: 10),
+          () {
+            if (mounted) {
+              state = state.copyWith(showTakeAlternateRouteButton: false);
+            }
+          },
+        );
+      }
+      // If it's the same hazard, keep the current button state and timer
+    } else {
+      // User moved away from hazards - hide button and cancel timer
+      if (state.showTakeAlternateRouteButton) {
+        shouldShowButton = false;
+        newLastAlertedHazardId = null;
+        _takeAlternateRouteButtonTimer?.cancel();
+        _takeAlternateRouteButtonTimer = null;
+      }
+    }
+
+    state = state.copyWith(
+      hazardCorridorsAhead: corridors,
+      isUserNearClosestHazard: isUserNear,
+      showTakeAlternateRouteButton: shouldShowButton,
+      lastAlertedHazardId: newLastAlertedHazardId,
+    );
+  }
+
+  /// Re-fetches the active route so it bypasses every corridor currently
+  /// flagged in [MapProviderState.hazardCorridorsAhead] (plus every
+  /// previously avoided corridor in [MapProviderState.forbiddenCorridors]).
+  ///
+  /// Strategy (Google Routes API doesn't expose "avoid this polygon"):
+  /// 1. Build a single bypass waypoint perpendicular to the corridor's
+  ///    travel direction, on a chosen side, at a chosen offset.
+  /// 2. Ask Routes API for a route that must visit that waypoint.
+  /// 3. Validate the returned polyline does not pass through any forbidden
+  ///    corridor (with buffer).
+  /// 4. If it still does, retry with a different side / wider offset.
+  /// 5. On success, swap the active route and remember the corridor so a
+  ///    later detour doesn't reuse this same area.
+  Future<void> takeAlternateRoute() async {
+    if (state.takeAlternateRouteState.isLoading) return;
+
+    final routePlan = state.currentRoutePlan;
+    final corridorsAhead = state.hazardCorridorsAhead;
+    final currentLocation = state.currentNavigationLocation;
+
+    if (routePlan == null ||
+        !routePlan.isNavigating ||
+        corridorsAhead.isEmpty ||
+        currentLocation == null) {
+      return;
+    }
+
+    // V1 detours route around the closest corridor ahead. Multi-corridor
+    // chaining is intentionally out of scope (see plan); the data model
+    // already represents all clusters so it can be added later.
+    final targetCorridor = corridorsAhead.first;
+    final corridorsToAvoid = <HazardCorridor>[
+      ...state.forbiddenCorridors,
+      targetCorridor,
+    ];
+    final destination = routePlan.destination;
+    final selectedMode = routePlan.selectedTravelMode;
+
+    state = state.copyWith(
+      takeAlternateRouteState: const TakeAlternateRouteState.loading(),
+    );
+
+    log(
+      '[Detour] requested for corridor with '
+      '${targetCorridor.hazards.length} hazard(s) — trying '
+      '${_kBypassAttempts.length} bypass attempt(s)',
+    );
+
+    RoutesApiResponse? acceptedResponse;
+    Route? acceptedRoute;
+    AppError? lastError;
+
+    for (final attempt in _kBypassAttempts) {
+      final intermediates = planBypassWaypoints(
+        corridor: targetCorridor,
+        offsetMeters: attempt.offsetMeters,
+        side: attempt.side,
+      );
+
+      final result = await _mapService.getRoute(
+        origin: LatLng(currentLocation.latitude, currentLocation.longitude),
+        destination: destination.latLng,
+        travelMode: selectedMode,
+        intermediates: intermediates,
+      );
+      if (!mounted) return;
+
+      RoutesApiResponse? response;
+      result.when(
+        (r) => response = r,
+        (e) => lastError = e,
+      );
+      if (response == null || response!.routes.isEmpty) continue;
+
+      // Pick the first returned route (alternatives are ordered best-first
+      // for the supplied constraints) and validate it.
+      for (final route in response!.routes) {
+        final points = route.polylinePoints;
+        if (points == null || points.isEmpty) continue;
+
+        final candidate = points
+            .map((p) => LatLng(p.latitude, p.longitude))
+            .toList(growable: false);
+
+        final crosses = polylineCrossesCorridors(
+          candidatePolyline: candidate,
+          corridors: corridorsToAvoid,
+        );
+        if (!crosses) {
+          acceptedResponse = response;
+          acceptedRoute = route;
+          break;
+        }
+      }
+      if (acceptedRoute != null) {
+        log(
+          '[Detour] accepted attempt offset=${attempt.offsetMeters}m '
+          'side=${attempt.side.name}',
+        );
+        break;
+      }
+    }
+
+    if (acceptedResponse == null || acceptedRoute == null) {
+      log(
+        '[Detour] no safe alternate found after ${_kBypassAttempts.length} '
+        'attempts (lastError=${lastError?.message})',
+      );
+      state = state.copyWith(
+        takeAlternateRouteState: const TakeAlternateRouteState.error(
+          'No safe detour found. Try again or proceed with caution.',
+        ),
+      );
+      return;
+    }
+
+    // Build a fresh SafestFastestRoutes for the chosen travel mode using
+    // the same parsing pipeline as initial planning so steps + scoring stay
+    // consistent.
+    final newSafestFastest = _mapService
+        .convertRoutesApiResponseToSafestFastestRoutes(
+          response: acceptedResponse,
+          hazardsToAvoid: routePlan.hazardsToAvoid,
+          travelMode: selectedMode,
+        );
+
+    if (newSafestFastest == null) {
+      state = state.copyWith(
+        takeAlternateRouteState: const TakeAlternateRouteState.error(
+          'No safe detour found. Try again or proceed with caution.',
+        ),
+      );
+      return;
+    }
+
+    // Promote the accepted route to the selected route in the new
+    // SafestFastestRoutes (the response may contain other alternatives we
+    // already validated against, but only the accepted one is guaranteed
+    // safe).
+    final detourSafestFastest = newSafestFastest.copyWith(
+      selectedRoute: acceptedRoute,
+    );
+
+    final newRoutePlan = routePlan.copyWith(
+      travelModeRoutes: <TravelMode, SafestFastestRoutes>{
+        ...routePlan.travelModeRoutes,
+        selectedMode: detourSafestFastest,
+      },
+    );
+
+    updateCurrentRoutePlan(
+      newRoutePlan,
+      animateToRouteBounds: false,
+    );
+
+    state = state.copyWith(
+      forbiddenCorridors: <HazardCorridor>[
+        ...state.forbiddenCorridors,
+        targetCorridor,
+      ],
+      takeAlternateRouteState: const TakeAlternateRouteState.idle(),
+    );
+  }
+
   /// Stops navigation and cancels heading updates.
   void stopNavigation() {
     _simulationNorthUpCameraFrameApplied = false;
@@ -1163,6 +1494,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
     _headingStreamSubscription = null;
     _positionStreamSubscription?.cancel();
     _positionStreamSubscription = null;
+    _takeAlternateRouteButtonTimer?.cancel();
+    _takeAlternateRouteButtonTimer = null;
 
     // Clear turn-by-turn step tracking so it doesn't leak into the next
     // navigation session.
@@ -1176,6 +1509,12 @@ class MapProvider extends StateNotifier<MapProviderState> {
       remainingDistanceMeters: null,
       remainingDurationSeconds: null,
       navigationSimulationEnabled: false,
+      hazardCorridorsAhead: const <HazardCorridor>[],
+      forbiddenCorridors: const <HazardCorridor>[],
+      takeAlternateRouteState: const TakeAlternateRouteState.idle(),
+      isUserNearClosestHazard: false,
+      showTakeAlternateRouteButton: false,
+      lastAlertedHazardId: null,
     );
 
     // Remove user location marker
@@ -1920,6 +2259,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
         );
       }
     }
+
+    // Initial route plan, reroute, and detour-applied cases all flow
+    // through here, so this single call keeps the alternate-route button
+    // in sync with whichever route is now active.
+    _recomputeHazardCorridorsAhead();
   }
 
   /// Updates [MapProviderState.currentRoutePlan]'s selected travel mode to the given [mode].
@@ -1981,6 +2325,15 @@ class MapProvider extends StateNotifier<MapProviderState> {
   void toggleShowRouteHazards() {
     updateShowRouteHazards(
       !state.showRouteHazards,
+    );
+  }
+
+  /// Updates [MapProviderState.showTakeAlternateRouteButton] to the given [showTakeAlternateRouteButton].
+  void updateShowTakeAlternateRouteButton(
+    final bool showTakeAlternateRouteButton,
+  ) {
+    state = state.copyWith(
+      showTakeAlternateRouteButton: showTakeAlternateRouteButton,
     );
   }
 }

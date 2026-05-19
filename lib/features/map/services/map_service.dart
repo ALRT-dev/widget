@@ -212,15 +212,21 @@ class MapService {
   /// Fetches different routes and the hazards near the routes between [origin] and [destination].
   ///
   /// Returns the safest and the fastest routes.
+  ///
+  /// When [intermediates] are supplied, the Routes API treats them as forced
+  /// pass-through points. This is how the "Take Alternate Route" detour
+  /// flow steers a new route around a hazard corridor.
   Future<Either<RoutesApiResponse, AppError>> getRoute({
     required final LatLng origin,
     required final LatLng destination,
     final TravelMode travelMode = TravelMode.driving,
+    final List<PolylineWayPoint>? intermediates,
   }) {
     return _mapRepository.getRoute(
       origin: origin,
       destination: destination,
       travelMode: travelMode,
+      intermediates: intermediates,
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_theme.dart';
@@ -96,6 +97,7 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
 
   /// Updates the current selected tab.
   void _onTabChanged(final HomeTab tab) {
+    context.unfocusInputs();
     ref.read(providerOfHomeTab.notifier).state = tab;
   }
 }

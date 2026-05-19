@@ -55,7 +55,26 @@ mixin _$MapProviderState {
 /// to the destination along the active route.
  int? get remainingDurationSeconds;/// When true (debug only), GPS updates are ignored and position is driven
 /// by simulation controls ([simulateNavigationOffsetMeters], etc.).
- bool get navigationSimulationEnabled;
+ bool get navigationSimulationEnabled;/// Hazard clusters within the proximity threshold of the *remaining*
+/// active route polyline, recomputed on each location update. The
+/// "Take Alternate Route" button is only shown when this list is
+/// non-empty.
+ List<HazardCorridor> get hazardCorridorsAhead;/// Corridors a previously accepted detour already routed around. They
+/// are kept across the trip so subsequent detours don't reuse a path
+/// through an earlier hazard.
+ List<HazardCorridor> get forbiddenCorridors;/// State of the "Take Alternate Route" orchestrator (idle / loading /
+/// error). Mirrors the [GetRouteState] pattern used elsewhere in this
+/// file.
+ TakeAlternateRouteState get takeAlternateRouteState;/// Whether the user is within 300m of the closest hazard corridor.
+/// Used to control the visibility of the "Take Alternate Route" button.
+ bool get isUserNearClosestHazard;/// Whether to show the "Take Alternate Route" button.
+/// This is true for 10 seconds after a hazard corridor is first detected,
+/// then automatically becomes false. Resets when a different corridor
+/// becomes the closest.
+ bool get showTakeAlternateRouteButton;/// ID of the hazard in the last alerted corridor, used to determine
+/// if a different hazard corridor has become closest (to restart the
+/// 10-second display timer).
+ String? get lastAlertedHazardId;
 /// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -66,16 +85,16 @@ $MapProviderStateCopyWith<MapProviderState> get copyWith => _$MapProviderStateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MapProviderState&&(identical(other.getMapHazardsCancelToken, getMapHazardsCancelToken) || other.getMapHazardsCancelToken == getMapHazardsCancelToken)&&(identical(other.getHazardsToAvoidCancelToken, getHazardsToAvoidCancelToken) || other.getHazardsToAvoidCancelToken == getHazardsToAvoidCancelToken)&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.selectedHazard, selectedHazard) || other.selectedHazard == selectedHazard)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other.markers, markers)&&(identical(other.clusterManager, clusterManager) || other.clusterManager == clusterManager)&&const DeepCollectionEquality().equals(other.polylines, polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState)&&(identical(other.currentNavigationLocation, currentNavigationLocation) || other.currentNavigationLocation == currentNavigationLocation)&&(identical(other.currentSpeed, currentSpeed) || other.currentSpeed == currentSpeed)&&(identical(other.currentBearing, currentBearing) || other.currentBearing == currentBearing)&&(identical(other.isOffRoute, isOffRoute) || other.isOffRoute == isOffRoute)&&(identical(other.followUser, followUser) || other.followUser == followUser)&&(identical(other.navigationState, navigationState) || other.navigationState == navigationState)&&(identical(other.isMapReady, isMapReady) || other.isMapReady == isMapReady)&&(identical(other.pendingCameraUpdateToApply, pendingCameraUpdateToApply) || other.pendingCameraUpdateToApply == pendingCameraUpdateToApply)&&(identical(other.showRouteHazards, showRouteHazards) || other.showRouteHazards == showRouteHazards)&&const DeepCollectionEquality().equals(other.hazardCache, hazardCache)&&(identical(other.currentStepIndex, currentStepIndex) || other.currentStepIndex == currentStepIndex)&&(identical(other.currentStep, currentStep) || other.currentStep == currentStep)&&(identical(other.nextStep, nextStep) || other.nextStep == nextStep)&&(identical(other.distanceToNextManeuverMeters, distanceToNextManeuverMeters) || other.distanceToNextManeuverMeters == distanceToNextManeuverMeters)&&(identical(other.stepAfterNext, stepAfterNext) || other.stepAfterNext == stepAfterNext)&&(identical(other.remainingDistanceMeters, remainingDistanceMeters) || other.remainingDistanceMeters == remainingDistanceMeters)&&(identical(other.remainingDurationSeconds, remainingDurationSeconds) || other.remainingDurationSeconds == remainingDurationSeconds)&&(identical(other.navigationSimulationEnabled, navigationSimulationEnabled) || other.navigationSimulationEnabled == navigationSimulationEnabled));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MapProviderState&&(identical(other.getMapHazardsCancelToken, getMapHazardsCancelToken) || other.getMapHazardsCancelToken == getMapHazardsCancelToken)&&(identical(other.getHazardsToAvoidCancelToken, getHazardsToAvoidCancelToken) || other.getHazardsToAvoidCancelToken == getHazardsToAvoidCancelToken)&&const DeepCollectionEquality().equals(other.hazards, hazards)&&(identical(other.selectedHazard, selectedHazard) || other.selectedHazard == selectedHazard)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other.markers, markers)&&(identical(other.clusterManager, clusterManager) || other.clusterManager == clusterManager)&&const DeepCollectionEquality().equals(other.polylines, polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState)&&(identical(other.currentNavigationLocation, currentNavigationLocation) || other.currentNavigationLocation == currentNavigationLocation)&&(identical(other.currentSpeed, currentSpeed) || other.currentSpeed == currentSpeed)&&(identical(other.currentBearing, currentBearing) || other.currentBearing == currentBearing)&&(identical(other.isOffRoute, isOffRoute) || other.isOffRoute == isOffRoute)&&(identical(other.followUser, followUser) || other.followUser == followUser)&&(identical(other.navigationState, navigationState) || other.navigationState == navigationState)&&(identical(other.isMapReady, isMapReady) || other.isMapReady == isMapReady)&&(identical(other.pendingCameraUpdateToApply, pendingCameraUpdateToApply) || other.pendingCameraUpdateToApply == pendingCameraUpdateToApply)&&(identical(other.showRouteHazards, showRouteHazards) || other.showRouteHazards == showRouteHazards)&&const DeepCollectionEquality().equals(other.hazardCache, hazardCache)&&(identical(other.currentStepIndex, currentStepIndex) || other.currentStepIndex == currentStepIndex)&&(identical(other.currentStep, currentStep) || other.currentStep == currentStep)&&(identical(other.nextStep, nextStep) || other.nextStep == nextStep)&&(identical(other.distanceToNextManeuverMeters, distanceToNextManeuverMeters) || other.distanceToNextManeuverMeters == distanceToNextManeuverMeters)&&(identical(other.stepAfterNext, stepAfterNext) || other.stepAfterNext == stepAfterNext)&&(identical(other.remainingDistanceMeters, remainingDistanceMeters) || other.remainingDistanceMeters == remainingDistanceMeters)&&(identical(other.remainingDurationSeconds, remainingDurationSeconds) || other.remainingDurationSeconds == remainingDurationSeconds)&&(identical(other.navigationSimulationEnabled, navigationSimulationEnabled) || other.navigationSimulationEnabled == navigationSimulationEnabled)&&const DeepCollectionEquality().equals(other.hazardCorridorsAhead, hazardCorridorsAhead)&&const DeepCollectionEquality().equals(other.forbiddenCorridors, forbiddenCorridors)&&(identical(other.takeAlternateRouteState, takeAlternateRouteState) || other.takeAlternateRouteState == takeAlternateRouteState)&&(identical(other.isUserNearClosestHazard, isUserNearClosestHazard) || other.isUserNearClosestHazard == isUserNearClosestHazard)&&(identical(other.showTakeAlternateRouteButton, showTakeAlternateRouteButton) || other.showTakeAlternateRouteButton == showTakeAlternateRouteButton)&&(identical(other.lastAlertedHazardId, lastAlertedHazardId) || other.lastAlertedHazardId == lastAlertedHazardId));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,getMapHazardsCancelToken,getHazardsToAvoidCancelToken,const DeepCollectionEquality().hash(hazards),selectedHazard,cameraPosition,const DeepCollectionEquality().hash(markers),clusterManager,const DeepCollectionEquality().hash(polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState,currentNavigationLocation,currentSpeed,currentBearing,isOffRoute,followUser,navigationState,isMapReady,pendingCameraUpdateToApply,showRouteHazards,const DeepCollectionEquality().hash(hazardCache),currentStepIndex,currentStep,nextStep,distanceToNextManeuverMeters,stepAfterNext,remainingDistanceMeters,remainingDurationSeconds,navigationSimulationEnabled]);
+int get hashCode => Object.hashAll([runtimeType,getMapHazardsCancelToken,getHazardsToAvoidCancelToken,const DeepCollectionEquality().hash(hazards),selectedHazard,cameraPosition,const DeepCollectionEquality().hash(markers),clusterManager,const DeepCollectionEquality().hash(polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState,currentNavigationLocation,currentSpeed,currentBearing,isOffRoute,followUser,navigationState,isMapReady,pendingCameraUpdateToApply,showRouteHazards,const DeepCollectionEquality().hash(hazardCache),currentStepIndex,currentStep,nextStep,distanceToNextManeuverMeters,stepAfterNext,remainingDistanceMeters,remainingDurationSeconds,navigationSimulationEnabled,const DeepCollectionEquality().hash(hazardCorridorsAhead),const DeepCollectionEquality().hash(forbiddenCorridors),takeAlternateRouteState,isUserNearClosestHazard,showTakeAlternateRouteButton,lastAlertedHazardId]);
 
 @override
 String toString() {
-  return 'MapProviderState(getMapHazardsCancelToken: $getMapHazardsCancelToken, getHazardsToAvoidCancelToken: $getHazardsToAvoidCancelToken, hazards: $hazards, selectedHazard: $selectedHazard, cameraPosition: $cameraPosition, markers: $markers, clusterManager: $clusterManager, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState, currentNavigationLocation: $currentNavigationLocation, currentSpeed: $currentSpeed, currentBearing: $currentBearing, isOffRoute: $isOffRoute, followUser: $followUser, navigationState: $navigationState, isMapReady: $isMapReady, pendingCameraUpdateToApply: $pendingCameraUpdateToApply, showRouteHazards: $showRouteHazards, hazardCache: $hazardCache, currentStepIndex: $currentStepIndex, currentStep: $currentStep, nextStep: $nextStep, distanceToNextManeuverMeters: $distanceToNextManeuverMeters, stepAfterNext: $stepAfterNext, remainingDistanceMeters: $remainingDistanceMeters, remainingDurationSeconds: $remainingDurationSeconds, navigationSimulationEnabled: $navigationSimulationEnabled)';
+  return 'MapProviderState(getMapHazardsCancelToken: $getMapHazardsCancelToken, getHazardsToAvoidCancelToken: $getHazardsToAvoidCancelToken, hazards: $hazards, selectedHazard: $selectedHazard, cameraPosition: $cameraPosition, markers: $markers, clusterManager: $clusterManager, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState, currentNavigationLocation: $currentNavigationLocation, currentSpeed: $currentSpeed, currentBearing: $currentBearing, isOffRoute: $isOffRoute, followUser: $followUser, navigationState: $navigationState, isMapReady: $isMapReady, pendingCameraUpdateToApply: $pendingCameraUpdateToApply, showRouteHazards: $showRouteHazards, hazardCache: $hazardCache, currentStepIndex: $currentStepIndex, currentStep: $currentStep, nextStep: $nextStep, distanceToNextManeuverMeters: $distanceToNextManeuverMeters, stepAfterNext: $stepAfterNext, remainingDistanceMeters: $remainingDistanceMeters, remainingDurationSeconds: $remainingDurationSeconds, navigationSimulationEnabled: $navigationSimulationEnabled, hazardCorridorsAhead: $hazardCorridorsAhead, forbiddenCorridors: $forbiddenCorridors, takeAlternateRouteState: $takeAlternateRouteState, isUserNearClosestHazard: $isUserNearClosestHazard, showTakeAlternateRouteButton: $showTakeAlternateRouteButton, lastAlertedHazardId: $lastAlertedHazardId)';
 }
 
 
@@ -86,11 +105,11 @@ abstract mixin class $MapProviderStateCopyWith<$Res>  {
   factory $MapProviderStateCopyWith(MapProviderState value, $Res Function(MapProviderState) _then) = _$MapProviderStateCopyWithImpl;
 @useResult
 $Res call({
- CancelToken getMapHazardsCancelToken, CancelToken getHazardsToAvoidCancelToken, List<Hazard> hazards, Hazard? selectedHazard, CameraPosition cameraPosition, Set<Marker> markers, cluster_manager.ClusterManager? clusterManager, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState, AlrtLocation? currentNavigationLocation, double currentSpeed, double currentBearing, bool isOffRoute, bool followUser, NavigationState navigationState, bool isMapReady, CameraUpdate? pendingCameraUpdateToApply, bool showRouteHazards, Map<String, Hazard> hazardCache, int? currentStepIndex, RouteStep? currentStep, RouteStep? nextStep, double? distanceToNextManeuverMeters, RouteStep? stepAfterNext, int? remainingDistanceMeters, int? remainingDurationSeconds, bool navigationSimulationEnabled
+ CancelToken getMapHazardsCancelToken, CancelToken getHazardsToAvoidCancelToken, List<Hazard> hazards, Hazard? selectedHazard, CameraPosition cameraPosition, Set<Marker> markers, cluster_manager.ClusterManager? clusterManager, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState, AlrtLocation? currentNavigationLocation, double currentSpeed, double currentBearing, bool isOffRoute, bool followUser, NavigationState navigationState, bool isMapReady, CameraUpdate? pendingCameraUpdateToApply, bool showRouteHazards, Map<String, Hazard> hazardCache, int? currentStepIndex, RouteStep? currentStep, RouteStep? nextStep, double? distanceToNextManeuverMeters, RouteStep? stepAfterNext, int? remainingDistanceMeters, int? remainingDurationSeconds, bool navigationSimulationEnabled, List<HazardCorridor> hazardCorridorsAhead, List<HazardCorridor> forbiddenCorridors, TakeAlternateRouteState takeAlternateRouteState, bool isUserNearClosestHazard, bool showTakeAlternateRouteButton, String? lastAlertedHazardId
 });
 
 
-$HazardCopyWith<$Res>? get selectedHazard;$AlrtLocationCopyWith<$Res>? get selectedLocation;$RoutePlanCopyWith<$Res>? get currentRoutePlan;$GetRouteStateCopyWith<$Res> get getRouteState;$GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;$GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;$AlrtLocationCopyWith<$Res>? get currentNavigationLocation;
+$HazardCopyWith<$Res>? get selectedHazard;$AlrtLocationCopyWith<$Res>? get selectedLocation;$RoutePlanCopyWith<$Res>? get currentRoutePlan;$GetRouteStateCopyWith<$Res> get getRouteState;$GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;$GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;$AlrtLocationCopyWith<$Res>? get currentNavigationLocation;$TakeAlternateRouteStateCopyWith<$Res> get takeAlternateRouteState;
 
 }
 /// @nodoc
@@ -103,7 +122,7 @@ class _$MapProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? getMapHazardsCancelToken = null,Object? getHazardsToAvoidCancelToken = null,Object? hazards = null,Object? selectedHazard = freezed,Object? cameraPosition = null,Object? markers = null,Object? clusterManager = freezed,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,Object? currentNavigationLocation = freezed,Object? currentSpeed = null,Object? currentBearing = null,Object? isOffRoute = null,Object? followUser = null,Object? navigationState = null,Object? isMapReady = null,Object? pendingCameraUpdateToApply = freezed,Object? showRouteHazards = null,Object? hazardCache = null,Object? currentStepIndex = freezed,Object? currentStep = freezed,Object? nextStep = freezed,Object? distanceToNextManeuverMeters = freezed,Object? stepAfterNext = freezed,Object? remainingDistanceMeters = freezed,Object? remainingDurationSeconds = freezed,Object? navigationSimulationEnabled = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? getMapHazardsCancelToken = null,Object? getHazardsToAvoidCancelToken = null,Object? hazards = null,Object? selectedHazard = freezed,Object? cameraPosition = null,Object? markers = null,Object? clusterManager = freezed,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,Object? currentNavigationLocation = freezed,Object? currentSpeed = null,Object? currentBearing = null,Object? isOffRoute = null,Object? followUser = null,Object? navigationState = null,Object? isMapReady = null,Object? pendingCameraUpdateToApply = freezed,Object? showRouteHazards = null,Object? hazardCache = null,Object? currentStepIndex = freezed,Object? currentStep = freezed,Object? nextStep = freezed,Object? distanceToNextManeuverMeters = freezed,Object? stepAfterNext = freezed,Object? remainingDistanceMeters = freezed,Object? remainingDurationSeconds = freezed,Object? navigationSimulationEnabled = null,Object? hazardCorridorsAhead = null,Object? forbiddenCorridors = null,Object? takeAlternateRouteState = null,Object? isUserNearClosestHazard = null,Object? showTakeAlternateRouteButton = null,Object? lastAlertedHazardId = freezed,}) {
   return _then(_self.copyWith(
 getMapHazardsCancelToken: null == getMapHazardsCancelToken ? _self.getMapHazardsCancelToken : getMapHazardsCancelToken // ignore: cast_nullable_to_non_nullable
 as CancelToken,getHazardsToAvoidCancelToken: null == getHazardsToAvoidCancelToken ? _self.getHazardsToAvoidCancelToken : getHazardsToAvoidCancelToken // ignore: cast_nullable_to_non_nullable
@@ -136,7 +155,13 @@ as double?,stepAfterNext: freezed == stepAfterNext ? _self.stepAfterNext : stepA
 as RouteStep?,remainingDistanceMeters: freezed == remainingDistanceMeters ? _self.remainingDistanceMeters : remainingDistanceMeters // ignore: cast_nullable_to_non_nullable
 as int?,remainingDurationSeconds: freezed == remainingDurationSeconds ? _self.remainingDurationSeconds : remainingDurationSeconds // ignore: cast_nullable_to_non_nullable
 as int?,navigationSimulationEnabled: null == navigationSimulationEnabled ? _self.navigationSimulationEnabled : navigationSimulationEnabled // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,hazardCorridorsAhead: null == hazardCorridorsAhead ? _self.hazardCorridorsAhead : hazardCorridorsAhead // ignore: cast_nullable_to_non_nullable
+as List<HazardCorridor>,forbiddenCorridors: null == forbiddenCorridors ? _self.forbiddenCorridors : forbiddenCorridors // ignore: cast_nullable_to_non_nullable
+as List<HazardCorridor>,takeAlternateRouteState: null == takeAlternateRouteState ? _self.takeAlternateRouteState : takeAlternateRouteState // ignore: cast_nullable_to_non_nullable
+as TakeAlternateRouteState,isUserNearClosestHazard: null == isUserNearClosestHazard ? _self.isUserNearClosestHazard : isUserNearClosestHazard // ignore: cast_nullable_to_non_nullable
+as bool,showTakeAlternateRouteButton: null == showTakeAlternateRouteButton ? _self.showTakeAlternateRouteButton : showTakeAlternateRouteButton // ignore: cast_nullable_to_non_nullable
+as bool,lastAlertedHazardId: freezed == lastAlertedHazardId ? _self.lastAlertedHazardId : lastAlertedHazardId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 /// Create a copy of MapProviderState
@@ -213,6 +238,15 @@ $AlrtLocationCopyWith<$Res>? get currentNavigationLocation {
 
   return $AlrtLocationCopyWith<$Res>(_self.currentNavigationLocation!, (value) {
     return _then(_self.copyWith(currentNavigationLocation: value));
+  });
+}/// Create a copy of MapProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TakeAlternateRouteStateCopyWith<$Res> get takeAlternateRouteState {
+  
+  return $TakeAlternateRouteStateCopyWith<$Res>(_self.takeAlternateRouteState, (value) {
+    return _then(_self.copyWith(takeAlternateRouteState: value));
   });
 }
 }
@@ -296,10 +330,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CancelToken getMapHazardsCancelToken,  CancelToken getHazardsToAvoidCancelToken,  List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  cluster_manager.ClusterManager? clusterManager,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState,  AlrtLocation? currentNavigationLocation,  double currentSpeed,  double currentBearing,  bool isOffRoute,  bool followUser,  NavigationState navigationState,  bool isMapReady,  CameraUpdate? pendingCameraUpdateToApply,  bool showRouteHazards,  Map<String, Hazard> hazardCache,  int? currentStepIndex,  RouteStep? currentStep,  RouteStep? nextStep,  double? distanceToNextManeuverMeters,  RouteStep? stepAfterNext,  int? remainingDistanceMeters,  int? remainingDurationSeconds,  bool navigationSimulationEnabled)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CancelToken getMapHazardsCancelToken,  CancelToken getHazardsToAvoidCancelToken,  List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  cluster_manager.ClusterManager? clusterManager,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState,  AlrtLocation? currentNavigationLocation,  double currentSpeed,  double currentBearing,  bool isOffRoute,  bool followUser,  NavigationState navigationState,  bool isMapReady,  CameraUpdate? pendingCameraUpdateToApply,  bool showRouteHazards,  Map<String, Hazard> hazardCache,  int? currentStepIndex,  RouteStep? currentStep,  RouteStep? nextStep,  double? distanceToNextManeuverMeters,  RouteStep? stepAfterNext,  int? remainingDistanceMeters,  int? remainingDurationSeconds,  bool navigationSimulationEnabled,  List<HazardCorridor> hazardCorridorsAhead,  List<HazardCorridor> forbiddenCorridors,  TakeAlternateRouteState takeAlternateRouteState,  bool isUserNearClosestHazard,  bool showTakeAlternateRouteButton,  String? lastAlertedHazardId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MapProviderState() when $default != null:
-return $default(_that.getMapHazardsCancelToken,_that.getHazardsToAvoidCancelToken,_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.clusterManager,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState,_that.currentNavigationLocation,_that.currentSpeed,_that.currentBearing,_that.isOffRoute,_that.followUser,_that.navigationState,_that.isMapReady,_that.pendingCameraUpdateToApply,_that.showRouteHazards,_that.hazardCache,_that.currentStepIndex,_that.currentStep,_that.nextStep,_that.distanceToNextManeuverMeters,_that.stepAfterNext,_that.remainingDistanceMeters,_that.remainingDurationSeconds,_that.navigationSimulationEnabled);case _:
+return $default(_that.getMapHazardsCancelToken,_that.getHazardsToAvoidCancelToken,_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.clusterManager,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState,_that.currentNavigationLocation,_that.currentSpeed,_that.currentBearing,_that.isOffRoute,_that.followUser,_that.navigationState,_that.isMapReady,_that.pendingCameraUpdateToApply,_that.showRouteHazards,_that.hazardCache,_that.currentStepIndex,_that.currentStep,_that.nextStep,_that.distanceToNextManeuverMeters,_that.stepAfterNext,_that.remainingDistanceMeters,_that.remainingDurationSeconds,_that.navigationSimulationEnabled,_that.hazardCorridorsAhead,_that.forbiddenCorridors,_that.takeAlternateRouteState,_that.isUserNearClosestHazard,_that.showTakeAlternateRouteButton,_that.lastAlertedHazardId);case _:
   return orElse();
 
 }
@@ -317,10 +351,10 @@ return $default(_that.getMapHazardsCancelToken,_that.getHazardsToAvoidCancelToke
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CancelToken getMapHazardsCancelToken,  CancelToken getHazardsToAvoidCancelToken,  List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  cluster_manager.ClusterManager? clusterManager,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState,  AlrtLocation? currentNavigationLocation,  double currentSpeed,  double currentBearing,  bool isOffRoute,  bool followUser,  NavigationState navigationState,  bool isMapReady,  CameraUpdate? pendingCameraUpdateToApply,  bool showRouteHazards,  Map<String, Hazard> hazardCache,  int? currentStepIndex,  RouteStep? currentStep,  RouteStep? nextStep,  double? distanceToNextManeuverMeters,  RouteStep? stepAfterNext,  int? remainingDistanceMeters,  int? remainingDurationSeconds,  bool navigationSimulationEnabled)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CancelToken getMapHazardsCancelToken,  CancelToken getHazardsToAvoidCancelToken,  List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  cluster_manager.ClusterManager? clusterManager,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState,  AlrtLocation? currentNavigationLocation,  double currentSpeed,  double currentBearing,  bool isOffRoute,  bool followUser,  NavigationState navigationState,  bool isMapReady,  CameraUpdate? pendingCameraUpdateToApply,  bool showRouteHazards,  Map<String, Hazard> hazardCache,  int? currentStepIndex,  RouteStep? currentStep,  RouteStep? nextStep,  double? distanceToNextManeuverMeters,  RouteStep? stepAfterNext,  int? remainingDistanceMeters,  int? remainingDurationSeconds,  bool navigationSimulationEnabled,  List<HazardCorridor> hazardCorridorsAhead,  List<HazardCorridor> forbiddenCorridors,  TakeAlternateRouteState takeAlternateRouteState,  bool isUserNearClosestHazard,  bool showTakeAlternateRouteButton,  String? lastAlertedHazardId)  $default,) {final _that = this;
 switch (_that) {
 case _MapProviderState():
-return $default(_that.getMapHazardsCancelToken,_that.getHazardsToAvoidCancelToken,_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.clusterManager,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState,_that.currentNavigationLocation,_that.currentSpeed,_that.currentBearing,_that.isOffRoute,_that.followUser,_that.navigationState,_that.isMapReady,_that.pendingCameraUpdateToApply,_that.showRouteHazards,_that.hazardCache,_that.currentStepIndex,_that.currentStep,_that.nextStep,_that.distanceToNextManeuverMeters,_that.stepAfterNext,_that.remainingDistanceMeters,_that.remainingDurationSeconds,_that.navigationSimulationEnabled);case _:
+return $default(_that.getMapHazardsCancelToken,_that.getHazardsToAvoidCancelToken,_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.clusterManager,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState,_that.currentNavigationLocation,_that.currentSpeed,_that.currentBearing,_that.isOffRoute,_that.followUser,_that.navigationState,_that.isMapReady,_that.pendingCameraUpdateToApply,_that.showRouteHazards,_that.hazardCache,_that.currentStepIndex,_that.currentStep,_that.nextStep,_that.distanceToNextManeuverMeters,_that.stepAfterNext,_that.remainingDistanceMeters,_that.remainingDurationSeconds,_that.navigationSimulationEnabled,_that.hazardCorridorsAhead,_that.forbiddenCorridors,_that.takeAlternateRouteState,_that.isUserNearClosestHazard,_that.showTakeAlternateRouteButton,_that.lastAlertedHazardId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -337,10 +371,10 @@ return $default(_that.getMapHazardsCancelToken,_that.getHazardsToAvoidCancelToke
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CancelToken getMapHazardsCancelToken,  CancelToken getHazardsToAvoidCancelToken,  List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  cluster_manager.ClusterManager? clusterManager,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState,  AlrtLocation? currentNavigationLocation,  double currentSpeed,  double currentBearing,  bool isOffRoute,  bool followUser,  NavigationState navigationState,  bool isMapReady,  CameraUpdate? pendingCameraUpdateToApply,  bool showRouteHazards,  Map<String, Hazard> hazardCache,  int? currentStepIndex,  RouteStep? currentStep,  RouteStep? nextStep,  double? distanceToNextManeuverMeters,  RouteStep? stepAfterNext,  int? remainingDistanceMeters,  int? remainingDurationSeconds,  bool navigationSimulationEnabled)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CancelToken getMapHazardsCancelToken,  CancelToken getHazardsToAvoidCancelToken,  List<Hazard> hazards,  Hazard? selectedHazard,  CameraPosition cameraPosition,  Set<Marker> markers,  cluster_manager.ClusterManager? clusterManager,  Set<Polyline> polylines,  AlrtLocation? selectedLocation,  RoutePlan? currentRoutePlan,  GetRouteState getRouteState,  GetAddressFromCoordinatesState getAddressFromCoordinatesState,  GetMapHazardsState getMapHazardsState,  AlrtLocation? currentNavigationLocation,  double currentSpeed,  double currentBearing,  bool isOffRoute,  bool followUser,  NavigationState navigationState,  bool isMapReady,  CameraUpdate? pendingCameraUpdateToApply,  bool showRouteHazards,  Map<String, Hazard> hazardCache,  int? currentStepIndex,  RouteStep? currentStep,  RouteStep? nextStep,  double? distanceToNextManeuverMeters,  RouteStep? stepAfterNext,  int? remainingDistanceMeters,  int? remainingDurationSeconds,  bool navigationSimulationEnabled,  List<HazardCorridor> hazardCorridorsAhead,  List<HazardCorridor> forbiddenCorridors,  TakeAlternateRouteState takeAlternateRouteState,  bool isUserNearClosestHazard,  bool showTakeAlternateRouteButton,  String? lastAlertedHazardId)?  $default,) {final _that = this;
 switch (_that) {
 case _MapProviderState() when $default != null:
-return $default(_that.getMapHazardsCancelToken,_that.getHazardsToAvoidCancelToken,_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.clusterManager,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState,_that.currentNavigationLocation,_that.currentSpeed,_that.currentBearing,_that.isOffRoute,_that.followUser,_that.navigationState,_that.isMapReady,_that.pendingCameraUpdateToApply,_that.showRouteHazards,_that.hazardCache,_that.currentStepIndex,_that.currentStep,_that.nextStep,_that.distanceToNextManeuverMeters,_that.stepAfterNext,_that.remainingDistanceMeters,_that.remainingDurationSeconds,_that.navigationSimulationEnabled);case _:
+return $default(_that.getMapHazardsCancelToken,_that.getHazardsToAvoidCancelToken,_that.hazards,_that.selectedHazard,_that.cameraPosition,_that.markers,_that.clusterManager,_that.polylines,_that.selectedLocation,_that.currentRoutePlan,_that.getRouteState,_that.getAddressFromCoordinatesState,_that.getMapHazardsState,_that.currentNavigationLocation,_that.currentSpeed,_that.currentBearing,_that.isOffRoute,_that.followUser,_that.navigationState,_that.isMapReady,_that.pendingCameraUpdateToApply,_that.showRouteHazards,_that.hazardCache,_that.currentStepIndex,_that.currentStep,_that.nextStep,_that.distanceToNextManeuverMeters,_that.stepAfterNext,_that.remainingDistanceMeters,_that.remainingDurationSeconds,_that.navigationSimulationEnabled,_that.hazardCorridorsAhead,_that.forbiddenCorridors,_that.takeAlternateRouteState,_that.isUserNearClosestHazard,_that.showTakeAlternateRouteButton,_that.lastAlertedHazardId);case _:
   return null;
 
 }
@@ -352,7 +386,7 @@ return $default(_that.getMapHazardsCancelToken,_that.getHazardsToAvoidCancelToke
 
 
 class _MapProviderState implements MapProviderState {
-  const _MapProviderState({required this.getMapHazardsCancelToken, required this.getHazardsToAvoidCancelToken, final  List<Hazard> hazards = const <Hazard>[], this.selectedHazard, this.cameraPosition = kDefaultCameraPosition, final  Set<Marker> markers = const <Marker>{}, this.clusterManager, final  Set<Polyline> polylines = const <Polyline>{}, this.selectedLocation, this.currentRoutePlan, this.getRouteState = const GetRouteState.initial(), this.getAddressFromCoordinatesState = const GetAddressFromCoordinatesState.initial(), this.getMapHazardsState = const GetMapHazardsState.initial(), this.currentNavigationLocation, this.currentSpeed = 0.0, this.currentBearing = 0.0, this.isOffRoute = false, this.followUser = true, this.navigationState = NavigationState.idle, this.isMapReady = false, this.pendingCameraUpdateToApply, this.showRouteHazards = false, final  Map<String, Hazard> hazardCache = const <String, Hazard>{}, this.currentStepIndex, this.currentStep, this.nextStep, this.distanceToNextManeuverMeters, this.stepAfterNext, this.remainingDistanceMeters, this.remainingDurationSeconds, this.navigationSimulationEnabled = false}): _hazards = hazards,_markers = markers,_polylines = polylines,_hazardCache = hazardCache;
+  const _MapProviderState({required this.getMapHazardsCancelToken, required this.getHazardsToAvoidCancelToken, final  List<Hazard> hazards = const <Hazard>[], this.selectedHazard, this.cameraPosition = kDefaultCameraPosition, final  Set<Marker> markers = const <Marker>{}, this.clusterManager, final  Set<Polyline> polylines = const <Polyline>{}, this.selectedLocation, this.currentRoutePlan, this.getRouteState = const GetRouteState.initial(), this.getAddressFromCoordinatesState = const GetAddressFromCoordinatesState.initial(), this.getMapHazardsState = const GetMapHazardsState.initial(), this.currentNavigationLocation, this.currentSpeed = 0.0, this.currentBearing = 0.0, this.isOffRoute = false, this.followUser = true, this.navigationState = NavigationState.idle, this.isMapReady = false, this.pendingCameraUpdateToApply, this.showRouteHazards = false, final  Map<String, Hazard> hazardCache = const <String, Hazard>{}, this.currentStepIndex, this.currentStep, this.nextStep, this.distanceToNextManeuverMeters, this.stepAfterNext, this.remainingDistanceMeters, this.remainingDurationSeconds, this.navigationSimulationEnabled = false, final  List<HazardCorridor> hazardCorridorsAhead = const <HazardCorridor>[], final  List<HazardCorridor> forbiddenCorridors = const <HazardCorridor>[], this.takeAlternateRouteState = const TakeAlternateRouteState.idle(), this.isUserNearClosestHazard = false, this.showTakeAlternateRouteButton = false, this.lastAlertedHazardId}): _hazards = hazards,_markers = markers,_polylines = polylines,_hazardCache = hazardCache,_hazardCorridorsAhead = hazardCorridorsAhead,_forbiddenCorridors = forbiddenCorridors;
   
 
 /// The cancel token for fetching map hazards.
@@ -455,6 +489,50 @@ class _MapProviderState implements MapProviderState {
 /// When true (debug only), GPS updates are ignored and position is driven
 /// by simulation controls ([simulateNavigationOffsetMeters], etc.).
 @override@JsonKey() final  bool navigationSimulationEnabled;
+/// Hazard clusters within the proximity threshold of the *remaining*
+/// active route polyline, recomputed on each location update. The
+/// "Take Alternate Route" button is only shown when this list is
+/// non-empty.
+ final  List<HazardCorridor> _hazardCorridorsAhead;
+/// Hazard clusters within the proximity threshold of the *remaining*
+/// active route polyline, recomputed on each location update. The
+/// "Take Alternate Route" button is only shown when this list is
+/// non-empty.
+@override@JsonKey() List<HazardCorridor> get hazardCorridorsAhead {
+  if (_hazardCorridorsAhead is EqualUnmodifiableListView) return _hazardCorridorsAhead;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_hazardCorridorsAhead);
+}
+
+/// Corridors a previously accepted detour already routed around. They
+/// are kept across the trip so subsequent detours don't reuse a path
+/// through an earlier hazard.
+ final  List<HazardCorridor> _forbiddenCorridors;
+/// Corridors a previously accepted detour already routed around. They
+/// are kept across the trip so subsequent detours don't reuse a path
+/// through an earlier hazard.
+@override@JsonKey() List<HazardCorridor> get forbiddenCorridors {
+  if (_forbiddenCorridors is EqualUnmodifiableListView) return _forbiddenCorridors;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_forbiddenCorridors);
+}
+
+/// State of the "Take Alternate Route" orchestrator (idle / loading /
+/// error). Mirrors the [GetRouteState] pattern used elsewhere in this
+/// file.
+@override@JsonKey() final  TakeAlternateRouteState takeAlternateRouteState;
+/// Whether the user is within 300m of the closest hazard corridor.
+/// Used to control the visibility of the "Take Alternate Route" button.
+@override@JsonKey() final  bool isUserNearClosestHazard;
+/// Whether to show the "Take Alternate Route" button.
+/// This is true for 10 seconds after a hazard corridor is first detected,
+/// then automatically becomes false. Resets when a different corridor
+/// becomes the closest.
+@override@JsonKey() final  bool showTakeAlternateRouteButton;
+/// ID of the hazard in the last alerted corridor, used to determine
+/// if a different hazard corridor has become closest (to restart the
+/// 10-second display timer).
+@override final  String? lastAlertedHazardId;
 
 /// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -466,16 +544,16 @@ _$MapProviderStateCopyWith<_MapProviderState> get copyWith => __$MapProviderStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MapProviderState&&(identical(other.getMapHazardsCancelToken, getMapHazardsCancelToken) || other.getMapHazardsCancelToken == getMapHazardsCancelToken)&&(identical(other.getHazardsToAvoidCancelToken, getHazardsToAvoidCancelToken) || other.getHazardsToAvoidCancelToken == getHazardsToAvoidCancelToken)&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.selectedHazard, selectedHazard) || other.selectedHazard == selectedHazard)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other._markers, _markers)&&(identical(other.clusterManager, clusterManager) || other.clusterManager == clusterManager)&&const DeepCollectionEquality().equals(other._polylines, _polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState)&&(identical(other.currentNavigationLocation, currentNavigationLocation) || other.currentNavigationLocation == currentNavigationLocation)&&(identical(other.currentSpeed, currentSpeed) || other.currentSpeed == currentSpeed)&&(identical(other.currentBearing, currentBearing) || other.currentBearing == currentBearing)&&(identical(other.isOffRoute, isOffRoute) || other.isOffRoute == isOffRoute)&&(identical(other.followUser, followUser) || other.followUser == followUser)&&(identical(other.navigationState, navigationState) || other.navigationState == navigationState)&&(identical(other.isMapReady, isMapReady) || other.isMapReady == isMapReady)&&(identical(other.pendingCameraUpdateToApply, pendingCameraUpdateToApply) || other.pendingCameraUpdateToApply == pendingCameraUpdateToApply)&&(identical(other.showRouteHazards, showRouteHazards) || other.showRouteHazards == showRouteHazards)&&const DeepCollectionEquality().equals(other._hazardCache, _hazardCache)&&(identical(other.currentStepIndex, currentStepIndex) || other.currentStepIndex == currentStepIndex)&&(identical(other.currentStep, currentStep) || other.currentStep == currentStep)&&(identical(other.nextStep, nextStep) || other.nextStep == nextStep)&&(identical(other.distanceToNextManeuverMeters, distanceToNextManeuverMeters) || other.distanceToNextManeuverMeters == distanceToNextManeuverMeters)&&(identical(other.stepAfterNext, stepAfterNext) || other.stepAfterNext == stepAfterNext)&&(identical(other.remainingDistanceMeters, remainingDistanceMeters) || other.remainingDistanceMeters == remainingDistanceMeters)&&(identical(other.remainingDurationSeconds, remainingDurationSeconds) || other.remainingDurationSeconds == remainingDurationSeconds)&&(identical(other.navigationSimulationEnabled, navigationSimulationEnabled) || other.navigationSimulationEnabled == navigationSimulationEnabled));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _MapProviderState&&(identical(other.getMapHazardsCancelToken, getMapHazardsCancelToken) || other.getMapHazardsCancelToken == getMapHazardsCancelToken)&&(identical(other.getHazardsToAvoidCancelToken, getHazardsToAvoidCancelToken) || other.getHazardsToAvoidCancelToken == getHazardsToAvoidCancelToken)&&const DeepCollectionEquality().equals(other._hazards, _hazards)&&(identical(other.selectedHazard, selectedHazard) || other.selectedHazard == selectedHazard)&&(identical(other.cameraPosition, cameraPosition) || other.cameraPosition == cameraPosition)&&const DeepCollectionEquality().equals(other._markers, _markers)&&(identical(other.clusterManager, clusterManager) || other.clusterManager == clusterManager)&&const DeepCollectionEquality().equals(other._polylines, _polylines)&&(identical(other.selectedLocation, selectedLocation) || other.selectedLocation == selectedLocation)&&(identical(other.currentRoutePlan, currentRoutePlan) || other.currentRoutePlan == currentRoutePlan)&&(identical(other.getRouteState, getRouteState) || other.getRouteState == getRouteState)&&(identical(other.getAddressFromCoordinatesState, getAddressFromCoordinatesState) || other.getAddressFromCoordinatesState == getAddressFromCoordinatesState)&&(identical(other.getMapHazardsState, getMapHazardsState) || other.getMapHazardsState == getMapHazardsState)&&(identical(other.currentNavigationLocation, currentNavigationLocation) || other.currentNavigationLocation == currentNavigationLocation)&&(identical(other.currentSpeed, currentSpeed) || other.currentSpeed == currentSpeed)&&(identical(other.currentBearing, currentBearing) || other.currentBearing == currentBearing)&&(identical(other.isOffRoute, isOffRoute) || other.isOffRoute == isOffRoute)&&(identical(other.followUser, followUser) || other.followUser == followUser)&&(identical(other.navigationState, navigationState) || other.navigationState == navigationState)&&(identical(other.isMapReady, isMapReady) || other.isMapReady == isMapReady)&&(identical(other.pendingCameraUpdateToApply, pendingCameraUpdateToApply) || other.pendingCameraUpdateToApply == pendingCameraUpdateToApply)&&(identical(other.showRouteHazards, showRouteHazards) || other.showRouteHazards == showRouteHazards)&&const DeepCollectionEquality().equals(other._hazardCache, _hazardCache)&&(identical(other.currentStepIndex, currentStepIndex) || other.currentStepIndex == currentStepIndex)&&(identical(other.currentStep, currentStep) || other.currentStep == currentStep)&&(identical(other.nextStep, nextStep) || other.nextStep == nextStep)&&(identical(other.distanceToNextManeuverMeters, distanceToNextManeuverMeters) || other.distanceToNextManeuverMeters == distanceToNextManeuverMeters)&&(identical(other.stepAfterNext, stepAfterNext) || other.stepAfterNext == stepAfterNext)&&(identical(other.remainingDistanceMeters, remainingDistanceMeters) || other.remainingDistanceMeters == remainingDistanceMeters)&&(identical(other.remainingDurationSeconds, remainingDurationSeconds) || other.remainingDurationSeconds == remainingDurationSeconds)&&(identical(other.navigationSimulationEnabled, navigationSimulationEnabled) || other.navigationSimulationEnabled == navigationSimulationEnabled)&&const DeepCollectionEquality().equals(other._hazardCorridorsAhead, _hazardCorridorsAhead)&&const DeepCollectionEquality().equals(other._forbiddenCorridors, _forbiddenCorridors)&&(identical(other.takeAlternateRouteState, takeAlternateRouteState) || other.takeAlternateRouteState == takeAlternateRouteState)&&(identical(other.isUserNearClosestHazard, isUserNearClosestHazard) || other.isUserNearClosestHazard == isUserNearClosestHazard)&&(identical(other.showTakeAlternateRouteButton, showTakeAlternateRouteButton) || other.showTakeAlternateRouteButton == showTakeAlternateRouteButton)&&(identical(other.lastAlertedHazardId, lastAlertedHazardId) || other.lastAlertedHazardId == lastAlertedHazardId));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,getMapHazardsCancelToken,getHazardsToAvoidCancelToken,const DeepCollectionEquality().hash(_hazards),selectedHazard,cameraPosition,const DeepCollectionEquality().hash(_markers),clusterManager,const DeepCollectionEquality().hash(_polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState,currentNavigationLocation,currentSpeed,currentBearing,isOffRoute,followUser,navigationState,isMapReady,pendingCameraUpdateToApply,showRouteHazards,const DeepCollectionEquality().hash(_hazardCache),currentStepIndex,currentStep,nextStep,distanceToNextManeuverMeters,stepAfterNext,remainingDistanceMeters,remainingDurationSeconds,navigationSimulationEnabled]);
+int get hashCode => Object.hashAll([runtimeType,getMapHazardsCancelToken,getHazardsToAvoidCancelToken,const DeepCollectionEquality().hash(_hazards),selectedHazard,cameraPosition,const DeepCollectionEquality().hash(_markers),clusterManager,const DeepCollectionEquality().hash(_polylines),selectedLocation,currentRoutePlan,getRouteState,getAddressFromCoordinatesState,getMapHazardsState,currentNavigationLocation,currentSpeed,currentBearing,isOffRoute,followUser,navigationState,isMapReady,pendingCameraUpdateToApply,showRouteHazards,const DeepCollectionEquality().hash(_hazardCache),currentStepIndex,currentStep,nextStep,distanceToNextManeuverMeters,stepAfterNext,remainingDistanceMeters,remainingDurationSeconds,navigationSimulationEnabled,const DeepCollectionEquality().hash(_hazardCorridorsAhead),const DeepCollectionEquality().hash(_forbiddenCorridors),takeAlternateRouteState,isUserNearClosestHazard,showTakeAlternateRouteButton,lastAlertedHazardId]);
 
 @override
 String toString() {
-  return 'MapProviderState(getMapHazardsCancelToken: $getMapHazardsCancelToken, getHazardsToAvoidCancelToken: $getHazardsToAvoidCancelToken, hazards: $hazards, selectedHazard: $selectedHazard, cameraPosition: $cameraPosition, markers: $markers, clusterManager: $clusterManager, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState, currentNavigationLocation: $currentNavigationLocation, currentSpeed: $currentSpeed, currentBearing: $currentBearing, isOffRoute: $isOffRoute, followUser: $followUser, navigationState: $navigationState, isMapReady: $isMapReady, pendingCameraUpdateToApply: $pendingCameraUpdateToApply, showRouteHazards: $showRouteHazards, hazardCache: $hazardCache, currentStepIndex: $currentStepIndex, currentStep: $currentStep, nextStep: $nextStep, distanceToNextManeuverMeters: $distanceToNextManeuverMeters, stepAfterNext: $stepAfterNext, remainingDistanceMeters: $remainingDistanceMeters, remainingDurationSeconds: $remainingDurationSeconds, navigationSimulationEnabled: $navigationSimulationEnabled)';
+  return 'MapProviderState(getMapHazardsCancelToken: $getMapHazardsCancelToken, getHazardsToAvoidCancelToken: $getHazardsToAvoidCancelToken, hazards: $hazards, selectedHazard: $selectedHazard, cameraPosition: $cameraPosition, markers: $markers, clusterManager: $clusterManager, polylines: $polylines, selectedLocation: $selectedLocation, currentRoutePlan: $currentRoutePlan, getRouteState: $getRouteState, getAddressFromCoordinatesState: $getAddressFromCoordinatesState, getMapHazardsState: $getMapHazardsState, currentNavigationLocation: $currentNavigationLocation, currentSpeed: $currentSpeed, currentBearing: $currentBearing, isOffRoute: $isOffRoute, followUser: $followUser, navigationState: $navigationState, isMapReady: $isMapReady, pendingCameraUpdateToApply: $pendingCameraUpdateToApply, showRouteHazards: $showRouteHazards, hazardCache: $hazardCache, currentStepIndex: $currentStepIndex, currentStep: $currentStep, nextStep: $nextStep, distanceToNextManeuverMeters: $distanceToNextManeuverMeters, stepAfterNext: $stepAfterNext, remainingDistanceMeters: $remainingDistanceMeters, remainingDurationSeconds: $remainingDurationSeconds, navigationSimulationEnabled: $navigationSimulationEnabled, hazardCorridorsAhead: $hazardCorridorsAhead, forbiddenCorridors: $forbiddenCorridors, takeAlternateRouteState: $takeAlternateRouteState, isUserNearClosestHazard: $isUserNearClosestHazard, showTakeAlternateRouteButton: $showTakeAlternateRouteButton, lastAlertedHazardId: $lastAlertedHazardId)';
 }
 
 
@@ -486,11 +564,11 @@ abstract mixin class _$MapProviderStateCopyWith<$Res> implements $MapProviderSta
   factory _$MapProviderStateCopyWith(_MapProviderState value, $Res Function(_MapProviderState) _then) = __$MapProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- CancelToken getMapHazardsCancelToken, CancelToken getHazardsToAvoidCancelToken, List<Hazard> hazards, Hazard? selectedHazard, CameraPosition cameraPosition, Set<Marker> markers, cluster_manager.ClusterManager? clusterManager, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState, AlrtLocation? currentNavigationLocation, double currentSpeed, double currentBearing, bool isOffRoute, bool followUser, NavigationState navigationState, bool isMapReady, CameraUpdate? pendingCameraUpdateToApply, bool showRouteHazards, Map<String, Hazard> hazardCache, int? currentStepIndex, RouteStep? currentStep, RouteStep? nextStep, double? distanceToNextManeuverMeters, RouteStep? stepAfterNext, int? remainingDistanceMeters, int? remainingDurationSeconds, bool navigationSimulationEnabled
+ CancelToken getMapHazardsCancelToken, CancelToken getHazardsToAvoidCancelToken, List<Hazard> hazards, Hazard? selectedHazard, CameraPosition cameraPosition, Set<Marker> markers, cluster_manager.ClusterManager? clusterManager, Set<Polyline> polylines, AlrtLocation? selectedLocation, RoutePlan? currentRoutePlan, GetRouteState getRouteState, GetAddressFromCoordinatesState getAddressFromCoordinatesState, GetMapHazardsState getMapHazardsState, AlrtLocation? currentNavigationLocation, double currentSpeed, double currentBearing, bool isOffRoute, bool followUser, NavigationState navigationState, bool isMapReady, CameraUpdate? pendingCameraUpdateToApply, bool showRouteHazards, Map<String, Hazard> hazardCache, int? currentStepIndex, RouteStep? currentStep, RouteStep? nextStep, double? distanceToNextManeuverMeters, RouteStep? stepAfterNext, int? remainingDistanceMeters, int? remainingDurationSeconds, bool navigationSimulationEnabled, List<HazardCorridor> hazardCorridorsAhead, List<HazardCorridor> forbiddenCorridors, TakeAlternateRouteState takeAlternateRouteState, bool isUserNearClosestHazard, bool showTakeAlternateRouteButton, String? lastAlertedHazardId
 });
 
 
-@override $HazardCopyWith<$Res>? get selectedHazard;@override $AlrtLocationCopyWith<$Res>? get selectedLocation;@override $RoutePlanCopyWith<$Res>? get currentRoutePlan;@override $GetRouteStateCopyWith<$Res> get getRouteState;@override $GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;@override $GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;@override $AlrtLocationCopyWith<$Res>? get currentNavigationLocation;
+@override $HazardCopyWith<$Res>? get selectedHazard;@override $AlrtLocationCopyWith<$Res>? get selectedLocation;@override $RoutePlanCopyWith<$Res>? get currentRoutePlan;@override $GetRouteStateCopyWith<$Res> get getRouteState;@override $GetAddressFromCoordinatesStateCopyWith<$Res> get getAddressFromCoordinatesState;@override $GetMapHazardsStateCopyWith<$Res> get getMapHazardsState;@override $AlrtLocationCopyWith<$Res>? get currentNavigationLocation;@override $TakeAlternateRouteStateCopyWith<$Res> get takeAlternateRouteState;
 
 }
 /// @nodoc
@@ -503,7 +581,7 @@ class __$MapProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of MapProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? getMapHazardsCancelToken = null,Object? getHazardsToAvoidCancelToken = null,Object? hazards = null,Object? selectedHazard = freezed,Object? cameraPosition = null,Object? markers = null,Object? clusterManager = freezed,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,Object? currentNavigationLocation = freezed,Object? currentSpeed = null,Object? currentBearing = null,Object? isOffRoute = null,Object? followUser = null,Object? navigationState = null,Object? isMapReady = null,Object? pendingCameraUpdateToApply = freezed,Object? showRouteHazards = null,Object? hazardCache = null,Object? currentStepIndex = freezed,Object? currentStep = freezed,Object? nextStep = freezed,Object? distanceToNextManeuverMeters = freezed,Object? stepAfterNext = freezed,Object? remainingDistanceMeters = freezed,Object? remainingDurationSeconds = freezed,Object? navigationSimulationEnabled = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? getMapHazardsCancelToken = null,Object? getHazardsToAvoidCancelToken = null,Object? hazards = null,Object? selectedHazard = freezed,Object? cameraPosition = null,Object? markers = null,Object? clusterManager = freezed,Object? polylines = null,Object? selectedLocation = freezed,Object? currentRoutePlan = freezed,Object? getRouteState = null,Object? getAddressFromCoordinatesState = null,Object? getMapHazardsState = null,Object? currentNavigationLocation = freezed,Object? currentSpeed = null,Object? currentBearing = null,Object? isOffRoute = null,Object? followUser = null,Object? navigationState = null,Object? isMapReady = null,Object? pendingCameraUpdateToApply = freezed,Object? showRouteHazards = null,Object? hazardCache = null,Object? currentStepIndex = freezed,Object? currentStep = freezed,Object? nextStep = freezed,Object? distanceToNextManeuverMeters = freezed,Object? stepAfterNext = freezed,Object? remainingDistanceMeters = freezed,Object? remainingDurationSeconds = freezed,Object? navigationSimulationEnabled = null,Object? hazardCorridorsAhead = null,Object? forbiddenCorridors = null,Object? takeAlternateRouteState = null,Object? isUserNearClosestHazard = null,Object? showTakeAlternateRouteButton = null,Object? lastAlertedHazardId = freezed,}) {
   return _then(_MapProviderState(
 getMapHazardsCancelToken: null == getMapHazardsCancelToken ? _self.getMapHazardsCancelToken : getMapHazardsCancelToken // ignore: cast_nullable_to_non_nullable
 as CancelToken,getHazardsToAvoidCancelToken: null == getHazardsToAvoidCancelToken ? _self.getHazardsToAvoidCancelToken : getHazardsToAvoidCancelToken // ignore: cast_nullable_to_non_nullable
@@ -536,7 +614,13 @@ as double?,stepAfterNext: freezed == stepAfterNext ? _self.stepAfterNext : stepA
 as RouteStep?,remainingDistanceMeters: freezed == remainingDistanceMeters ? _self.remainingDistanceMeters : remainingDistanceMeters // ignore: cast_nullable_to_non_nullable
 as int?,remainingDurationSeconds: freezed == remainingDurationSeconds ? _self.remainingDurationSeconds : remainingDurationSeconds // ignore: cast_nullable_to_non_nullable
 as int?,navigationSimulationEnabled: null == navigationSimulationEnabled ? _self.navigationSimulationEnabled : navigationSimulationEnabled // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,hazardCorridorsAhead: null == hazardCorridorsAhead ? _self._hazardCorridorsAhead : hazardCorridorsAhead // ignore: cast_nullable_to_non_nullable
+as List<HazardCorridor>,forbiddenCorridors: null == forbiddenCorridors ? _self._forbiddenCorridors : forbiddenCorridors // ignore: cast_nullable_to_non_nullable
+as List<HazardCorridor>,takeAlternateRouteState: null == takeAlternateRouteState ? _self.takeAlternateRouteState : takeAlternateRouteState // ignore: cast_nullable_to_non_nullable
+as TakeAlternateRouteState,isUserNearClosestHazard: null == isUserNearClosestHazard ? _self.isUserNearClosestHazard : isUserNearClosestHazard // ignore: cast_nullable_to_non_nullable
+as bool,showTakeAlternateRouteButton: null == showTakeAlternateRouteButton ? _self.showTakeAlternateRouteButton : showTakeAlternateRouteButton // ignore: cast_nullable_to_non_nullable
+as bool,lastAlertedHazardId: freezed == lastAlertedHazardId ? _self.lastAlertedHazardId : lastAlertedHazardId // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -614,6 +698,15 @@ $AlrtLocationCopyWith<$Res>? get currentNavigationLocation {
 
   return $AlrtLocationCopyWith<$Res>(_self.currentNavigationLocation!, (value) {
     return _then(_self.copyWith(currentNavigationLocation: value));
+  });
+}/// Create a copy of MapProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$TakeAlternateRouteStateCopyWith<$Res> get takeAlternateRouteState {
+  
+  return $TakeAlternateRouteStateCopyWith<$Res>(_self.takeAlternateRouteState, (value) {
+    return _then(_self.copyWith(takeAlternateRouteState: value));
   });
 }
 }
@@ -1789,6 +1882,308 @@ $AppErrorCopyWith<$Res> get error {
     return _then(_self.copyWith(error: value));
   });
 }
+}
+
+/// @nodoc
+mixin _$TakeAlternateRouteState {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TakeAlternateRouteState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'TakeAlternateRouteState()';
+}
+
+
+}
+
+/// @nodoc
+class $TakeAlternateRouteStateCopyWith<$Res>  {
+$TakeAlternateRouteStateCopyWith(TakeAlternateRouteState _, $Res Function(TakeAlternateRouteState) __);
+}
+
+
+/// Adds pattern-matching-related methods to [TakeAlternateRouteState].
+extension TakeAlternateRouteStatePatterns on TakeAlternateRouteState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _TakeAlternateRouteStateIdle value)?  idle,TResult Function( _TakeAlternateRouteStateLoading value)?  loading,TResult Function( _TakeAlternateRouteStateError value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _TakeAlternateRouteStateIdle() when idle != null:
+return idle(_that);case _TakeAlternateRouteStateLoading() when loading != null:
+return loading(_that);case _TakeAlternateRouteStateError() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _TakeAlternateRouteStateIdle value)  idle,required TResult Function( _TakeAlternateRouteStateLoading value)  loading,required TResult Function( _TakeAlternateRouteStateError value)  error,}){
+final _that = this;
+switch (_that) {
+case _TakeAlternateRouteStateIdle():
+return idle(_that);case _TakeAlternateRouteStateLoading():
+return loading(_that);case _TakeAlternateRouteStateError():
+return error(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _TakeAlternateRouteStateIdle value)?  idle,TResult? Function( _TakeAlternateRouteStateLoading value)?  loading,TResult? Function( _TakeAlternateRouteStateError value)?  error,}){
+final _that = this;
+switch (_that) {
+case _TakeAlternateRouteStateIdle() when idle != null:
+return idle(_that);case _TakeAlternateRouteStateLoading() when loading != null:
+return loading(_that);case _TakeAlternateRouteStateError() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  idle,TResult Function()?  loading,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _TakeAlternateRouteStateIdle() when idle != null:
+return idle();case _TakeAlternateRouteStateLoading() when loading != null:
+return loading();case _TakeAlternateRouteStateError() when error != null:
+return error(_that.message);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  idle,required TResult Function()  loading,required TResult Function( String message)  error,}) {final _that = this;
+switch (_that) {
+case _TakeAlternateRouteStateIdle():
+return idle();case _TakeAlternateRouteStateLoading():
+return loading();case _TakeAlternateRouteStateError():
+return error(_that.message);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  idle,TResult? Function()?  loading,TResult? Function( String message)?  error,}) {final _that = this;
+switch (_that) {
+case _TakeAlternateRouteStateIdle() when idle != null:
+return idle();case _TakeAlternateRouteStateLoading() when loading != null:
+return loading();case _TakeAlternateRouteStateError() when error != null:
+return error(_that.message);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _TakeAlternateRouteStateIdle extends TakeAlternateRouteState {
+  const _TakeAlternateRouteStateIdle(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TakeAlternateRouteStateIdle);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'TakeAlternateRouteState.idle()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _TakeAlternateRouteStateLoading extends TakeAlternateRouteState {
+  const _TakeAlternateRouteStateLoading(): super._();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TakeAlternateRouteStateLoading);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'TakeAlternateRouteState.loading()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _TakeAlternateRouteStateError extends TakeAlternateRouteState {
+  const _TakeAlternateRouteStateError(this.message): super._();
+  
+
+ final  String message;
+
+/// Create a copy of TakeAlternateRouteState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$TakeAlternateRouteStateErrorCopyWith<_TakeAlternateRouteStateError> get copyWith => __$TakeAlternateRouteStateErrorCopyWithImpl<_TakeAlternateRouteStateError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _TakeAlternateRouteStateError&&(identical(other.message, message) || other.message == message));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,message);
+
+@override
+String toString() {
+  return 'TakeAlternateRouteState.error(message: $message)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$TakeAlternateRouteStateErrorCopyWith<$Res> implements $TakeAlternateRouteStateCopyWith<$Res> {
+  factory _$TakeAlternateRouteStateErrorCopyWith(_TakeAlternateRouteStateError value, $Res Function(_TakeAlternateRouteStateError) _then) = __$TakeAlternateRouteStateErrorCopyWithImpl;
+@useResult
+$Res call({
+ String message
+});
+
+
+
+
+}
+/// @nodoc
+class __$TakeAlternateRouteStateErrorCopyWithImpl<$Res>
+    implements _$TakeAlternateRouteStateErrorCopyWith<$Res> {
+  __$TakeAlternateRouteStateErrorCopyWithImpl(this._self, this._then);
+
+  final _TakeAlternateRouteStateError _self;
+  final $Res Function(_TakeAlternateRouteStateError) _then;
+
+/// Create a copy of TakeAlternateRouteState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
+  return _then(_TakeAlternateRouteStateError(
+null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
 }
 
 // dart format on

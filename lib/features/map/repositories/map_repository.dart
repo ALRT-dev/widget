@@ -30,6 +30,7 @@ abstract class MapRepository {
     required final LatLng origin,
     required final LatLng destination,
     final TravelMode travelMode = TravelMode.driving,
+    final List<PolylineWayPoint>? intermediates,
   });
 
   Future<Either<String, AppError>> getAddressFromCoordinates({
@@ -193,6 +194,7 @@ class MapRepositoryImpl implements MapRepository {
     required LatLng origin,
     required LatLng destination,
     TravelMode travelMode = TravelMode.driving,
+    List<PolylineWayPoint>? intermediates,
   }) {
     return runAsyncCall(
       name: 'getRoute',
@@ -201,6 +203,7 @@ class MapRepositoryImpl implements MapRepository {
           origin: PointLatLng(origin.latitude, origin.longitude),
           destination: PointLatLng(destination.latitude, destination.longitude),
           travelMode: travelMode,
+          intermediates: intermediates,
           routingPreference: travelMode == TravelMode.driving
               ? RoutingPreference.trafficAware
               : RoutingPreference.unspecified,

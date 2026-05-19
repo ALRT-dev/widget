@@ -165,9 +165,9 @@ class NavigationSimulationControls extends ConsumerWidget {
                     padding: EdgeInsets.symmetric(vertical: 4.spMin),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  onPressed: () => notifier.simulateAdvanceAlongRoute(50),
+                  onPressed: () => notifier.simulateAdvanceAlongRoute(100),
                   child: Text(
-                    '+${50.round()} m along route',
+                    '+${100.round()} m along route',
                     style: TextStyle(fontSize: 11.spMin),
                   ),
                 ),

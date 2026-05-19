@@ -7,6 +7,7 @@ import 'package:hazard_app/features/map/models/route_step_model.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_compass_button.dart';
 import 'package:hazard_app/features/map/views/widgets/navigation/navigation_simulation_controls.dart';
+import 'package:hazard_app/features/map/views/widgets/navigation/take_alternate_route.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -56,6 +57,7 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               CustomCompassButton(),
+              _buildTakeAlternateRouteButton(),
               _buildRemainingInfo(),
               _buildFooter(),
             ],
@@ -277,13 +279,21 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
     );
   }
 
-  Widget _buildDivider() {
-    return Container(
-      width: 1.spMin,
-      decoration: BoxDecoration(
-        color: AppColors.grey.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(100),
-      ),
+  Widget _buildTakeAlternateRouteButton() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final shouldShow = ref.watch(
+          providerOfMap.select(
+            (s) => s.showTakeAlternateRouteButton,
+          ),
+        );
+
+        // Only show button when showTakeAlternateRouteButton is true
+        // (auto-hides after 10 seconds, reappears for new hazards)
+        if (!shouldShow) return const SizedBox.shrink();
+
+        return TakeAlternateRoute();
+      },
     );
   }
 
@@ -518,6 +528,16 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      width: 1.spMin,
+      decoration: BoxDecoration(
+        color: AppColors.grey.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(100),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:google_maps_cluster_manager_2/google_maps_cluster_manager_2.dart
     as cluster_manager;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/models/hazard_corridor_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
 import 'package:hazard_app/features/map/models/route_step_model.dart';
 import 'package:hazard_app/features/map/utils/constants.dart';
@@ -119,6 +120,42 @@ abstract class MapProviderState with _$MapProviderState {
     /// When true (debug only), GPS updates are ignored and position is driven
     /// by simulation controls ([simulateNavigationOffsetMeters], etc.).
     @Default(false) final bool navigationSimulationEnabled,
+
+    /// Hazard clusters within the proximity threshold of the *remaining*
+    /// active route polyline, recomputed on each location update. The
+    /// "Take Alternate Route" button is only shown when this list is
+    /// non-empty.
+    @Default(<HazardCorridor>[])
+    final List<HazardCorridor> hazardCorridorsAhead,
+
+    /// Corridors a previously accepted detour already routed around. They
+    /// are kept across the trip so subsequent detours don't reuse a path
+    /// through an earlier hazard.
+    @Default(<HazardCorridor>[])
+    final List<HazardCorridor> forbiddenCorridors,
+
+    /// State of the "Take Alternate Route" orchestrator (idle / loading /
+    /// error). Mirrors the [GetRouteState] pattern used elsewhere in this
+    /// file.
+    @Default(TakeAlternateRouteState.idle())
+    final TakeAlternateRouteState takeAlternateRouteState,
+
+    /// Whether the user is within 300m of the closest hazard corridor.
+    /// Used to control the visibility of the "Take Alternate Route" button.
+    @Default(false)
+    final bool isUserNearClosestHazard,
+
+    /// Whether to show the "Take Alternate Route" button.
+    /// This is true for 10 seconds after a hazard corridor is first detected,
+    /// then automatically becomes false. Resets when a different corridor
+    /// becomes the closest.
+    @Default(false)
+    final bool showTakeAlternateRouteButton,
+
+    /// ID of the hazard in the last alerted corridor, used to determine
+    /// if a different hazard corridor has become closest (to restart the
+    /// 10-second display timer).
+    final String? lastAlertedHazardId,
   }) = _MapProviderState;
 }
 
@@ -168,4 +205,18 @@ abstract class GetMapHazardsState with _$GetMapHazardsState {
   const factory GetMapHazardsState.error(
     final AppError error,
   ) = _GetMapHazardsStateError;
+}
+
+@freezed
+abstract class TakeAlternateRouteState with _$TakeAlternateRouteState {
+  const TakeAlternateRouteState._();
+
+  const factory TakeAlternateRouteState.idle() = _TakeAlternateRouteStateIdle;
+  const factory TakeAlternateRouteState.loading() =
+      _TakeAlternateRouteStateLoading;
+  const factory TakeAlternateRouteState.error(
+    final String message,
+  ) = _TakeAlternateRouteStateError;
+
+  bool get isLoading => this is _TakeAlternateRouteStateLoading;
 }
