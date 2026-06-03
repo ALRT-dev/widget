@@ -27,7 +27,7 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Column(
-        spacing: 10.spMin,
+        spacing: 8.spMin,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
@@ -47,23 +47,23 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                   if (!showNavigationSimulationPanel) {
                     return const SizedBox.shrink();
                   }
-                  return const NavigationSimulationControls().pT(10.0);
+                  return const NavigationSimulationControls().pT(8.0);
                 },
               ),
             ],
           ),
           Column(
-            spacing: 10.spMin,
+            spacing: 8.spMin,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              CustomCompassButton(),
+              _buildCompassButton(),
               _buildTakeAlternateRouteButton(),
               _buildRemainingInfo(),
               _buildFooter(),
             ],
           ),
         ],
-      ).pX(20.0).pB(30.0),
+      ).pX(16.0).pB(30.0),
     );
   }
 
@@ -71,18 +71,18 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF252525),
-        borderRadius: BorderRadius.circular(20.spMin),
+        borderRadius: BorderRadius.circular(14.spMin),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadowColor,
-            blurRadius: 10.0,
+            blurRadius: 8.0,
             offset: Offset(0.0, 0.0),
           ),
         ],
       ),
-      padding: EdgeInsets.all(16.spMin),
+      padding: EdgeInsets.all(12.spMin),
       child: Row(
-        spacing: 16.spMin,
+        spacing: 12.spMin,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
@@ -97,10 +97,10 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                     );
 
                     return Container(
-                      width: 70.spMin,
-                      height: 70.spMin,
+                      width: 56.spMin,
+                      height: 56.spMin,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16.spMin),
+                        borderRadius: BorderRadius.circular(12.spMin),
                         gradient: LinearGradient(
                           colors: [
                             AppColors.orange300,
@@ -110,7 +110,7 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.red200,
-                            blurRadius: 10.0,
+                            blurRadius: 8.0,
                             offset: Offset(0.0, 0.0),
                           ),
                         ],
@@ -118,14 +118,14 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                       child: Center(
                         child: Icon(
                           _iconForManeuver(maneuver),
-                          size: 44.spMin,
+                          size: 32.spMin,
                           color: AppColors.white,
                         ),
                       ),
                     );
                   },
                 ),
-                16.wSizedBox,
+                12.wSizedBox,
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,14 +144,14 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                           return Text(
                             _formatDistancePrefix(meters),
                             style: TextStyle(
-                              fontSize: 13.spMin,
+                              fontSize: 11.spMin,
                               fontWeight: FontWeight.w600,
                               color: const Color(0xFF888888),
                             ),
                           );
                         },
                       ),
-                      5.hSizedBox,
+                      4.hSizedBox,
                       // Primary instruction — the action you're approaching.
                       // Falls back to currentStep on the final (ARRIVE) step
                       // where nextStep is null.
@@ -168,17 +168,17 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                           return AutoSizeText(
                             instruction.isEmpty ? '--' : instruction,
                             maxLines: 3,
-                            minFontSize: 8.spMin,
+                            minFontSize: 7.spMin,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 16.spMin,
+                              fontSize: 14.spMin,
                               fontWeight: FontWeight.w600,
                               color: AppColors.white,
                             ),
                           );
                         },
                       ),
-                      5.hSizedBox,
+                      4.hSizedBox,
                       // "Continue for X km" — length of the road segment after
                       // the upcoming maneuver. Hidden when no next step or its
                       // distance is zero (e.g. ARRIVE step).
@@ -195,7 +195,7 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                           return Text(
                             'Continue for ${_formatDistance(meters)}',
                             style: TextStyle(
-                              fontSize: 12.spMin,
+                              fontSize: 10.spMin,
                               fontWeight: FontWeight.w500,
                               color: AppColors.grey,
                             ),
@@ -222,19 +222,19 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                 child: Row(
                   children: [
                     _buildDivider(),
-                    16.wSizedBox,
+                    12.wSizedBox,
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           'THEN',
                           style: TextStyle(
-                            fontSize: 10.spMin,
+                            fontSize: 9.spMin,
                             fontWeight: FontWeight.w600,
                             color: AppColors.grey,
                           ),
                         ),
-                        5.hSizedBox,
+                        4.hSizedBox,
                         Consumer(
                           builder: (context, ref, child) {
                             final maneuver = ref.watch(
@@ -244,12 +244,12 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                             );
                             return Icon(
                               _iconForManeuver(maneuver),
-                              size: 20.spMin,
+                              size: 16.spMin,
                               color: const Color(0xFF888888),
                             );
                           },
                         ),
-                        5.hSizedBox,
+                        4.hSizedBox,
                         Consumer(
                           builder: (context, ref, child) {
                             final meters = ref.watch(
@@ -260,7 +260,7 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                             return Text(
                               _formatDistance(meters),
                               style: TextStyle(
-                                fontSize: 12.spMin,
+                                fontSize: 10.spMin,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xFF888888),
                               ),
@@ -276,6 +276,24 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCompassButton() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final showNavigationSimulationPanel =
+            kDebugMode &&
+            ref.watch(
+              providerOfMap.select(
+                (value) => value.currentRoutePlan?.isNavigating ?? false,
+              ),
+            );
+        if (!showNavigationSimulationPanel) {
+          return const SizedBox.shrink();
+        }
+        return CustomCompassButton();
+      },
     );
   }
 
@@ -302,16 +320,19 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF252525),
-          borderRadius: BorderRadius.circular(20.spMin),
+          borderRadius: BorderRadius.circular(14.spMin),
           boxShadow: [
             BoxShadow(
               color: AppColors.shadowColor,
-              blurRadius: 10.0,
+              blurRadius: 8.0,
               offset: Offset(0.0, 0.0),
             ),
           ],
         ),
-        padding: EdgeInsets.all(20.spMin),
+        padding: EdgeInsets.symmetric(
+          horizontal: 14.spMin,
+          vertical: 12.spMin,
+        ),
         child: Row(
           spacing: 5.spMin,
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -382,7 +403,7 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 18.spMin,
+            fontSize: 15.spMin,
             fontWeight: FontWeight.w600,
             color: AppColors.white,
           ),
@@ -390,7 +411,7 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
         Text(
           unit,
           style: TextStyle(
-            fontSize: 12.spMin,
+            fontSize: 10.spMin,
             fontWeight: FontWeight.w600,
             color: const Color(0xFF888888),
           ),
@@ -399,7 +420,7 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
         Text(
           label,
           style: TextStyle(
-            fontSize: 10.spMin,
+            fontSize: 9.spMin,
             fontWeight: FontWeight.w600,
             color: AppColors.grey,
           ),
@@ -411,19 +432,22 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
   Widget _buildFooter() {
     return IntrinsicHeight(
       child: Row(
-        spacing: 10.spMin,
+        spacing: 8.spMin,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Current speed in km/h (state stores m/s).
           Container(
-            padding: EdgeInsets.all(10.spMin),
+            padding: EdgeInsets.symmetric(
+              horizontal: 10.spMin,
+              vertical: 8.spMin,
+            ),
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(14.spMin),
+              borderRadius: BorderRadius.circular(12.spMin),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.shadowColorDark,
-                  blurRadius: 10.0,
+                  blurRadius: 8.0,
                   offset: Offset(0.0, 0.0),
                 ),
               ],
@@ -441,7 +465,7 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                         TextSpan(
                           text: '$kmh',
                           style: TextStyle(
-                            fontSize: 16.spMin,
+                            fontSize: 13.spMin,
                             fontWeight: FontWeight.w600,
                             color: AppColors.black,
                           ),
@@ -449,7 +473,7 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                         TextSpan(
                           text: ' km/h',
                           style: TextStyle(
-                            fontSize: 12.spMin,
+                            fontSize: 10.spMin,
                             fontWeight: FontWeight.w600,
                             color: AppColors.grey,
                           ),
@@ -490,14 +514,17 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
             child: Consumer(
               builder: (context, ref, child) {
                 return Container(
-                  padding: EdgeInsets.all(10.spMin),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.spMin,
+                    vertical: 8.spMin,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.white,
-                    borderRadius: BorderRadius.circular(14.spMin),
+                    borderRadius: BorderRadius.circular(12.spMin),
                     boxShadow: [
                       BoxShadow(
                         color: AppColors.shadowColorDark,
-                        blurRadius: 10.0,
+                        blurRadius: 8.0,
                         offset: Offset(0.0, 0.0),
                       ),
                     ],
@@ -508,14 +535,14 @@ class _NavigationModeOverlayState extends ConsumerState<NavigationModeOverlay> {
                       children: [
                         Icon(
                           LucideIcons.x400,
-                          size: 20.spMin,
+                          size: 16.spMin,
                           color: AppColors.red,
                         ),
                         5.wSizedBox,
                         Text(
                           'End Navigation',
                           style: TextStyle(
-                            fontSize: 14.spMin,
+                            fontSize: 12.spMin,
                             fontWeight: FontWeight.w600,
                             color: AppColors.red,
                           ),

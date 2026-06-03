@@ -37,37 +37,44 @@ class _NavigationRouteInfoCardsListItemState
     );
     return Container(
       constraints: BoxConstraints(
-        minWidth: 180.spMin,
+        minWidth: 152.spMin,
       ),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16.spMin),
+        borderRadius: BorderRadius.circular(12.spMin),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadowColor,
-            blurRadius: 10.0,
+            blurRadius: 8.0,
             offset: Offset(0, 0.0),
           ),
         ],
         border: Border.all(
           color: isSelected ? AppColors.blue : AppColors.transparent,
-          width: 2.0,
+          width: 1.5,
         ),
       ),
-      padding: EdgeInsets.all(10.spMin),
+      padding: EdgeInsets.all(8.spMin),
       child: IntrinsicWidth(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _buildHeaderHazardCount(),
-            4.hSizedBox,
-            _buildRouteDuration(),
-            _buildRouteDistance(),
-            8.hSizedBox,
-            Expanded(
-              child: _buildRouteMetadata(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildHeaderHazardCount(),
+                6.wSizedBox,
+                _buildRouteMetadata(),
+              ],
             ),
-            8.hSizedBox,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildRouteDuration(),
+                _buildRouteDistance(),
+              ],
+            ),
             _buildActionButton(),
           ],
         ),
@@ -88,11 +95,11 @@ class _NavigationRouteInfoCardsListItemState
                 color: hazardCount == 0
                     ? AppColors.green.withValues(alpha: 0.1)
                     : AppColors.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(5.spMin),
+                borderRadius: BorderRadius.circular(4.spMin),
               ),
               padding: EdgeInsets.symmetric(
-                horizontal: 8.spMin,
-                vertical: 3.spMin,
+                horizontal: 6.spMin,
+                vertical: 2.spMin,
               ),
               child: Row(
                 children: [
@@ -100,16 +107,16 @@ class _NavigationRouteInfoCardsListItemState
                     hazardCount == 0
                         ? Icons.check_rounded
                         : Icons.warning_rounded,
-                    size: 12.spMin,
+                    size: 10.spMin,
                     color: hazardCount == 0 ? AppColors.green : AppColors.red,
                   ),
-                  4.wSizedBox,
+                  3.wSizedBox,
                   Text(
                     hazardCount == 0
                         ? 'AVOIDS HAZARDS'
                         : '$hazardCount HAZARD${hazardCount == 1 ? '' : 'S'}',
                     style: TextStyle(
-                      fontSize: 10.spMin,
+                      fontSize: 9.spMin,
                       fontWeight: FontWeight.w700,
                       color: hazardCount == 0 ? AppColors.green : AppColors.red,
                     ),
@@ -126,7 +133,7 @@ class _NavigationRouteInfoCardsListItemState
   Widget _buildRouteDuration() {
     final totalMinutes = (widget.route.durationMinutes ?? 0).round();
     final suffixStyle = TextStyle(
-      fontSize: 12.spMin,
+      fontSize: 10.spMin,
       color: AppColors.grey.withValues(alpha: 0.7),
       letterSpacing: -0.5,
       fontFamily: AppTheme.defaultFontFamily,
@@ -159,9 +166,10 @@ class _NavigationRouteInfoCardsListItemState
     return Text.rich(
       TextSpan(children: children),
       style: TextStyle(
-        fontSize: 24.spMin,
+        fontSize: 20.spMin,
         fontWeight: FontWeight.w700,
         fontFamily: AppTheme.defaultFontFamily,
+        height: 1.2,
       ),
     );
   }
@@ -180,7 +188,7 @@ class _NavigationRouteInfoCardsListItemState
               : '',
 
           style: TextStyle(
-            fontSize: 12.spMin,
+            fontSize: 10.spMin,
             color: AppColors.grey.withValues(alpha: 0.8),
           ),
         ),
@@ -191,51 +199,36 @@ class _NavigationRouteInfoCardsListItemState
   Widget _buildRouteMetadata() {
     return Consumer(
       builder: (context, ref, child) {
-        final hazardCount = _getRouteHazardSummary(ref).totalHazards;
-
         final fastestRoute = ref.watch(
           providerOfMap.select(
             (value) => value.currentRoutePlan?.currentRoute?.fastestRoute,
           ),
         );
-        final isFastest = fastestRoute == widget.route;
         final additionalDuration =
             (widget.route.durationMinutes ?? 0).round() -
             (fastestRoute?.durationMinutes ?? 0).round();
+        final isFastest =
+            fastestRoute == widget.route || additionalDuration == 0;
 
-        return Row(
-          spacing: 8.spMin,
-          children: [
-            Expanded(
-              child: Container(
-                height: 3.5.spMin,
-                decoration: BoxDecoration(
-                  color: hazardCount == 0 ? AppColors.green : AppColors.blue,
-                  borderRadius: BorderRadius.circular(5.spMin),
-                ),
-              ),
+        return Container(
+          decoration: BoxDecoration(
+            color: isFastest
+                ? AppColors.green.withValues(alpha: 0.1)
+                : AppColors.red.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(50.spMin),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 6.spMin,
+            vertical: 2.spMin,
+          ),
+          child: Text(
+            isFastest ? 'Fastest' : '+$additionalDuration min',
+            style: TextStyle(
+              fontSize: 9.spMin,
+              color: isFastest ? AppColors.green : AppColors.red,
+              fontWeight: FontWeight.w700,
             ),
-            Container(
-              decoration: BoxDecoration(
-                color: isFastest
-                    ? AppColors.grey.withValues(alpha: 0.1)
-                    : AppColors.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(50.spMin),
-              ),
-              padding: EdgeInsets.symmetric(
-                horizontal: 7.spMin,
-                vertical: 3.spMin,
-              ),
-              child: Text(
-                isFastest ? 'Fastest' : '+$additionalDuration min',
-                style: TextStyle(
-                  fontSize: 10.spMin,
-                  color: isFastest ? AppColors.grey : AppColors.red,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
+          ),
         );
       },
     );
@@ -251,11 +244,11 @@ class _NavigationRouteInfoCardsListItemState
             color: hazardCount == 0
                 ? AppColors.green.withValues(alpha: 0.1)
                 : AppColors.red.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8.spMin),
+            borderRadius: BorderRadius.circular(6.spMin),
           ),
           padding: EdgeInsets.symmetric(
-            horizontal: 8.spMin,
-            vertical: 4.spMin,
+            horizontal: 6.spMin,
+            vertical: 3.spMin,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -263,24 +256,24 @@ class _NavigationRouteInfoCardsListItemState
               if (hazardCount == 0) ...[
                 Icon(
                   Icons.check_rounded,
-                  size: 12.spMin,
+                  size: 10.spMin,
                   color: AppColors.green,
                 ),
-                4.wSizedBox,
+                3.wSizedBox,
               ],
               Text(
                 hazardCount == 0 ? 'No hazards on route' : 'View Hazards',
                 style: TextStyle(
-                  fontSize: 12.spMin,
+                  fontSize: 10.spMin,
                   color: hazardCount == 0 ? AppColors.green : AppColors.red,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               if (hazardCount > 0) ...[
-                4.wSizedBox,
+                3.wSizedBox,
                 Icon(
                   Icons.arrow_forward_rounded,
-                  size: 12.spMin,
+                  size: 10.spMin,
                   color: hazardCount == 0 ? AppColors.green : AppColors.red,
                 ),
               ],

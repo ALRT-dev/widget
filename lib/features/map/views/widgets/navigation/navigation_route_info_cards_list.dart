@@ -28,18 +28,18 @@ class _NavigationRouteInfoCardsListState
     return Column(
       children: [
         SizedBox(
-          height: 174.spMin,
+          height: 130.spMin,
           child: ListView.separated(
             itemCount: allRoutes.length,
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(
-              horizontal: 20.spMin,
-              vertical: 10.spMin,
+              horizontal: 16.spMin,
+              vertical: 8.spMin,
             ),
             itemBuilder: (context, index) => NavigationRouteInfoCardsListItem(
               route: allRoutes[index],
             ),
-            separatorBuilder: (context, index) => 10.wSizedBox,
+            separatorBuilder: (context, index) => 8.wSizedBox,
           ),
         ),
         StartNavigationButton().pX(20.0),

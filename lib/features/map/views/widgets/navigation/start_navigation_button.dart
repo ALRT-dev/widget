@@ -25,7 +25,7 @@ class _StartNavigationButtonState extends ConsumerState<StartNavigationButton> {
     );
 
     return SizedBox(
-      height: 54.spMin,
+      height: 42.spMin,
       child: Row(
         children: [
           Expanded(
@@ -36,8 +36,15 @@ class _StartNavigationButtonState extends ConsumerState<StartNavigationButton> {
                   AppColors.red200,
                 ],
               ),
+              padding: EdgeInsets.symmetric(
+                horizontal: 16.spMin,
+              ),
+              borderRadius: 12.0,
               value: 'Start Navigation',
               icon: Icon(LucideIcons.navigation),
+              valueStyle: TextStyle(
+                fontSize: 14.spMin,
+              ),
               isLoading: isNavigating,
               onPressed: _handleStartNavigation,
             ),
@@ -50,9 +57,11 @@ class _StartNavigationButtonState extends ConsumerState<StartNavigationButton> {
                 AppColors.red200,
               ],
             ),
+            padding: EdgeInsets.zero,
+            borderRadius: 12.0,
             icon: Icon(
               LucideIcons.x400,
-              size: 24.spMin,
+              size: 20.spMin,
               color: AppColors.white,
             ),
             onPressed: _handleCancelNavigation,

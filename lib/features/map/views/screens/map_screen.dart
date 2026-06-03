@@ -140,49 +140,67 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ],
               ),
               Expanded(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            right: 15.spMin,
-                            bottom: 0.0,
-                            child: _mapActionButtons(),
-                          ),
-                          Positioned(
-                            bottom: 0.0,
-                            left: 0.0,
-                            right: 0.0,
-                            child: _viewListButtonBuilder(),
-                          ),
-                        ],
+                child: Consumer(
+                  builder: (context, ref, child) {
+                    final isRoutePresent = ref.watch(
+                      providerOfMap.select(
+                        (value) => value.currentRoutePlan != null,
                       ),
-                    ),
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final isRoutePresent = ref.watch(
-                          providerOfMap.select(
-                            (value) => value.currentRoutePlan != null,
-                          ),
-                        );
-                        if (isRoutePresent) {
-                          return NavigationRouteInfoCardsList().pT(10.0);
-                        }
+                    );
 
-                        final isSelectedLocationPresent = ref.watch(
-                          providerOfMap.select(
-                            (value) => value.selectedLocation != null,
-                          ),
-                        );
-                        if (isSelectedLocationPresent) {
-                          return SelectedLocationPreview().pT(10.0).pX(20.0);
-                        }
+                    return Column(
+                      children: [
+                        // Don't show the map action buttons and view list button if a route is present
+                        isRoutePresent
+                            ? Expanded(
+                                child: const SizedBox.shrink(),
+                              )
+                            : Expanded(
+                                child: Stack(
+                                  children: [
+                                    Positioned(
+                                      right: 15.spMin,
+                                      bottom: 0.0,
+                                      child: _mapActionButtons(),
+                                    ),
+                                    Positioned(
+                                      bottom: 0.0,
+                                      left: 0.0,
+                                      right: 0.0,
+                                      child: _viewListButtonBuilder(),
+                                    ),
+                                  ],
+                                ),
+                              ),
 
-                        return const SizedBox();
-                      },
-                    ),
-                  ],
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final isRoutePresent = ref.watch(
+                              providerOfMap.select(
+                                (value) => value.currentRoutePlan != null,
+                              ),
+                            );
+                            if (isRoutePresent) {
+                              return NavigationRouteInfoCardsList().pT(10.0);
+                            }
+
+                            final isSelectedLocationPresent = ref.watch(
+                              providerOfMap.select(
+                                (value) => value.selectedLocation != null,
+                              ),
+                            );
+                            if (isSelectedLocationPresent) {
+                              return SelectedLocationPreview()
+                                  .pT(10.0)
+                                  .pX(20.0);
+                            }
+
+                            return const SizedBox();
+                          },
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
