@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -291,9 +292,10 @@ class MapService {
 
     return SafestFastestRoutes(
       safestRoute: safestRoute ?? fastestRoute,
-      selectedRoute: safestRoute ?? fastestRoute,
+      selectedRoute: fastestRoute,
       fastestRoute: fastestRoute,
-      allRoutes: routes,
+      // Always sort the fastest route to be the first in the list
+      allRoutes: routes.sorted((a, b) => a.duration!.compareTo(b.duration!)),
       routeSteps: routeSteps,
     );
   }

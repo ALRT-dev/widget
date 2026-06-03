@@ -29,7 +29,8 @@ abstract class SafestFastestRoutes with _$SafestFastestRoutes {
   }) = _SafestFastestRoutes;
 
   /// Gets the current route, prioritizing the selected route if available.
-  Route get currentRoute => selectedRoute ?? safestRoute;
+  Route get currentRoute =>
+      selectedRoute ?? allRoutes.firstOrNull ?? fastestRoute;
 
   /// Returns the turn-by-turn steps for [route], or an empty list if none.
   List<RouteStep> stepsForRoute(final Route route) =>
