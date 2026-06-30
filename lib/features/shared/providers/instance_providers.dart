@@ -31,6 +31,13 @@ final providerOfGoogleSignInInstance = Provider<GoogleSignIn>(
 );
 
 /// Provider of [PolylinePoints] instance.
+///
+/// NOTE: this is the only remaining in-app use of the Google Maps web-service key
+/// (`GOOGLE_MAPS_API_KEY`). The flutter_polyline_points package calls Google's Routes
+/// API directly and can't be pointed at our backend proxy, so the Geocoding/Places
+/// calls were moved server-side (see kUrlMaps*) but Directions was not. Migrating this
+/// to a `/api/maps/directions` backend proxy is the follow-up that lets us drop the
+/// web-service key from the app entirely.
 final providerOfPolylinePointsInstance = Provider<PolylinePoints>(
   (ref) => PolylinePoints(
     apiKey: Env.googleMapsApiKey,

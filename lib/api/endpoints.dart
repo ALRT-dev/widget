@@ -64,3 +64,13 @@ const kUrlNotificationsPushNotificationToken =
 // ---------------------------- SUPPORT ----------------------------
 
 const kUrlSupport = '$kUrlApi/support';
+
+// ---------------------------- MAPS ----------------------------
+// Backend proxy for Google Maps web services. The app calls these instead of
+// Google directly so the Maps web-service key never ships in the app binary.
+
+const kUrlMaps = '$kUrlApi/maps';
+
+const kUrlMapsGeocode = '$kUrlMaps/geocode';
+const kUrlMapsPlacesAutocomplete = '$kUrlMaps/places/autocomplete';
+const kUrlMapsPlaceDetails = '$kUrlMaps/places/details';
