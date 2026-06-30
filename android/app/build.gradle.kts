@@ -17,6 +17,20 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// Google Maps API key — injected into the manifest at build time, never committed.
+// Resolved from (in order): the GOOGLE_MAPS_API_KEY environment variable (CI), then the
+// project's .env file (the same file flutter_dotenv loads at runtime).
+val mapsApiKey: String = run {
+    System.getenv("GOOGLE_MAPS_API_KEY")?.takeIf { it.isNotBlank() }?.let { return@run it }
+    val envFile = rootProject.file("../.env")
+    if (envFile.exists()) {
+        val envProps = Properties()
+        envFile.inputStream().use { envProps.load(it) }
+        (envProps.getProperty("GOOGLE_MAPS_API_KEY"))?.takeIf { it.isNotBlank() }?.let { return@run it }
+    }
+    ""
+}
+
 android {
     namespace = "com.safetyalrt.alrt"
     compileSdk = flutter.compileSdkVersion
@@ -37,6 +51,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Substituted into com.google.android.geo.API_KEY in AndroidManifest.xml.
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
