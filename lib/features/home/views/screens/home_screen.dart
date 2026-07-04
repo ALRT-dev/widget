@@ -123,6 +123,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 const HazardSearchScreen(),
                 const CreateUpdateReportScreen(),
                 const NotificationsScreen(),
+                const _FamilyTabPlaceholder(),
                 const ProfileScreen(),
               ],
             ).pB(HomeTabbar.height - 20.0),
@@ -247,5 +248,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ViewHazardScreen.route,
       extra: ViewHazardScreenArgs(hazard: hazard),
     );
+  }
+}
+
+/// Placeholder for the Family tab while the family feature wires in.
+class _FamilyTabPlaceholder extends StatelessWidget {
+  const _FamilyTabPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: CircularProgressIndicator());
   }
 }

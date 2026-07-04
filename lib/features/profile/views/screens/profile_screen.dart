@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hazard_app/features/home/enums/home_tab_types.dart';
+import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
 import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
 import 'package:hazard_app/features/profile/views/screens/support_request_screen.dart';
@@ -50,6 +52,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildStatsSection(),
+                  24.spMin.hSizedBox,
+                  _buildFamilySafetyCard(),
+                  14.spMin.hSizedBox,
+                  _buildLearnAndPrepareCard(),
                   24.spMin.hSizedBox,
                   _buildSubmittedHazardsSection(),
                   _buildFailedReviewsSection(),
@@ -419,6 +425,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 onTap: _gotoSubscribedLocationsScreen,
               ),
               _buildAccountSettingsItem(
+                title: 'Language',
+                subtitle: _currentLanguageLabel(),
+                icon: LucideIcons.globe,
+                color: AppColors.purple,
+                onTap: _showLanguagePicker,
+              ),
+              _buildAccountSettingsItem(
                 title: 'Support Request',
                 subtitle: 'Get help or submit feedback',
                 icon: LucideIcons.messageSquare,
@@ -445,6 +458,245 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       icon: Icon(Icons.logout),
       onPressed: () {
         _showLogoutDialog();
+      },
+    );
+  }
+
+  /// Indigo hero card promoting Family Safety — jumps to the Family tab.
+  Widget _buildFamilySafetyCard() {
+    const familyIndigo = Color(0xFF5B5BD6);
+    return GestureDetector(
+      onTap: () =>
+          ref.read(providerOfHomeTab.notifier).state = HomeTab.family,
+      child: Container(
+        padding: EdgeInsets.all(18.spMin),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [familyIndigo, Color(0xFF7C7CE0)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20.spMin),
+          boxShadow: [
+            BoxShadow(
+              color: familyIndigo.withValues(alpha: 0.35),
+              blurRadius: 12.0,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 46.spMin,
+              height: 46.spMin,
+              decoration: BoxDecoration(
+                color: AppColors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(14.spMin),
+              ),
+              child: Icon(
+                LucideIcons.users,
+                color: AppColors.white,
+                size: 24.spMin,
+              ),
+            ),
+            14.spMin.wSizedBox,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Family Safety',
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: 17.spMin,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    'Check in and see who is near an alert',
+                    style: TextStyle(
+                      color: AppColors.white.withValues(alpha: 0.85),
+                      fontSize: 12.spMin,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              LucideIcons.chevronRight,
+              color: AppColors.white,
+              size: 20.spMin,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Learn & Prepare card — opens the safety guides hub.
+  Widget _buildLearnAndPrepareCard() {
+    return GestureDetector(
+      onTap: () => context.push('/learn'),
+      child: Container(
+        padding: EdgeInsets.all(18.spMin),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(20.spMin),
+          border: Border.all(
+            color: AppColors.orange.withValues(alpha: 0.4),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowColorLight,
+              blurRadius: 2.0,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 46.spMin,
+              height: 46.spMin,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.orange, Color(0xFFE8492E)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14.spMin),
+              ),
+              child: Icon(
+                LucideIcons.bookOpen,
+                color: AppColors.white,
+                size: 24.spMin,
+              ),
+            ),
+            14.spMin.wSizedBox,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Learn & Prepare',
+                    style: TextStyle(
+                      fontSize: 17.spMin,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  Text(
+                    'Safety guides for before, during and after',
+                    style: TextStyle(
+                      color: AppColors.grey,
+                      fontSize: 12.spMin,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              LucideIcons.chevronRight,
+              color: AppColors.grey,
+              size: 20.spMin,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _currentLanguageLabel() {
+    return switch (context.locale.languageCode) {
+      'es' => 'Español',
+      _ => 'English',
+    };
+  }
+
+  /// Bottom sheet to switch between the supported languages.
+  void _showLanguagePicker() {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.spMin)),
+      ),
+      builder: (sheetContext) {
+        final currentCode = context.locale.languageCode;
+        Widget languageTile({
+          required String code,
+          required String title,
+          required String subtitle,
+        }) {
+          final isSelected = currentCode == code;
+          return ListTile(
+            leading: CircleAvatar(
+              backgroundColor: isSelected
+                  ? AppColors.orange
+                  : AppColors.grey.withValues(alpha: 0.15),
+              child: Text(
+                code.toUpperCase(),
+                style: TextStyle(
+                  color: isSelected ? AppColors.white : AppColors.grey,
+                  fontSize: 12.spMin,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            title: Text(
+              title,
+              style: TextStyle(
+                fontSize: 15.spMin,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            subtitle: Text(subtitle, style: TextStyle(fontSize: 12.spMin)),
+            trailing: isSelected
+                ? Icon(Icons.check_circle, color: AppColors.orange)
+                : null,
+            onTap: () {
+              context.setLocale(Locale(code));
+              Navigator.of(sheetContext).pop();
+            },
+          );
+        }
+
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.all(16.spMin),
+                child: Text(
+                  'Language',
+                  style: TextStyle(
+                    fontSize: 18.spMin,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              languageTile(
+                code: 'en',
+                title: 'English',
+                subtitle: 'English',
+              ),
+              languageTile(
+                code: 'es',
+                title: 'Español',
+                subtitle: 'Spanish',
+              ),
+              Padding(
+                padding: EdgeInsets.all(16.spMin),
+                child: Text(
+                  'Official warnings are shown in their original English wording where a verified translation is not yet available.',
+                  style: TextStyle(
+                    fontSize: 11.spMin,
+                    color: AppColors.grey,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
       },
     );
   }
