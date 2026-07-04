@@ -14,6 +14,7 @@ import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
+import 'package:hazard_app/features/shared/utils/share_alert.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -798,6 +799,11 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                       ),
                     ),
                   ),
+                  if (!widget.isInfoWindow) ...[
+                    const Spacer(),
+                    _shareButtonBuilder(),
+                    12.wSizedBox,
+                  ],
                   GestureDetector(
                     onTap: _gotoViewHazard,
                     child: Row(
@@ -838,6 +844,29 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               ),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  Widget _shareButtonBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final hazard = ref.watch(provider.select((value) => value.hazard));
+        if (hazard == null || !isAlertShareable(hazard)) {
+          return const SizedBox.shrink();
+        }
+
+        return GestureDetector(
+          onTap: () => shareAlert(hazard: hazard, from: 'card'),
+          child: Padding(
+            padding: EdgeInsets.all(4.spMin),
+            child: Icon(
+              LucideIcons.share,
+              size: 17.spMin,
+              color: AppColors.grey,
+            ),
+          ),
         );
       },
     );

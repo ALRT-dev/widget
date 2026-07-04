@@ -9,6 +9,7 @@ import 'package:hazard_app/features/family/services/family_location_service.dart
 import 'package:hazard_app/features/family/services/family_service.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
+import 'package:hazard_app/features/shared/services/analytics_service.dart';
 
 final providerOfFamily =
     StateNotifierProvider<FamilyProvider, FamilyProviderState>(
@@ -379,12 +380,21 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
       longitude: longitude,
     );
     if (!mounted) return false;
-    return result.when((_) => true, (_) => false);
+    return result.when(
+      (_) {
+        if (share) AnalyticsService.familySnapshotShared(via: 'request');
+        return true;
+      },
+      (_) => false,
+    );
   }
 
   /// Explicitly shares a fresh snapshot (e.g. re-sharing during an SOS).
   Future<bool> shareSnapshotNow() async {
     final shared = await _familyLocationService.shareSnapshotNow();
+    if (shared) {
+      AnalyticsService.familySnapshotShared(via: 'manual');
+    }
     if (shared && mounted) {
       await load(silent: true);
     }
@@ -415,6 +425,7 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
 
     result.when(
       (checkInResult) {
+        AnalyticsService.familyCheckIn();
         _appendCheckIn(checkInResult);
         state = state.copyWith(
           checkInState: const FamilyActionState.success(),
@@ -729,6 +740,7 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
 
     return result.when(
       (sosEvent) {
+        AnalyticsService.familySosTriggered();
         _upsertSosEvent(sosEvent);
         state = state.copyWith(
           sosTriggerState: const FamilyActionState.success(),

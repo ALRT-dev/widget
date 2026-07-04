@@ -16,6 +16,11 @@ abstract class NotificationRepository {
     final String? vapidKey,
   });
 
+  /// Reads the current notification permission WITHOUT triggering the OS
+  /// prompt — used to decide whether to show the priming screen first.
+  Future<Either<AuthorizationStatus, AppError>>
+  getNotificationPermissionStatus();
+
   Future<Either<void, AppError>> sendPushNotificationToken({
     required final String token,
   });
@@ -91,6 +96,19 @@ class NotificationRepositoryImpl implements NotificationRepository {
           code: ksUnknownErrorCode,
           message: ksUnknownErrorMessage,
         );
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<AuthorizationStatus, AppError>>
+  getNotificationPermissionStatus() {
+    return runAsyncCall(
+      name: 'getNotificationPermissionStatus',
+      future: () async {
+        final settings = await _firebaseMessaging.getNotificationSettings();
+        return Success(settings.authorizationStatus);
       },
       onError: Failure.new,
     );

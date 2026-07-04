@@ -5,6 +5,7 @@ import 'package:hazard_app/features/learn/providers/learn_provider.dart';
 import 'package:hazard_app/features/learn/providers/service_providers.dart';
 import 'package:hazard_app/features/learn/providers/states/guide_detail_provider_state.dart';
 import 'package:hazard_app/features/learn/services/learn_service.dart';
+import 'package:hazard_app/features/shared/services/analytics_service.dart';
 
 /// A single guide, keyed by its slug (or id). Loads on first watch.
 final providerOfGuideDetail = StateNotifierProvider.autoDispose
@@ -82,6 +83,7 @@ class GuideDetailProvider extends StateNotifier<GuideDetailProviderState> {
 
     return result.when(
       (completion) {
+        AnalyticsService.guideCompleted(guideSlug: slugOrId);
         state = state.copyWith(
           isCompleting: false,
           detail: state.detail?.copyWith(

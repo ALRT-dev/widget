@@ -65,6 +65,12 @@ class NotificationService {
     );
   }
 
+  /// Current notification permission without triggering the OS prompt.
+  Future<Either<AuthorizationStatus, AppError>>
+  getNotificationPermissionStatus() {
+    return _notificationRepository.getNotificationPermissionStatus();
+  }
+
   /// Sends the push notification [token] in the server.
   Future<Either<void, AppError>> sendPushNotificationToken({
     required final String token,

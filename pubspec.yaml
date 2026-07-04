@@ -59,6 +59,9 @@ dependencies:
   msal_auth: ^3.3.0
   google_fonts: ^6.2.1
   flutter_local_notifications: ^18.0.1
+  share_plus: ^13.2.0
+  in_app_review: ^2.0.12
+  firebase_analytics: ^12.4.3
 
 dev_dependencies:
   flutter_test:

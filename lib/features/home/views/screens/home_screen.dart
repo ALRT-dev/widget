@@ -20,6 +20,7 @@ import 'package:hazard_app/features/notification/extensions/remote_message_exten
 import 'package:hazard_app/features/notification/providers/manage_notifications_provider.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/providers/push_notification_message_provider.dart';
+import 'package:hazard_app/features/notification/views/widgets/notification_priming_sheet.dart';
 import 'package:hazard_app/features/notification/views/screens/notifications_screen.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
@@ -37,6 +38,8 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/repository_providers.dart';
+import 'package:hazard_app/features/shared/utils/review_prompt.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/providers/user_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
@@ -112,6 +115,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     _listenToHomeTabStateChanges();
     _listenToCreateReportState();
     _listenToTheMessageRecievedFromThePushNotification();
+    _listenToNotificationPrimingRequests();
 
     return Scaffold(
       body: Stack(
@@ -175,6 +179,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               success: (hazard) {
                 if (hazard.reviewStatus == HazardReviewStatus.accepted) {
                   _showAlrtApprovedToast();
+                  // A just-approved report is the happiest moment we have —
+                  // ask for a store review once the toast has landed.
+                  Future.delayed(const Duration(seconds: 5), () {
+                    if (!mounted) return;
+                    maybeAskForReview(
+                      prefs: ref.read(providerOfSharedPreferencesRepository),
+                    );
+                  });
                 } else if (hazard.reviewStatus == HazardReviewStatus.rejected) {
                   context.showErrorToast(
                     message:
@@ -241,6 +253,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               return;
             default:
           }
+        }
+      },
+    );
+  }
+
+  /// Shows the notification priming sheet when the home provider decides
+  /// permission should be pitched (before the OS prompt / after a deny).
+  void _listenToNotificationPrimingRequests() {
+    ref.listen(
+      providerOfHome.select((s) => s.notificationPrimingRequest),
+      (prev, next) {
+        if (next != null && prev == null) {
+          showNotificationPrimingSheet(context: context, kind: next);
         }
       },
     );

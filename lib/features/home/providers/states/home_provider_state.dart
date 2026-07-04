@@ -4,6 +4,15 @@ import 'package:hazard_app/features/shared/models/error_model.dart';
 
 part 'home_provider_state.freezed.dart';
 
+/// Why the notification priming screen should be shown.
+enum NotificationPrimingKind {
+  /// Permission has never been asked — priming precedes the OS prompt.
+  firstAsk,
+
+  /// Permission was denied before — priming deep-links to system settings.
+  previouslyDenied,
+}
+
 @freezed
 abstract class HomeProviderState with _$HomeProviderState {
   const factory HomeProviderState({
@@ -14,6 +23,10 @@ abstract class HomeProviderState with _$HomeProviderState {
     /// The state of updating user location
     @Default(UpdateUserLocationState.initial())
     final UpdateUserLocationState updateUserLocationState,
+
+    /// Set when the notification priming screen should be shown (permission
+    /// missing and the "maybe later" snooze has lapsed). Null otherwise.
+    final NotificationPrimingKind? notificationPrimingRequest,
   }) = _HomeProviderState;
 }
 
