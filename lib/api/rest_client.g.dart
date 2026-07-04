@@ -1076,12 +1076,15 @@ class _RestClient implements RestClient {
 
   @override
   Future<HttpResponse<dynamic>> updateFamilyCircle({
-    required String name,
+    String? name,
+    String? themeColor,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = {'name': name};
+    final _data = {'name': name, 'themeColor': themeColor};
+    _data.removeWhere((k, v) => v == null);
     final _options = _setStreamType<HttpResponse<dynamic>>(
       Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
@@ -1170,18 +1173,61 @@ class _RestClient implements RestClient {
   Future<HttpResponse<dynamic>> updateOwnFamilyMember({
     String? nickname,
     String? sharingLevel,
+    String? colorHex,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = {'nickname': nickname, 'sharingLevel': sharingLevel};
+    final _data = {
+      'nickname': nickname,
+      'sharingLevel': sharingLevel,
+      'colorHex': colorHex,
+    };
     _data.removeWhere((k, v) => v == null);
     final _options = _setStreamType<HttpResponse<dynamic>>(
       Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
             '/api/family/members/me',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch(_options);
+    final _value = _result.data;
+    final httpResponse = HttpResponse(_value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> updateOwnFamilyMemberPhoto({
+    required File photo,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = FormData();
+    _data.files.add(
+      MapEntry(
+        'profilePictureFile',
+        MultipartFile.fromFileSync(
+          photo.path,
+          filename: photo.path.split(Platform.pathSeparator).last,
+        ),
+      ),
+    );
+    final _options = _setStreamType<HttpResponse<dynamic>>(
+      Options(
+            method: 'PUT',
+            headers: _headers,
+            extra: _extra,
+            contentType: 'multipart/form-data',
+          )
+          .compose(
+            _dio.options,
+            '/api/family/members/me/photo',
             queryParameters: queryParameters,
             data: _data,
           )

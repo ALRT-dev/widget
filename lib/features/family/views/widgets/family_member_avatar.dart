@@ -22,9 +22,18 @@ class FamilyMemberAvatar extends StatelessWidget {
   /// Ambers the status dot when the member is near an active alert.
   final bool isNearAlert;
 
+  /// Parses "#RRGGBB"; falls back to the stable per-member palette.
+  Color _memberColor() {
+    final hex = member.colorHex;
+    if (hex != null && RegExp(r'^#[0-9a-fA-F]{6}$').hasMatch(hex)) {
+      return Color(int.parse(hex.substring(1), radix: 16) | 0xFF000000);
+    }
+    return FamilyColors.memberColor(member.id);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final color = FamilyColors.memberColor(member.id);
+    final color = _memberColor();
     final photoUrl = member.profilePictureUrl;
 
     final avatar = Container(
@@ -33,6 +42,10 @@ class FamilyMemberAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
+        // The chosen colour stays visible as a ring around the photo.
+        border: photoUrl != null && photoUrl.isNotEmpty
+            ? Border.all(color: color, width: 2)
+            : null,
         image: photoUrl != null && photoUrl.isNotEmpty
             ? DecorationImage(
                 image: CachedNetworkImageProvider(photoUrl),

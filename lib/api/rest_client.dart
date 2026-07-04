@@ -224,7 +224,8 @@ abstract class RestClient {
 
   @PUT(kUrlFamilyCircle)
   Future<HttpResponse> updateFamilyCircle({
-    @Field() required final String name,
+    @Field() final String? name,
+    @Field() final String? themeColor,
   });
 
   @DELETE(kUrlFamilyCircle)
@@ -242,6 +243,13 @@ abstract class RestClient {
   Future<HttpResponse> updateOwnFamilyMember({
     @Field() final String? nickname,
     @Field() final String? sharingLevel,
+    @Field() final String? colorHex,
+  });
+
+  @PUT(kUrlFamilyMemberMePhoto)
+  @MultiPart()
+  Future<HttpResponse> updateOwnFamilyMemberPhoto({
+    @Part(name: 'profilePictureFile') required final File photo,
   });
 
   @POST(kUrlFamilyInvites)

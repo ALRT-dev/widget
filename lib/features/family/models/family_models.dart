@@ -93,6 +93,7 @@ abstract class FamilyMember with _$FamilyMember {
     required final String userId,
     @Default('Family member') final String name,
     final String? profilePictureUrl,
+    final String? colorHex,
     @JsonKey(unknownEnumValue: FamilyRole.adult)
     @Default(FamilyRole.adult)
     final FamilyRole role,

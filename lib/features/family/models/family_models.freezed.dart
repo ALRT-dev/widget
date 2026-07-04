@@ -347,7 +347,7 @@ $FamilyCheckInRequestCopyWith<$Res>? get latestCheckInRequest {
 /// @nodoc
 mixin _$FamilyMember {
 
- String get id; String get userId; String get name; String? get profilePictureUrl;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role;@JsonKey(unknownEnumValue: FamilySharingLevel.precise) FamilySharingLevel get sharingLevel; double? get latitude; double? get longitude; String? get locationLabel; DateTime? get locationUpdatedAt; DateTime? get locationExpiresAt;@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) FamilySnapshotSource? get locationSharedVia; int? get batteryLevel; bool get isMoving; String? get currentPlaceId; DateTime? get lastCheckInAt; DateTime? get createdAt;
+ String get id; String get userId; String get name; String? get profilePictureUrl; String? get colorHex;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role;@JsonKey(unknownEnumValue: FamilySharingLevel.precise) FamilySharingLevel get sharingLevel; double? get latitude; double? get longitude; String? get locationLabel; DateTime? get locationUpdatedAt; DateTime? get locationExpiresAt;@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) FamilySnapshotSource? get locationSharedVia; int? get batteryLevel; bool get isMoving; String? get currentPlaceId; DateTime? get lastCheckInAt; DateTime? get createdAt;
 /// Create a copy of FamilyMember
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -360,16 +360,16 @@ $FamilyMemberCopyWith<FamilyMember> get copyWith => _$FamilyMemberCopyWithImpl<F
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyMember&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.role, role) || other.role == role)&&(identical(other.sharingLevel, sharingLevel) || other.sharingLevel == sharingLevel)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.locationLabel, locationLabel) || other.locationLabel == locationLabel)&&(identical(other.locationUpdatedAt, locationUpdatedAt) || other.locationUpdatedAt == locationUpdatedAt)&&(identical(other.locationExpiresAt, locationExpiresAt) || other.locationExpiresAt == locationExpiresAt)&&(identical(other.locationSharedVia, locationSharedVia) || other.locationSharedVia == locationSharedVia)&&(identical(other.batteryLevel, batteryLevel) || other.batteryLevel == batteryLevel)&&(identical(other.isMoving, isMoving) || other.isMoving == isMoving)&&(identical(other.currentPlaceId, currentPlaceId) || other.currentPlaceId == currentPlaceId)&&(identical(other.lastCheckInAt, lastCheckInAt) || other.lastCheckInAt == lastCheckInAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyMember&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.colorHex, colorHex) || other.colorHex == colorHex)&&(identical(other.role, role) || other.role == role)&&(identical(other.sharingLevel, sharingLevel) || other.sharingLevel == sharingLevel)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.locationLabel, locationLabel) || other.locationLabel == locationLabel)&&(identical(other.locationUpdatedAt, locationUpdatedAt) || other.locationUpdatedAt == locationUpdatedAt)&&(identical(other.locationExpiresAt, locationExpiresAt) || other.locationExpiresAt == locationExpiresAt)&&(identical(other.locationSharedVia, locationSharedVia) || other.locationSharedVia == locationSharedVia)&&(identical(other.batteryLevel, batteryLevel) || other.batteryLevel == batteryLevel)&&(identical(other.isMoving, isMoving) || other.isMoving == isMoving)&&(identical(other.currentPlaceId, currentPlaceId) || other.currentPlaceId == currentPlaceId)&&(identical(other.lastCheckInAt, lastCheckInAt) || other.lastCheckInAt == lastCheckInAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,name,profilePictureUrl,role,sharingLevel,latitude,longitude,locationLabel,locationUpdatedAt,locationExpiresAt,locationSharedVia,batteryLevel,isMoving,currentPlaceId,lastCheckInAt,createdAt);
+int get hashCode => Object.hash(runtimeType,id,userId,name,profilePictureUrl,colorHex,role,sharingLevel,latitude,longitude,locationLabel,locationUpdatedAt,locationExpiresAt,locationSharedVia,batteryLevel,isMoving,currentPlaceId,lastCheckInAt,createdAt);
 
 @override
 String toString() {
-  return 'FamilyMember(id: $id, userId: $userId, name: $name, profilePictureUrl: $profilePictureUrl, role: $role, sharingLevel: $sharingLevel, latitude: $latitude, longitude: $longitude, locationLabel: $locationLabel, locationUpdatedAt: $locationUpdatedAt, locationExpiresAt: $locationExpiresAt, locationSharedVia: $locationSharedVia, batteryLevel: $batteryLevel, isMoving: $isMoving, currentPlaceId: $currentPlaceId, lastCheckInAt: $lastCheckInAt, createdAt: $createdAt)';
+  return 'FamilyMember(id: $id, userId: $userId, name: $name, profilePictureUrl: $profilePictureUrl, colorHex: $colorHex, role: $role, sharingLevel: $sharingLevel, latitude: $latitude, longitude: $longitude, locationLabel: $locationLabel, locationUpdatedAt: $locationUpdatedAt, locationExpiresAt: $locationExpiresAt, locationSharedVia: $locationSharedVia, batteryLevel: $batteryLevel, isMoving: $isMoving, currentPlaceId: $currentPlaceId, lastCheckInAt: $lastCheckInAt, createdAt: $createdAt)';
 }
 
 
@@ -380,7 +380,7 @@ abstract mixin class $FamilyMemberCopyWith<$Res>  {
   factory $FamilyMemberCopyWith(FamilyMember value, $Res Function(FamilyMember) _then) = _$FamilyMemberCopyWithImpl;
 @useResult
 $Res call({
- String id, String userId, String name, String? profilePictureUrl,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role,@JsonKey(unknownEnumValue: FamilySharingLevel.precise) FamilySharingLevel sharingLevel, double? latitude, double? longitude, String? locationLabel, DateTime? locationUpdatedAt, DateTime? locationExpiresAt,@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) FamilySnapshotSource? locationSharedVia, int? batteryLevel, bool isMoving, String? currentPlaceId, DateTime? lastCheckInAt, DateTime? createdAt
+ String id, String userId, String name, String? profilePictureUrl, String? colorHex,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role,@JsonKey(unknownEnumValue: FamilySharingLevel.precise) FamilySharingLevel sharingLevel, double? latitude, double? longitude, String? locationLabel, DateTime? locationUpdatedAt, DateTime? locationExpiresAt,@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) FamilySnapshotSource? locationSharedVia, int? batteryLevel, bool isMoving, String? currentPlaceId, DateTime? lastCheckInAt, DateTime? createdAt
 });
 
 
@@ -397,12 +397,13 @@ class _$FamilyMemberCopyWithImpl<$Res>
 
 /// Create a copy of FamilyMember
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? name = null,Object? profilePictureUrl = freezed,Object? role = null,Object? sharingLevel = null,Object? latitude = freezed,Object? longitude = freezed,Object? locationLabel = freezed,Object? locationUpdatedAt = freezed,Object? locationExpiresAt = freezed,Object? locationSharedVia = freezed,Object? batteryLevel = freezed,Object? isMoving = null,Object? currentPlaceId = freezed,Object? lastCheckInAt = freezed,Object? createdAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? name = null,Object? profilePictureUrl = freezed,Object? colorHex = freezed,Object? role = null,Object? sharingLevel = null,Object? latitude = freezed,Object? longitude = freezed,Object? locationLabel = freezed,Object? locationUpdatedAt = freezed,Object? locationExpiresAt = freezed,Object? locationSharedVia = freezed,Object? batteryLevel = freezed,Object? isMoving = null,Object? currentPlaceId = freezed,Object? lastCheckInAt = freezed,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+as String?,colorHex: freezed == colorHex ? _self.colorHex : colorHex // ignore: cast_nullable_to_non_nullable
 as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as FamilyRole,sharingLevel: null == sharingLevel ? _self.sharingLevel : sharingLevel // ignore: cast_nullable_to_non_nullable
 as FamilySharingLevel,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
@@ -501,10 +502,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String name,  String? profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role, @JsonKey(unknownEnumValue: FamilySharingLevel.precise)  FamilySharingLevel sharingLevel,  double? latitude,  double? longitude,  String? locationLabel,  DateTime? locationUpdatedAt,  DateTime? locationExpiresAt, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  FamilySnapshotSource? locationSharedVia,  int? batteryLevel,  bool isMoving,  String? currentPlaceId,  DateTime? lastCheckInAt,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String name,  String? profilePictureUrl,  String? colorHex, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role, @JsonKey(unknownEnumValue: FamilySharingLevel.precise)  FamilySharingLevel sharingLevel,  double? latitude,  double? longitude,  String? locationLabel,  DateTime? locationUpdatedAt,  DateTime? locationExpiresAt, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  FamilySnapshotSource? locationSharedVia,  int? batteryLevel,  bool isMoving,  String? currentPlaceId,  DateTime? lastCheckInAt,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FamilyMember() when $default != null:
-return $default(_that.id,_that.userId,_that.name,_that.profilePictureUrl,_that.role,_that.sharingLevel,_that.latitude,_that.longitude,_that.locationLabel,_that.locationUpdatedAt,_that.locationExpiresAt,_that.locationSharedVia,_that.batteryLevel,_that.isMoving,_that.currentPlaceId,_that.lastCheckInAt,_that.createdAt);case _:
+return $default(_that.id,_that.userId,_that.name,_that.profilePictureUrl,_that.colorHex,_that.role,_that.sharingLevel,_that.latitude,_that.longitude,_that.locationLabel,_that.locationUpdatedAt,_that.locationExpiresAt,_that.locationSharedVia,_that.batteryLevel,_that.isMoving,_that.currentPlaceId,_that.lastCheckInAt,_that.createdAt);case _:
   return orElse();
 
 }
@@ -522,10 +523,10 @@ return $default(_that.id,_that.userId,_that.name,_that.profilePictureUrl,_that.r
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String name,  String? profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role, @JsonKey(unknownEnumValue: FamilySharingLevel.precise)  FamilySharingLevel sharingLevel,  double? latitude,  double? longitude,  String? locationLabel,  DateTime? locationUpdatedAt,  DateTime? locationExpiresAt, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  FamilySnapshotSource? locationSharedVia,  int? batteryLevel,  bool isMoving,  String? currentPlaceId,  DateTime? lastCheckInAt,  DateTime? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String name,  String? profilePictureUrl,  String? colorHex, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role, @JsonKey(unknownEnumValue: FamilySharingLevel.precise)  FamilySharingLevel sharingLevel,  double? latitude,  double? longitude,  String? locationLabel,  DateTime? locationUpdatedAt,  DateTime? locationExpiresAt, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  FamilySnapshotSource? locationSharedVia,  int? batteryLevel,  bool isMoving,  String? currentPlaceId,  DateTime? lastCheckInAt,  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _FamilyMember():
-return $default(_that.id,_that.userId,_that.name,_that.profilePictureUrl,_that.role,_that.sharingLevel,_that.latitude,_that.longitude,_that.locationLabel,_that.locationUpdatedAt,_that.locationExpiresAt,_that.locationSharedVia,_that.batteryLevel,_that.isMoving,_that.currentPlaceId,_that.lastCheckInAt,_that.createdAt);case _:
+return $default(_that.id,_that.userId,_that.name,_that.profilePictureUrl,_that.colorHex,_that.role,_that.sharingLevel,_that.latitude,_that.longitude,_that.locationLabel,_that.locationUpdatedAt,_that.locationExpiresAt,_that.locationSharedVia,_that.batteryLevel,_that.isMoving,_that.currentPlaceId,_that.lastCheckInAt,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -542,10 +543,10 @@ return $default(_that.id,_that.userId,_that.name,_that.profilePictureUrl,_that.r
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String name,  String? profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role, @JsonKey(unknownEnumValue: FamilySharingLevel.precise)  FamilySharingLevel sharingLevel,  double? latitude,  double? longitude,  String? locationLabel,  DateTime? locationUpdatedAt,  DateTime? locationExpiresAt, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  FamilySnapshotSource? locationSharedVia,  int? batteryLevel,  bool isMoving,  String? currentPlaceId,  DateTime? lastCheckInAt,  DateTime? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String name,  String? profilePictureUrl,  String? colorHex, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role, @JsonKey(unknownEnumValue: FamilySharingLevel.precise)  FamilySharingLevel sharingLevel,  double? latitude,  double? longitude,  String? locationLabel,  DateTime? locationUpdatedAt,  DateTime? locationExpiresAt, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  FamilySnapshotSource? locationSharedVia,  int? batteryLevel,  bool isMoving,  String? currentPlaceId,  DateTime? lastCheckInAt,  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FamilyMember() when $default != null:
-return $default(_that.id,_that.userId,_that.name,_that.profilePictureUrl,_that.role,_that.sharingLevel,_that.latitude,_that.longitude,_that.locationLabel,_that.locationUpdatedAt,_that.locationExpiresAt,_that.locationSharedVia,_that.batteryLevel,_that.isMoving,_that.currentPlaceId,_that.lastCheckInAt,_that.createdAt);case _:
+return $default(_that.id,_that.userId,_that.name,_that.profilePictureUrl,_that.colorHex,_that.role,_that.sharingLevel,_that.latitude,_that.longitude,_that.locationLabel,_that.locationUpdatedAt,_that.locationExpiresAt,_that.locationSharedVia,_that.batteryLevel,_that.isMoving,_that.currentPlaceId,_that.lastCheckInAt,_that.createdAt);case _:
   return null;
 
 }
@@ -557,13 +558,14 @@ return $default(_that.id,_that.userId,_that.name,_that.profilePictureUrl,_that.r
 @JsonSerializable()
 
 class _FamilyMember extends FamilyMember {
-  const _FamilyMember({required this.id, required this.userId, this.name = 'Family member', this.profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult) this.role = FamilyRole.adult, @JsonKey(unknownEnumValue: FamilySharingLevel.precise) this.sharingLevel = FamilySharingLevel.precise, this.latitude, this.longitude, this.locationLabel, this.locationUpdatedAt, this.locationExpiresAt, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) this.locationSharedVia, this.batteryLevel, this.isMoving = false, this.currentPlaceId, this.lastCheckInAt, this.createdAt}): super._();
+  const _FamilyMember({required this.id, required this.userId, this.name = 'Family member', this.profilePictureUrl, this.colorHex, @JsonKey(unknownEnumValue: FamilyRole.adult) this.role = FamilyRole.adult, @JsonKey(unknownEnumValue: FamilySharingLevel.precise) this.sharingLevel = FamilySharingLevel.precise, this.latitude, this.longitude, this.locationLabel, this.locationUpdatedAt, this.locationExpiresAt, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) this.locationSharedVia, this.batteryLevel, this.isMoving = false, this.currentPlaceId, this.lastCheckInAt, this.createdAt}): super._();
   factory _FamilyMember.fromJson(Map<String, dynamic> json) => _$FamilyMemberFromJson(json);
 
 @override final  String id;
 @override final  String userId;
 @override@JsonKey() final  String name;
 @override final  String? profilePictureUrl;
+@override final  String? colorHex;
 @override@JsonKey(unknownEnumValue: FamilyRole.adult) final  FamilyRole role;
 @override@JsonKey(unknownEnumValue: FamilySharingLevel.precise) final  FamilySharingLevel sharingLevel;
 @override final  double? latitude;
@@ -591,16 +593,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyMember&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.role, role) || other.role == role)&&(identical(other.sharingLevel, sharingLevel) || other.sharingLevel == sharingLevel)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.locationLabel, locationLabel) || other.locationLabel == locationLabel)&&(identical(other.locationUpdatedAt, locationUpdatedAt) || other.locationUpdatedAt == locationUpdatedAt)&&(identical(other.locationExpiresAt, locationExpiresAt) || other.locationExpiresAt == locationExpiresAt)&&(identical(other.locationSharedVia, locationSharedVia) || other.locationSharedVia == locationSharedVia)&&(identical(other.batteryLevel, batteryLevel) || other.batteryLevel == batteryLevel)&&(identical(other.isMoving, isMoving) || other.isMoving == isMoving)&&(identical(other.currentPlaceId, currentPlaceId) || other.currentPlaceId == currentPlaceId)&&(identical(other.lastCheckInAt, lastCheckInAt) || other.lastCheckInAt == lastCheckInAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyMember&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.colorHex, colorHex) || other.colorHex == colorHex)&&(identical(other.role, role) || other.role == role)&&(identical(other.sharingLevel, sharingLevel) || other.sharingLevel == sharingLevel)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.locationLabel, locationLabel) || other.locationLabel == locationLabel)&&(identical(other.locationUpdatedAt, locationUpdatedAt) || other.locationUpdatedAt == locationUpdatedAt)&&(identical(other.locationExpiresAt, locationExpiresAt) || other.locationExpiresAt == locationExpiresAt)&&(identical(other.locationSharedVia, locationSharedVia) || other.locationSharedVia == locationSharedVia)&&(identical(other.batteryLevel, batteryLevel) || other.batteryLevel == batteryLevel)&&(identical(other.isMoving, isMoving) || other.isMoving == isMoving)&&(identical(other.currentPlaceId, currentPlaceId) || other.currentPlaceId == currentPlaceId)&&(identical(other.lastCheckInAt, lastCheckInAt) || other.lastCheckInAt == lastCheckInAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,userId,name,profilePictureUrl,role,sharingLevel,latitude,longitude,locationLabel,locationUpdatedAt,locationExpiresAt,locationSharedVia,batteryLevel,isMoving,currentPlaceId,lastCheckInAt,createdAt);
+int get hashCode => Object.hash(runtimeType,id,userId,name,profilePictureUrl,colorHex,role,sharingLevel,latitude,longitude,locationLabel,locationUpdatedAt,locationExpiresAt,locationSharedVia,batteryLevel,isMoving,currentPlaceId,lastCheckInAt,createdAt);
 
 @override
 String toString() {
-  return 'FamilyMember(id: $id, userId: $userId, name: $name, profilePictureUrl: $profilePictureUrl, role: $role, sharingLevel: $sharingLevel, latitude: $latitude, longitude: $longitude, locationLabel: $locationLabel, locationUpdatedAt: $locationUpdatedAt, locationExpiresAt: $locationExpiresAt, locationSharedVia: $locationSharedVia, batteryLevel: $batteryLevel, isMoving: $isMoving, currentPlaceId: $currentPlaceId, lastCheckInAt: $lastCheckInAt, createdAt: $createdAt)';
+  return 'FamilyMember(id: $id, userId: $userId, name: $name, profilePictureUrl: $profilePictureUrl, colorHex: $colorHex, role: $role, sharingLevel: $sharingLevel, latitude: $latitude, longitude: $longitude, locationLabel: $locationLabel, locationUpdatedAt: $locationUpdatedAt, locationExpiresAt: $locationExpiresAt, locationSharedVia: $locationSharedVia, batteryLevel: $batteryLevel, isMoving: $isMoving, currentPlaceId: $currentPlaceId, lastCheckInAt: $lastCheckInAt, createdAt: $createdAt)';
 }
 
 
@@ -611,7 +613,7 @@ abstract mixin class _$FamilyMemberCopyWith<$Res> implements $FamilyMemberCopyWi
   factory _$FamilyMemberCopyWith(_FamilyMember value, $Res Function(_FamilyMember) _then) = __$FamilyMemberCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String userId, String name, String? profilePictureUrl,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role,@JsonKey(unknownEnumValue: FamilySharingLevel.precise) FamilySharingLevel sharingLevel, double? latitude, double? longitude, String? locationLabel, DateTime? locationUpdatedAt, DateTime? locationExpiresAt,@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) FamilySnapshotSource? locationSharedVia, int? batteryLevel, bool isMoving, String? currentPlaceId, DateTime? lastCheckInAt, DateTime? createdAt
+ String id, String userId, String name, String? profilePictureUrl, String? colorHex,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role,@JsonKey(unknownEnumValue: FamilySharingLevel.precise) FamilySharingLevel sharingLevel, double? latitude, double? longitude, String? locationLabel, DateTime? locationUpdatedAt, DateTime? locationExpiresAt,@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) FamilySnapshotSource? locationSharedVia, int? batteryLevel, bool isMoving, String? currentPlaceId, DateTime? lastCheckInAt, DateTime? createdAt
 });
 
 
@@ -628,12 +630,13 @@ class __$FamilyMemberCopyWithImpl<$Res>
 
 /// Create a copy of FamilyMember
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? name = null,Object? profilePictureUrl = freezed,Object? role = null,Object? sharingLevel = null,Object? latitude = freezed,Object? longitude = freezed,Object? locationLabel = freezed,Object? locationUpdatedAt = freezed,Object? locationExpiresAt = freezed,Object? locationSharedVia = freezed,Object? batteryLevel = freezed,Object? isMoving = null,Object? currentPlaceId = freezed,Object? lastCheckInAt = freezed,Object? createdAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? name = null,Object? profilePictureUrl = freezed,Object? colorHex = freezed,Object? role = null,Object? sharingLevel = null,Object? latitude = freezed,Object? longitude = freezed,Object? locationLabel = freezed,Object? locationUpdatedAt = freezed,Object? locationExpiresAt = freezed,Object? locationSharedVia = freezed,Object? batteryLevel = freezed,Object? isMoving = null,Object? currentPlaceId = freezed,Object? lastCheckInAt = freezed,Object? createdAt = freezed,}) {
   return _then(_FamilyMember(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+as String?,colorHex: freezed == colorHex ? _self.colorHex : colorHex // ignore: cast_nullable_to_non_nullable
 as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as FamilyRole,sharingLevel: null == sharingLevel ? _self.sharingLevel : sharingLevel // ignore: cast_nullable_to_non_nullable
 as FamilySharingLevel,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable

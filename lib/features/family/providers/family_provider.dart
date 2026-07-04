@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -314,6 +315,66 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
         state = state.copyWith(
           memberUpdateState: FamilyActionState.error(error),
         );
+      },
+    );
+  }
+
+  /// Updates the member's circle profile (nickname and/or accent colour).
+  Future<bool> updateMyProfile({
+    final String? nickname,
+    final String? colorHex,
+  }) async {
+    state = state.copyWith(
+      memberUpdateState: const FamilyActionState.loading(),
+    );
+
+    final result = await _familyService.updateOwnFamilyMember(
+      nickname: nickname,
+      colorHex: colorHex,
+    );
+    if (!mounted) return false;
+
+    return result.when(
+      (_) {
+        state = state.copyWith(
+          memberUpdateState: const FamilyActionState.success(),
+        );
+        load(silent: true);
+        return true;
+      },
+      (error) {
+        state = state.copyWith(
+          memberUpdateState: FamilyActionState.error(error),
+        );
+        return false;
+      },
+    );
+  }
+
+  /// Uploads a circle-specific photo for the member.
+  Future<bool> updateMyPhoto(final File photo) async {
+    state = state.copyWith(
+      memberUpdateState: const FamilyActionState.loading(),
+    );
+
+    final result = await _familyService.updateOwnFamilyMemberPhoto(
+      photo: photo,
+    );
+    if (!mounted) return false;
+
+    return result.when(
+      (_) {
+        state = state.copyWith(
+          memberUpdateState: const FamilyActionState.success(),
+        );
+        load(silent: true);
+        return true;
+      },
+      (error) {
+        state = state.copyWith(
+          memberUpdateState: FamilyActionState.error(error),
+        );
+        return false;
       },
     );
   }

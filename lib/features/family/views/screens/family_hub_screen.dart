@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/providers/states/family_provider_state.dart';
+import 'package:hazard_app/features/family/views/screens/family_circle_profile_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_invite_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_places_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_sharing_level_screen.dart';
@@ -208,6 +209,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
             context.push(FamilyInviteScreen.route);
           case 'sharing':
             context.push(FamilySharingLevelScreen.route);
+          case 'profile':
+            context.push(FamilyCircleProfileScreen.route);
           case 'leave':
             _confirmLeaveOrDelete(isOwner: isOwner);
         }
@@ -216,6 +219,7 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         const PopupMenuItem(value: 'places', child: Text('Places')),
         const PopupMenuItem(value: 'invite', child: Text('Invite members')),
         const PopupMenuItem(value: 'sharing', child: Text('My sharing level')),
+        const PopupMenuItem(value: 'profile', child: Text('My circle profile')),
         PopupMenuItem(
           value: 'leave',
           child: Text(

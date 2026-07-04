@@ -83,6 +83,7 @@ const kUrlFamilyCircle = '$kUrlFamily/circle';
 const kUrlFamilyCircleLeave = '$kUrlFamilyCircle/leave';
 const kUrlFamilyMembers = '$kUrlFamily/members';
 const kUrlFamilyMemberMe = '$kUrlFamilyMembers/me';
+const kUrlFamilyMemberMePhoto = '$kUrlFamilyMemberMe/photo';
 const kUrlFamilyInvites = '$kUrlFamily/invites';
 const kUrlFamilyInviteRevoke = '$kUrlFamilyInvites/{inviteId}/revoke';
 const kUrlFamilyJoin = '$kUrlFamily/join';

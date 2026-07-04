@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/repositories/family_repository.dart';
@@ -27,9 +29,13 @@ class FamilyService {
   }
 
   Future<Either<void, AppError>> updateFamilyCircle({
-    required final String name,
+    final String? name,
+    final String? themeColor,
   }) {
-    return _familyRepository.updateFamilyCircle(name: name);
+    return _familyRepository.updateFamilyCircle(
+      name: name,
+      themeColor: themeColor,
+    );
   }
 
   Future<Either<void, AppError>> deleteFamilyCircle() {
@@ -49,11 +55,19 @@ class FamilyService {
   Future<Either<void, AppError>> updateOwnFamilyMember({
     final String? nickname,
     final FamilySharingLevel? sharingLevel,
+    final String? colorHex,
   }) {
     return _familyRepository.updateOwnFamilyMember(
       nickname: nickname,
       sharingLevel: sharingLevel,
+      colorHex: colorHex,
     );
+  }
+
+  Future<Either<void, AppError>> updateOwnFamilyMemberPhoto({
+    required final File photo,
+  }) {
+    return _familyRepository.updateOwnFamilyMemberPhoto(photo: photo);
   }
 
   Future<Either<FamilyInvite, AppError>> createFamilyInvite() {

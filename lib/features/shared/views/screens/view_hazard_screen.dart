@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/family/views/widgets/family_safe_strip.dart';
 import 'package:hazard_app/features/learn/views/widgets/guide_strip_card.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
@@ -1126,6 +1127,16 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                             ),
                           );
                           return GuideStripCard(categoryId: categoryId);
+                        },
+                      ),
+                      // One-tap "I'm safe" for family circle members.
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final hazard = ref.watch(
+                            provider.select((value) => value.hazard),
+                          );
+                          if (hazard == null) return const SizedBox.shrink();
+                          return FamilySafeStrip(hazard: hazard);
                         },
                       ),
                     ],

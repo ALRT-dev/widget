@@ -59,6 +59,7 @@ _FamilyMember _$FamilyMemberFromJson(Map<String, dynamic> json) =>
       userId: json['userId'] as String,
       name: json['name'] as String? ?? 'Family member',
       profilePictureUrl: json['profilePictureUrl'] as String?,
+      colorHex: json['colorHex'] as String?,
       role:
           $enumDecodeNullable(
             _$FamilyRoleEnumMap,
@@ -104,6 +105,7 @@ Map<String, dynamic> _$FamilyMemberToJson(_FamilyMember instance) =>
       'userId': instance.userId,
       'name': instance.name,
       'profilePictureUrl': ?instance.profilePictureUrl,
+      'colorHex': ?instance.colorHex,
       'role': _$FamilyRoleEnumMap[instance.role]!,
       'sharingLevel': _$FamilySharingLevelEnumMap[instance.sharingLevel]!,
       'latitude': ?instance.latitude,

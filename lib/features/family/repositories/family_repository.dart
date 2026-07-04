@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
@@ -22,7 +23,8 @@ abstract class FamilyRepository {
   });
 
   Future<Either<void, AppError>> updateFamilyCircle({
-    required final String name,
+    final String? name,
+    final String? themeColor,
   });
 
   Future<Either<void, AppError>> deleteFamilyCircle();
@@ -36,6 +38,11 @@ abstract class FamilyRepository {
   Future<Either<void, AppError>> updateOwnFamilyMember({
     final String? nickname,
     final FamilySharingLevel? sharingLevel,
+    final String? colorHex,
+  });
+
+  Future<Either<void, AppError>> updateOwnFamilyMemberPhoto({
+    required final File photo,
   });
 
   Future<Either<FamilyInvite, AppError>> createFamilyInvite();
@@ -179,11 +186,14 @@ class FamilyRepositoryImpl implements FamilyRepository {
   }
 
   @override
-  Future<Either<void, AppError>> updateFamilyCircle({required String name}) {
+  Future<Either<void, AppError>> updateFamilyCircle({
+    String? name,
+    String? themeColor,
+  }) {
     return runAsyncCall(
       name: 'updateFamilyCircle',
       future: () async {
-        await _restClient.updateFamilyCircle(name: name);
+        await _restClient.updateFamilyCircle(name: name, themeColor: themeColor);
         return const Success(null);
       },
       onError: Failure.new,
@@ -232,6 +242,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
   Future<Either<void, AppError>> updateOwnFamilyMember({
     String? nickname,
     FamilySharingLevel? sharingLevel,
+    String? colorHex,
   }) {
     return runAsyncCall(
       name: 'updateOwnFamilyMember',
@@ -239,7 +250,22 @@ class FamilyRepositoryImpl implements FamilyRepository {
         await _restClient.updateOwnFamilyMember(
           nickname: nickname,
           sharingLevel: sharingLevel?.name,
+          colorHex: colorHex,
         );
+        return const Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> updateOwnFamilyMemberPhoto({
+    required File photo,
+  }) {
+    return runAsyncCall(
+      name: 'updateOwnFamilyMemberPhoto',
+      future: () async {
+        await _restClient.updateOwnFamilyMemberPhoto(photo: photo);
         return const Success(null);
       },
       onError: Failure.new,
