@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/learn/views/widgets/guide_strip_card.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
@@ -1079,6 +1080,17 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                           ),
                         );
                       }),
+                      // Deep link into the matching safety guide, if any.
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final categoryId = ref.watch(
+                            provider.select(
+                              (value) => value.hazard?.category?.id,
+                            ),
+                          );
+                          return GuideStripCard(categoryId: categoryId);
+                        },
+                      ),
                     ],
                   ),
                 ),

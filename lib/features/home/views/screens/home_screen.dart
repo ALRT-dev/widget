@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/family/providers/family_provider.dart';
+import 'package:hazard_app/features/family/views/screens/family_tab_view.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_provider.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
@@ -123,7 +125,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 const HazardSearchScreen(),
                 const CreateUpdateReportScreen(),
                 const NotificationsScreen(),
-                const _FamilyTabPlaceholder(),
+                const FamilyTabView(),
                 const ProfileScreen(),
               ],
             ).pB(HomeTabbar.height - 20.0),
@@ -208,6 +210,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               return _gotoViewHazardScreen(
                 Hazard.fromJson(remoteMessage.payload),
               );
+            case PushNotificationType.familyHazardProximity:
+              // Payload carries the hazard near the family member/place.
+              return _gotoViewHazardScreen(
+                Hazard.fromJson(remoteMessage.payload),
+              );
+            case PushNotificationType.familyCheckIn:
+            case PushNotificationType.familyCheckInRequest:
+            case PushNotificationType.familyPlaceEvent:
+            case PushNotificationType.familySos:
+            case PushNotificationType.familySosResponse:
+            case PushNotificationType.familySosResolved:
+            case PushNotificationType.familyCircleUpdate:
+              // Land on the family hub with fresh data.
+              ref.read(providerOfFamily.notifier).load(silent: true);
+              ref.read(providerOfHomeTab.notifier).state = HomeTab.family;
+              return;
             default:
           }
         }
@@ -248,15 +266,5 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ViewHazardScreen.route,
       extra: ViewHazardScreenArgs(hazard: hazard),
     );
-  }
-}
-
-/// Placeholder for the Family tab while the family feature wires in.
-class _FamilyTabPlaceholder extends StatelessWidget {
-  const _FamilyTabPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator());
   }
 }

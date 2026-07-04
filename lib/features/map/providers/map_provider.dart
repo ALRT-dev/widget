@@ -21,6 +21,8 @@ import 'package:hazard_app/features/map/providers/states/hazard_markers_bitmaps_
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
 import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
+import 'package:hazard_app/features/family/providers/family_provider.dart';
+import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 import 'package:hazard_app/features/map/utils/hazard_cluster_util.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
@@ -83,6 +85,19 @@ class MapProvider extends StateNotifier<MapProviderState> {
         ),
         zoom: 14.0,
       ),
+    );
+
+    // Re-render markers when family members' live locations move so their
+    // avatar pins track in real time.
+    _ref.listen(
+      providerOfFamily.select(
+        (s) => s.circle?.members
+            .map((m) => '${m.id}:${m.latitude},${m.longitude}')
+            .join('|'),
+      ),
+      (prev, next) {
+        if (prev != next && state.isMapReady) generateMarkers();
+      },
     );
 
     _ref.onDispose(() {
@@ -1005,6 +1020,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
       }
     }
 
+    // Family members with live locations render as avatar pins.
+    final familyMarkers = await _generateFamilyMemberMarkers();
+
     // Preserve non-hazard markers
     final selectedPlaceMarker = state.markers.firstWhereOrNull(
       (marker) => marker.markerId.value == 'selected_location',
@@ -1018,12 +1036,87 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     final allMarkers = <Marker>{
       ...individualMarkers,
+      ...familyMarkers,
       if (selectedPlaceMarker != null) selectedPlaceMarker,
       ...routeLabelMarkers,
       if (currentUserLocationMarker != null) currentUserLocationMarker,
     };
 
     updateMarkers(allMarkers);
+  }
+
+  /// Cache of member avatar pin bitmaps keyed by member id + initials.
+  final Map<String, BitmapDescriptor> _familyPinBitmapCache = {};
+
+  /// Builds avatar pins for family members currently sharing a location
+  /// (other than the user themself).
+  Future<List<Marker>> _generateFamilyMemberMarkers() async {
+    try {
+      final familyState = _ref.read(providerOfFamily);
+      final circle = familyState.circle;
+      if (circle == null) return const [];
+
+      final markers = <Marker>[];
+      for (final member in circle.others) {
+        if (!member.hasLiveLocation) continue;
+
+        final cacheKey = '${member.id}_${member.initials}';
+        var bitmap = _familyPinBitmapCache[cacheKey];
+        if (bitmap == null) {
+          final color = FamilyColors.memberColor(member.id);
+          const size = 44.0;
+          final widget = Container(
+            width: size,
+            height: size,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.white, width: 3),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x40000000),
+                  blurRadius: 5,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              member.initials,
+              style: const TextStyle(
+                color: AppColors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                decoration: TextDecoration.none,
+              ),
+            ),
+          );
+          bitmap = await widget.toBitmapDescriptor(
+            logicalSize: const Size(size, size),
+            imageSize: const Size(size * 2.5, size * 2.5),
+          );
+          _familyPinBitmapCache[cacheKey] = bitmap;
+        }
+
+        markers.add(
+          Marker(
+            markerId: MarkerId('family_${member.id}'),
+            position: LatLng(member.latitude!, member.longitude!),
+            icon: bitmap,
+            zIndexInt: 2, // keep family pins above hazard markers
+            anchor: const Offset(0.5, 0.5),
+            infoWindow: InfoWindow(
+              title: member.name,
+              snippet: member.locationLabel,
+            ),
+          ),
+        );
+      }
+      return markers;
+    } catch (_) {
+      // The family layer must never break hazard rendering.
+      return const [];
+    }
   }
 
   void _onIndividualMarkerTap({

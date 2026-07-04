@@ -2,7 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/views/screens/auth_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_invite_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_place_edit_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_places_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_sharing_level_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_sos_receiver_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_sos_screen.dart';
 import 'package:hazard_app/features/home/views/screens/home_screen.dart';
+import 'package:hazard_app/features/learn/views/screens/guide_detail_screen.dart';
+import 'package:hazard_app/features/learn/views/screens/learn_topics_screen.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
 import 'package:hazard_app/features/map/views/screens/navigation_screen.dart';
@@ -146,6 +154,46 @@ class AppRouter {
           builder: (context, state) {
             return const NavigationScreen();
           },
+        ),
+        // ------------------------- FAMILY MODE -------------------------
+        GoRoute(
+          path: FamilyInviteScreen.route,
+          builder: (context, state) => const FamilyInviteScreen(),
+        ),
+        GoRoute(
+          path: FamilyPlacesScreen.route,
+          builder: (context, state) => const FamilyPlacesScreen(),
+        ),
+        GoRoute(
+          path: FamilyPlaceEditScreen.route,
+          builder: (context, state) => FamilyPlaceEditScreen(
+            args: state.extra as FamilyPlaceEditScreenArgs?,
+          ),
+        ),
+        GoRoute(
+          path: FamilySharingLevelScreen.route,
+          builder: (context, state) => const FamilySharingLevelScreen(),
+        ),
+        GoRoute(
+          path: FamilySosScreen.route,
+          builder: (context, state) => const FamilySosScreen(),
+        ),
+        GoRoute(
+          path: FamilySosReceiverScreen.route,
+          builder: (context, state) => FamilySosReceiverScreen(
+            args: state.extra as FamilySosReceiverScreenArgs,
+          ),
+        ),
+        // ------------------------- LEARN HUB -------------------------
+        GoRoute(
+          path: LearnTopicsScreen.route,
+          builder: (context, state) => const LearnTopicsScreen(),
+        ),
+        GoRoute(
+          path: GuideDetailScreen.route,
+          builder: (context, state) => GuideDetailScreen(
+            args: state.extra as GuideDetailScreenArgs,
+          ),
         ),
         GoRoute(
           path: ViewHazardScreen.route,
