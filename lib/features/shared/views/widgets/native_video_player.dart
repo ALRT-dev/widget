@@ -111,7 +111,6 @@ class NativeVideoPlayerState extends ConsumerState<NativeVideoPlayer> {
             IgnorePointer(
               child: NativeVideoPlayerView(
                 onViewReady: _onControllerReady,
-                fit: BoxFit.cover,
               ),
             ),
             if (_initializedVideoInfo == null)
@@ -274,7 +273,7 @@ class NativeVideoPlayerState extends ConsumerState<NativeVideoPlayer> {
       _playVideoIfHighestPriority();
     }
 
-    final videoInfo = await _controller?.getVideoInfo();
+    final videoInfo = _controller?.videoInfo;
     if (!mounted) return;
     setState(() {
       _initializedVideoInfo = videoInfo;

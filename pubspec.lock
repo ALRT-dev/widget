@@ -1152,9 +1152,11 @@ packages:
   native_video_player:
     dependency: "direct main"
     description:
-      path: "/Users/shrijanregmi/Projects/Flutter/native_video_player"
-      relative: false
-    source: path
+      path: "."
+      ref: "72696497020dac9bad6d8be212ed12bb3648dc46"
+      resolved-ref: "72696497020dac9bad6d8be212ed12bb3648dc46"
+      url: "https://github.com/shrijanRegmi/native_video_player.git"
+    source: git
     version: "4.0.0"
   nm:
     dependency: transitive
