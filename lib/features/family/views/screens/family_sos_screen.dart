@@ -8,7 +8,7 @@ import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// Hold-to-send Family SOS. Sends live location + SOS to the circle only —
+/// Hold-to-send Family SOS. Sends a location snapshot + SOS to the circle only —
 /// ALRT never contacts authorities, and the screen says so with 000 one tap
 /// away the whole time.
 class FamilySosScreen extends ConsumerStatefulWidget {
@@ -97,9 +97,10 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
               SizedBox(height: 8.spMin),
               Text(
                 _sent
-                    ? 'Your live location is being shared with $circleName.'
-                    : 'Sends your live location and an SOS to all '
-                          '$memberCount members of $circleName.',
+                    ? 'A snapshot of your location was shared with '
+                          '$circleName.'
+                    : 'Sends an SOS and a one-time snapshot of your location '
+                          'to all $memberCount members of $circleName.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.8),

@@ -270,6 +270,22 @@ abstract class RestClient {
     @Field() final bool? isMoving,
   });
 
+  @POST(kUrlFamilyLocationRequest)
+  Future<FamilyLocationRequest> createFamilyLocationRequest({
+    @Path() required final String memberId,
+  });
+
+  @GET(kUrlFamilyLocationRequestsPending)
+  Future<List<FamilyLocationRequest>> getPendingFamilyLocationRequests();
+
+  @POST(kUrlFamilyLocationRequestRespond)
+  Future<FamilyLocationRequest> respondToFamilyLocationRequest({
+    @Path() required final String requestId,
+    @Field() required final bool share,
+    @Field() final double? latitude,
+    @Field() final double? longitude,
+  });
+
   @POST(kUrlFamilyCheckIn)
   Future<FamilyCheckIn> sendFamilyCheckIn({
     @Field() final String? status,

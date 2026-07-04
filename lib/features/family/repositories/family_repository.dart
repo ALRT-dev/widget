@@ -59,6 +59,21 @@ abstract class FamilyRepository {
     final bool? isMoving,
   });
 
+  Future<Either<FamilyLocationRequest, AppError>> createFamilyLocationRequest({
+    required final String memberId,
+  });
+
+  Future<Either<List<FamilyLocationRequest>, AppError>>
+  getPendingFamilyLocationRequests();
+
+  Future<Either<FamilyLocationRequest, AppError>>
+  respondToFamilyLocationRequest({
+    required final String requestId,
+    required final bool share,
+    final double? latitude,
+    final double? longitude,
+  });
+
   Future<Either<FamilyCheckIn, AppError>> sendFamilyCheckIn({
     final FamilyCheckInStatus? status,
     final String? message,
@@ -304,6 +319,58 @@ class FamilyRepositoryImpl implements FamilyRepository {
           isMoving: isMoving,
         );
         return const Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilyLocationRequest, AppError>> createFamilyLocationRequest({
+    required String memberId,
+  }) {
+    return runAsyncCall(
+      name: 'createFamilyLocationRequest',
+      future: () async {
+        final request = await _restClient.createFamilyLocationRequest(
+          memberId: memberId,
+        );
+        return Success(request);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<List<FamilyLocationRequest>, AppError>>
+  getPendingFamilyLocationRequests() {
+    return runAsyncCall(
+      name: 'getPendingFamilyLocationRequests',
+      future: () async {
+        final requests = await _restClient.getPendingFamilyLocationRequests();
+        return Success(requests);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilyLocationRequest, AppError>>
+  respondToFamilyLocationRequest({
+    required String requestId,
+    required bool share,
+    double? latitude,
+    double? longitude,
+  }) {
+    return runAsyncCall(
+      name: 'respondToFamilyLocationRequest',
+      future: () async {
+        final request = await _restClient.respondToFamilyLocationRequest(
+          requestId: requestId,
+          share: share,
+          latitude: latitude,
+          longitude: longitude,
+        );
+        return Success(request);
       },
       onError: Failure.new,
     );

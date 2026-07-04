@@ -70,7 +70,9 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                     _imSafeButtonBuilder(checkInState),
                     SizedBox(height: 10.spMin),
                     _requestCheckInButtonBuilder(),
-                    SizedBox(height: 24.spMin),
+                    SizedBox(height: 16.spMin),
+                    _privacyBannerBuilder(),
+                    SizedBox(height: 20.spMin),
                     _membersSectionBuilder(circle, memberIdsNearAlert),
                     SizedBox(height: 120.spMin),
                   ],
@@ -333,6 +335,56 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
     );
   }
 
+  Widget _privacyBannerBuilder() {
+    return Container(
+      padding: EdgeInsets.all(14.spMin),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.spMin),
+        border: Border(
+          left: BorderSide(color: FamilyColors.safeGreen, width: 3.spMin),
+        ),
+        boxShadow: [
+          BoxShadow(color: AppColors.shadowColorLight, blurRadius: 2.0),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            LucideIcons.shieldCheck,
+            color: FamilyColors.safeGreen,
+            size: 18.spMin,
+          ),
+          SizedBox(width: 10.spMin),
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'ALRT never live-tracks. ',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  const TextSpan(
+                    text:
+                        'What you see is each member\'s last shared snapshot. '
+                        'Ask for a fresh one anytime; they choose whether to '
+                        'send it.',
+                  ),
+                ],
+              ),
+              style: TextStyle(
+                fontSize: 12.spMin,
+                height: 1.4,
+                color: AppColors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _membersSectionBuilder(
     final FamilyCircle circle,
     final Set<String> memberIdsNearAlert,
@@ -374,6 +426,9 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                   onLongPress: isOwner && member.id != circle.myMemberId
                       ? () => _confirmRemoveMember(member)
                       : null,
+                  onRequestLocation: member.id != circle.myMemberId
+                      ? () => _requestLocationSnapshot(member)
+                      : null,
                 ),
               ],
             ],
@@ -404,6 +459,19 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _requestLocationSnapshot(final FamilyMember member) async {
+    final sent = await ref
+        .read(providerOfFamily.notifier)
+        .requestMemberLocation(memberId: member.id);
+    if (!mounted) return;
+    if (sent) {
+      context.showSuccessToast(
+        message:
+            '${member.name} has been asked to share a one-time snapshot.',
+      );
+    }
   }
 
   void _confirmRemoveMember(final FamilyMember member) {

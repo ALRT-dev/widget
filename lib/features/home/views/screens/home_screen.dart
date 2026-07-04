@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/screens/family_tab_view.dart';
+import 'package:hazard_app/features/family/views/widgets/family_location_request_sheet.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_provider.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
@@ -215,6 +216,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               return _gotoViewHazardScreen(
                 Hazard.fromJson(remoteMessage.payload),
               );
+            case PushNotificationType.familyLocationRequest:
+              // Consent-first: open the Share once / Not now sheet.
+              final requestId = remoteMessage.data['locationRequestId'];
+              if (requestId is String && requestId.isNotEmpty) {
+                showFamilyLocationRequestSheet(
+                  context: context,
+                  requestId: requestId,
+                  requesterName: remoteMessage.data['requesterName'],
+                );
+              }
+              return;
             case PushNotificationType.familyCheckIn:
             case PushNotificationType.familyCheckInRequest:
             case PushNotificationType.familyPlaceEvent:
@@ -222,6 +234,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             case PushNotificationType.familySosResponse:
             case PushNotificationType.familySosResolved:
             case PushNotificationType.familyCircleUpdate:
+            case PushNotificationType.familyLocationShared:
               // Land on the family hub with fresh data.
               ref.read(providerOfFamily.notifier).load(silent: true);
               ref.read(providerOfHomeTab.notifier).state = HomeTab.family;

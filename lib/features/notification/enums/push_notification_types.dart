@@ -11,4 +11,6 @@ enum PushNotificationType {
   familySosResolved,
   familyHazardProximity,
   familyCircleUpdate,
+  familyLocationRequest,
+  familyLocationShared,
 }

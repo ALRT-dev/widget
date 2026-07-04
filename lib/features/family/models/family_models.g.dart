@@ -79,6 +79,14 @@ _FamilyMember _$FamilyMemberFromJson(Map<String, dynamic> json) =>
       locationUpdatedAt: json['locationUpdatedAt'] == null
           ? null
           : DateTime.parse(json['locationUpdatedAt'] as String),
+      locationExpiresAt: json['locationExpiresAt'] == null
+          ? null
+          : DateTime.parse(json['locationExpiresAt'] as String),
+      locationSharedVia: $enumDecodeNullable(
+        _$FamilySnapshotSourceEnumMap,
+        json['locationSharedVia'],
+        unknownValue: JsonKey.nullForUndefinedEnumValue,
+      ),
       batteryLevel: (json['batteryLevel'] as num?)?.toInt(),
       isMoving: json['isMoving'] as bool? ?? false,
       currentPlaceId: json['currentPlaceId'] as String?,
@@ -102,6 +110,9 @@ Map<String, dynamic> _$FamilyMemberToJson(_FamilyMember instance) =>
       'longitude': ?instance.longitude,
       'locationLabel': ?instance.locationLabel,
       'locationUpdatedAt': ?instance.locationUpdatedAt?.toIso8601String(),
+      'locationExpiresAt': ?instance.locationExpiresAt?.toIso8601String(),
+      'locationSharedVia':
+          ?_$FamilySnapshotSourceEnumMap[instance.locationSharedVia],
       'batteryLevel': ?instance.batteryLevel,
       'isMoving': instance.isMoving,
       'currentPlaceId': ?instance.currentPlaceId,
@@ -120,6 +131,13 @@ const _$FamilySharingLevelEnumMap = {
   FamilySharingLevel.approximate: 'approximate',
   FamilySharingLevel.alertsOnly: 'alertsOnly',
   FamilySharingLevel.off: 'off',
+};
+
+const _$FamilySnapshotSourceEnumMap = {
+  FamilySnapshotSource.checkIn: 'checkIn',
+  FamilySnapshotSource.request: 'request',
+  FamilySnapshotSource.sos: 'sos',
+  FamilySnapshotSource.manual: 'manual',
 };
 
 _FamilyInvite _$FamilyInviteFromJson(Map<String, dynamic> json) =>
@@ -381,6 +399,57 @@ const _$FamilySosStatusEnumMap = {
   FamilySosStatus.active: 'active',
   FamilySosStatus.resolved: 'resolved',
   FamilySosStatus.cancelled: 'cancelled',
+};
+
+_FamilyLocationRequest _$FamilyLocationRequestFromJson(
+  Map<String, dynamic> json,
+) => _FamilyLocationRequest(
+  id: json['id'] as String,
+  circleId: json['circleId'] as String,
+  requesterId: json['requesterId'] as String,
+  targetMemberId: json['targetMemberId'] as String,
+  status:
+      $enumDecodeNullable(
+        _$FamilyLocationRequestStatusEnumMap,
+        json['status'],
+        unknownValue: FamilyLocationRequestStatus.pending,
+      ) ??
+      FamilyLocationRequestStatus.pending,
+  message: json['message'] as String?,
+  requester: json['requester'] == null
+      ? null
+      : FamilyMemberSnippet.fromJson(json['requester'] as Map<String, dynamic>),
+  respondedAt: json['respondedAt'] == null
+      ? null
+      : DateTime.parse(json['respondedAt'] as String),
+  expiresAt: json['expiresAt'] == null
+      ? null
+      : DateTime.parse(json['expiresAt'] as String),
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+);
+
+Map<String, dynamic> _$FamilyLocationRequestToJson(
+  _FamilyLocationRequest instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'circleId': instance.circleId,
+  'requesterId': instance.requesterId,
+  'targetMemberId': instance.targetMemberId,
+  'status': _$FamilyLocationRequestStatusEnumMap[instance.status]!,
+  'message': ?instance.message,
+  'requester': ?instance.requester?.toJson(),
+  'respondedAt': ?instance.respondedAt?.toIso8601String(),
+  'expiresAt': ?instance.expiresAt?.toIso8601String(),
+  'createdAt': ?instance.createdAt?.toIso8601String(),
+};
+
+const _$FamilyLocationRequestStatusEnumMap = {
+  FamilyLocationRequestStatus.pending: 'pending',
+  FamilyLocationRequestStatus.shared: 'shared',
+  FamilyLocationRequestStatus.declined: 'declined',
+  FamilyLocationRequestStatus.expired: 'expired',
 };
 
 _FamilySosResponse _$FamilySosResponseFromJson(Map<String, dynamic> json) =>

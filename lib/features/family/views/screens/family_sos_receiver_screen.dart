@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -16,9 +17,10 @@ class FamilySosReceiverScreenArgs {
   final FamilySosEvent sosEvent;
 }
 
-/// What the circle sees when someone triggers SOS: live pin, one-tap
-/// responses, and calling 000 from their own phone — the person dials,
-/// never the platform.
+/// What the circle sees when someone triggers SOS: the location snapshot
+/// shared at trigger time, one-tap responses, and calling 000 from their own
+/// phone — the person dials, never the platform. The sender can re-share a
+/// fresh snapshot at any time; ALRT never updates it automatically.
 class FamilySosReceiverScreen extends ConsumerWidget {
   const FamilySosReceiverScreen({super.key, required this.args});
 
@@ -60,7 +62,11 @@ class FamilySosReceiverScreen extends ConsumerWidget {
                 _locationCardBuilder(sos),
                 SizedBox(height: 16.spMin),
                 if (!isResolved && !isMine) _actionsBuilder(context, ref, sos, name),
-                if (!isResolved && isMine) _resolveButtonBuilder(ref, sos),
+                if (!isResolved && isMine) ...[
+                  _resolveButtonBuilder(ref, sos),
+                  SizedBox(height: 10.spMin),
+                  _shareUpdatedLocationButtonBuilder(context, ref),
+                ],
                 SizedBox(height: 20.spMin),
                 _responsesBuilder(sos),
               ],
@@ -104,7 +110,7 @@ class FamilySosReceiverScreen extends ConsumerWidget {
                     Text(
                       isResolved
                           ? 'SOS resolved'
-                          : 'Live location · started ${timeago.format(sos.createdAt!)}',
+                          : 'Snapshot shared · started ${timeago.format(sos.createdAt!)}',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.85),
                         fontSize: 12.spMin,
@@ -277,6 +283,47 @@ class FamilySosReceiverScreen extends ConsumerWidget {
             ref.read(providerOfFamily.notifier).resolveSos(sosEventId: sos.id),
         child: Text(
           "I'm safe now — resolve SOS",
+          style: TextStyle(fontSize: 15.spMin, fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
+
+  /// Lets the person in SOS push a fresh snapshot to the circle — an explicit
+  /// tap, keeping the "requested, never tracked" posture even mid-SOS.
+  Widget _shareUpdatedLocationButtonBuilder(
+    final BuildContext context,
+    final WidgetRef ref,
+  ) {
+    return SizedBox(
+      height: 50.spMin,
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: FamilyColors.indigo,
+          backgroundColor: Colors.white,
+          side: BorderSide(color: FamilyColors.indigo.withValues(alpha: 0.3)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.spMin),
+          ),
+        ),
+        onPressed: () async {
+          final shared =
+              await ref.read(providerOfFamily.notifier).shareSnapshotNow();
+          if (!context.mounted) return;
+          shared
+              ? context.showSuccessToast(
+                  message: 'Updated snapshot shared with your circle.',
+                )
+              : context.showErrorToast(
+                  message:
+                      'Could not get your location. Check location '
+                      'permissions and try again.',
+                );
+        },
+        icon: Icon(LucideIcons.mapPin, size: 18.spMin),
+        label: Text(
+          'Share updated location',
           style: TextStyle(fontSize: 15.spMin, fontWeight: FontWeight.w700),
         ),
       ),

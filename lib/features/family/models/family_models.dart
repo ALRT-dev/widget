@@ -41,6 +41,21 @@ enum FamilySosResponseType {
   called,
 }
 
+/// How a location snapshot came to be shared — always a deliberate action.
+enum FamilySnapshotSource {
+  checkIn,
+  request,
+  sos,
+  manual,
+}
+
+enum FamilyLocationRequestStatus {
+  pending,
+  shared,
+  declined,
+  expired,
+}
+
 /// Response of `GET /api/family/circle` — the family hub payload.
 @freezed
 abstract class FamilyCircle with _$FamilyCircle {
@@ -88,6 +103,9 @@ abstract class FamilyMember with _$FamilyMember {
     final double? longitude,
     final String? locationLabel,
     final DateTime? locationUpdatedAt,
+    final DateTime? locationExpiresAt,
+    @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
+    final FamilySnapshotSource? locationSharedVia,
     final int? batteryLevel,
     @Default(false) final bool isMoving,
     final String? currentPlaceId,
@@ -252,6 +270,28 @@ abstract class FamilySosEvent with _$FamilySosEvent {
 
   factory FamilySosEvent.fromJson(Map<String, dynamic> json) =>
       _$FamilySosEventFromJson(json);
+}
+
+/// "Sarah asked where you are" — a one-time, consent-gated location request.
+@freezed
+abstract class FamilyLocationRequest with _$FamilyLocationRequest {
+  const factory FamilyLocationRequest({
+    required final String id,
+    required final String circleId,
+    required final String requesterId,
+    required final String targetMemberId,
+    @JsonKey(unknownEnumValue: FamilyLocationRequestStatus.pending)
+    @Default(FamilyLocationRequestStatus.pending)
+    final FamilyLocationRequestStatus status,
+    final String? message,
+    final FamilyMemberSnippet? requester,
+    final DateTime? respondedAt,
+    final DateTime? expiresAt,
+    final DateTime? createdAt,
+  }) = _FamilyLocationRequest;
+
+  factory FamilyLocationRequest.fromJson(Map<String, dynamic> json) =>
+      _$FamilyLocationRequestFromJson(json);
 }
 
 @freezed

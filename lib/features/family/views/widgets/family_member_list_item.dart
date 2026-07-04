@@ -16,12 +16,16 @@ class FamilyMemberListItem extends StatelessWidget {
     required this.isMe,
     this.isNearAlert = false,
     this.onLongPress,
+    this.onRequestLocation,
   });
 
   final FamilyMember member;
   final bool isMe;
   final bool isNearAlert;
   final VoidCallback? onLongPress;
+
+  /// Shown as a "Request" action — asks this member for a one-time snapshot.
+  final VoidCallback? onRequestLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +75,30 @@ class FamilyMemberListItem extends StatelessWidget {
               ),
             ),
             SizedBox(width: 8.spMin),
+            if (onRequestLocation != null) ...[
+              GestureDetector(
+                onTap: onRequestLocation,
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 10.spMin,
+                    vertical: 6.spMin,
+                  ),
+                  decoration: BoxDecoration(
+                    color: FamilyColors.indigoLight,
+                    borderRadius: BorderRadius.circular(10.spMin),
+                  ),
+                  child: Text(
+                    'Request',
+                    style: TextStyle(
+                      color: FamilyColors.indigo,
+                      fontSize: 11.spMin,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 6.spMin),
+            ],
             _statusChipBuilder(),
           ],
         ),
@@ -86,7 +114,13 @@ class FamilyMemberListItem extends StatelessWidget {
 
   String get _subtitleText {
     final label = member.locationLabel;
-    if (label != null && label.isNotEmpty) return label;
+    final sharedAt = member.locationUpdatedAt;
+    if (label != null && label.isNotEmpty) {
+      // Snapshots are explicit shares — say when it was shared, honestly.
+      return sharedAt != null
+          ? '$label · shared ${timeago.format(sharedAt)}'
+          : label;
+    }
     if (member.sharingLevel == FamilySharingLevel.off ||
         member.sharingLevel == FamilySharingLevel.alertsOnly) {
       return 'Location hidden';
@@ -95,7 +129,7 @@ class FamilyMemberListItem extends StatelessWidget {
     if (lastCheckIn != null) {
       return 'Checked in ${timeago.format(lastCheckIn)}';
     }
-    return 'No location yet';
+    return 'No snapshot yet';
   }
 
   Widget _statusChipBuilder() {

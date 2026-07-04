@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,87 +10,43 @@ final providerOfFamilyLocationService = Provider<FamilyLocationService>(
   FamilyLocationService.new,
 );
 
-/// A battery-conscious background location pinger for Family Mode.
+/// One-time location snapshot sharing for Family Mode.
 ///
-/// While running it:
-/// - sends an immediate ping on [start],
-/// - listens to the position stream with a 150m distance filter,
-/// - throttles pings to at most one per 2 minutes, unless the user has moved
-///   more than 500m since the last ping,
-/// - attaches an `isMoving` flag derived from the reported speed.
+/// ALRT never live-tracks. A snapshot is shared only when the member takes a
+/// deliberate action — checking in, answering a location request, triggering
+/// SOS, or explicitly re-sharing — and it expires on the server after an
+/// hour. There is no position stream, no timer, and no background tracking.
 class FamilyLocationService {
   FamilyLocationService(final Ref ref) : _ref = ref;
 
   final Ref _ref;
   FamilyService get _familyService => _ref.read(providerOfFamilyService);
 
-  StreamSubscription<Position>? _positionSubscription;
-  DateTime? _lastPingAt;
-  Position? _lastPingPosition;
-  var _isRunning = false;
-
-  /// Minimum interval between two pings, unless the user moved far enough.
-  static const minPingInterval = Duration(minutes: 2);
-
-  /// Position stream distance filter in meters.
-  static const distanceFilterMeters = 150;
-
-  /// Moving further than this since the last ping bypasses the throttle.
-  static const forcePingDistanceMeters = 500.0;
-
   /// Speeds above this (m/s) are considered "moving".
   static const movingSpeedThresholdMps = 1.0;
 
-  /// Whether the pinger is currently running.
-  bool get isRunning => _isRunning;
-
-  /// Starts the location pinger.
+  /// Shares a single, expiring location snapshot with the circle.
   ///
-  /// Returns without crashing when location permission is denied or the
-  /// location service is disabled.
-  Future<void> start() async {
-    if (_isRunning) return;
-
-    final hasPermission = await _hasLocationPermission();
-    if (!hasPermission) {
+  /// Returns true when a snapshot was shared; false when location is
+  /// unavailable or not permitted (never crashes).
+  Future<bool> shareSnapshotNow() async {
+    final position = await getLastKnownOrCurrentPosition();
+    if (position == null) {
       log(
-        'Location permission not granted, family location pings disabled.',
+        'No location available — snapshot not shared.',
         name: 'FamilyLocationService',
       );
-      return;
+      return false;
     }
 
-    _isRunning = true;
-
-    // Send an immediate ping so the family sees us right away.
-    final initialPosition = await getLastKnownOrCurrentPosition();
-    if (initialPosition != null) {
-      await _sendPing(initialPosition);
-    }
-
-    _positionSubscription?.cancel();
-    _positionSubscription =
-        Geolocator.getPositionStream(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.medium,
-            distanceFilter: distanceFilterMeters,
-          ),
-        ).listen(
-          _onPosition,
-          onError: (Object error) {
-            log(
-              'Family position stream error: $error',
-              name: 'FamilyLocationService',
-            );
-          },
-        );
-  }
-
-  /// Stops the location pinger.
-  void stop() {
-    _positionSubscription?.cancel();
-    _positionSubscription = null;
-    _isRunning = false;
+    final result = await _familyService.sendFamilyLocationPing(
+      latitude: position.latitude,
+      longitude: position.longitude,
+      accuracy: position.accuracy,
+      speed: position.speed,
+      isMoving: position.speed > movingSpeedThresholdMps,
+    );
+    return result.whenSuccess((_) => true) ?? false;
   }
 
   /// Returns the last known position, falling back to a fresh (low accuracy)
@@ -114,42 +69,6 @@ class FamilyLocationService {
         );
       },
       onError: (_) => null,
-    );
-  }
-
-  /// Handles a new position from the stream, applying the ping throttle.
-  Future<void> _onPosition(final Position position) async {
-    final now = DateTime.now();
-
-    final movedFarEnough =
-        _lastPingPosition == null ||
-        Geolocator.distanceBetween(
-              _lastPingPosition!.latitude,
-              _lastPingPosition!.longitude,
-              position.latitude,
-              position.longitude,
-            ) >
-            forcePingDistanceMeters;
-
-    final intervalElapsed =
-        _lastPingAt == null || now.difference(_lastPingAt!) >= minPingInterval;
-
-    if (!intervalElapsed && !movedFarEnough) return;
-
-    await _sendPing(position);
-  }
-
-  /// Sends a single location ping for [position].
-  Future<void> _sendPing(final Position position) async {
-    _lastPingAt = DateTime.now();
-    _lastPingPosition = position;
-
-    await _familyService.sendFamilyLocationPing(
-      latitude: position.latitude,
-      longitude: position.longitude,
-      accuracy: position.accuracy,
-      speed: position.speed,
-      isMoving: position.speed > movingSpeedThresholdMps,
     );
   }
 

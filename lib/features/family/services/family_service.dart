@@ -94,6 +94,32 @@ class FamilyService {
     );
   }
 
+  Future<Either<FamilyLocationRequest, AppError>> createFamilyLocationRequest({
+    required final String memberId,
+  }) {
+    return _familyRepository.createFamilyLocationRequest(memberId: memberId);
+  }
+
+  Future<Either<List<FamilyLocationRequest>, AppError>>
+  getPendingFamilyLocationRequests() {
+    return _familyRepository.getPendingFamilyLocationRequests();
+  }
+
+  Future<Either<FamilyLocationRequest, AppError>>
+  respondToFamilyLocationRequest({
+    required final String requestId,
+    required final bool share,
+    final double? latitude,
+    final double? longitude,
+  }) {
+    return _familyRepository.respondToFamilyLocationRequest(
+      requestId: requestId,
+      share: share,
+      latitude: latitude,
+      longitude: longitude,
+    );
+  }
+
   Future<Either<FamilyCheckIn, AppError>> sendFamilyCheckIn({
     final FamilyCheckInStatus? status,
     final String? message,

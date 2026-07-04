@@ -59,7 +59,7 @@ class FamilySharingLevelScreen extends ConsumerWidget {
     final (title, description, icon) = switch (level) {
       FamilySharingLevel.precise => (
         'Precise',
-        'Your live pin with street-level accuracy.',
+        'Snapshots you share show street-level accuracy.',
         LucideIcons.locateFixed,
       ),
       FamilySharingLevel.approximate => (

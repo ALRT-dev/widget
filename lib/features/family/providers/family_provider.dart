@@ -257,7 +257,6 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
 
     result.when(
       (_) {
-        _familyLocationService.stop();
         state = const FamilyProviderState(
           hasLoadedOnce: true,
           loadState: FamilyActionState.success(),
@@ -341,6 +340,55 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
         );
       },
     );
+  }
+
+  // ---------------------------- LOCATION SNAPSHOTS ----------------------------
+  // ALRT never live-tracks: these are one-time, expiring, member-initiated.
+
+  /// Asks [memberId] to share a one-time location snapshot.
+  /// Returns true when the request was sent.
+  Future<bool> requestMemberLocation({required final String memberId}) async {
+    final result = await _familyService.createFamilyLocationRequest(
+      memberId: memberId,
+    );
+    if (!mounted) return false;
+    return result.when((_) => true, (_) => false);
+  }
+
+  /// Answers a "where are you" request. When [share] is true the current
+  /// position is attached; declining sends nothing.
+  Future<bool> respondToLocationRequest({
+    required final String requestId,
+    required final bool share,
+  }) async {
+    double? latitude;
+    double? longitude;
+    if (share) {
+      final position = await _familyLocationService
+          .getLastKnownOrCurrentPosition();
+      if (position == null) return false;
+      latitude = position.latitude;
+      longitude = position.longitude;
+    }
+    if (!mounted) return false;
+
+    final result = await _familyService.respondToFamilyLocationRequest(
+      requestId: requestId,
+      share: share,
+      latitude: latitude,
+      longitude: longitude,
+    );
+    if (!mounted) return false;
+    return result.when((_) => true, (_) => false);
+  }
+
+  /// Explicitly shares a fresh snapshot (e.g. re-sharing during an SOS).
+  Future<bool> shareSnapshotNow() async {
+    final shared = await _familyLocationService.shareSnapshotNow();
+    if (shared && mounted) {
+      await load(silent: true);
+    }
+    return shared;
   }
 
   // ---------------------------- CHECK-INS ----------------------------

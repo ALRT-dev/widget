@@ -87,6 +87,12 @@ const kUrlFamilyInvites = '$kUrlFamily/invites';
 const kUrlFamilyInviteRevoke = '$kUrlFamilyInvites/{inviteId}/revoke';
 const kUrlFamilyJoin = '$kUrlFamily/join';
 const kUrlFamilyLocation = '$kUrlFamily/location';
+const kUrlFamilyLocationRequest =
+    '$kUrlFamilyMembers/{memberId}/location-request';
+const kUrlFamilyLocationRequestsPending =
+    '$kUrlFamily/location-requests/pending';
+const kUrlFamilyLocationRequestRespond =
+    '$kUrlFamily/location-requests/{requestId}/respond';
 const kUrlFamilyCheckIn = '$kUrlFamily/check-in';
 const kUrlFamilyCheckInRequest = '$kUrlFamilyCheckIn/request';
 const kUrlFamilyCheckIns = '$kUrlFamily/check-ins';
