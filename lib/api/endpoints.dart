@@ -103,6 +103,12 @@ const kUrlFamilySosActive = '$kUrlFamilySos/active';
 const kUrlFamilySosRespond = '$kUrlFamilySos/{sosEventId}/respond';
 const kUrlFamilySosResolve = '$kUrlFamilySos/{sosEventId}/resolve';
 
+// ---------------------------- XP / SCORING ----------------------------
+
+const kUrlXp = '$kUrlApi/xp';
+
+const kUrlXpSummary = '$kUrlXp/summary';
+
 // ---------------------------- LEARN / GUIDES ----------------------------
 
 const kUrlGuides = '$kUrlApi/guides';

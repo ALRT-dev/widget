@@ -10,6 +10,7 @@ import 'package:hazard_app/features/family/views/screens/family_sos_receiver_scr
 import 'package:hazard_app/features/family/views/screens/family_sos_screen.dart';
 import 'package:hazard_app/features/home/views/screens/home_screen.dart';
 import 'package:hazard_app/features/learn/views/screens/guide_detail_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/how_points_work_screen.dart';
 import 'package:hazard_app/features/learn/views/screens/learn_topics_screen.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
@@ -194,6 +195,10 @@ class AppRouter {
           builder: (context, state) => GuideDetailScreen(
             args: state.extra as GuideDetailScreenArgs,
           ),
+        ),
+        GoRoute(
+          path: HowPointsWorkScreen.route,
+          builder: (context, state) => const HowPointsWorkScreen(),
         ),
         GoRoute(
           path: ViewHazardScreen.route,

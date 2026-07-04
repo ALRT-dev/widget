@@ -6,6 +6,7 @@ import 'package:hazard_app/api/endpoints.dart';
 import 'package:hazard_app/features/auth/models/auth_success_model.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/learn/models/guide_models.dart';
+import 'package:hazard_app/features/profile/models/xp_summary_models.dart';
 import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
@@ -365,6 +366,9 @@ abstract class RestClient {
   });
 
   // ---------------------------- LEARN / GUIDES ----------------------------
+
+  @GET(kUrlXpSummary)
+  Future<XpSummary> getXpSummary();
 
   @GET(kUrlGuideTopics)
   Future<GuideTopicsResponse> getGuideTopics();

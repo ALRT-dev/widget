@@ -15,6 +15,7 @@ import 'package:hazard_app/features/profile/providers/states/profile_provider_st
 import 'package:hazard_app/features/profile/views/screens/delete_account_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/profile/views/widgets/accepted_hazards_widgets/my_accepted_hazards_list.dart';
+import 'package:hazard_app/features/profile/views/widgets/profile_trust_card.dart';
 import 'package:hazard_app/features/profile/views/widgets/profile_xp_progress.dart';
 import 'package:hazard_app/features/profile/views/widgets/rejected_hazards_widgets/my_rejected_hazards_list.dart';
 import 'package:hazard_app/features/shared/enums/user_badge_enum.dart';
@@ -52,6 +53,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildStatsSection(),
+                  14.spMin.hSizedBox,
+                  const ProfileTrustCard(),
                   24.spMin.hSizedBox,
                   _buildFamilySafetyCard(),
                   14.spMin.hSizedBox,
