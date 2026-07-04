@@ -21,9 +21,11 @@ import 'package:hazard_app/features/map/providers/states/hazard_markers_bitmaps_
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
 import 'package:hazard_app/features/map/services/location_service.dart';
 import 'package:hazard_app/features/map/services/map_service.dart';
+import 'package:hazard_app/features/map/utils/hazard_cluster_util.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -932,6 +934,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
   }
 
   /// Generates markers for all hazards in the state.
+  ///
+  /// Below [kClusterMaxZoom] hazards are grouped into screen-space grid
+  /// clusters rendered as a count badge tinted by the highest severity in
+  /// the group — previously every hazard rendered as its own marker (up to
+  /// the full 5000-item page) which made wide zooms unreadable and slow.
   void generateMarkers() async {
     final hazards = state.showRouteHazards
         ? state.currentRoutePlan?.hazardsToAvoid ?? []
@@ -939,35 +946,63 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final currentZoom = state.cameraPosition.zoom;
     final individualMarkers = <Marker>[];
 
-    // At low zoom levels (< 6.5), show small red dots instead of detailed icons
-    final useRedDotBitmap = currentZoom < 6.5;
-    final redDotBitmap = _hazardMarkerBitmapsProviderState.redDotBitmap;
+    if (currentZoom < kClusterMaxZoom) {
+      final clusters = clusterHazards(hazards: hazards, zoom: currentZoom);
+      final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
 
-    for (final hazard in hazards) {
-      if (hazard.latitude == null || hazard.longitude == null) continue;
+      for (final cluster in clusters) {
+        if (cluster.isSingle) {
+          final hazard = cluster.single;
+          individualMarkers.add(
+            Marker(
+              markerId: MarkerId(
+                'hazard_${hazard.id ?? '${hazard.latitude},${hazard.longitude}'}',
+              ),
+              position: LatLng(hazard.latitude!, hazard.longitude!),
+              onTap: () => _onIndividualMarkerTap(hazard: hazard),
+              consumeTapEvents: true,
+              icon:
+                  hazard.getMarkerBitmapDescriptor(markerBitmaps) ??
+                  BitmapDescriptor.defaultMarker,
+            ),
+          );
+          continue;
+        }
 
-      BitmapDescriptor? bitmapDescriptor;
-      if (useRedDotBitmap && redDotBitmap != null) {
-        bitmapDescriptor = redDotBitmap;
-      } else {
-        final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
-        bitmapDescriptor = hazard.getMarkerBitmapDescriptor(markerBitmaps);
+        final clusterBitmap = await _getClusterBitmap(cluster);
+        individualMarkers.add(
+          Marker(
+            markerId: MarkerId(
+              'cluster_${cluster.latitude}_${cluster.longitude}_${cluster.count}',
+            ),
+            position: LatLng(cluster.latitude, cluster.longitude),
+            onTap: () => _onClusterMarkerTap(cluster),
+            consumeTapEvents: true,
+            icon: clusterBitmap ?? BitmapDescriptor.defaultMarker,
+          ),
+        );
       }
+    } else {
+      for (final hazard in hazards) {
+        if (hazard.latitude == null || hazard.longitude == null) continue;
 
-      individualMarkers.add(
-        Marker(
-          markerId: MarkerId(
-            'hazard_${hazard.id ?? '${hazard.latitude},${hazard.longitude}'}',
+        final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
+        final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(
+          markerBitmaps,
+        );
+
+        individualMarkers.add(
+          Marker(
+            markerId: MarkerId(
+              'hazard_${hazard.id ?? '${hazard.latitude},${hazard.longitude}'}',
+            ),
+            position: LatLng(hazard.latitude!, hazard.longitude!),
+            onTap: () => _onIndividualMarkerTap(hazard: hazard),
+            consumeTapEvents: true,
+            icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
           ),
-          position: LatLng(hazard.latitude!, hazard.longitude!),
-          onTap: () => _onIndividualMarkerTap(
-            hazard: hazard,
-            isRedDot: useRedDotBitmap,
-          ),
-          consumeTapEvents: true,
-          icon: bitmapDescriptor ?? BitmapDescriptor.defaultMarker,
-        ),
-      );
+        );
+      }
     }
 
     // Preserve non-hazard markers
@@ -1029,6 +1064,77 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
 
     animateTo(position: targetPosition, zoom: currentZoom + 0.01);
+  }
+
+  /// Tapping a cluster zooms in towards its centroid to break it apart.
+  void _onClusterMarkerTap(final HazardCluster cluster) {
+    final currentZoom = state.cameraPosition.zoom;
+    final targetZoom = min(currentZoom + 2.5, kClusterMaxZoom + 1.5);
+    animateTo(
+      position: LatLng(cluster.latitude, cluster.longitude),
+      zoom: targetZoom,
+    );
+  }
+
+  /// Cache of cluster badge bitmaps keyed by label + severity, so repeated
+  /// camera moves don't re-rasterize identical badges.
+  final Map<String, BitmapDescriptor> _clusterBitmapCache = {};
+
+  /// Builds (or reuses) the circular count badge for a cluster, tinted by
+  /// the highest severity present in the group.
+  Future<BitmapDescriptor?> _getClusterBitmap(
+    final HazardCluster cluster,
+  ) async {
+    final severity = cluster.dominantSeverity;
+    final badgeColor = switch (severity) {
+      HazardSeverity.emergency => AppColors.emergency,
+      HazardSeverity.watchAndAct => AppColors.watchAndAct,
+      HazardSeverity.advice => AppColors.advice,
+      _ => AppColors.black,
+    };
+    final cacheKey = '${cluster.label}_${severity.name}';
+
+    final cached = _clusterBitmapCache[cacheKey];
+    if (cached != null) return cached;
+
+    try {
+      final size = cluster.count > 20 ? 46.0 : 40.0;
+      final widget = Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: badgeColor,
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.white, width: 2.5),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x33000000),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Text(
+          cluster.label,
+          style: const TextStyle(
+            color: AppColors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            decoration: TextDecoration.none,
+          ),
+        ),
+      );
+
+      final bitmap = await widget.toBitmapDescriptor(
+        logicalSize: Size(size, size),
+        imageSize: Size(size * 2.5, size * 2.5),
+      );
+      _clusterBitmapCache[cacheKey] = bitmap;
+      return bitmap;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Updates [MapProviderState.isMapReady] to the given [isMapReady].
