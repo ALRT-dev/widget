@@ -23,6 +23,8 @@ abstract class NotificationRepository {
   Future<Either<RemoteMessage?, AppError>> getInitialPushNotificationMessage();
 
   Stream<RemoteMessage> onPushNotificationMessageOpenedApp();
+
+  Stream<RemoteMessage> onForegroundPushNotificationMessage();
 }
 
 class NotificationRepositoryImpl implements NotificationRepository {
@@ -125,5 +127,10 @@ class NotificationRepositoryImpl implements NotificationRepository {
   @override
   Stream<RemoteMessage> onPushNotificationMessageOpenedApp() {
     return FirebaseMessaging.onMessageOpenedApp;
+  }
+
+  @override
+  Stream<RemoteMessage> onForegroundPushNotificationMessage() {
+    return FirebaseMessaging.onMessage;
   }
 }

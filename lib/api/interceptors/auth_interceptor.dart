@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:hazard_app/api/auth_session_events.dart';
 import 'package:hazard_app/api/endpoints.dart';
 import 'package:hazard_app/api/token_handler.dart';
 import 'package:hazard_app/features/shared/enums/shared_prefs_key_types.dart';
@@ -17,9 +18,50 @@ class AuthInterceptor implements Interceptor {
   final Dio _dio;
   final SharedPreferencesRepository _sharedPreferencesRepository;
 
+  /// Single in-flight refresh shared by all concurrent requests, so an
+  /// expired token triggers exactly one refresh call instead of one per
+  /// pending request.
+  Future<String?>? _refreshInFlight;
+
+  /// Refresh slightly before the actual expiry so a token that is valid now
+  /// doesn't expire mid-flight.
+  static const _expiryBuffer = Duration(seconds: 60);
+
+  /// Marker to ensure a request is only retried once after a 401.
+  static const _retriedExtraKey = 'authInterceptorRetried';
+
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    return handler.next(err);
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    final response = err.response;
+    final requestOptions = err.requestOptions;
+
+    final isUnauthorized = response?.statusCode == 401;
+    final isRefreshCall = requestOptions.path.contains(kUrlRefreshToken);
+    final alreadyRetried =
+        requestOptions.extra[_retriedExtraKey] == true;
+
+    if (!isUnauthorized || isRefreshCall || alreadyRetried) {
+      return handler.next(err);
+    }
+
+    // The server rejected our token: force one refresh and retry once.
+    final newAccessToken = await _refreshAccessToken();
+    if (newAccessToken == null) {
+      // Refresh failed — the session is gone. Clear tokens and tell the app.
+      await _clearStoredTokens();
+      AuthSessionEvents.notifySessionExpired();
+      return handler.next(err);
+    }
+
+    try {
+      final retryOptions = requestOptions
+        ..headers['Authorization'] = 'Bearer $newAccessToken'
+        ..extra[_retriedExtraKey] = true;
+      final retryResponse = await _dio.fetch<dynamic>(retryOptions);
+      return handler.resolve(retryResponse);
+    } on DioException catch (retryError) {
+      return handler.next(retryError);
+    }
   }
 
   @override
@@ -58,7 +100,7 @@ class AuthInterceptor implements Interceptor {
       withLog: false,
       future: () async {
         // ignore adding token to the endpoints that do not require authentication
-        final ignoreEndpoints = [];
+        final ignoreEndpoints = [kUrlRefreshToken];
 
         final ignoreToken = ignoreEndpoints.any(
           (endpoint) => requestEndpoint.contains(endpoint),
@@ -92,26 +134,55 @@ class AuthInterceptor implements Interceptor {
     );
     if (accessToken == null) return null;
 
-    // check if the token is expired or not
-    final isExpired = await TokenHandler.isTokenExpired(
-      token: accessToken,
-    );
+    // A malformed token is treated as expired rather than crashing the call.
+    bool isExpired;
+    try {
+      final expirationDate = await TokenHandler.getExpirationDateTime(
+        token: accessToken,
+      );
+      isExpired = expirationDate == null ||
+          DateTime.now().add(_expiryBuffer).isAfter(expirationDate);
+    } catch (_) {
+      isExpired = true;
+    }
+
     if (isExpired) {
-      // if the token is expired then generate new access token using the refresh token
-      final newAccessTokenResult = await _generateNewAccessToken();
-
-      return newAccessTokenResult.whenSuccess((success) {
-        // save the new access token to the local storage.
-        _sharedPreferencesRepository.saveString(
-          key: SharedPrefsKey.accessToken,
-          value: success,
-        );
-
-        return success;
-      });
+      return await _refreshAccessToken() ?? accessToken;
     }
 
     return accessToken;
+  }
+
+  /// Refreshes the access token, coalescing concurrent callers onto a single
+  /// in-flight request. Returns null when the refresh fails.
+  Future<String?> _refreshAccessToken() {
+    final inFlight = _refreshInFlight;
+    if (inFlight != null) return inFlight;
+
+    final refreshFuture = _doRefreshAccessToken().whenComplete(() {
+      _refreshInFlight = null;
+    });
+    _refreshInFlight = refreshFuture;
+    return refreshFuture;
+  }
+
+  Future<String?> _doRefreshAccessToken() async {
+    final newAccessTokenResult = await _generateNewAccessToken();
+    return newAccessTokenResult.whenSuccess((success) {
+      // save the new access token to the local storage.
+      _sharedPreferencesRepository.saveString(
+        key: SharedPrefsKey.accessToken,
+        value: success,
+      );
+      return success;
+    });
+  }
+
+  Future<void> _clearStoredTokens() async {
+    await Future.wait([
+      _sharedPreferencesRepository.removeKey(key: SharedPrefsKey.accessToken),
+      _sharedPreferencesRepository.removeKey(key: SharedPrefsKey.refreshToken),
+    ]);
   }
 
   /// Calls the API to generate new accessToken using the old refreshToken.

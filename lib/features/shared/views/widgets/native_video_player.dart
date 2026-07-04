@@ -111,7 +111,6 @@ class NativeVideoPlayerState extends ConsumerState<NativeVideoPlayer> {
             IgnorePointer(
               child: NativeVideoPlayerView(
                 onViewReady: _onControllerReady,
-                fit: BoxFit.cover,
               ),
             ),
             if (_initializedVideoInfo == null)
@@ -226,6 +225,28 @@ class NativeVideoPlayerState extends ConsumerState<NativeVideoPlayer> {
   void _onControllerReady(final NativeVideoPlayerController controller) async {
     _controller = controller;
 
+    _controller?.events.listen((event) async {
+      switch (event) {
+        case PlaybackReadyEvent():
+          // Video metadata is available once playback is ready (v4 API).
+          if (mounted) {
+            setState(() {
+              _initializedVideoInfo = _controller?.videoInfo;
+            });
+          }
+          break;
+        case PlaybackEndedEvent():
+          // when the playback has ended, start playing again if autoPlay is true.
+          if (widget.autoPlay) {
+            _controller
+              ?..stop()
+              ..play();
+          }
+          break;
+        default:
+      }
+    });
+
     _videoMedia = widget.videoMedia;
     if (_videoMedia.source == AlrtMediaSource.networkUrl) {
       final cacheManagerService = ref.read(providerOfCacheManagerService);
@@ -273,26 +294,6 @@ class NativeVideoPlayerState extends ConsumerState<NativeVideoPlayer> {
     if (widget.autoPlay) {
       _playVideoIfHighestPriority();
     }
-
-    final videoInfo = await _controller?.getVideoInfo();
-    if (!mounted) return;
-    setState(() {
-      _initializedVideoInfo = videoInfo;
-    });
-
-    _controller?.events.listen((event) async {
-      switch (event) {
-        case PlaybackEndedEvent():
-          // when the playback has ended, start playing again if autoPlay is true.
-          if (widget.autoPlay) {
-            _controller
-              ?..stop()
-              ..play();
-          }
-          break;
-        default:
-      }
-    });
   }
 
   /// Plays the video if its priority is the highest among the currently playing videos.

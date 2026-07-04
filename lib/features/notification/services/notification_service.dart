@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/notification/providers/repository_providers.dart';
 import 'package:hazard_app/features/notification/repositories/notification_repository.dart';
+import 'package:hazard_app/features/notification/services/local_notification_service.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
@@ -20,6 +21,7 @@ class NotificationService {
   HazardService get _hazardService => _ref.read(providerOfHazardService);
 
   StreamSubscription<RemoteMessage>? _remoteMessageStreamSub;
+  StreamSubscription<RemoteMessage>? _foregroundMessageStreamSub;
 
   /// Fetches the hazards that the user has subscribed to for notifications.
   Future<Either<List<Hazard>, AppError>> getNotificationsFeed({
@@ -88,11 +90,23 @@ class NotificationService {
     _remoteMessageStreamSub = _notificationRepository
         .onPushNotificationMessageOpenedApp()
         .listen(onMessageReceived);
+
+    // Foreground messages: FCM does not display these automatically. Show
+    // them via the local-notification layer (Android) / native presentation
+    // (iOS); a tap routes into the same deep-link callback.
+    await LocalNotificationService.instance.initialize(
+      onNotificationTap: onMessageReceived,
+    );
+    _foregroundMessageStreamSub = _notificationRepository
+        .onForegroundPushNotificationMessage()
+        .listen(LocalNotificationService.instance.showFromRemoteMessage);
   }
 
   /// Disposes the stream.
   void disposePushNotificationMessageListener() {
     _remoteMessageStreamSub?.cancel();
     _remoteMessageStreamSub = null;
+    _foregroundMessageStreamSub?.cancel();
+    _foregroundMessageStreamSub = null;
   }
 }
