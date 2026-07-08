@@ -12,3 +12,5 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+# Public upload certificate — regenerable from the keystore, kept out of git for consistency.
+upload_certificate.pem
