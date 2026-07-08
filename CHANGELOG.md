@@ -1,3 +1,7 @@
+## v1.0.3+29 - 2026/07/08
+* Bug fixes and improvements
+
+
 ## v1.0.1+27 - 2026/03/12
 * UI Updates
 
