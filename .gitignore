@@ -50,3 +50,6 @@ release_note.txt
 
 # Google Maps API key for iOS (copy Maps.xcconfig.default -> Maps.xcconfig)
 /ios/Flutter/Maps.xcconfig
+
+# FVM Version Cache
+.fvm/

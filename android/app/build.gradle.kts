@@ -56,9 +56,10 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
-    // Release signing uses key.properties when present; otherwise the build
-    // falls back to debug signing so local `flutter run --release` and CI
-    // builds without the keystore still work.
+    // Only define the release signing config when key.properties is present.
+    // Without it (e.g. a fresh machine missing the upload keystore), release builds
+    // fall back to debug signing so local device testing still works — but such a
+    // build is NOT accepted by the Play Store.
     val hasReleaseKeystore = keystorePropertiesFile.exists()
     signingConfigs {
         if (hasReleaseKeystore) {
@@ -67,22 +68,6 @@ android {
                 keyPassword = keystoreProperties["keyPassword"] as String
                 storeFile = keystoreProperties["storeFile"]?.let { file(it) }
                 storePassword = keystoreProperties["storePassword"] as String
-            }
-        }
-    }
-
-    buildTypes {
-        debug {
-            signingConfig = signingConfigs.getByName("debug")
-        }
-        release {
-            signingConfig = if (hasReleaseKeystore) {
-                signingConfigs.getByName("release")
-            } else {
-                logger.warn(
-                    "key.properties not found — signing release build with debug keys."
-                )
-                signingConfigs.getByName("debug")
             }
         }
     }
@@ -98,6 +83,16 @@ android {
             dimension = "default"
             resValue("string", "app_name", "ALRT")
             applicationIdSuffix = ""
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig = if (hasReleaseKeystore) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }
