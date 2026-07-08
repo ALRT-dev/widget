@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/family/providers/family_provider.dart';
+import 'package:hazard_app/features/family/views/screens/family_tab_view.dart';
+import 'package:hazard_app/features/family/views/widgets/family_location_request_sheet.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_provider.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
@@ -17,6 +20,7 @@ import 'package:hazard_app/features/notification/extensions/remote_message_exten
 import 'package:hazard_app/features/notification/providers/manage_notifications_provider.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/notification/providers/push_notification_message_provider.dart';
+import 'package:hazard_app/features/notification/views/widgets/notification_priming_sheet.dart';
 import 'package:hazard_app/features/notification/views/screens/notifications_screen.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/my_location_subscriptions_provider.dart';
@@ -34,6 +38,8 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
+import 'package:hazard_app/features/shared/providers/repository_providers.dart';
+import 'package:hazard_app/features/shared/utils/review_prompt.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/providers/user_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
@@ -109,6 +115,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     _listenToHomeTabStateChanges();
     _listenToCreateReportState();
     _listenToTheMessageRecievedFromThePushNotification();
+    _listenToNotificationPrimingRequests();
 
     return Scaffold(
       body: Stack(
@@ -123,6 +130,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 const HazardSearchScreen(),
                 const CreateUpdateReportScreen(),
                 const NotificationsScreen(),
+                const FamilyTabView(),
                 const ProfileScreen(),
               ],
             ).pB(HomeTabbar.height - 20.0),
@@ -171,6 +179,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               success: (hazard) {
                 if (hazard.reviewStatus == HazardReviewStatus.accepted) {
                   _showAlrtApprovedToast();
+                  // A just-approved report is the happiest moment we have —
+                  // ask for a store review once the toast has landed.
+                  Future.delayed(const Duration(seconds: 5), () {
+                    if (!mounted) return;
+                    maybeAskForReview(
+                      prefs: ref.read(providerOfSharedPreferencesRepository),
+                    );
+                  });
                 } else if (hazard.reviewStatus == HazardReviewStatus.rejected) {
                   context.showErrorToast(
                     message:
@@ -207,8 +223,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               return _gotoViewHazardScreen(
                 Hazard.fromJson(remoteMessage.payload),
               );
+            case PushNotificationType.familyHazardProximity:
+              // Payload carries the hazard near the family member/place.
+              return _gotoViewHazardScreen(
+                Hazard.fromJson(remoteMessage.payload),
+              );
+            case PushNotificationType.familyLocationRequest:
+              // Consent-first: open the Share once / Not now sheet.
+              final requestId = remoteMessage.data['locationRequestId'];
+              if (requestId is String && requestId.isNotEmpty) {
+                showFamilyLocationRequestSheet(
+                  context: context,
+                  requestId: requestId,
+                  requesterName: remoteMessage.data['requesterName'],
+                );
+              }
+              return;
+            case PushNotificationType.familyCheckIn:
+            case PushNotificationType.familyCheckInRequest:
+            case PushNotificationType.familyPlaceEvent:
+            case PushNotificationType.familySos:
+            case PushNotificationType.familySosResponse:
+            case PushNotificationType.familySosResolved:
+            case PushNotificationType.familyCircleUpdate:
+            case PushNotificationType.familyLocationShared:
+              // Land on the family hub with fresh data.
+              ref.read(providerOfFamily.notifier).load(silent: true);
+              ref.read(providerOfHomeTab.notifier).state = HomeTab.family;
+              return;
             default:
           }
+        }
+      },
+    );
+  }
+
+  /// Shows the notification priming sheet when the home provider decides
+  /// permission should be pitched (before the OS prompt / after a deny).
+  void _listenToNotificationPrimingRequests() {
+    ref.listen(
+      providerOfHome.select((s) => s.notificationPrimingRequest),
+      (prev, next) {
+        if (next != null && prev == null) {
+          showNotificationPrimingSheet(context: context, kind: next);
         }
       },
     );

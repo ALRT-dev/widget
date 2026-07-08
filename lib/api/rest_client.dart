@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:hazard_app/api/endpoints.dart';
 import 'package:hazard_app/features/auth/models/auth_success_model.dart';
+import 'package:hazard_app/features/family/models/family_models.dart';
+import 'package:hazard_app/features/learn/models/guide_models.dart';
+import 'package:hazard_app/features/profile/models/xp_summary_models.dart';
 import 'package:hazard_app/features/notification/models/push_notification_settings_model.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
@@ -205,5 +208,192 @@ abstract class RestClient {
     @Field() required final String details,
     @Field() final String? userName,
     @Field() final String? userEmail,
+  });
+
+  // ---------------------------- FAMILY ----------------------------
+
+  /// Returns the user's family circle, or a null body when they have none —
+  /// handled as dynamic so the repository can map null -> no circle.
+  @GET(kUrlFamilyCircle)
+  Future<HttpResponse<dynamic>> getFamilyCircle();
+
+  @POST(kUrlFamilyCircle)
+  Future<FamilyCircle> createFamilyCircle({
+    @Field() required final String name,
+  });
+
+  @PUT(kUrlFamilyCircle)
+  Future<HttpResponse> updateFamilyCircle({
+    @Field() final String? name,
+    @Field() final String? themeColor,
+  });
+
+  @DELETE(kUrlFamilyCircle)
+  Future<HttpResponse> deleteFamilyCircle();
+
+  @POST(kUrlFamilyCircleLeave)
+  Future<HttpResponse> leaveFamilyCircle();
+
+  @DELETE('$kUrlFamilyMembers/{memberId}')
+  Future<HttpResponse> removeFamilyMember({
+    @Path() required final String memberId,
+  });
+
+  @PUT(kUrlFamilyMemberMe)
+  Future<HttpResponse> updateOwnFamilyMember({
+    @Field() final String? nickname,
+    @Field() final String? sharingLevel,
+    @Field() final String? colorHex,
+  });
+
+  @PUT(kUrlFamilyMemberMePhoto)
+  @MultiPart()
+  Future<HttpResponse> updateOwnFamilyMemberPhoto({
+    @Part(name: 'profilePictureFile') required final File photo,
+  });
+
+  @POST(kUrlFamilyInvites)
+  Future<FamilyInvite> createFamilyInvite();
+
+  @GET(kUrlFamilyInvites)
+  Future<List<FamilyInvite>> getFamilyInvites();
+
+  @POST(kUrlFamilyInviteRevoke)
+  Future<HttpResponse> revokeFamilyInvite({
+    @Path() required final String inviteId,
+  });
+
+  @POST(kUrlFamilyJoin)
+  Future<FamilyCircle> joinFamilyCircle({
+    @Field() required final String code,
+  });
+
+  @POST(kUrlFamilyLocation)
+  Future<HttpResponse> sendFamilyLocationPing({
+    @Field() required final double latitude,
+    @Field() required final double longitude,
+    @Field() final double? accuracy,
+    @Field() final double? speed,
+    @Field() final double? heading,
+    @Field() final int? batteryLevel,
+    @Field() final bool? isMoving,
+  });
+
+  @POST(kUrlFamilyLocationRequest)
+  Future<FamilyLocationRequest> createFamilyLocationRequest({
+    @Path() required final String memberId,
+  });
+
+  @GET(kUrlFamilyLocationRequestsPending)
+  Future<List<FamilyLocationRequest>> getPendingFamilyLocationRequests();
+
+  @POST(kUrlFamilyLocationRequestRespond)
+  Future<FamilyLocationRequest> respondToFamilyLocationRequest({
+    @Path() required final String requestId,
+    @Field() required final bool share,
+    @Field() final double? latitude,
+    @Field() final double? longitude,
+  });
+
+  @POST(kUrlFamilyCheckIn)
+  Future<FamilyCheckIn> sendFamilyCheckIn({
+    @Field() final String? status,
+    @Field() final String? message,
+    @Field() final double? latitude,
+    @Field() final double? longitude,
+    @Field() final String? requestId,
+    @Field() final String? hazardId,
+  });
+
+  @POST(kUrlFamilyCheckInRequest)
+  Future<FamilyCheckInRequest> requestFamilyCheckIn({
+    @Field() final String? message,
+    @Field() final String? hazardId,
+  });
+
+  @GET(kUrlFamilyCheckIns)
+  Future<List<FamilyCheckIn>> getFamilyCheckIns({
+    @Query('limit') final int? limit,
+  });
+
+  @GET(kUrlFamilyPlaces)
+  Future<List<FamilySavedPlace>> getFamilyPlaces();
+
+  @POST(kUrlFamilyPlaces)
+  Future<FamilySavedPlace> createFamilyPlace({
+    @Field() required final String name,
+    @Field() final String? icon,
+    @Field() required final double latitude,
+    @Field() required final double longitude,
+    @Field() final int? radiusMeters,
+    @Field() final String? address,
+  });
+
+  @PUT('$kUrlFamilyPlaces/{placeId}')
+  Future<FamilySavedPlace> updateFamilyPlace({
+    @Path() required final String placeId,
+    @Field() final String? name,
+    @Field() final String? icon,
+    @Field() final double? latitude,
+    @Field() final double? longitude,
+    @Field() final int? radiusMeters,
+    @Field() final String? address,
+  });
+
+  @DELETE('$kUrlFamilyPlaces/{placeId}')
+  Future<HttpResponse> deleteFamilyPlace({
+    @Path() required final String placeId,
+  });
+
+  @PUT(kUrlFamilyPlacePrefs)
+  Future<FamilyPlaceNotificationPref> updateFamilyPlacePref({
+    @Path() required final String placeId,
+    @Field() required final String subjectMemberId,
+    @Field() required final bool notifyArrivals,
+    @Field() required final bool notifyDepartures,
+  });
+
+  @POST(kUrlFamilySos)
+  Future<FamilySosEvent> triggerFamilySos({
+    @Field() final double? latitude,
+    @Field() final double? longitude,
+  });
+
+  @GET(kUrlFamilySosActive)
+  Future<List<FamilySosEvent>> getActiveFamilySosEvents();
+
+  @POST(kUrlFamilySosRespond)
+  Future<FamilySosResponse> respondToFamilySos({
+    @Path() required final String sosEventId,
+    @Field() required final String type,
+  });
+
+  @POST(kUrlFamilySosResolve)
+  Future<FamilySosEvent> resolveFamilySos({
+    @Path() required final String sosEventId,
+  });
+
+  // ---------------------------- LEARN / GUIDES ----------------------------
+
+  @GET(kUrlXpSummary)
+  Future<XpSummary> getXpSummary();
+
+  @GET(kUrlGuideTopics)
+  Future<GuideTopicsResponse> getGuideTopics();
+
+  @GET(kUrlGuideDetail)
+  Future<GuideDetail> getGuideDetail({
+    @Path() required final String slugOrId,
+  });
+
+  @POST(kUrlGuideComplete)
+  Future<GuideCompletionResponse> completeGuide({
+    @Path() required final String slugOrId,
+  });
+
+  /// Returns the guide linked to a hazard category (nullable body).
+  @GET(kUrlGuideForCategory)
+  Future<HttpResponse<dynamic>> getGuideForCategory({
+    @Path() required final String categoryId,
   });
 }

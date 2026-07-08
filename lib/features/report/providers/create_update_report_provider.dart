@@ -13,6 +13,7 @@ import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
+import 'package:hazard_app/features/shared/services/analytics_service.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -122,6 +123,8 @@ class CreateReportProvider
         );
 
         if (!isUpdating) {
+          AnalyticsService.reportSubmitted(categoryId: hazard.category?.id);
+
           // Update user's hazardsReportedCount by 1 if a new hazard was created.
           _ref
               .read(providerOfLoggedInUser.notifier)

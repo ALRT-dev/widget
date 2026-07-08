@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/family/views/widgets/family_safe_strip.dart';
+import 'package:hazard_app/features/learn/views/widgets/guide_strip_card.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
@@ -23,6 +25,7 @@ import 'package:hazard_app/features/shared/providers/video_preview_lifecycle_pro
 import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/utils/open_link.dart';
+import 'package:hazard_app/features/shared/utils/share_alert.dart';
 import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -243,6 +246,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               borderColor: pillBorderColor,
             ),
           Spacer(),
+          _buildShareButton(
+            backgroundColor: pillBackgroundColor,
+            backgroundColorAlpha: pillBackgroundColorAlpha,
+            foregroundColor: pillForegroundColor,
+            borderColor: pillBorderColor,
+          ),
           _buildBackButton(
             backgroundColor: pillBackgroundColor,
             backgroundColorAlpha: pillBackgroundColorAlpha,
@@ -252,6 +261,36 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildShareButton({
+    required final Color backgroundColor,
+    required final Color foregroundColor,
+    required final double backgroundColorAlpha,
+    required final Color? borderColor,
+  }) {
+    final hazard = ref.watch(provider.select((value) => value.hazard));
+    if (hazard == null || !isAlertShareable(hazard)) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      width: 35.spMin,
+      height: 35.spMin,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: backgroundColor.withValues(alpha: backgroundColorAlpha),
+        border: Border.all(
+          color: borderColor ?? AppColors.transparent,
+          width: 1,
+        ),
+      ),
+      child: Icon(
+        LucideIcons.share,
+        color: foregroundColor,
+        size: 18.spMin,
+      ),
+    ).onPressed(() => shareAlert(hazard: hazard, from: 'detail'));
   }
 
   Widget _buildBackButton({
@@ -1079,6 +1118,27 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                           ),
                         );
                       }),
+                      // Deep link into the matching safety guide, if any.
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final categoryId = ref.watch(
+                            provider.select(
+                              (value) => value.hazard?.category?.id,
+                            ),
+                          );
+                          return GuideStripCard(categoryId: categoryId);
+                        },
+                      ),
+                      // One-tap "I'm safe" for family circle members.
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final hazard = ref.watch(
+                            provider.select((value) => value.hazard),
+                          );
+                          if (hazard == null) return const SizedBox.shrink();
+                          return FamilySafeStrip(hazard: hazard);
+                        },
+                      ),
                     ],
                   ),
                 ),

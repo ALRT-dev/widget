@@ -16,6 +16,11 @@ abstract class NotificationRepository {
     final String? vapidKey,
   });
 
+  /// Reads the current notification permission WITHOUT triggering the OS
+  /// prompt — used to decide whether to show the priming screen first.
+  Future<Either<AuthorizationStatus, AppError>>
+  getNotificationPermissionStatus();
+
   Future<Either<void, AppError>> sendPushNotificationToken({
     required final String token,
   });
@@ -23,6 +28,8 @@ abstract class NotificationRepository {
   Future<Either<RemoteMessage?, AppError>> getInitialPushNotificationMessage();
 
   Stream<RemoteMessage> onPushNotificationMessageOpenedApp();
+
+  Stream<RemoteMessage> onForegroundPushNotificationMessage();
 }
 
 class NotificationRepositoryImpl implements NotificationRepository {
@@ -95,6 +102,19 @@ class NotificationRepositoryImpl implements NotificationRepository {
   }
 
   @override
+  Future<Either<AuthorizationStatus, AppError>>
+  getNotificationPermissionStatus() {
+    return runAsyncCall(
+      name: 'getNotificationPermissionStatus',
+      future: () async {
+        final settings = await _firebaseMessaging.getNotificationSettings();
+        return Success(settings.authorizationStatus);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
   Future<Either<void, AppError>> sendPushNotificationToken({
     required String token,
   }) {
@@ -125,5 +145,10 @@ class NotificationRepositoryImpl implements NotificationRepository {
   @override
   Stream<RemoteMessage> onPushNotificationMessageOpenedApp() {
     return FirebaseMessaging.onMessageOpenedApp;
+  }
+
+  @override
+  Stream<RemoteMessage> onForegroundPushNotificationMessage() {
+    return FirebaseMessaging.onMessage;
   }
 }

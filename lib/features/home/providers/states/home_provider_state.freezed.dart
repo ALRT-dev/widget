@@ -16,7 +16,9 @@ mixin _$HomeProviderState {
 
 /// The state of sending push notification token to the server
  SendPushNotificationTokenState get sendPushNotificationTokenState;/// The state of updating user location
- UpdateUserLocationState get updateUserLocationState;
+ UpdateUserLocationState get updateUserLocationState;/// Set when the notification priming screen should be shown (permission
+/// missing and the "maybe later" snooze has lapsed). Null otherwise.
+ NotificationPrimingKind? get notificationPrimingRequest;
 /// Create a copy of HomeProviderState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,16 +29,16 @@ $HomeProviderStateCopyWith<HomeProviderState> get copyWith => _$HomeProviderStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeProviderState&&(identical(other.sendPushNotificationTokenState, sendPushNotificationTokenState) || other.sendPushNotificationTokenState == sendPushNotificationTokenState)&&(identical(other.updateUserLocationState, updateUserLocationState) || other.updateUserLocationState == updateUserLocationState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeProviderState&&(identical(other.sendPushNotificationTokenState, sendPushNotificationTokenState) || other.sendPushNotificationTokenState == sendPushNotificationTokenState)&&(identical(other.updateUserLocationState, updateUserLocationState) || other.updateUserLocationState == updateUserLocationState)&&(identical(other.notificationPrimingRequest, notificationPrimingRequest) || other.notificationPrimingRequest == notificationPrimingRequest));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,sendPushNotificationTokenState,updateUserLocationState);
+int get hashCode => Object.hash(runtimeType,sendPushNotificationTokenState,updateUserLocationState,notificationPrimingRequest);
 
 @override
 String toString() {
-  return 'HomeProviderState(sendPushNotificationTokenState: $sendPushNotificationTokenState, updateUserLocationState: $updateUserLocationState)';
+  return 'HomeProviderState(sendPushNotificationTokenState: $sendPushNotificationTokenState, updateUserLocationState: $updateUserLocationState, notificationPrimingRequest: $notificationPrimingRequest)';
 }
 
 
@@ -47,7 +49,7 @@ abstract mixin class $HomeProviderStateCopyWith<$Res>  {
   factory $HomeProviderStateCopyWith(HomeProviderState value, $Res Function(HomeProviderState) _then) = _$HomeProviderStateCopyWithImpl;
 @useResult
 $Res call({
- SendPushNotificationTokenState sendPushNotificationTokenState, UpdateUserLocationState updateUserLocationState
+ SendPushNotificationTokenState sendPushNotificationTokenState, UpdateUserLocationState updateUserLocationState, NotificationPrimingKind? notificationPrimingRequest
 });
 
 
@@ -64,11 +66,12 @@ class _$HomeProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? sendPushNotificationTokenState = null,Object? updateUserLocationState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? sendPushNotificationTokenState = null,Object? updateUserLocationState = null,Object? notificationPrimingRequest = freezed,}) {
   return _then(_self.copyWith(
 sendPushNotificationTokenState: null == sendPushNotificationTokenState ? _self.sendPushNotificationTokenState : sendPushNotificationTokenState // ignore: cast_nullable_to_non_nullable
 as SendPushNotificationTokenState,updateUserLocationState: null == updateUserLocationState ? _self.updateUserLocationState : updateUserLocationState // ignore: cast_nullable_to_non_nullable
-as UpdateUserLocationState,
+as UpdateUserLocationState,notificationPrimingRequest: freezed == notificationPrimingRequest ? _self.notificationPrimingRequest : notificationPrimingRequest // ignore: cast_nullable_to_non_nullable
+as NotificationPrimingKind?,
   ));
 }
 /// Create a copy of HomeProviderState
@@ -171,10 +174,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SendPushNotificationTokenState sendPushNotificationTokenState,  UpdateUserLocationState updateUserLocationState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SendPushNotificationTokenState sendPushNotificationTokenState,  UpdateUserLocationState updateUserLocationState,  NotificationPrimingKind? notificationPrimingRequest)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HomeProviderState() when $default != null:
-return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationState);case _:
+return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationState,_that.notificationPrimingRequest);case _:
   return orElse();
 
 }
@@ -192,10 +195,10 @@ return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationSta
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SendPushNotificationTokenState sendPushNotificationTokenState,  UpdateUserLocationState updateUserLocationState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SendPushNotificationTokenState sendPushNotificationTokenState,  UpdateUserLocationState updateUserLocationState,  NotificationPrimingKind? notificationPrimingRequest)  $default,) {final _that = this;
 switch (_that) {
 case _HomeProviderState():
-return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationState);case _:
+return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationState,_that.notificationPrimingRequest);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -212,10 +215,10 @@ return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationSta
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SendPushNotificationTokenState sendPushNotificationTokenState,  UpdateUserLocationState updateUserLocationState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SendPushNotificationTokenState sendPushNotificationTokenState,  UpdateUserLocationState updateUserLocationState,  NotificationPrimingKind? notificationPrimingRequest)?  $default,) {final _that = this;
 switch (_that) {
 case _HomeProviderState() when $default != null:
-return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationState);case _:
+return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationState,_that.notificationPrimingRequest);case _:
   return null;
 
 }
@@ -227,13 +230,16 @@ return $default(_that.sendPushNotificationTokenState,_that.updateUserLocationSta
 
 
 class _HomeProviderState implements HomeProviderState {
-  const _HomeProviderState({this.sendPushNotificationTokenState = const SendPushNotificationTokenState.initial(), this.updateUserLocationState = const UpdateUserLocationState.initial()});
+  const _HomeProviderState({this.sendPushNotificationTokenState = const SendPushNotificationTokenState.initial(), this.updateUserLocationState = const UpdateUserLocationState.initial(), this.notificationPrimingRequest});
   
 
 /// The state of sending push notification token to the server
 @override@JsonKey() final  SendPushNotificationTokenState sendPushNotificationTokenState;
 /// The state of updating user location
 @override@JsonKey() final  UpdateUserLocationState updateUserLocationState;
+/// Set when the notification priming screen should be shown (permission
+/// missing and the "maybe later" snooze has lapsed). Null otherwise.
+@override final  NotificationPrimingKind? notificationPrimingRequest;
 
 /// Create a copy of HomeProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -245,16 +251,16 @@ _$HomeProviderStateCopyWith<_HomeProviderState> get copyWith => __$HomeProviderS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeProviderState&&(identical(other.sendPushNotificationTokenState, sendPushNotificationTokenState) || other.sendPushNotificationTokenState == sendPushNotificationTokenState)&&(identical(other.updateUserLocationState, updateUserLocationState) || other.updateUserLocationState == updateUserLocationState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HomeProviderState&&(identical(other.sendPushNotificationTokenState, sendPushNotificationTokenState) || other.sendPushNotificationTokenState == sendPushNotificationTokenState)&&(identical(other.updateUserLocationState, updateUserLocationState) || other.updateUserLocationState == updateUserLocationState)&&(identical(other.notificationPrimingRequest, notificationPrimingRequest) || other.notificationPrimingRequest == notificationPrimingRequest));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,sendPushNotificationTokenState,updateUserLocationState);
+int get hashCode => Object.hash(runtimeType,sendPushNotificationTokenState,updateUserLocationState,notificationPrimingRequest);
 
 @override
 String toString() {
-  return 'HomeProviderState(sendPushNotificationTokenState: $sendPushNotificationTokenState, updateUserLocationState: $updateUserLocationState)';
+  return 'HomeProviderState(sendPushNotificationTokenState: $sendPushNotificationTokenState, updateUserLocationState: $updateUserLocationState, notificationPrimingRequest: $notificationPrimingRequest)';
 }
 
 
@@ -265,7 +271,7 @@ abstract mixin class _$HomeProviderStateCopyWith<$Res> implements $HomeProviderS
   factory _$HomeProviderStateCopyWith(_HomeProviderState value, $Res Function(_HomeProviderState) _then) = __$HomeProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- SendPushNotificationTokenState sendPushNotificationTokenState, UpdateUserLocationState updateUserLocationState
+ SendPushNotificationTokenState sendPushNotificationTokenState, UpdateUserLocationState updateUserLocationState, NotificationPrimingKind? notificationPrimingRequest
 });
 
 
@@ -282,11 +288,12 @@ class __$HomeProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of HomeProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? sendPushNotificationTokenState = null,Object? updateUserLocationState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? sendPushNotificationTokenState = null,Object? updateUserLocationState = null,Object? notificationPrimingRequest = freezed,}) {
   return _then(_HomeProviderState(
 sendPushNotificationTokenState: null == sendPushNotificationTokenState ? _self.sendPushNotificationTokenState : sendPushNotificationTokenState // ignore: cast_nullable_to_non_nullable
 as SendPushNotificationTokenState,updateUserLocationState: null == updateUserLocationState ? _self.updateUserLocationState : updateUserLocationState // ignore: cast_nullable_to_non_nullable
-as UpdateUserLocationState,
+as UpdateUserLocationState,notificationPrimingRequest: freezed == notificationPrimingRequest ? _self.notificationPrimingRequest : notificationPrimingRequest // ignore: cast_nullable_to_non_nullable
+as NotificationPrimingKind?,
   ));
 }
 

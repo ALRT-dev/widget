@@ -64,3 +64,52 @@ const kUrlNotificationsPushNotificationToken =
 // ---------------------------- SUPPORT ----------------------------
 
 const kUrlSupport = '$kUrlApi/support';
+
+// ---------------------------- FAMILY ----------------------------
+
+const kUrlFamily = '$kUrlApi/family';
+
+const kUrlFamilyCircle = '$kUrlFamily/circle';
+const kUrlFamilyCircleLeave = '$kUrlFamilyCircle/leave';
+const kUrlFamilyMembers = '$kUrlFamily/members';
+const kUrlFamilyMemberMe = '$kUrlFamilyMembers/me';
+const kUrlFamilyMemberMePhoto = '$kUrlFamilyMemberMe/photo';
+const kUrlFamilyInvites = '$kUrlFamily/invites';
+const kUrlFamilyInviteRevoke = '$kUrlFamilyInvites/{inviteId}/revoke';
+const kUrlFamilyJoin = '$kUrlFamily/join';
+const kUrlFamilyLocation = '$kUrlFamily/location';
+const kUrlFamilyLocationRequest =
+    '$kUrlFamilyMembers/{memberId}/location-request';
+const kUrlFamilyLocationRequestsPending =
+    '$kUrlFamily/location-requests/pending';
+const kUrlFamilyLocationRequestRespond =
+    '$kUrlFamily/location-requests/{requestId}/respond';
+const kUrlFamilyCheckIn = '$kUrlFamily/check-in';
+const kUrlFamilyCheckInRequest = '$kUrlFamilyCheckIn/request';
+const kUrlFamilyCheckIns = '$kUrlFamily/check-ins';
+const kUrlFamilyPlaces = '$kUrlFamily/places';
+const kUrlFamilyPlacePrefs = '$kUrlFamilyPlaces/{placeId}/prefs';
+const kUrlFamilySos = '$kUrlFamily/sos';
+const kUrlFamilySosActive = '$kUrlFamilySos/active';
+const kUrlFamilySosRespond = '$kUrlFamilySos/{sosEventId}/respond';
+const kUrlFamilySosResolve = '$kUrlFamilySos/{sosEventId}/resolve';
+
+// ---------------------------- XP / SCORING ----------------------------
+
+const kUrlXp = '$kUrlApi/xp';
+
+const kUrlXpSummary = '$kUrlXp/summary';
+
+// ---------------------------- LEARN / GUIDES ----------------------------
+
+const kUrlGuides = '$kUrlApi/guides';
+
+const kUrlGuideTopics = '$kUrlGuides/topics';
+const kUrlGuideForCategory = '$kUrlGuides/for-category/{categoryId}';
+const kUrlGuideDetail = '$kUrlGuides/{slugOrId}';
+const kUrlGuideComplete = '$kUrlGuides/{slugOrId}/complete';
+
+// ---------------------------- PUBLIC SHARE ----------------------------
+
+/// Public share page for an alert — used when sharing an alert externally.
+const kUrlShareAlert = '$kUrlBase/share/alert';
