@@ -10,6 +10,7 @@ import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
+import 'package:hazard_app/features/shared/views/widgets/voice/voice_search_mic_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class HazardSearchAppBar extends ConsumerStatefulWidget {
@@ -140,21 +141,29 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
                     ).pL(15.0),
                   ],
                 ),
-                suffixIcon: !isSearchActive
-                    ? null
-                    : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            onPressed: _handleClearSearchPressed,
-                            icon: Icon(
-                              Icons.close_rounded,
-                              size: 20.spMin,
-                              color: AppColors.black,
-                            ),
-                          ).pR(5.0),
-                        ],
-                      ),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (!isSearchActive)
+                      VoiceSearchMicButton(
+                        onTranscript: (text) {
+                          _searchController.text = text;
+                          _searchController.selection =
+                              TextSelection.collapsed(offset: text.length);
+                          _handleSearchChanged(text);
+                        },
+                      )
+                    else
+                      IconButton(
+                        onPressed: _handleClearSearchPressed,
+                        icon: Icon(
+                          Icons.close_rounded,
+                          size: 20.spMin,
+                          color: AppColors.black,
+                        ),
+                      ).pR(5.0),
+                  ],
+                ),
               ),
             ),
           );

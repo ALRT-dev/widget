@@ -63,6 +63,7 @@ dependencies:
   in_app_review: ^2.0.12
   firebase_analytics: ^12.4.3
   auto_size_text: ^3.0.0
+  speech_to_text: ^7.0.0
 
 dev_dependencies:
   flutter_test:
