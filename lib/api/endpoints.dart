@@ -99,6 +99,8 @@ const kUrlFamilySosResolve = '$kUrlFamilySos/{sosEventId}/resolve';
 const kUrlXp = '$kUrlApi/xp';
 
 const kUrlXpSummary = '$kUrlXp/summary';
+const kUrlXpBreakdown = '$kUrlXp/breakdown';
+const kUrlXpLeaderboard = '$kUrlXp/leaderboard';
 
 // ---------------------------- LEARN / GUIDES ----------------------------
 

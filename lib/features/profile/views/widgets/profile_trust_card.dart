@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/profile/models/xp_summary_models.dart';
 import 'package:hazard_app/features/profile/providers/xp_summary_provider.dart';
 import 'package:hazard_app/features/profile/views/screens/how_points_work_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/leaderboard_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/points_breakdown_screen.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -106,6 +108,48 @@ class ProfileTrustCard extends ConsumerWidget {
                 Icon(LucideIcons.chevronRight, size: 15.spMin, color: _indigo),
               ],
             ),
+          ),
+          SizedBox(height: 10.spMin),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => context.push(LeaderboardScreen.route),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(LucideIcons.trophy, size: 15.spMin, color: _indigo),
+                    SizedBox(width: 4.spMin),
+                    Text(
+                      'Leaderboard',
+                      style: TextStyle(
+                        fontSize: 13.spMin,
+                        fontWeight: FontWeight.w700,
+                        color: _indigo,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 18.spMin),
+              GestureDetector(
+                onTap: () => context.push(PointsBreakdownScreen.route),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(LucideIcons.chartColumnBig, size: 15.spMin, color: _indigo),
+                    SizedBox(width: 4.spMin),
+                    Text(
+                      'Your points',
+                      style: TextStyle(
+                        fontSize: 13.spMin,
+                        fontWeight: FontWeight.w700,
+                        color: _indigo,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

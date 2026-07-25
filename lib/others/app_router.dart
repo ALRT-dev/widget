@@ -12,6 +12,8 @@ import 'package:hazard_app/features/home/views/screens/home_screen.dart';
 import 'package:hazard_app/features/learn/views/screens/guide_detail_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_circle_profile_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/how_points_work_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/leaderboard_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/points_breakdown_screen.dart';
 import 'package:hazard_app/features/learn/views/screens/learn_topics_screen.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
@@ -197,6 +199,14 @@ class AppRouter {
         GoRoute(
           path: HowPointsWorkScreen.route,
           builder: (context, state) => const HowPointsWorkScreen(),
+        ),
+        GoRoute(
+          path: LeaderboardScreen.route,
+          builder: (context, state) => const LeaderboardScreen(),
+        ),
+        GoRoute(
+          path: PointsBreakdownScreen.route,
+          builder: (context, state) => const PointsBreakdownScreen(),
         ),
         GoRoute(
           path: ViewHazardScreen.route,
