@@ -24,14 +24,13 @@ class _RouteSourceAndDestinationState
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.lightGrey),
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(14.spMin),
+        borderRadius: BorderRadius.circular(18.spMin),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadowColor,
             blurRadius: 10.0,
-            offset: Offset(0, 0.0),
+            offset: Offset(0.0, 0.0),
           ),
         ],
       ),

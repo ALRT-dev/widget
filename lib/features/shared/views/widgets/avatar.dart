@@ -213,7 +213,6 @@ class _AvatarState extends ConsumerState<Avatar> {
         image: widget.cache
             ? AppCachedNetworkImageProvider.fromRef(
                 ref: ref,
-                cacheKey: widget.imgUrl!,
                 widget.imgUrl!,
               )
             : NetworkImage(widget.imgUrl!),
@@ -283,6 +282,7 @@ class _AvatarState extends ConsumerState<Avatar> {
             ? AppCachedNetworkImageProvider.fromRef(
                 ref: ref,
                 widget.profileMedia!.value,
+                cacheKey: widget.profileMedia!.s3Key,
               )
             : NetworkImage(widget.profileMedia!.value),
         fit: widget.fit,

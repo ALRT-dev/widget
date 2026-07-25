@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/notification/views/widgets/change_my_location_subscription_bottomsheet_content.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
 import 'package:hazard_app/features/shared/views/widgets/change_location_bottomsheet_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/change_radius_bottomsheet_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/confirmation_sheet_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_bottomsheet_content.dart';
+import 'package:hazard_app/features/shared/views/widgets/hazards_bottomsheet_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/image_picker_bottomsheet.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -128,6 +130,19 @@ Future<void> showChangeRadiusBottomsheet({
     context: context,
     builder: (_) => ChangeRadiusBottomsheetContent(
       initialRadius: initialRadius,
+    ),
+  );
+}
+
+/// Shows a full-screen bottom sheet displaying the list of hazards.
+Future<void> showHazardsBottomsheet({
+  required final BuildContext context,
+  required final List<Hazard> hazards,
+}) {
+  return showCupertinoModalPopup(
+    context: context,
+    builder: (context) => HazardsBottomsheetContent(
+      hazards: hazards,
     ),
   );
 }

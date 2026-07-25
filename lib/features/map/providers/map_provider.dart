@@ -4,7 +4,8 @@ import 'dart:developer';
 
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -13,7 +14,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
 import 'package:hazard_app/features/map/extensions/polyline_extension.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
+import 'package:hazard_app/features/map/models/hazard_corridor_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
+import 'package:hazard_app/features/map/models/route_step_model.dart';
+import 'package:hazard_app/features/map/models/safest_fastest_routes_model.dart';
 import 'package:hazard_app/features/map/providers/hazard_markers_bitmaps_provider.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/service_providers.dart';
@@ -24,6 +28,9 @@ import 'package:hazard_app/features/map/services/map_service.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 import 'package:hazard_app/features/map/utils/hazard_cluster_util.dart';
+import 'package:hazard_app/features/map/utils/bypass_waypoint_planner.dart';
+import 'package:hazard_app/features/map/utils/hazard_corridor_detector.dart';
+import 'package:hazard_app/features/map/utils/navigation_polyline_simulation.dart';
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
@@ -72,6 +79,14 @@ class MapProvider extends StateNotifier<MapProviderState> {
   StreamSubscription? _positionStreamSubscription;
   int _hazardRequestId = 0;
 
+  /// Timer to auto-hide the "Take Alternate Route" button after 10 seconds.
+  Timer? _takeAlternateRouteButtonTimer;
+
+  /// After sim framing runs once ([_applySimulationNorthUpCameraFrame]), arrow
+  /// presses only pan with [CameraUpdate.newLatLng] so zoom/bearing/tilt do not
+  /// animate every tick (maps interpolate full [CameraPosition] updates).
+  bool _simulationNorthUpCameraFrameApplied = false;
+
   /// The page size for fetching hazards.
   int get _pageSize => 5000;
 
@@ -103,6 +118,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
     _ref.onDispose(() {
       _headingStreamSubscription?.cancel();
       _positionStreamSubscription?.cancel();
+      _takeAlternateRouteButtonTimer?.cancel();
       // Reset map ready state when provider is disposed
       if (mounted) {
         state = state.copyWith(
@@ -533,7 +549,23 @@ class MapProvider extends StateNotifier<MapProviderState> {
       if (!mounted) return;
     }
 
+    _logStartNavigationSteps();
+
+    // Seed navigation state from the user's last known location so the
+    // overlay has populated step / distance / bearing values on its very
+    // first build. Without this, the geolocator stream in
+    // `_startLocationTracking` (distanceFilter: 5m) can take a long time to
+    // emit while the user is stationary, leaving the UI showing "--" for
+    // current step, next step, ETA, etc.
+    _updateNavigationLocation(currentUserLocation);
+    _updateNavigationStep(currentUserLocation);
+
     updateIsNavigating(true);
+
+    // Seed the hazard corridor list so the alternate-route button can show
+    // immediately if the route already overlaps a hazard cluster, instead
+    // of waiting for the next GPS tick.
+    _recomputeHazardCorridorsAhead();
 
     final zoom = 18.0;
     final tilt = 20.0;
@@ -578,6 +610,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
         .listen(
           (position) {
             if (!mounted) return;
+            if (state.navigationSimulationEnabled) return;
 
             final newLocation = AlrtLocation(
               latitude: position.latitude,
@@ -593,13 +626,27 @@ class MapProvider extends StateNotifier<MapProviderState> {
         );
   }
 
-  /// Handles location updates during navigation
-  void _handleLocationUpdate(AlrtLocation newLocation) {
+  /// Handles location updates during navigation.
+  ///
+  /// When [preserveHeadingAndSpeed] is true (cardinal nudge simulation),
+  /// bearing and speed are left unchanged so the follow-camera bearing and
+  /// zoom tiers do not snap on each arrow tap.
+  void _handleLocationUpdate(
+    AlrtLocation newLocation, {
+    bool preserveHeadingAndSpeed = false,
+  }) {
     final currentRoutePlan = state.currentRoutePlan;
     if (currentRoutePlan == null || !currentRoutePlan.isNavigating) return;
 
     // Update current navigation location and calculate bearing/speed
-    _updateNavigationLocation(newLocation);
+    _updateNavigationLocation(
+      newLocation,
+      preserveHeadingAndSpeed: preserveHeadingAndSpeed,
+    );
+
+    // Update current step / next step / distance to next maneuver and log
+    // any meaningful changes for the upcoming navigation UI to consume.
+    _updateNavigationStep(newLocation);
 
     // Check if destination is reached
     if (_checkDestinationReached(newLocation)) {
@@ -618,16 +665,25 @@ class MapProvider extends StateNotifier<MapProviderState> {
 
     // Update camera position smoothly
     _updateNavigationCamera(newLocation);
+
+    _syncSimulatedNavigationMarker();
+
+    // Refresh the ahead-of-user hazard corridors so the alternate-route
+    // button reflects the user's new position.
+    _recomputeHazardCorridorsAhead();
   }
 
   /// Updates navigation location and calculates speed/bearing
-  void _updateNavigationLocation(AlrtLocation newLocation) {
+  void _updateNavigationLocation(
+    AlrtLocation newLocation, {
+    bool preserveHeadingAndSpeed = false,
+  }) {
     final previousLocation = state.currentNavigationLocation;
 
     double bearing = state.currentBearing;
     double speed = state.currentSpeed;
 
-    if (previousLocation != null) {
+    if (previousLocation != null && !preserveHeadingAndSpeed) {
       speed = _calculateSpeed(previousLocation, newLocation);
       bearing = _calculateBearing(
         LatLng(previousLocation.latitude, previousLocation.longitude),
@@ -640,6 +696,193 @@ class MapProvider extends StateNotifier<MapProviderState> {
       currentSpeed: speed,
       currentBearing: bearing,
     );
+  }
+
+  /// Distance thresholds (meters) at which we re-emit the "approaching the
+  /// next maneuver" log. Mirrors how Google Maps announces *"In 500 m..."*,
+  /// *"In 200 m..."*, *"Now turn..."*.
+  static const List<double> _maneuverAnnouncementThresholdsMeters = [
+    500.0,
+    200.0,
+    50.0,
+  ];
+
+  /// Locates the user's current step on the active route, computes the
+  /// remaining distance to the next maneuver, and pushes everything into
+  /// state.
+  ///
+  /// Logs are emitted only when the step index advances or the user crosses
+  /// one of [_maneuverAnnouncementThresholdsMeters], so the console isn't
+  /// flooded by per-tick GPS updates.
+  void _updateNavigationStep(AlrtLocation newLocation) {
+    final routePlan = state.currentRoutePlan;
+    final safestFastest = routePlan?.currentRoute;
+    if (safestFastest == null) return;
+
+    final activeRoute = safestFastest.currentRoute;
+    final steps = safestFastest.stepsForRoute(activeRoute);
+    if (steps.isEmpty) return;
+
+    final userLatLng = LatLng(newLocation.latitude, newLocation.longitude);
+
+    // Pick the step whose polyline (or, if missing, whose start/end segment)
+    // is closest to the user. This is robust against GPS noise pushing the
+    // user briefly off the next step.
+    int? bestStepIndex;
+    double bestDistance = double.infinity;
+    for (var i = 0; i < steps.length; i++) {
+      final distance = _distanceFromUserToStep(userLatLng, steps[i]);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestStepIndex = i;
+      }
+    }
+    if (bestStepIndex == null) return;
+
+    final currentStep = steps[bestStepIndex];
+    final nextStep = bestStepIndex + 1 < steps.length
+        ? steps[bestStepIndex + 1]
+        : null;
+    final stepAfterNext = bestStepIndex + 2 < steps.length
+        ? steps[bestStepIndex + 2]
+        : null;
+    final distanceToNextManeuver = _calculateDistanceToStepEnd(
+      userLatLng,
+      currentStep,
+    );
+
+    // Total remaining distance: distance left in the current step plus the
+    // full length of every subsequent step.
+    var remainingDistance = distanceToNextManeuver;
+    for (var i = bestStepIndex + 1; i < steps.length; i++) {
+      remainingDistance += steps[i].distanceMeters.toDouble();
+    }
+
+    // Total remaining duration: pro-rate the current step's duration by how
+    // much of it is left, then add full durations of all subsequent steps.
+    final currentStepDistance = currentStep.distanceMeters;
+    final currentStepRemainingFraction = currentStepDistance > 0
+        ? (distanceToNextManeuver / currentStepDistance).clamp(0.0, 1.0)
+        : 0.0;
+    var remainingDuration =
+        (currentStep.durationSeconds * currentStepRemainingFraction).round();
+    for (var i = bestStepIndex + 1; i < steps.length; i++) {
+      remainingDuration += steps[i].durationSeconds;
+    }
+
+    final previousStepIndex = state.currentStepIndex;
+    final previousDistance = state.distanceToNextManeuverMeters;
+
+    state = state.copyWith(
+      currentStepIndex: bestStepIndex,
+      currentStep: currentStep,
+      nextStep: nextStep,
+      stepAfterNext: stepAfterNext,
+      distanceToNextManeuverMeters: distanceToNextManeuver,
+      remainingDistanceMeters: remainingDistance.round(),
+      remainingDurationSeconds: remainingDuration,
+    );
+
+    final stepChanged = previousStepIndex != bestStepIndex;
+    final crossedThreshold = _crossedAnnouncementThreshold(
+      previousDistance,
+      distanceToNextManeuver,
+    );
+
+    if (stepChanged || crossedThreshold) {
+      log(
+        '[Nav step] #${bestStepIndex + 1}/${steps.length} '
+        '[${currentStep.maneuver.name}] ${currentStep.instruction} '
+        '(${distanceToNextManeuver.toStringAsFixed(0)} m to next maneuver)',
+      );
+      log(
+        '[Nav step]   Then: '
+        '${nextStep == null ? "(arrive)" : "[${nextStep.maneuver.name}] ${nextStep.instruction}"}',
+      );
+    }
+  }
+
+  /// Returns the perpendicular distance, in meters, from [user] to the
+  /// closest segment of [step]'s polyline. Falls back to the start->end
+  /// segment when the polyline is empty.
+  double _distanceFromUserToStep(LatLng user, RouteStep step) {
+    final polyline = step.polylinePoints;
+    if (polyline.length < 2) {
+      return _calculateDistanceToLineSegment(
+        user,
+        step.startLocation,
+        step.endLocation,
+      );
+    }
+
+    var minDistance = double.infinity;
+    for (var i = 0; i < polyline.length - 1; i++) {
+      final distance = _calculateDistanceToLineSegment(
+        user,
+        polyline[i],
+        polyline[i + 1],
+      );
+      if (distance < minDistance) minDistance = distance;
+    }
+    return minDistance;
+  }
+
+  /// Approximates remaining distance from [user] to [step]'s end location by
+  /// walking the step polyline forwards from the closest vertex. Falls back
+  /// to a straight-line haversine measurement when no polyline is available.
+  double _calculateDistanceToStepEnd(LatLng user, RouteStep step) {
+    final polyline = step.polylinePoints;
+    if (polyline.length < 2) {
+      return calculateDistanceInMeters(
+        user.latitude,
+        user.longitude,
+        step.endLocation.latitude,
+        step.endLocation.longitude,
+      );
+    }
+
+    // Find the closest segment to the user, then sum the remaining segment
+    // lengths plus the residual distance from the user to the end of that
+    // closest segment.
+    var minDistance = double.infinity;
+    var closestSegmentIndex = 0;
+    for (var i = 0; i < polyline.length - 1; i++) {
+      final distance = _calculateDistanceToLineSegment(
+        user,
+        polyline[i],
+        polyline[i + 1],
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestSegmentIndex = i;
+      }
+    }
+
+    var remaining = calculateDistanceInMeters(
+      user.latitude,
+      user.longitude,
+      polyline[closestSegmentIndex + 1].latitude,
+      polyline[closestSegmentIndex + 1].longitude,
+    );
+    for (var i = closestSegmentIndex + 1; i < polyline.length - 1; i++) {
+      remaining += calculateDistanceInMeters(
+        polyline[i].latitude,
+        polyline[i].longitude,
+        polyline[i + 1].latitude,
+        polyline[i + 1].longitude,
+      );
+    }
+    return remaining;
+  }
+
+  /// True iff [current] crossed below any of the announcement thresholds
+  /// since the last update represented by [previous].
+  bool _crossedAnnouncementThreshold(double? previous, double current) {
+    if (previous == null) return true;
+    for (final threshold in _maneuverAnnouncementThresholdsMeters) {
+      if (previous > threshold && current <= threshold) return true;
+    }
+    return false;
   }
 
   /// Calculates speed between two locations in m/s
@@ -811,10 +1054,36 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
+  void _applySimulationNorthUpCameraFrame(LatLng target) {
+    animateToCameraUpdate(
+      cameraUpdate: CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: target,
+          zoom: _kSimulationNavigationCameraZoom,
+          bearing: _kSimulationNavigationCameraBearing,
+          tilt: _kSimulationNavigationCameraTilt,
+        ),
+      ),
+    );
+  }
+
   /// Updates camera position during navigation
   void _updateNavigationCamera(AlrtLocation location) {
     // Only update camera if user following is enabled
     if (!state.followUser) return;
+
+    if (state.navigationSimulationEnabled) {
+      final latLng = LatLng(location.latitude, location.longitude);
+      if (!_simulationNorthUpCameraFrameApplied) {
+        _applySimulationNorthUpCameraFrame(latLng);
+        _simulationNorthUpCameraFrameApplied = true;
+      } else {
+        animateToCameraUpdate(
+          cameraUpdate: CameraUpdate.newLatLng(latLng),
+        );
+      }
+      return;
+    }
 
     final currentBearing = state.currentBearing;
     final currentSpeed = state.currentSpeed;
@@ -857,6 +1126,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
         heading,
       ) {
         if (!mounted) return;
+        if (state.navigationSimulationEnabled) return;
 
         if (lastHeading == null || (heading - (lastHeading ?? 0)).abs() > 6) {
           lastHeading = heading;
@@ -919,22 +1189,563 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // Hazard-aware alternate route
+  // ---------------------------------------------------------------------------
+
+  /// Distance (in meters) within which a hazard is considered to lie on the
+  /// active route polyline.
+  static const double _kHazardProximityThresholdMeters = 100.0;
+
+  /// Hazards whose pairwise distance is at or below this value collapse into
+  /// the same [HazardCorridor] so a single bypass waypoint can route around
+  /// the entire group.
+  static const double _kHazardClusterDistanceMeters = 100.0;
+
+  /// Buffer (in meters) used when validating that a candidate detour
+  /// polyline doesn't graze a forbidden corridor. Slightly larger than
+  /// [_kHazardProximityThresholdMeters] so a fresh route hugging the edge
+  /// is still rejected.
+  static const double _kForbiddenCorridorBufferMeters = 220.0;
+
+  /// Distance (in meters) within which the user is considered to be near the
+  /// closest hazard corridor.
+  static const double _kUserNearHazardThresholdMeters = 1500.0;
+
+  /// Schedule of (offset meters, side) attempts the [takeAlternateRoute]
+  /// orchestrator iterates through. Order alternates side at the same
+  /// distance so the first detour found is the shortest viable one.
+  static const List<({double offsetMeters, BypassSide side})> _kBypassAttempts =
+      [
+        (offsetMeters: 200.0, side: BypassSide.right),
+        (offsetMeters: 200.0, side: BypassSide.left),
+        (offsetMeters: 500.0, side: BypassSide.right),
+        (offsetMeters: 500.0, side: BypassSide.left),
+        (offsetMeters: 1500.0, side: BypassSide.right),
+        (offsetMeters: 1500.0, side: BypassSide.left),
+        (offsetMeters: 5000.0, side: BypassSide.right),
+        (offsetMeters: 5000.0, side: BypassSide.left),
+      ];
+
+  /// Recomputes [MapProviderState.hazardCorridorsAhead] from the current
+  /// navigation location, the active route polyline, and the route plan's
+  /// `hazardsToAvoid` set.
+  ///
+  /// Called whenever any of those inputs change (new location, new route,
+  /// detour applied, etc.) so the "Take Alternate Route" button visibility
+  /// stays in sync.
+  void _recomputeHazardCorridorsAhead() {
+    final routePlan = state.currentRoutePlan;
+    final user = state.currentNavigationLocation;
+    final polylinePoints = routePlan?.currentRoute?.currentRoute.polylinePoints;
+
+    if (routePlan == null ||
+        !routePlan.isNavigating ||
+        user == null ||
+        polylinePoints == null ||
+        polylinePoints.length < 2) {
+      if (state.hazardCorridorsAhead.isNotEmpty ||
+          state.isUserNearClosestHazard ||
+          state.showTakeAlternateRouteButton) {
+        _takeAlternateRouteButtonTimer?.cancel();
+        _takeAlternateRouteButtonTimer = null;
+        state = state.copyWith(
+          hazardCorridorsAhead: const <HazardCorridor>[],
+          isUserNearClosestHazard: false,
+          showTakeAlternateRouteButton: false,
+          lastAlertedHazardId: null,
+        );
+      }
+      return;
+    }
+
+    final polyline = polylinePoints
+        .map((p) => LatLng(p.latitude, p.longitude))
+        .toList(growable: false);
+
+    final corridors = detectHazardCorridorsAhead(
+      user: user,
+      polyline: polyline,
+      hazards: routePlan.hazardsToAvoid,
+      proximityMeters: _kHazardProximityThresholdMeters,
+      clusterDistanceMeters: _kHazardClusterDistanceMeters,
+      corridorBufferMeters: _kForbiddenCorridorBufferMeters,
+    );
+
+    // Calculate if user is within 300m of the closest hazard corridor
+    bool isUserNear = false;
+    HazardCorridor? closestCorridor;
+    if (corridors.isNotEmpty) {
+      double minDistance = double.infinity;
+
+      for (final corridor in corridors) {
+        final distanceToCenter = calculateDistanceInMeters(
+          user.latitude,
+          user.longitude,
+          corridor.centerPoint.latitude,
+          corridor.centerPoint.longitude,
+        );
+        if (distanceToCenter < minDistance) {
+          minDistance = distanceToCenter;
+          closestCorridor = corridor;
+        }
+      }
+
+      isUserNear = minDistance <= _kUserNearHazardThresholdMeters;
+    }
+
+    // Determine if we should show the button and manage the timer
+    bool shouldShowButton = state.showTakeAlternateRouteButton;
+    String? newLastAlertedHazardId = state.lastAlertedHazardId;
+
+    if (isUserNear && closestCorridor != null) {
+      // Get the first hazard ID from the closest corridor as its identifier
+      final closestHazardId = closestCorridor.hazards.firstOrNull?.id;
+
+      // Check if this is a new/different hazard than the one we last alerted for
+      if (closestHazardId != null &&
+          closestHazardId != state.lastAlertedHazardId) {
+        // New hazard detected - show button and start timer
+        shouldShowButton = true;
+        newLastAlertedHazardId = closestHazardId;
+
+        // Cancel existing timer and start a new one
+        _takeAlternateRouteButtonTimer?.cancel();
+        _takeAlternateRouteButtonTimer = Timer(
+          const Duration(seconds: 10),
+          () {
+            if (mounted) {
+              state = state.copyWith(showTakeAlternateRouteButton: false);
+            }
+          },
+        );
+      }
+      // If it's the same hazard, keep the current button state and timer
+    } else {
+      // User moved away from hazards - hide button and cancel timer
+      if (state.showTakeAlternateRouteButton) {
+        shouldShowButton = false;
+        newLastAlertedHazardId = null;
+        _takeAlternateRouteButtonTimer?.cancel();
+        _takeAlternateRouteButtonTimer = null;
+      }
+    }
+
+    state = state.copyWith(
+      hazardCorridorsAhead: corridors,
+      isUserNearClosestHazard: isUserNear,
+      showTakeAlternateRouteButton: shouldShowButton,
+      lastAlertedHazardId: newLastAlertedHazardId,
+    );
+  }
+
+  /// Re-fetches the active route so it bypasses every corridor currently
+  /// flagged in [MapProviderState.hazardCorridorsAhead] (plus every
+  /// previously avoided corridor in [MapProviderState.forbiddenCorridors]).
+  ///
+  /// Strategy (Google Routes API doesn't expose "avoid this polygon"):
+  /// 1. Build a single bypass waypoint perpendicular to the corridor's
+  ///    travel direction, on a chosen side, at a chosen offset.
+  /// 2. Ask Routes API for a route that must visit that waypoint.
+  /// 3. Validate the returned polyline does not pass through any forbidden
+  ///    corridor (with buffer).
+  /// 4. If it still does, retry with a different side / wider offset.
+  /// 5. On success, swap the active route and remember the corridor so a
+  ///    later detour doesn't reuse this same area.
+  Future<void> takeAlternateRoute() async {
+    if (state.takeAlternateRouteState.isLoading) return;
+
+    final routePlan = state.currentRoutePlan;
+    final corridorsAhead = state.hazardCorridorsAhead;
+    final currentLocation = state.currentNavigationLocation;
+
+    if (routePlan == null ||
+        !routePlan.isNavigating ||
+        corridorsAhead.isEmpty ||
+        currentLocation == null) {
+      return;
+    }
+
+    // V1 detours route around the closest corridor ahead. Multi-corridor
+    // chaining is intentionally out of scope (see plan); the data model
+    // already represents all clusters so it can be added later.
+    final targetCorridor = corridorsAhead.first;
+    final corridorsToAvoid = <HazardCorridor>[
+      ...state.forbiddenCorridors,
+      targetCorridor,
+    ];
+    final destination = routePlan.destination;
+    final selectedMode = routePlan.selectedTravelMode;
+
+    state = state.copyWith(
+      takeAlternateRouteState: const TakeAlternateRouteState.loading(),
+    );
+
+    log(
+      '[Detour] requested for corridor with '
+      '${targetCorridor.hazards.length} hazard(s) — trying '
+      '${_kBypassAttempts.length} bypass attempt(s)',
+    );
+
+    RoutesApiResponse? acceptedResponse;
+    Route? acceptedRoute;
+    AppError? lastError;
+
+    for (final attempt in _kBypassAttempts) {
+      final intermediates = planBypassWaypoints(
+        corridor: targetCorridor,
+        offsetMeters: attempt.offsetMeters,
+        side: attempt.side,
+      );
+
+      final result = await _mapService.getRoute(
+        origin: LatLng(currentLocation.latitude, currentLocation.longitude),
+        destination: destination.latLng,
+        travelMode: selectedMode,
+        intermediates: intermediates,
+      );
+      if (!mounted) return;
+
+      RoutesApiResponse? response;
+      result.when(
+        (r) => response = r,
+        (e) => lastError = e,
+      );
+      if (response == null || response!.routes.isEmpty) continue;
+
+      // Pick the first returned route (alternatives are ordered best-first
+      // for the supplied constraints) and validate it.
+      for (final route in response!.routes) {
+        final points = route.polylinePoints;
+        if (points == null || points.isEmpty) continue;
+
+        final candidate = points
+            .map((p) => LatLng(p.latitude, p.longitude))
+            .toList(growable: false);
+
+        final crosses = polylineCrossesCorridors(
+          candidatePolyline: candidate,
+          corridors: corridorsToAvoid,
+        );
+        if (!crosses) {
+          acceptedResponse = response;
+          acceptedRoute = route;
+          break;
+        }
+      }
+      if (acceptedRoute != null) {
+        log(
+          '[Detour] accepted attempt offset=${attempt.offsetMeters}m '
+          'side=${attempt.side.name}',
+        );
+        break;
+      }
+    }
+
+    if (acceptedResponse == null || acceptedRoute == null) {
+      log(
+        '[Detour] no safe alternate found after ${_kBypassAttempts.length} '
+        'attempts (lastError=${lastError?.message})',
+      );
+      state = state.copyWith(
+        takeAlternateRouteState: const TakeAlternateRouteState.error(
+          'No safe detour found. Try again or proceed with caution.',
+        ),
+      );
+      return;
+    }
+
+    // Build a fresh SafestFastestRoutes for the chosen travel mode using
+    // the same parsing pipeline as initial planning so steps + scoring stay
+    // consistent.
+    final newSafestFastest = _mapService
+        .convertRoutesApiResponseToSafestFastestRoutes(
+          response: acceptedResponse,
+          hazardsToAvoid: routePlan.hazardsToAvoid,
+          travelMode: selectedMode,
+        );
+
+    if (newSafestFastest == null) {
+      state = state.copyWith(
+        takeAlternateRouteState: const TakeAlternateRouteState.error(
+          'No safe detour found. Try again or proceed with caution.',
+        ),
+      );
+      return;
+    }
+
+    // Promote the accepted route to the selected route in the new
+    // SafestFastestRoutes (the response may contain other alternatives we
+    // already validated against, but only the accepted one is guaranteed
+    // safe).
+    final detourSafestFastest = newSafestFastest.copyWith(
+      selectedRoute: acceptedRoute,
+    );
+
+    final newRoutePlan = routePlan.copyWith(
+      travelModeRoutes: <TravelMode, SafestFastestRoutes>{
+        ...routePlan.travelModeRoutes,
+        selectedMode: detourSafestFastest,
+      },
+    );
+
+    updateCurrentRoutePlan(
+      newRoutePlan,
+      animateToRouteBounds: false,
+    );
+
+    state = state.copyWith(
+      forbiddenCorridors: <HazardCorridor>[
+        ...state.forbiddenCorridors,
+        targetCorridor,
+      ],
+      takeAlternateRouteState: const TakeAlternateRouteState.idle(),
+    );
+  }
+
   /// Stops navigation and cancels heading updates.
   void stopNavigation() {
+    _simulationNorthUpCameraFrameApplied = false;
     updateIsNavigating(false);
     _headingStreamSubscription?.cancel();
     _headingStreamSubscription = null;
     _positionStreamSubscription?.cancel();
     _positionStreamSubscription = null;
+    _takeAlternateRouteButtonTimer?.cancel();
+    _takeAlternateRouteButtonTimer = null;
+
+    // Clear turn-by-turn step tracking so it doesn't leak into the next
+    // navigation session.
+    state = state.copyWith(
+      currentStepIndex: null,
+      currentStep: null,
+      nextStep: null,
+      stepAfterNext: null,
+      currentSpeed: 0.0,
+      distanceToNextManeuverMeters: null,
+      remainingDistanceMeters: null,
+      remainingDurationSeconds: null,
+      navigationSimulationEnabled: false,
+      hazardCorridorsAhead: const <HazardCorridor>[],
+      forbiddenCorridors: const <HazardCorridor>[],
+      takeAlternateRouteState: const TakeAlternateRouteState.idle(),
+      isUserNearClosestHazard: false,
+      showTakeAlternateRouteButton: false,
+      lastAlertedHazardId: null,
+    );
 
     // Remove user location marker
     _removeUserLocationMarker();
+    _removeSimulatedNavigationMarker();
+  }
+
+  /// Debug-only: toggles whether GPS is ignored and movement is simulated.
+  void toggleNavigationSimulation() {
+    if (!kDebugMode) return;
+    if (!(state.currentRoutePlan?.isNavigating ?? false)) return;
+    final enablingSim = !state.navigationSimulationEnabled;
+    state = state.copyWith(
+      navigationSimulationEnabled: enablingSim,
+    );
+    _syncSimulatedNavigationMarker();
+
+    if (!enablingSim) {
+      _simulationNorthUpCameraFrameApplied = false;
+      return;
+    }
+
+    _simulationNorthUpCameraFrameApplied = false;
+    final loc = state.currentNavigationLocation;
+    if (loc != null && state.followUser) {
+      _applySimulationNorthUpCameraFrame(
+        LatLng(loc.latitude, loc.longitude),
+      );
+      _simulationNorthUpCameraFrameApplied = true;
+    }
+  }
+
+  /// Desk-testing: stable north-up follow camera (no speed-based zoom/tilt).
+  static const double _kSimulationNavigationCameraZoom = 18.0;
+  static const double _kSimulationNavigationCameraTilt = 0.0;
+  static const double _kSimulationNavigationCameraBearing = 0.0;
+
+  static const double _navigationSimulationNudgeMeters = 2.0;
+  static const String _kSimulatedNavigationMarkerIdValue =
+      'simulated_navigation_location';
+
+  /// Debug-only: move the simulated position by [northMeters] / [eastMeters].
+  void simulateNavigationOffsetMeters({
+    required double northMeters,
+    required double eastMeters,
+  }) {
+    if (!kDebugMode) return;
+    if (!state.navigationSimulationEnabled) return;
+    final plan = state.currentRoutePlan;
+    if (plan == null || !plan.isNavigating) return;
+
+    final base =
+        state.currentNavigationLocation ??
+        _ref.read(providerOfLocation).location;
+    final nextLatLng = offsetByNorthEastMeters(
+      LatLng(base.latitude, base.longitude),
+      northMeters,
+      eastMeters,
+    );
+    _handleLocationUpdate(
+      AlrtLocation(
+        latitude: nextLatLng.latitude,
+        longitude: nextLatLng.longitude,
+        address: 'Simulated',
+      ),
+      preserveHeadingAndSpeed: true,
+    );
+  }
+
+  void simulateNavigationNudgeNorth() => simulateNavigationOffsetMeters(
+    northMeters: _navigationSimulationNudgeMeters,
+    eastMeters: 0,
+  );
+
+  void simulateNavigationNudgeSouth() => simulateNavigationOffsetMeters(
+    northMeters: -_navigationSimulationNudgeMeters,
+    eastMeters: 0,
+  );
+
+  void simulateNavigationNudgeEast() => simulateNavigationOffsetMeters(
+    northMeters: 0,
+    eastMeters: _navigationSimulationNudgeMeters,
+  );
+
+  void simulateNavigationNudgeWest() => simulateNavigationOffsetMeters(
+    northMeters: 0,
+    eastMeters: -_navigationSimulationNudgeMeters,
+  );
+
+  /// Debug-only: advance [meters] along the active route polyline toward the
+  /// destination (realistic step progression for desk testing).
+  void simulateAdvanceAlongRoute(final double meters) {
+    if (!kDebugMode) return;
+    if (!state.navigationSimulationEnabled) return;
+    final plan = state.currentRoutePlan;
+    final safest = plan?.currentRoute;
+    if (plan == null || !plan.isNavigating || safest == null) return;
+
+    final polyPoints = safest.currentRoute.polylinePoints;
+    if (polyPoints == null || polyPoints.isEmpty) return;
+
+    final polyline = polyPoints
+        .map((p) => LatLng(p.latitude, p.longitude))
+        .toList();
+
+    final base =
+        state.currentNavigationLocation ??
+        _ref.read(providerOfLocation).location;
+    final from = LatLng(base.latitude, base.longitude);
+
+    final nextLatLng = advanceAlongPolylineTowardsEnd(
+      polyline: polyline,
+      from: from,
+      meters: meters,
+    );
+    if (nextLatLng == null) return;
+
+    _handleLocationUpdate(
+      AlrtLocation(
+        latitude: nextLatLng.latitude,
+        longitude: nextLatLng.longitude,
+        address: 'Simulated',
+      ),
+    );
+  }
+
+  /// Debug-only: jump to [latLng] (used with map long-press while sim is on).
+  void simulateTeleportToNavigationLocation(final LatLng latLng) {
+    if (!kDebugMode) return;
+    if (!state.navigationSimulationEnabled) return;
+    final plan = state.currentRoutePlan;
+    if (plan == null || !plan.isNavigating) return;
+
+    _handleLocationUpdate(
+      AlrtLocation(
+        latitude: latLng.latitude,
+        longitude: latLng.longitude,
+        address: 'Simulated',
+      ),
+    );
+  }
+
+  /// Dumps the full ordered step list for the route the user is about to
+  /// navigate. Mirrors how Google Maps recaps the trip in voice and the
+  /// "all steps" sheet at navigation start.
+  void _logStartNavigationSteps() {
+    final routePlan = state.currentRoutePlan;
+    final safestFastest = routePlan?.currentRoute;
+    if (routePlan == null || safestFastest == null) return;
+
+    final activeRoute = safestFastest.currentRoute;
+    final steps = safestFastest.stepsForRoute(activeRoute);
+
+    log(
+      '[Nav start] travelMode=${routePlan.selectedTravelMode.name}, '
+      '${steps.length} step(s) for selected route',
+    );
+    for (var i = 0; i < steps.length; i++) {
+      final s = steps[i];
+      log(
+        '[Nav start]   ${i + 1}. [${s.maneuver.name}] ${s.instruction} '
+        '(${s.distanceMeters} m, ${s.durationSeconds}s)',
+      );
+    }
   }
 
   /// Removes the user location marker
   void _removeUserLocationMarker() {
     final updatedMarkers = Set<Marker>.from(state.markers)
       ..removeWhere((marker) => marker.markerId.value == 'user_location');
+    updateMarkers(updatedMarkers);
+  }
+
+  /// Debug-only: shows the simulated navigation position as an Azure pin on
+  /// the map (real GPS continues to use the blue-dot pipeline when sim is off).
+  void _syncSimulatedNavigationMarker() {
+    if (!kDebugMode) {
+      _removeSimulatedNavigationMarker();
+      return;
+    }
+    final navigating = state.currentRoutePlan?.isNavigating ?? false;
+    final loc = state.currentNavigationLocation;
+    if (!navigating || !state.navigationSimulationEnabled || loc == null) {
+      _removeSimulatedNavigationMarker();
+      return;
+    }
+    final marker = Marker(
+      markerId: MarkerId(_kSimulatedNavigationMarkerIdValue),
+      position: LatLng(loc.latitude, loc.longitude),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+      rotation: state.currentBearing,
+      flat: true,
+      zIndexInt: 100,
+      consumeTapEvents: false,
+      infoWindow: const InfoWindow(title: 'Simulated position'),
+    );
+    final updatedMarkers = Set<Marker>.from(state.markers)
+      ..removeWhere(
+        (final m) => m.markerId.value == _kSimulatedNavigationMarkerIdValue,
+      )
+      ..add(marker);
+    updateMarkers(updatedMarkers);
+  }
+
+  void _removeSimulatedNavigationMarker() {
+    if (!state.markers.any(
+      (final m) => m.markerId.value == _kSimulatedNavigationMarkerIdValue,
+    )) {
+      return;
+    }
+    final updatedMarkers = Set<Marker>.from(state.markers)
+      ..removeWhere(
+        (final m) => m.markerId.value == _kSimulatedNavigationMarkerIdValue,
+      );
     updateMarkers(updatedMarkers);
   }
 
@@ -1030,6 +1841,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final routeLabelMarkers = state.markers.where(
       (marker) => marker.markerId.value.startsWith('route_label_'),
     );
+    final simulatedNavigationMarker = state.markers.firstWhereOrNull(
+      (marker) => marker.markerId.value == _kSimulatedNavigationMarkerIdValue,
+    );
     final currentUserLocationMarker = state.markers.firstWhereOrNull(
       (marker) => marker.markerId.value == 'user_location',
     );
@@ -1039,6 +1853,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
       ...familyMarkers,
       if (selectedPlaceMarker != null) selectedPlaceMarker,
       ...routeLabelMarkers,
+      if (simulatedNavigationMarker != null) simulatedNavigationMarker,
       if (currentUserLocationMarker != null) currentUserLocationMarker,
     };
 
@@ -1360,18 +2175,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
           consumeTapEvents: true,
           onTap: () {
             // Update selected route in the current route plan
-            updateCurrentRoutePlan(
-              state.currentRoutePlan?.copyWith(
-                travelModeRoutes: {
-                  ...state.currentRoutePlan!.travelModeRoutes,
-                  selectedTravelMode: state
-                      .currentRoutePlan!
-                      .travelModeRoutes[selectedTravelMode]!
-                      .copyWith(selectedRoute: route),
-                },
-              ),
-              animateToRouteBounds: false,
-            );
+            handleRouteTap(route);
           },
         );
         polylines.add(polyLine);
@@ -1402,6 +2206,27 @@ class MapProvider extends StateNotifier<MapProviderState> {
         );
       }
     }
+  }
+
+  /// Handles the tap on a route.
+  ///
+  /// Updates the current route plan to the given [route].
+  void handleRouteTap(final Route route) {
+    final selectedTravelMode = state.currentRoutePlan?.selectedTravelMode;
+    if (selectedTravelMode == null) return;
+
+    updateCurrentRoutePlan(
+      state.currentRoutePlan?.copyWith(
+        travelModeRoutes: {
+          ...state.currentRoutePlan!.travelModeRoutes,
+          selectedTravelMode: state
+              .currentRoutePlan!
+              .travelModeRoutes[selectedTravelMode]!
+              .copyWith(selectedRoute: route),
+        },
+      ),
+      animateToRouteBounds: false,
+    );
   }
 
   /// Creates route segments for navigation with different colors for passed and upcoming parts
@@ -1633,6 +2458,11 @@ class MapProvider extends StateNotifier<MapProviderState> {
         );
       }
     }
+
+    // Initial route plan, reroute, and detour-applied cases all flow
+    // through here, so this single call keeps the alternate-route button
+    // in sync with whichever route is now active.
+    _recomputeHazardCorridorsAhead();
   }
 
   /// Updates [MapProviderState.currentRoutePlan]'s selected travel mode to the given [mode].
@@ -1694,6 +2524,15 @@ class MapProvider extends StateNotifier<MapProviderState> {
   void toggleShowRouteHazards() {
     updateShowRouteHazards(
       !state.showRouteHazards,
+    );
+  }
+
+  /// Updates [MapProviderState.showTakeAlternateRouteButton] to the given [showTakeAlternateRouteButton].
+  void updateShowTakeAlternateRouteButton(
+    final bool showTakeAlternateRouteButton,
+  ) {
+    state = state.copyWith(
+      showTakeAlternateRouteButton: showTakeAlternateRouteButton,
     );
   }
 }

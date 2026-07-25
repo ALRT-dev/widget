@@ -15,7 +15,6 @@ import 'package:hazard_app/features/profile/views/screens/how_points_work_screen
 import 'package:hazard_app/features/learn/views/screens/learn_topics_screen.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/providers/states/map_provider_state.dart';
-import 'package:hazard_app/features/map/views/screens/navigation_screen.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_on_map_screen.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
@@ -149,12 +148,6 @@ class AppRouter {
                 args: state.extra as SelectLocationOnMapScreenArgs?,
               ),
             );
-          },
-        ),
-        GoRoute(
-          path: NavigationScreen.route,
-          builder: (context, state) {
-            return const NavigationScreen();
           },
         ),
         // ------------------------- FAMILY MODE -------------------------

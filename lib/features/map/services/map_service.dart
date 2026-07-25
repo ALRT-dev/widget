@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart' hide Route;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,11 +10,13 @@ import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/models/route_plan_model.dart';
+import 'package:hazard_app/features/map/models/route_step_model.dart';
 import 'package:hazard_app/features/map/models/safest_fastest_routes_model.dart';
 import 'package:hazard_app/features/map/providers/repository_providers.dart';
 import 'package:hazard_app/features/map/repositories/map_repository.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
@@ -165,24 +169,28 @@ class MapService {
       (response) => convertRoutesApiResponseToSafestFastestRoutes(
         response: response,
         hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.driving,
       ),
     );
     final travelModeTransit = result[1].whenSuccess(
       (response) => convertRoutesApiResponseToSafestFastestRoutes(
         response: response,
         hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.transit,
       ),
     );
     final travelModeWalking = result[2].whenSuccess(
       (response) => convertRoutesApiResponseToSafestFastestRoutes(
         response: response,
         hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.walking,
       ),
     );
     final travelModeBicycling = result[3].whenSuccess(
       (response) => convertRoutesApiResponseToSafestFastestRoutes(
         response: response,
         hazardsToAvoid: hazardsToAvoid,
+        travelMode: TravelMode.bicycling,
       ),
     );
 
@@ -205,35 +213,72 @@ class MapService {
   /// Fetches different routes and the hazards near the routes between [origin] and [destination].
   ///
   /// Returns the safest and the fastest routes.
+  ///
+  /// When [intermediates] are supplied, the Routes API treats them as forced
+  /// pass-through points. This is how the "Take Alternate Route" detour
+  /// flow steers a new route around a hazard corridor.
   Future<Either<RoutesApiResponse, AppError>> getRoute({
     required final LatLng origin,
     required final LatLng destination,
     final TravelMode travelMode = TravelMode.driving,
+    final List<PolylineWayPoint>? intermediates,
   }) {
     return _mapRepository.getRoute(
       origin: origin,
       destination: destination,
       travelMode: travelMode,
+      intermediates: intermediates,
     );
   }
 
   /// Extracts the safest and fastest routes from the [RoutesApiResponse].
+  ///
+  /// [travelMode] is optional and only used to label the parsed-step debug
+  /// log so transit/walking/bicycling/driving entries are easy to distinguish.
   SafestFastestRoutes? convertRoutesApiResponseToSafestFastestRoutes({
     required final RoutesApiResponse response,
     final List<Hazard>? hazardsToAvoid,
+    final TravelMode? travelMode,
   }) {
     final routes = response.routes;
     if (routes.isEmpty) {
       return null;
     }
 
-    // Determine the safest route if hazards are provided
+    final hasHazardsToAvoid =
+        hazardsToAvoid != null && hazardsToAvoid.isNotEmpty;
+
+    // Compute the relevant hazards for each route once so the same lists can
+    // be reused for safest-route selection and stored on the returned model.
+    final routeHazards = <Route, List<Hazard>>{
+      for (final route in routes)
+        route:
+            (hasHazardsToAvoid &&
+                route.polylinePoints != null &&
+                route.polylinePoints!.isNotEmpty)
+            ? HazardAvoidanceHelper.getRelevantHazardsForPolyline(
+                hazardsToAvoid,
+                route.polylinePoints!
+                    .map((point) => LatLng(point.latitude, point.longitude))
+                    .toList(),
+              )
+            : const <Hazard>[],
+    };
+
+    // Parse turn-by-turn steps for every alternative route, index-aligned
+    // against `response.rawJson['routes']` since the package's own `Route`
+    // model does not surface `legs.steps`.
+    final routeSteps = _parseRouteStepsFromRawJson(
+      response.rawJson,
+      routes,
+    );
+    _logParsedRouteSteps(travelMode, routes, routeSteps);
+
     Route? safestRoute;
-    if (hazardsToAvoid != null && hazardsToAvoid.isNotEmpty) {
-      safestRoute = _chooseSafestRoute(routes, hazardsToAvoid);
+    if (hasHazardsToAvoid) {
+      safestRoute = _chooseSafestRoute(routes, routeHazards);
     }
 
-    // The fastest route based on duration
     Route? fastestRoute;
     for (final route in routes) {
       if (route.duration != null) {
@@ -247,15 +292,88 @@ class MapService {
 
     return SafestFastestRoutes(
       safestRoute: safestRoute ?? fastestRoute,
+      selectedRoute: fastestRoute,
       fastestRoute: fastestRoute,
-      allRoutes: routes,
+      // Always sort the fastest route to be the first in the list
+      allRoutes: routes.sorted((a, b) => a.duration!.compareTo(b.duration!)),
+      routeSteps: routeSteps,
     );
   }
 
-  /// Chooses the safest route from available options.
+  /// Parses `routes[i].legs[*].steps[*]` from the raw API response into a
+  /// flat `List<RouteStep>` per [Route], aligned by index with [routes].
+  ///
+  /// Routes whose JSON entry is missing or malformed map to an empty list so
+  /// downstream code can rely on `stepsForRoute(route)` always returning a
+  /// non-null list.
+  Map<Route, List<RouteStep>> _parseRouteStepsFromRawJson(
+    Map<String, dynamic> rawJson,
+    List<Route> routes,
+  ) {
+    final rawRoutes = (rawJson['routes'] as List?) ?? const [];
+    final routeSteps = <Route, List<RouteStep>>{};
+
+    for (var i = 0; i < routes.length; i++) {
+      final rawRoute = i < rawRoutes.length
+          ? rawRoutes[i] as Map<String, dynamic>?
+          : null;
+      routeSteps[routes[i]] = _parseStepsForRoute(rawRoute);
+    }
+
+    return routeSteps;
+  }
+
+  /// Walks `legs[*].steps[*]` of a single raw route entry and returns a flat
+  /// list of [RouteStep] (preserving leg order).
+  List<RouteStep> _parseStepsForRoute(Map<String, dynamic>? rawRoute) {
+    if (rawRoute == null) return const <RouteStep>[];
+
+    final legs = (rawRoute['legs'] as List?) ?? const [];
+    final steps = <RouteStep>[];
+    for (final leg in legs) {
+      if (leg is! Map<String, dynamic>) continue;
+      final rawSteps = (leg['steps'] as List?) ?? const [];
+      for (final rawStep in rawSteps) {
+        if (rawStep is! Map<String, dynamic>) continue;
+        final step = RouteStep.fromJson(rawStep);
+        if (step != null) steps.add(step);
+      }
+    }
+    return steps;
+  }
+
+  /// Pretty-prints every parsed step for every route to the debug console so
+  /// the user can iterate on the navigation UI without touching the network
+  /// layer.
+  void _logParsedRouteSteps(
+    TravelMode? travelMode,
+    List<Route> routes,
+    Map<Route, List<RouteStep>> routeSteps,
+  ) {
+    final modeLabel = travelMode?.name ?? 'unknown';
+    log('[Routes] travelMode=$modeLabel, ${routes.length} route(s) parsed');
+    for (var i = 0; i < routes.length; i++) {
+      final route = routes[i];
+      final steps = routeSteps[route] ?? const <RouteStep>[];
+      final distanceKm = route.distanceKm?.toStringAsFixed(2) ?? '-';
+      final durationMin = route.durationMinutes?.toStringAsFixed(1) ?? '-';
+      log(
+        '[Routes]   Route #$i: $distanceKm km, $durationMin min, ${steps.length} step(s)',
+      );
+      for (var j = 0; j < steps.length; j++) {
+        final s = steps[j];
+        log(
+          '[Routes]     ${j + 1}. [${s.maneuver.name}] ${s.instruction} '
+          '(${s.distanceMeters} m, ${s.durationSeconds}s)',
+        );
+      }
+    }
+  }
+
+  /// Chooses the safest route using precomputed [routeHazards] per route.
   Route? _chooseSafestRoute(
     List<Route> routes,
-    List<Hazard> hazards,
+    Map<Route, List<Hazard>> routeHazards,
   ) {
     if (routes.isEmpty) return null;
 
@@ -263,7 +381,8 @@ class MapService {
     double lowestRiskScore = double.infinity;
 
     for (final route in routes) {
-      final riskScore = _calculateRouteRiskScore(route, hazards);
+      final relevantHazards = routeHazards[route] ?? const <Hazard>[];
+      final riskScore = _calculateRouteRiskScore(route, relevantHazards);
       if (riskScore < lowestRiskScore) {
         lowestRiskScore = riskScore;
         safestRoute = route;
@@ -273,44 +392,41 @@ class MapService {
     return safestRoute;
   }
 
-  /// Calculates risk score for a route based on hazard proximity using actual route polyline.
+  /// Calculates risk score for a route from its precomputed [relevantHazards].
   double _calculateRouteRiskScore(
     Route route,
-    List<Hazard> hazards,
+    List<Hazard> relevantHazards,
   ) {
-    try {
-      // Check if polylinePoints are available directly on the route
-      if (route.polylinePoints != null && route.polylinePoints!.isNotEmpty) {
-        // Convert polyline points to LatLng list
-        final routePoints = route.polylinePoints!
-            .map((point) => LatLng(point.latitude, point.longitude))
-            .toList();
-
-        // Use the improved hazard analysis with actual route polyline
-        final routeAnalysis = HazardAvoidanceHelper.analyzeRouteHazards(
-          hazards: hazards,
-          routePoints: routePoints,
-        );
-
-        // Calculate risk score based on hazard severity and count
-        double totalRisk = 0.0;
-        totalRisk +=
-            routeAnalysis.emergencyHazards * 10.0; // Emergency: 10x weight
-        totalRisk +=
-            routeAnalysis.highRiskHazards * 5.0; // High risk: 5x weight
-        totalRisk +=
-            routeAnalysis.mediumRiskHazards * 2.0; // Medium risk: 2x weight
-        totalRisk += routeAnalysis.lowRiskHazards * 1.0; // Low risk: 1x weight
-
-        return totalRisk;
-      } else {
-        // Fallback: assign moderate risk if we can't analyze the route properly
-        return hazards.length * 0.5; // Basic risk assessment
-      }
-    } catch (e) {
-      // If we can't decode the route properly, assign moderate risk
-      return hazards.length * 1.0;
+    if (route.polylinePoints == null || route.polylinePoints!.isEmpty) {
+      // Fallback: assign moderate risk when we cannot analyze the polyline.
+      return relevantHazards.length * 0.5;
     }
+
+    int emergencyCount = 0;
+    int highRiskCount = 0;
+    int mediumRiskCount = 0;
+    int lowRiskCount = 0;
+
+    for (final hazard in relevantHazards) {
+      switch (hazard.severityBand) {
+        case HazardSeverityBand.critical:
+          emergencyCount++;
+        case HazardSeverityBand.action:
+          highRiskCount++;
+        case HazardSeverityBand.monitor:
+          mediumRiskCount++;
+        case HazardSeverityBand.info:
+          lowRiskCount++;
+        case null:
+          break;
+      }
+    }
+
+    // Severity weighting: emergency 10x, high 5x, medium 2x, low 1x.
+    return emergencyCount * 10.0 +
+        highRiskCount * 5.0 +
+        mediumRiskCount * 2.0 +
+        lowRiskCount * 1.0;
   }
 
   /// Gets the screen coordinate for a given [latLng] position on the map.

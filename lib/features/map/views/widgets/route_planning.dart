@@ -360,10 +360,11 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
             [],
       ),
     );
-    return HazardAvoidanceHelper.analyzeRouteHazards(
+    final sum = HazardAvoidanceHelper.analyzeRouteHazards(
       hazards: hazards,
       routePoints: routePoints,
     );
+    return sum;
   }
 
   /// Returns the main color based on the route risk level.

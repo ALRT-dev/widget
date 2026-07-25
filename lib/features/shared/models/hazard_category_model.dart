@@ -1,6 +1,9 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:hazard_app/features/shared/enums/category_image_type.dart';
+import 'package:hazard_app/features/shared/models/category_image_model.dart';
 
 part 'hazard_category_model.freezed.dart';
 part 'hazard_category_model.g.dart';
@@ -30,6 +33,12 @@ abstract class HazardCategory with _$HazardCategory {
 
     /// The number of hazards associated with this category.
     @Default(0) final int hazardsCount,
+
+    /// Whether the hazard category is fire-related.
+    @Default(false) final bool isFireRelated,
+
+    /// The images associated with the hazard category.
+    final List<CategoryImage>? images,
   }) = _HazardCategory;
 
   /// Checks if the hazard category is bushfire.
@@ -37,6 +46,21 @@ abstract class HazardCategory with _$HazardCategory {
 
   /// Gets the effective color of the hazard category, falling back to the parent's color if not set.
   Color? get effectiveColor => color ?? parent?.color;
+
+  /// Gets the category image by type from the category or its parent.
+  CategoryImage? categoryImageByType(CategoryImageType type) {
+    final img = images?.firstWhereOrNull((image) => image.imageType == type);
+    if (img != null) {
+      return img;
+    }
+
+    final parentImg = parent?.categoryImageByType(type);
+    if (parentImg != null) {
+      return parentImg;
+    }
+
+    return null;
+  }
 
   factory HazardCategory.fromJson(Map<String, dynamic> json) =>
       _$HazardCategoryFromJson(json);

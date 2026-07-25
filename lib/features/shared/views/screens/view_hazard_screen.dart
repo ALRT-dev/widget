@@ -26,6 +26,7 @@ import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/utils/open_link.dart';
 import 'package:hazard_app/features/shared/utils/share_alert.dart';
+import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -541,45 +542,44 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   Widget _buildIcon() {
     return Consumer(
       builder: (context, ref, child) {
-        final iconPath = ref.watch(
+        final categoryImage = ref.watch(
           provider.select(
-            (value) => value.hazard?.iconPath,
+            (value) => value.hazard?.categoryImage,
           ),
         );
-        if (iconPath == null) {
-          return const SizedBox.shrink();
-        }
-
+        final hazardColor = ref.watch(
+          provider.select(
+            (value) => value.hazard?.color ?? AppColors.black,
+          ),
+        );
         final fallbackIconPath = ref.watch(
           provider.select(
-            (value) => value.hazard?.fallbackIconPath,
+            (value) => value.hazard?.fallbackIconPath ?? '',
           ),
         );
-        if (fallbackIconPath == null) {
-          return const SizedBox.shrink();
-        }
-
-        final fallbackIconPath2 = ref.watch(
-          provider.select(
-            (value) => value.hazard?.fallbackIconPath2,
-          ),
-        );
-        if (fallbackIconPath2 == null) {
-          return const SizedBox.shrink();
-        }
 
         return SizedBox(
           height: 70.spMin,
           width: 70.spMin,
-          child: Image.asset(
-            iconPath,
+          child: AppCachedNetworkImage(
+            imageUrl: categoryImage?.url ?? '',
+            cacheKey: categoryImage?.s3Key,
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => Image.asset(
+            errorWidget: (context, url, error) => Image.asset(
               fallbackIconPath,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Image.asset(
-                fallbackIconPath2,
-                fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Container(
+                decoration: BoxDecoration(
+                  color: hazardColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12.spMin),
+                ),
+                child: Icon(
+                  Icons.error,
+                  size: 24.spMin,
+                  color: hazardColor == AppColors.transparent
+                      ? AppColors.grey
+                      : hazardColor,
+                ),
               ),
             ),
           ),

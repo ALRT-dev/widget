@@ -2,10 +2,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 
 /// The default latitude for the map, centered on Sydney, Australia.
-const kDefaultLatitude = -33.8688;
+const kDefaultLatitude = -33.873265;
 
 /// The default longitude for the map, centered on Sydney, Australia.
-const kDefaultLongitude = 151.2093;
+const kDefaultLongitude = 151.209845;
 
 /// The default user location, centered on Sydney, Australia.
 const kDefaultUserLocation = AlrtLocation(

@@ -130,7 +130,7 @@ class _HazardMediasCarouselState extends ConsumerState<HazardMediasCarousel>
       case AlrtMediaSource.networkUrl:
         imageWidget = AppCachedNetworkImage(
           imageUrl: media.value,
-          cacheKey: media.id,
+          cacheKey: media.s3Key,
           fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,

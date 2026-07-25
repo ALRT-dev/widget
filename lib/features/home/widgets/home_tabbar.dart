@@ -6,6 +6,7 @@ import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 /// The dark floating pill navigation bar.
@@ -197,6 +198,7 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
 
   /// Updates the current selected tab.
   void _onTabChanged(final HomeTab tab) {
+    context.unfocusInputs();
     ref.read(providerOfHomeTab.notifier).state = tab;
   }
 }

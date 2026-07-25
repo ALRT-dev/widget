@@ -30,6 +30,7 @@ abstract class MapRepository {
     required final LatLng origin,
     required final LatLng destination,
     final TravelMode travelMode = TravelMode.driving,
+    final List<PolylineWayPoint>? intermediates,
   });
 
   Future<Either<String, AppError>> getAddressFromCoordinates({
@@ -193,6 +194,7 @@ class MapRepositoryImpl implements MapRepository {
     required LatLng origin,
     required LatLng destination,
     TravelMode travelMode = TravelMode.driving,
+    List<PolylineWayPoint>? intermediates,
   }) {
     return runAsyncCall(
       name: 'getRoute',
@@ -201,11 +203,33 @@ class MapRepositoryImpl implements MapRepository {
           origin: PointLatLng(origin.latitude, origin.longitude),
           destination: PointLatLng(destination.latitude, destination.longitude),
           travelMode: travelMode,
+          intermediates: intermediates,
           routingPreference: travelMode == TravelMode.driving
               ? RoutingPreference.trafficAware
               : RoutingPreference.unspecified,
           polylineQuality: PolylineQuality.overview,
           computeAlternativeRoutes: true,
+          languageCode: 'en',
+          regionCode: 'AU',
+          // Override the package's default field mask so the Routes API also
+          // returns turn-by-turn step data (instructions, maneuvers, per-step
+          // polylines) for every route — including alternative routes.
+          responseFieldMask: const [
+            'routes.duration',
+            'routes.staticDuration',
+            'routes.distanceMeters',
+            'routes.polyline.encodedPolyline',
+            'routes.legs.distanceMeters',
+            'routes.legs.duration',
+            'routes.legs.steps.distanceMeters',
+            'routes.legs.steps.staticDuration',
+            'routes.legs.steps.polyline.encodedPolyline',
+            'routes.legs.steps.startLocation',
+            'routes.legs.steps.endLocation',
+            'routes.legs.steps.navigationInstruction',
+            'routes.legs.steps.travelMode',
+            'routes.legs.steps.transitDetails',
+          ].join(','),
         );
 
         final result = await _polylinePoints.getRouteBetweenCoordinatesV2(
