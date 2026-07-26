@@ -17,6 +17,10 @@ abstract class AuthProviderState with _$AuthProviderState {
     /// The state of signing in with Microsoft.
     @Default(SignInWithMicrosoftState.initial())
     SignInWithMicrosoftState signInWithMicrosoftState,
+
+    /// The state of signing in / registering with email + password.
+    @Default(SignInWithEmailState.initial())
+    SignInWithEmailState signInWithEmailState,
   }) = _AuthProviderState;
 }
 
@@ -51,4 +55,14 @@ class SignInWithMicrosoftState with _$SignInWithMicrosoftState {
   const factory SignInWithMicrosoftState.error(
     final AppError error,
   ) = SignInWithMicrosoftStateError;
+}
+
+@freezed
+class SignInWithEmailState with _$SignInWithEmailState {
+  const factory SignInWithEmailState.initial() = SignInWithEmailStateInitial;
+  const factory SignInWithEmailState.loading() = SignInWithEmailStateLoading;
+  const factory SignInWithEmailState.success() = SignInWithEmailStateSuccess;
+  const factory SignInWithEmailState.error(
+    final AppError error,
+  ) = SignInWithEmailStateError;
 }

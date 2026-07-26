@@ -12,6 +12,8 @@ const kUrlOAuthGoogle = '$kUrlAuth/oauth/google';
 const kUrlOAuthApple = '$kUrlAuth/oauth/apple';
 const kUrlOAuthMicrosoft = '$kUrlAuth/oauth/microsoft';
 const kUrlRefreshToken = '$kUrlAuth/refresh-token';
+const kUrlEmailLogin = '$kUrlAuth/email-password/login';
+const kUrlEmailRegister = '$kUrlAuth/email-password/register';
 
 // ---------------------------- ONBOARDING ----------------------------
 

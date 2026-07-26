@@ -20,6 +20,16 @@ abstract class AuthRepository {
   Future<Either<AuthSuccess, AppError>> signInWithApple();
 
   Future<Either<AuthSuccess, AppError>> signInWithMicrosoft();
+
+  Future<Either<AuthSuccess, AppError>> loginWithEmail({
+    required final String email,
+    required final String password,
+  });
+
+  Future<Either<AuthSuccess, AppError>> registerWithEmail({
+    required final String email,
+    required final String password,
+  });
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -156,6 +166,42 @@ class AuthRepositoryImpl implements AuthRepository {
         // Verify with backend
         final result = await _restClient.verifyMicrosoftOAuth(
           idToken: idToken,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<AuthSuccess, AppError>> loginWithEmail({
+    required final String email,
+    required final String password,
+  }) {
+    return runAsyncCall(
+      name: 'loginWithEmail',
+      future: () async {
+        final result = await _restClient.loginWithEmail(
+          email: email,
+          password: password,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<AuthSuccess, AppError>> registerWithEmail({
+    required final String email,
+    required final String password,
+  }) {
+    return runAsyncCall(
+      name: 'registerWithEmail',
+      future: () async {
+        final result = await _restClient.registerWithEmail(
+          email: email,
+          password: password,
         );
         return Success(result);
       },

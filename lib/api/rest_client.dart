@@ -44,6 +44,18 @@ abstract class RestClient {
     @Field() required final String idToken,
   });
 
+  @POST(kUrlEmailLogin)
+  Future<AuthSuccess> loginWithEmail({
+    @Field() required final String email,
+    @Field() required final String password,
+  });
+
+  @POST(kUrlEmailRegister)
+  Future<AuthSuccess> registerWithEmail({
+    @Field() required final String email,
+    @Field() required final String password,
+  });
+
   @POST(kUrlRefreshToken)
   Future<AuthSuccess> refreshToken({
     @Field() required final String accessToken,

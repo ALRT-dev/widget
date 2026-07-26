@@ -123,6 +123,52 @@ class AuthService {
     return result;
   }
 
+  /// Signs in the user with email + password.
+  Future<Either<AuthSuccess, AppError>> loginWithEmail({
+    required final String email,
+    required final String password,
+  }) async {
+    final result = await _authRepository.loginWithEmail(
+      email: email,
+      password: password,
+    );
+
+    await result.whenSuccess((response) {
+      return Future.wait([
+        _saveAuthMethod(authMethod: AuthMethod.email),
+        _saveAuthTokens(
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        ),
+      ]);
+    });
+
+    return result;
+  }
+
+  /// Registers a new user with email + password (and signs them in).
+  Future<Either<AuthSuccess, AppError>> registerWithEmail({
+    required final String email,
+    required final String password,
+  }) async {
+    final result = await _authRepository.registerWithEmail(
+      email: email,
+      password: password,
+    );
+
+    await result.whenSuccess((response) {
+      return Future.wait([
+        _saveAuthMethod(authMethod: AuthMethod.email),
+        _saveAuthTokens(
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        ),
+      ]);
+    });
+
+    return result;
+  }
+
   /// Logs out the user by deleting the access token from local storage.
   Future<Either<void, AppError>> logout() async {
     await _deleteAccessToken();

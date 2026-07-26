@@ -17,7 +17,8 @@ mixin _$AuthProviderState {
 /// The state of signing in with Google.
  SignInWithGoogleState get signInWithGoogleState;/// The state of signing in with Apple.
  SignInWithAppleState get signInWithAppleState;/// The state of signing in with Microsoft.
- SignInWithMicrosoftState get signInWithMicrosoftState;
+ SignInWithMicrosoftState get signInWithMicrosoftState;/// The state of signing in / registering with email + password.
+ SignInWithEmailState get signInWithEmailState;
 /// Create a copy of AuthProviderState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +29,16 @@ $AuthProviderStateCopyWith<AuthProviderState> get copyWith => _$AuthProviderStat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthProviderState&&(identical(other.signInWithGoogleState, signInWithGoogleState) || other.signInWithGoogleState == signInWithGoogleState)&&(identical(other.signInWithAppleState, signInWithAppleState) || other.signInWithAppleState == signInWithAppleState)&&(identical(other.signInWithMicrosoftState, signInWithMicrosoftState) || other.signInWithMicrosoftState == signInWithMicrosoftState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthProviderState&&(identical(other.signInWithGoogleState, signInWithGoogleState) || other.signInWithGoogleState == signInWithGoogleState)&&(identical(other.signInWithAppleState, signInWithAppleState) || other.signInWithAppleState == signInWithAppleState)&&(identical(other.signInWithMicrosoftState, signInWithMicrosoftState) || other.signInWithMicrosoftState == signInWithMicrosoftState)&&(identical(other.signInWithEmailState, signInWithEmailState) || other.signInWithEmailState == signInWithEmailState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,signInWithGoogleState,signInWithAppleState,signInWithMicrosoftState);
+int get hashCode => Object.hash(runtimeType,signInWithGoogleState,signInWithAppleState,signInWithMicrosoftState,signInWithEmailState);
 
 @override
 String toString() {
-  return 'AuthProviderState(signInWithGoogleState: $signInWithGoogleState, signInWithAppleState: $signInWithAppleState, signInWithMicrosoftState: $signInWithMicrosoftState)';
+  return 'AuthProviderState(signInWithGoogleState: $signInWithGoogleState, signInWithAppleState: $signInWithAppleState, signInWithMicrosoftState: $signInWithMicrosoftState, signInWithEmailState: $signInWithEmailState)';
 }
 
 
@@ -48,11 +49,11 @@ abstract mixin class $AuthProviderStateCopyWith<$Res>  {
   factory $AuthProviderStateCopyWith(AuthProviderState value, $Res Function(AuthProviderState) _then) = _$AuthProviderStateCopyWithImpl;
 @useResult
 $Res call({
- SignInWithGoogleState signInWithGoogleState, SignInWithAppleState signInWithAppleState, SignInWithMicrosoftState signInWithMicrosoftState
+ SignInWithGoogleState signInWithGoogleState, SignInWithAppleState signInWithAppleState, SignInWithMicrosoftState signInWithMicrosoftState, SignInWithEmailState signInWithEmailState
 });
 
 
-$SignInWithGoogleStateCopyWith<$Res> get signInWithGoogleState;$SignInWithAppleStateCopyWith<$Res> get signInWithAppleState;$SignInWithMicrosoftStateCopyWith<$Res> get signInWithMicrosoftState;
+$SignInWithGoogleStateCopyWith<$Res> get signInWithGoogleState;$SignInWithAppleStateCopyWith<$Res> get signInWithAppleState;$SignInWithMicrosoftStateCopyWith<$Res> get signInWithMicrosoftState;$SignInWithEmailStateCopyWith<$Res> get signInWithEmailState;
 
 }
 /// @nodoc
@@ -65,12 +66,13 @@ class _$AuthProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of AuthProviderState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? signInWithGoogleState = null,Object? signInWithAppleState = null,Object? signInWithMicrosoftState = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? signInWithGoogleState = null,Object? signInWithAppleState = null,Object? signInWithMicrosoftState = null,Object? signInWithEmailState = null,}) {
   return _then(_self.copyWith(
 signInWithGoogleState: null == signInWithGoogleState ? _self.signInWithGoogleState : signInWithGoogleState // ignore: cast_nullable_to_non_nullable
 as SignInWithGoogleState,signInWithAppleState: null == signInWithAppleState ? _self.signInWithAppleState : signInWithAppleState // ignore: cast_nullable_to_non_nullable
 as SignInWithAppleState,signInWithMicrosoftState: null == signInWithMicrosoftState ? _self.signInWithMicrosoftState : signInWithMicrosoftState // ignore: cast_nullable_to_non_nullable
-as SignInWithMicrosoftState,
+as SignInWithMicrosoftState,signInWithEmailState: null == signInWithEmailState ? _self.signInWithEmailState : signInWithEmailState // ignore: cast_nullable_to_non_nullable
+as SignInWithEmailState,
   ));
 }
 /// Create a copy of AuthProviderState
@@ -99,6 +101,15 @@ $SignInWithMicrosoftStateCopyWith<$Res> get signInWithMicrosoftState {
   
   return $SignInWithMicrosoftStateCopyWith<$Res>(_self.signInWithMicrosoftState, (value) {
     return _then(_self.copyWith(signInWithMicrosoftState: value));
+  });
+}/// Create a copy of AuthProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SignInWithEmailStateCopyWith<$Res> get signInWithEmailState {
+  
+  return $SignInWithEmailStateCopyWith<$Res>(_self.signInWithEmailState, (value) {
+    return _then(_self.copyWith(signInWithEmailState: value));
   });
 }
 }
@@ -182,10 +193,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SignInWithGoogleState signInWithGoogleState,  SignInWithAppleState signInWithAppleState,  SignInWithMicrosoftState signInWithMicrosoftState)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SignInWithGoogleState signInWithGoogleState,  SignInWithAppleState signInWithAppleState,  SignInWithMicrosoftState signInWithMicrosoftState,  SignInWithEmailState signInWithEmailState)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthProviderState() when $default != null:
-return $default(_that.signInWithGoogleState,_that.signInWithAppleState,_that.signInWithMicrosoftState);case _:
+return $default(_that.signInWithGoogleState,_that.signInWithAppleState,_that.signInWithMicrosoftState,_that.signInWithEmailState);case _:
   return orElse();
 
 }
@@ -203,10 +214,10 @@ return $default(_that.signInWithGoogleState,_that.signInWithAppleState,_that.sig
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SignInWithGoogleState signInWithGoogleState,  SignInWithAppleState signInWithAppleState,  SignInWithMicrosoftState signInWithMicrosoftState)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SignInWithGoogleState signInWithGoogleState,  SignInWithAppleState signInWithAppleState,  SignInWithMicrosoftState signInWithMicrosoftState,  SignInWithEmailState signInWithEmailState)  $default,) {final _that = this;
 switch (_that) {
 case _AuthProviderState():
-return $default(_that.signInWithGoogleState,_that.signInWithAppleState,_that.signInWithMicrosoftState);case _:
+return $default(_that.signInWithGoogleState,_that.signInWithAppleState,_that.signInWithMicrosoftState,_that.signInWithEmailState);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -223,10 +234,10 @@ return $default(_that.signInWithGoogleState,_that.signInWithAppleState,_that.sig
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SignInWithGoogleState signInWithGoogleState,  SignInWithAppleState signInWithAppleState,  SignInWithMicrosoftState signInWithMicrosoftState)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SignInWithGoogleState signInWithGoogleState,  SignInWithAppleState signInWithAppleState,  SignInWithMicrosoftState signInWithMicrosoftState,  SignInWithEmailState signInWithEmailState)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthProviderState() when $default != null:
-return $default(_that.signInWithGoogleState,_that.signInWithAppleState,_that.signInWithMicrosoftState);case _:
+return $default(_that.signInWithGoogleState,_that.signInWithAppleState,_that.signInWithMicrosoftState,_that.signInWithEmailState);case _:
   return null;
 
 }
@@ -238,7 +249,7 @@ return $default(_that.signInWithGoogleState,_that.signInWithAppleState,_that.sig
 
 
 class _AuthProviderState implements AuthProviderState {
-  const _AuthProviderState({this.signInWithGoogleState = const SignInWithGoogleState.initial(), this.signInWithAppleState = const SignInWithAppleState.initial(), this.signInWithMicrosoftState = const SignInWithMicrosoftState.initial()});
+  const _AuthProviderState({this.signInWithGoogleState = const SignInWithGoogleState.initial(), this.signInWithAppleState = const SignInWithAppleState.initial(), this.signInWithMicrosoftState = const SignInWithMicrosoftState.initial(), this.signInWithEmailState = const SignInWithEmailState.initial()});
   
 
 /// The state of signing in with Google.
@@ -247,6 +258,8 @@ class _AuthProviderState implements AuthProviderState {
 @override@JsonKey() final  SignInWithAppleState signInWithAppleState;
 /// The state of signing in with Microsoft.
 @override@JsonKey() final  SignInWithMicrosoftState signInWithMicrosoftState;
+/// The state of signing in / registering with email + password.
+@override@JsonKey() final  SignInWithEmailState signInWithEmailState;
 
 /// Create a copy of AuthProviderState
 /// with the given fields replaced by the non-null parameter values.
@@ -258,16 +271,16 @@ _$AuthProviderStateCopyWith<_AuthProviderState> get copyWith => __$AuthProviderS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthProviderState&&(identical(other.signInWithGoogleState, signInWithGoogleState) || other.signInWithGoogleState == signInWithGoogleState)&&(identical(other.signInWithAppleState, signInWithAppleState) || other.signInWithAppleState == signInWithAppleState)&&(identical(other.signInWithMicrosoftState, signInWithMicrosoftState) || other.signInWithMicrosoftState == signInWithMicrosoftState));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthProviderState&&(identical(other.signInWithGoogleState, signInWithGoogleState) || other.signInWithGoogleState == signInWithGoogleState)&&(identical(other.signInWithAppleState, signInWithAppleState) || other.signInWithAppleState == signInWithAppleState)&&(identical(other.signInWithMicrosoftState, signInWithMicrosoftState) || other.signInWithMicrosoftState == signInWithMicrosoftState)&&(identical(other.signInWithEmailState, signInWithEmailState) || other.signInWithEmailState == signInWithEmailState));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,signInWithGoogleState,signInWithAppleState,signInWithMicrosoftState);
+int get hashCode => Object.hash(runtimeType,signInWithGoogleState,signInWithAppleState,signInWithMicrosoftState,signInWithEmailState);
 
 @override
 String toString() {
-  return 'AuthProviderState(signInWithGoogleState: $signInWithGoogleState, signInWithAppleState: $signInWithAppleState, signInWithMicrosoftState: $signInWithMicrosoftState)';
+  return 'AuthProviderState(signInWithGoogleState: $signInWithGoogleState, signInWithAppleState: $signInWithAppleState, signInWithMicrosoftState: $signInWithMicrosoftState, signInWithEmailState: $signInWithEmailState)';
 }
 
 
@@ -278,11 +291,11 @@ abstract mixin class _$AuthProviderStateCopyWith<$Res> implements $AuthProviderS
   factory _$AuthProviderStateCopyWith(_AuthProviderState value, $Res Function(_AuthProviderState) _then) = __$AuthProviderStateCopyWithImpl;
 @override @useResult
 $Res call({
- SignInWithGoogleState signInWithGoogleState, SignInWithAppleState signInWithAppleState, SignInWithMicrosoftState signInWithMicrosoftState
+ SignInWithGoogleState signInWithGoogleState, SignInWithAppleState signInWithAppleState, SignInWithMicrosoftState signInWithMicrosoftState, SignInWithEmailState signInWithEmailState
 });
 
 
-@override $SignInWithGoogleStateCopyWith<$Res> get signInWithGoogleState;@override $SignInWithAppleStateCopyWith<$Res> get signInWithAppleState;@override $SignInWithMicrosoftStateCopyWith<$Res> get signInWithMicrosoftState;
+@override $SignInWithGoogleStateCopyWith<$Res> get signInWithGoogleState;@override $SignInWithAppleStateCopyWith<$Res> get signInWithAppleState;@override $SignInWithMicrosoftStateCopyWith<$Res> get signInWithMicrosoftState;@override $SignInWithEmailStateCopyWith<$Res> get signInWithEmailState;
 
 }
 /// @nodoc
@@ -295,12 +308,13 @@ class __$AuthProviderStateCopyWithImpl<$Res>
 
 /// Create a copy of AuthProviderState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? signInWithGoogleState = null,Object? signInWithAppleState = null,Object? signInWithMicrosoftState = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? signInWithGoogleState = null,Object? signInWithAppleState = null,Object? signInWithMicrosoftState = null,Object? signInWithEmailState = null,}) {
   return _then(_AuthProviderState(
 signInWithGoogleState: null == signInWithGoogleState ? _self.signInWithGoogleState : signInWithGoogleState // ignore: cast_nullable_to_non_nullable
 as SignInWithGoogleState,signInWithAppleState: null == signInWithAppleState ? _self.signInWithAppleState : signInWithAppleState // ignore: cast_nullable_to_non_nullable
 as SignInWithAppleState,signInWithMicrosoftState: null == signInWithMicrosoftState ? _self.signInWithMicrosoftState : signInWithMicrosoftState // ignore: cast_nullable_to_non_nullable
-as SignInWithMicrosoftState,
+as SignInWithMicrosoftState,signInWithEmailState: null == signInWithEmailState ? _self.signInWithEmailState : signInWithEmailState // ignore: cast_nullable_to_non_nullable
+as SignInWithEmailState,
   ));
 }
 
@@ -330,6 +344,15 @@ $SignInWithMicrosoftStateCopyWith<$Res> get signInWithMicrosoftState {
   
   return $SignInWithMicrosoftStateCopyWith<$Res>(_self.signInWithMicrosoftState, (value) {
     return _then(_self.copyWith(signInWithMicrosoftState: value));
+  });
+}/// Create a copy of AuthProviderState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SignInWithEmailStateCopyWith<$Res> get signInWithEmailState {
+  
+  return $SignInWithEmailStateCopyWith<$Res>(_self.signInWithEmailState, (value) {
+    return _then(_self.copyWith(signInWithEmailState: value));
   });
 }
 }
@@ -1370,6 +1393,355 @@ as AppError,
 }
 
 /// Create a copy of SignInWithMicrosoftState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$AppErrorCopyWith<$Res> get error {
+  
+  return $AppErrorCopyWith<$Res>(_self.error, (value) {
+    return _then(_self.copyWith(error: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$SignInWithEmailState {
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignInWithEmailState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'SignInWithEmailState()';
+}
+
+
+}
+
+/// @nodoc
+class $SignInWithEmailStateCopyWith<$Res>  {
+$SignInWithEmailStateCopyWith(SignInWithEmailState _, $Res Function(SignInWithEmailState) __);
+}
+
+
+/// Adds pattern-matching-related methods to [SignInWithEmailState].
+extension SignInWithEmailStatePatterns on SignInWithEmailState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( SignInWithEmailStateInitial value)?  initial,TResult Function( SignInWithEmailStateLoading value)?  loading,TResult Function( SignInWithEmailStateSuccess value)?  success,TResult Function( SignInWithEmailStateError value)?  error,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case SignInWithEmailStateInitial() when initial != null:
+return initial(_that);case SignInWithEmailStateLoading() when loading != null:
+return loading(_that);case SignInWithEmailStateSuccess() when success != null:
+return success(_that);case SignInWithEmailStateError() when error != null:
+return error(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( SignInWithEmailStateInitial value)  initial,required TResult Function( SignInWithEmailStateLoading value)  loading,required TResult Function( SignInWithEmailStateSuccess value)  success,required TResult Function( SignInWithEmailStateError value)  error,}){
+final _that = this;
+switch (_that) {
+case SignInWithEmailStateInitial():
+return initial(_that);case SignInWithEmailStateLoading():
+return loading(_that);case SignInWithEmailStateSuccess():
+return success(_that);case SignInWithEmailStateError():
+return error(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( SignInWithEmailStateInitial value)?  initial,TResult? Function( SignInWithEmailStateLoading value)?  loading,TResult? Function( SignInWithEmailStateSuccess value)?  success,TResult? Function( SignInWithEmailStateError value)?  error,}){
+final _that = this;
+switch (_that) {
+case SignInWithEmailStateInitial() when initial != null:
+return initial(_that);case SignInWithEmailStateLoading() when loading != null:
+return loading(_that);case SignInWithEmailStateSuccess() when success != null:
+return success(_that);case SignInWithEmailStateError() when error != null:
+return error(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  success,TResult Function( AppError error)?  error,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case SignInWithEmailStateInitial() when initial != null:
+return initial();case SignInWithEmailStateLoading() when loading != null:
+return loading();case SignInWithEmailStateSuccess() when success != null:
+return success();case SignInWithEmailStateError() when error != null:
+return error(_that.error);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  success,required TResult Function( AppError error)  error,}) {final _that = this;
+switch (_that) {
+case SignInWithEmailStateInitial():
+return initial();case SignInWithEmailStateLoading():
+return loading();case SignInWithEmailStateSuccess():
+return success();case SignInWithEmailStateError():
+return error(_that.error);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  success,TResult? Function( AppError error)?  error,}) {final _that = this;
+switch (_that) {
+case SignInWithEmailStateInitial() when initial != null:
+return initial();case SignInWithEmailStateLoading() when loading != null:
+return loading();case SignInWithEmailStateSuccess() when success != null:
+return success();case SignInWithEmailStateError() when error != null:
+return error(_that.error);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class SignInWithEmailStateInitial implements SignInWithEmailState {
+  const SignInWithEmailStateInitial();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignInWithEmailStateInitial);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'SignInWithEmailState.initial()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class SignInWithEmailStateLoading implements SignInWithEmailState {
+  const SignInWithEmailStateLoading();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignInWithEmailStateLoading);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'SignInWithEmailState.loading()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class SignInWithEmailStateSuccess implements SignInWithEmailState {
+  const SignInWithEmailStateSuccess();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignInWithEmailStateSuccess);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'SignInWithEmailState.success()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class SignInWithEmailStateError implements SignInWithEmailState {
+  const SignInWithEmailStateError(this.error);
+  
+
+ final  AppError error;
+
+/// Create a copy of SignInWithEmailState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SignInWithEmailStateErrorCopyWith<SignInWithEmailStateError> get copyWith => _$SignInWithEmailStateErrorCopyWithImpl<SignInWithEmailStateError>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SignInWithEmailStateError&&(identical(other.error, error) || other.error == error));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,error);
+
+@override
+String toString() {
+  return 'SignInWithEmailState.error(error: $error)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $SignInWithEmailStateErrorCopyWith<$Res> implements $SignInWithEmailStateCopyWith<$Res> {
+  factory $SignInWithEmailStateErrorCopyWith(SignInWithEmailStateError value, $Res Function(SignInWithEmailStateError) _then) = _$SignInWithEmailStateErrorCopyWithImpl;
+@useResult
+$Res call({
+ AppError error
+});
+
+
+$AppErrorCopyWith<$Res> get error;
+
+}
+/// @nodoc
+class _$SignInWithEmailStateErrorCopyWithImpl<$Res>
+    implements $SignInWithEmailStateErrorCopyWith<$Res> {
+  _$SignInWithEmailStateErrorCopyWithImpl(this._self, this._then);
+
+  final SignInWithEmailStateError _self;
+  final $Res Function(SignInWithEmailStateError) _then;
+
+/// Create a copy of SignInWithEmailState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
+  return _then(SignInWithEmailStateError(
+null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as AppError,
+  ));
+}
+
+/// Create a copy of SignInWithEmailState
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')

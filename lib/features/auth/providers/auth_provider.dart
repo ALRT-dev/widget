@@ -112,4 +112,62 @@ class AuthProvider extends Notifier<AuthProviderState> {
       },
     );
   }
+
+  /// Signs in the user with email + password.
+  Future<void> signInWithEmail({
+    required final String email,
+    required final String password,
+  }) async {
+    state = state.copyWith(
+      signInWithEmailState: const SignInWithEmailState.loading(),
+    );
+
+    final result = await _authService.loginWithEmail(
+      email: email,
+      password: password,
+    );
+    if (!ref.mounted) return;
+
+    result.when(
+      (data) {
+        state = state.copyWith(
+          signInWithEmailState: const SignInWithEmailState.success(),
+        );
+      },
+      (error) {
+        state = state.copyWith(
+          signInWithEmailState: SignInWithEmailState.error(error),
+        );
+      },
+    );
+  }
+
+  /// Registers a new user with email + password.
+  Future<void> registerWithEmail({
+    required final String email,
+    required final String password,
+  }) async {
+    state = state.copyWith(
+      signInWithEmailState: const SignInWithEmailState.loading(),
+    );
+
+    final result = await _authService.registerWithEmail(
+      email: email,
+      password: password,
+    );
+    if (!ref.mounted) return;
+
+    result.when(
+      (data) {
+        state = state.copyWith(
+          signInWithEmailState: const SignInWithEmailState.success(),
+        );
+      },
+      (error) {
+        state = state.copyWith(
+          signInWithEmailState: SignInWithEmailState.error(error),
+        );
+      },
+    );
+  }
 }

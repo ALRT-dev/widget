@@ -9,6 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/providers/auth_provider.dart';
 import 'package:hazard_app/features/auth/providers/states/auth_provider_state.dart';
+import 'package:hazard_app/features/auth/views/screens/email_auth_screen.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
@@ -200,8 +201,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
   Widget _buildAuthButtons() {
     return Column(
       children: [
-        // _buildEmailButton(),
-        // 12.hSizedBox,
+        _buildEmailButton(),
+        12.hSizedBox,
         Row(
           spacing: 12.spMin,
           children: [
@@ -218,7 +219,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
     );
   }
 
-  // ignore: unused_element
   Widget _buildEmailButton() {
     return SizedBox(
       width: double.infinity,
@@ -507,7 +507,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   /// Handles email authentication flow.
   void _handleEmailAuth() {
-    context.showErrorToast(message: 'Email flow for role: $_selectedRole');
+    context.push(EmailAuthScreen.route);
   }
 
   /// Signs in the user with Apple.

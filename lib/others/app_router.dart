@@ -14,6 +14,7 @@ import 'package:hazard_app/features/family/views/screens/family_circle_profile_s
 import 'package:hazard_app/features/profile/views/screens/how_points_work_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/leaderboard_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/points_breakdown_screen.dart';
+import 'package:hazard_app/features/auth/views/screens/email_auth_screen.dart';
 import 'package:hazard_app/features/subscription/views/screens/alrt_plus_paywall_screen.dart';
 import 'package:hazard_app/features/learn/views/screens/learn_topics_screen.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
@@ -212,6 +213,10 @@ class AppRouter {
         GoRoute(
           path: AlrtPlusPaywallScreen.route,
           builder: (context, state) => const AlrtPlusPaywallScreen(),
+        ),
+        GoRoute(
+          path: EmailAuthScreen.route,
+          builder: (context, state) => const EmailAuthScreen(),
         ),
         GoRoute(
           path: ViewHazardScreen.route,
