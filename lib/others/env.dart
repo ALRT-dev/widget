@@ -9,4 +9,12 @@ class Env {
   static final microsoftClientId = dotenv.env['MICROSOFT_CLIENT_ID'] ?? '';
 
   static final microsoftTenantId = dotenv.env['MICROSOFT_TENANT_ID'] ?? '';
+
+  // RevenueCat public SDK keys (per platform). Safe to ship in the app —
+  // these are publishable keys, not secrets.
+  static final revenueCatApiKeyApple =
+      dotenv.env['REVENUECAT_API_KEY_APPLE'] ?? '';
+
+  static final revenueCatApiKeyGoogle =
+      dotenv.env['REVENUECAT_API_KEY_GOOGLE'] ?? '';
 }

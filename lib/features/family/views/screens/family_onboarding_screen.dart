@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
+import 'package:hazard_app/features/subscription/views/screens/alrt_plus_paywall_screen.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -230,12 +233,21 @@ class _FamilyOnboardingScreenState
     );
   }
 
-  void _onCreate() {
+  Future<void> _onCreate() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       context.showErrorToast(message: 'Give your circle a name first');
       return;
     }
+    // ALRT+ moment: HOSTING a circle needs an ALRT+ subscription (1-month free
+    // trial). Joining a circle is always free, so only this path is gated.
+    final isPlus = await ref.read(providerOfAlrtPlus.future);
+    if (!isPlus) {
+      if (!mounted) return;
+      final subscribed = await context.push<bool>(AlrtPlusPaywallScreen.route);
+      if (subscribed != true) return;
+    }
+    if (!mounted) return;
     ref.read(providerOfFamily.notifier).createCircle(name: name);
   }
 
