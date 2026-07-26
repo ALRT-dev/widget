@@ -8,6 +8,7 @@ import 'package:hazard_app/features/family/providers/family_socket_manager_provi
 import 'package:hazard_app/features/family/providers/states/family_provider_state.dart';
 import 'package:hazard_app/features/family/services/family_location_service.dart';
 import 'package:hazard_app/features/family/services/family_service.dart';
+import 'package:hazard_app/features/home_screen_widget/family_widget_sync.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/services/analytics_service.dart';
@@ -27,6 +28,9 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
   }) : _ref = ref,
        super(state) {
     _listenToSocketEvents();
+    // Mirror family status onto the home-screen widget on every state change
+    // (a signature guard inside suppresses redundant writes).
+    addListener(FamilyWidgetSync.push, fireImmediately: true);
   }
 
   final Ref _ref;

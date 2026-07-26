@@ -2,6 +2,18 @@ import 'package:hazard_app/features/home_screen_widget/home_widget_keys.dart';
 import 'package:hazard_app/features/home_screen_widget/models/home_widget_alert.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/models/hazard_model.dart';
+
+/// Monochrome-safe glyphs per band, so the row still reads if colour is
+/// stripped (locked rule 8).
+extension HazardSeverityBandWidgetEmoji on HazardSeverityBand {
+  String get widgetEmoji => switch (this) {
+        HazardSeverityBand.info => '🔵',
+        HazardSeverityBand.monitor => '🟡',
+        HazardSeverityBand.action => '🟠',
+        HazardSeverityBand.critical => '🔴',
+      };
+}
 
 /// Maps app hazard concepts onto the [HomeWidgetPayload] the native widgets
 /// render. Keeping this in one place means wiring the widget to real hazard
@@ -38,6 +50,28 @@ class HomeWidgetMapper {
       title: title,
       emoji: severity.emojiAws,
       area: area,
+      distance: distance,
+      time: time,
+    );
+  }
+
+  /// Builds a widget row straight from a [Hazard]. Uses the hazard's own
+  /// [Hazard.severityBand] and [Hazard.severityTitle] so it stays consistent
+  /// with how the hazard renders everywhere else in the app.
+  static HomeWidgetAlert fromHazard(
+    final Hazard hazard, {
+    final String? distance,
+    final String? time,
+  }) {
+    final band = hazard.severityBand ??
+        hazard.severity?.widgetBand ??
+        HazardSeverityBand.info;
+    return HomeWidgetAlert(
+      band: band,
+      severityLabel: hazard.severityTitle,
+      title: hazard.title ?? hazard.category?.name ?? 'Hazard',
+      emoji: band.widgetEmoji,
+      area: hazard.locationName,
       distance: distance,
       time: time,
     );

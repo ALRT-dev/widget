@@ -17,7 +17,8 @@ hand-written).
    the Project Navigator **Add Files to "Runner"…** and add the four files that
    already exist in `ios/AlrtWidget/`:
    - `AlrtAlertsWidget.swift`
-   - `AlrtWidgetBundle.swift`
+   - `AlrtFamilyWidget.swift`
+   - `AlrtWidgetBundle.swift`  (declares both widgets — holds the `@main`)
    - `Info.plist`  (set it as the target's Info.plist under Build Settings ▸
      Packaging ▸ Info.plist File if not already)
    - `AlrtWidget.entitlements`

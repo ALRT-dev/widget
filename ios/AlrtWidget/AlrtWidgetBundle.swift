@@ -5,5 +5,6 @@ import SwiftUI
 struct AlrtWidgetBundle: WidgetBundle {
     var body: some Widget {
         AlrtAlertsWidget()
+        AlrtFamilyWidget()
     }
 }

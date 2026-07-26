@@ -12,15 +12,24 @@ class HomeWidgetKeys {
   /// target and the AlrtWidget extension target.
   static const appGroupId = 'group.com.safetyalrt.alrt';
 
-  /// The single JSON payload the widget renders from. One key keeps the
-  /// Dart/Kotlin/Swift contract trivial to reason about.
+  /// The single JSON payload the Nearby Alerts widget renders from. One key
+  /// keeps the Dart/Kotlin/Swift contract trivial to reason about.
   static const payloadKey = 'alrt_widget_payload';
+
+  /// The JSON payload for the Family status widget.
+  static const familyPayloadKey = 'alrt_family_widget_payload';
 
   /// Android provider class name (as registered in AndroidManifest.xml).
   static const androidProviderName = 'AlrtAlertsWidgetProvider';
 
   /// iOS widget `kind` (must match the `kind:` in AlrtAlertsWidget.swift).
   static const iosWidgetName = 'AlrtAlertsWidget';
+
+  /// Android provider class name for the Family widget.
+  static const androidFamilyProviderName = 'AlrtFamilyWidgetProvider';
+
+  /// iOS widget `kind` for the Family widget.
+  static const iosFamilyWidgetName = 'AlrtFamilyWidget';
 
   /// Custom scheme used when the user taps the widget. Handled by the router.
   static const deeplinkScheme = 'alrtwidget';

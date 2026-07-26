@@ -59,6 +59,12 @@ class HomeWidgetLaunchHandler {
         case 'map':
           _ref.read(providerOfHomeTab.notifier).state = HomeTab.map;
           break;
+        // Both family cases land on the Family tab, where an active SOS is
+        // surfaced by the app's own banner. The widget never opens SOS directly.
+        case 'family':
+        case 'family_sos':
+          _ref.read(providerOfHomeTab.notifier).state = HomeTab.family;
+          break;
         default:
           break;
       }

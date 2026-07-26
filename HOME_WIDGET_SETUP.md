@@ -1,9 +1,14 @@
-# Home-screen widget — ALRT "Nearby Alerts"
+# Home-screen widgets — ALRT
 
-A home-screen widget (iOS WidgetKit + Android App Widget) that surfaces the
-single highest-severity nearby hazard, an "All clear" green state when nothing
-is active, and taps that deep-link back into the app. Built to the locked
-product rules:
+Two home-screen widgets (iOS WidgetKit + Android App Widget):
+
+1. **Nearby Alerts** — the single highest-severity nearby hazard, or an
+   "All clear" green state. Auto-fed from the map provider's hazard fetches.
+2. **Family status** — the user's circle at a glance: a live family SOS
+   (solid red), "Everyone's safe" (green), an "N of M checked in" count, or
+   "No family circle". Auto-fed from the family provider.
+
+Both deep-link back into the app on tap. Built to the locked product rules:
 
 - **The two reds (rule 6):** the solid red gradient (`#FF5247 → #B80000`) is used
   ONLY for the `critical` band. Every other band uses its own colour; no
@@ -41,27 +46,29 @@ flutter pub get
 cd ios && pod install && cd ..
 ```
 
-## 2. Push data to the widget
-Call this wherever the nearby-alerts list is known (e.g. after the map/alerts
-provider refreshes). `nearby` must be ordered highest-severity first; pass an
-empty list to show "All clear".
+## 2. Data push (already wired)
+Both widgets update themselves — no extra call sites needed:
+
+- **Nearby Alerts** — `MapProvider` calls `HomeWidgetSync.push(_ref, hazards)`
+  right after each hazard-fetch success (`lib/features/map/providers/map_provider.dart`).
+  It ranks by severity band then distance from the user (within 50 km), and
+  renders "All clear" when nothing is nearby.
+- **Family status** — `FamilyProvider` registers
+  `addListener(FamilyWidgetSync.push)` in its constructor, so any circle / SOS /
+  check-in change reflects on the widget. A signature guard suppresses
+  redundant writes.
+
+To push manually from elsewhere (e.g. a background handler), the low-level API
+is still available:
 
 ```dart
 import 'package:hazard_app/features/home_screen_widget/home_widget_mapper.dart';
 import 'package:hazard_app/features/home_screen_widget/home_widget_service.dart';
 
-final nearby = hazards.map((h) => HomeWidgetMapper.alert(
-  severity: h.severity,          // HazardSeverity
-  title: h.title,
-  area: h.area,                  // optional
-  distance: h.distanceLabel,     // optional, already formatted e.g. "3.2 km"
-  time: h.relativeTime,          // optional, already formatted e.g. "8 min ago"
-)).toList();
-
 await HomeWidgetService.update(
   HomeWidgetMapper.payload(
-    nearby: nearby,
-    updatedLabel: 'Updated ${TimeOfDay.now().format(context)}',
+    nearby: hazards.map(HomeWidgetMapper.fromHazard).toList(), // highest-severity first
+    updatedLabel: 'Updated 9:42 am',
   ),
 );
 ```

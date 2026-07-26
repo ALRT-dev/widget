@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:hazard_app/features/home_screen_widget/home_widget_keys.dart';
+import 'package:hazard_app/features/home_screen_widget/models/family_widget_payload.dart';
 import 'package:hazard_app/features/home_screen_widget/models/home_widget_alert.dart';
 
 /// Bridges app state to the native home-screen widgets (iOS WidgetKit +
@@ -36,7 +37,20 @@ class HomeWidgetService {
     }
   }
 
-  /// Forces a redraw without changing data (e.g. after a locale change).
+  /// Serializes a [FamilyWidgetPayload] and redraws the Family widget.
+  static Future<void> updateFamily(final FamilyWidgetPayload payload) async {
+    try {
+      await HomeWidget.saveWidgetData<String>(
+        HomeWidgetKeys.familyPayloadKey,
+        jsonEncode(payload.toJson()),
+      );
+      await _refreshFamily();
+    } catch (e, s) {
+      debugPrint('HomeWidgetService.updateFamily failed: $e\n$s');
+    }
+  }
+
+  /// Forces a redraw of the Nearby Alerts widget without changing data.
   static Future<void> refresh() async {
     await HomeWidget.updateWidget(
       name: HomeWidgetKeys.androidProviderName,
@@ -44,6 +58,16 @@ class HomeWidgetService {
       iOSName: HomeWidgetKeys.iosWidgetName,
       qualifiedAndroidName:
           'com.safetyalrt.alrt.${HomeWidgetKeys.androidProviderName}',
+    );
+  }
+
+  static Future<void> _refreshFamily() async {
+    await HomeWidget.updateWidget(
+      name: HomeWidgetKeys.androidFamilyProviderName,
+      androidName: HomeWidgetKeys.androidFamilyProviderName,
+      iOSName: HomeWidgetKeys.iosFamilyWidgetName,
+      qualifiedAndroidName:
+          'com.safetyalrt.alrt.${HomeWidgetKeys.androidFamilyProviderName}',
     );
   }
 

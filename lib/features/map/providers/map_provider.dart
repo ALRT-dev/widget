@@ -11,6 +11,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hazard_app/features/home_screen_widget/home_widget_sync.dart';
 import 'package:hazard_app/features/map/extensions/lat_lng_list_extension.dart';
 import 'package:hazard_app/features/map/extensions/polyline_extension.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
@@ -328,6 +329,10 @@ class MapProvider extends StateNotifier<MapProviderState> {
           getMapHazardsState: GetMapHazardsState.success(hazards),
           hazards: visibleHazards,
         );
+
+        // Keep the home-screen widget in step with the freshly fetched hazards.
+        // Fire-and-forget; failures are swallowed inside HomeWidgetSync.
+        HomeWidgetSync.push(_ref, hazards);
 
         final selectedHazard = visibleHazards.firstWhereOrNull(
           (hazard) => hazard.id == state.selectedHazard?.id,
