@@ -73,6 +73,18 @@
           android:scheme="msauth" />
       </intent-filter>
     </activity>
+
+    <!-- ALRT Nearby Alerts home-screen widget -->
+    <receiver
+      android:name=".AlrtAlertsWidgetProvider"
+      android:exported="false">
+      <intent-filter>
+        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+      </intent-filter>
+      <meta-data
+        android:name="android.appwidget.provider"
+        android:resource="@xml/alrt_alerts_widget_info" />
+    </receiver>
   </application>
   <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

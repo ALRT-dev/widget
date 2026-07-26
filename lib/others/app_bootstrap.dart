@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hazard_app/features/shared/providers/app_info_provider.dart';
 import 'package:hazard_app/features/shared/providers/base_url_provider.dart';
+import 'package:hazard_app/features/home_screen_widget/home_widget_service.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/firebase_options.dart';
 import 'package:hazard_app/others/app.dart';
@@ -28,6 +29,7 @@ class AppBootstrap {
       _initializeFirebase(),
       _loadEnvironmentVariables(),
       _initializeGoogleFonts(),
+      _initializeHomeWidget(),
     ]);
 
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -86,6 +88,16 @@ class AppBootstrap {
         await GoogleFonts.pendingFonts([
           GoogleFonts.bebasNeue(),
         ]);
+      },
+      onError: (_) {},
+    );
+  }
+
+  Future<void> _initializeHomeWidget() async {
+    return runAsyncCall(
+      name: 'initializeHomeWidget',
+      future: () async {
+        await HomeWidgetService.initialize();
       },
       onError: (_) {},
     );
