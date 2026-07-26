@@ -73,28 +73,15 @@ await HomeWidgetService.update(
 );
 ```
 
-## 3. Handle taps (deep-link)
-From a widget that lives for the app's lifetime (e.g. `MyApp` / `AppWrapper`),
-after the router exists:
+## 3. Handle taps (already wired)
+`AppWrapper` attaches `HomeWidgetLaunchHandler` in `_gotoHomeScreen()` — i.e.
+only once the user is authenticated and heading to home, so a cold-start tap
+can never bypass the auth/onboarding gate. `attach()` covers both cold start
+(app launched from the widget) and warm taps.
 
-```dart
-late final HomeWidgetLaunchHandler _widgetLaunch;
-
-@override
-void initState() {
-  super.initState();
-  _widgetLaunch = HomeWidgetLaunchHandler(ref)..attach();
-}
-
-@override
-void dispose() {
-  _widgetLaunch.dispose();
-  super.dispose();
-}
-```
-`attach()` handles both cold start (app launched from the widget) and warm taps.
-The handler navigates to `/home` and selects the Alerts tab
-(`HomeTab.notifications`) for `screen=alerts`, or the Map tab for `screen=map`.
+Routing: `screen=alerts` → Alerts tab (`HomeTab.notifications`), `screen=map` →
+Map tab, `screen=family` / `screen=family_sos` → Family tab (an active SOS is
+surfaced there by the app's own banner; the widget never opens SOS directly).
 
 ## Verification status
 - **Not yet compiled/built here** — this was authored on Windows without a

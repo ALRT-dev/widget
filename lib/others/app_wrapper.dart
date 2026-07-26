@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/views/screens/auth_screen.dart';
 import 'package:hazard_app/features/home/views/screens/home_screen.dart';
+import 'package:hazard_app/features/home_screen_widget/home_widget_launch_handler.dart';
 import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/profile/views/screens/deleted_account_info_screen.dart';
 import 'package:hazard_app/features/shared/providers/app_initialization_provider.dart';
@@ -36,10 +37,21 @@ class AppWrapper extends ConsumerStatefulWidget {
 }
 
 class _AppWrapperState extends ConsumerState<AppWrapper> {
+  /// Routes home-screen widget taps into the app. Attached only once the user
+  /// is authenticated and heading to home, so a cold-start tap can never
+  /// bypass the auth/onboarding gate.
+  HomeWidgetLaunchHandler? _widgetLaunch;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
+  }
+
+  @override
+  void dispose() {
+    _widgetLaunch?.dispose();
+    super.dispose();
   }
 
   @override
@@ -102,6 +114,8 @@ class _AppWrapperState extends ConsumerState<AppWrapper> {
       HomeScreen.route,
       extra: widget.args.homeScreenArgs,
     );
+    // Now that we're authenticated and on home, start honoring widget taps.
+    _widgetLaunch ??= HomeWidgetLaunchHandler(ref)..attach();
   }
 
   /// Navigates to the deleted account info screen.
