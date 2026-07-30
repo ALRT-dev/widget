@@ -26,6 +26,7 @@ import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/utils/open_link.dart';
 import 'package:hazard_app/features/shared/utils/share_alert.dart';
+import 'package:hazard_app/features/shared/views/widgets/alert_icon.dart';
 import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
@@ -547,9 +548,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             (value) => value.hazard?.categoryImage,
           ),
         );
-        final hazardColor = ref.watch(
+        final hazard = ref.watch(
           provider.select(
-            (value) => value.hazard?.color ?? AppColors.black,
+            (value) => value.hazard,
           ),
         );
         final fallbackIconPath = ref.watch(
@@ -568,19 +569,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             errorWidget: (context, url, error) => Image.asset(
               fallbackIconPath,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Container(
-                decoration: BoxDecoration(
-                  color: hazardColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12.spMin),
-                ),
-                child: Icon(
-                  Icons.error,
-                  size: 24.spMin,
-                  color: hazardColor == AppColors.transparent
-                      ? AppColors.grey
-                      : hazardColor,
-                ),
-              ),
+              // Final fallback: the drawn "One Glance" icon instead of an error box.
+              errorBuilder: (context, error, stackTrace) => hazard == null
+                  ? const SizedBox.shrink()
+                  : AlertIcon(hazard: hazard, dimension: 70),
             ),
           ),
         );

@@ -16,6 +16,7 @@ import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dar
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/utils/share_alert.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
+import 'package:hazard_app/features/shared/views/widgets/alert_icon.dart';
 import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -425,11 +426,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard!.categoryImage,
           ),
         );
-        final hazardColor = ref.watch(
-          provider.select(
-            (value) => value.hazard?.color ?? AppColors.black,
-          ),
-        );
         final fallbackIconPath = ref.watch(
           provider.select(
             (value) => value.hazard?.fallbackIconPath ?? '',
@@ -446,19 +442,10 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             errorWidget: (context, url, error) => Image.asset(
               fallbackIconPath,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Container(
-                decoration: BoxDecoration(
-                  color: hazardColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12.spMin),
-                ),
-                child: Icon(
-                  Icons.error,
-                  size: 24.spMin,
-                  color: hazardColor == AppColors.transparent
-                      ? AppColors.grey
-                      : hazardColor,
-                ),
-              ),
+              // Final fallback: the drawn "One Glance" icon (shape · colour ·
+              // glyph) instead of a plain error box.
+              errorBuilder: (context, error, stackTrace) =>
+                  AlertIcon(hazard: widget.hazard, dimension: 48),
             ),
           ),
         );
