@@ -54,6 +54,18 @@ class RevenueCatService {
     }
   }
 
+  /// The full RevenueCat customer info (entitlement dates, billing issue
+  /// flags, the store's subscription management URL). Null when RevenueCat
+  /// isn't configured or the lookup fails.
+  Future<CustomerInfo?> customerInfo() async {
+    if (!_hasKeys) return null;
+    try {
+      return await Purchases.getCustomerInfo();
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// The current offering (its packages hold store-rendered prices).
   Future<Offering?> currentOffering() async {
     if (!_hasKeys) return null;
