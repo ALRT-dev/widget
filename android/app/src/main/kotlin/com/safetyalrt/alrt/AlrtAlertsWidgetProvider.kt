@@ -59,13 +59,26 @@ class AlrtAlertsWidgetProvider : HomeWidgetProvider() {
         }
     }
 
+    /** Live relative freshness, e.g. "Checked 1 min ago" (Edit 6). */
+    private fun checkedLabel(payload: JSONObject, prefix: String): String {
+        val at = payload.optLong("updatedAtMillis", 0L)
+        if (at <= 0L) return payload.optString("updatedLabel", "")
+        val mins = (System.currentTimeMillis() - at) / 60000L
+        return when {
+            mins < 1 -> "$prefix just now"
+            mins < 60 -> "$prefix $mins min ago"
+            mins < 60 * 24 -> "$prefix ${mins / 60} h ago"
+            else -> "$prefix ${mins / (60 * 24)} d ago"
+        }
+    }
+
     private fun bind(views: RemoteViews, payload: JSONObject) {
-        val updated = payload.optString("updatedLabel", "")
+        val updated = checkedLabel(payload, "Updated")
         views.setTextViewText(R.id.widget_updated, updated)
 
         val state = payload.optString("state", "all_clear")
         if (state != "alert" || !payload.has("primary")) {
-            renderAllClear(views, updated)
+            renderAllClear(views, checkedLabel(payload, "Checked"))
             return
         }
 
@@ -153,7 +166,7 @@ class AlrtAlertsWidgetProvider : HomeWidgetProvider() {
         views.setTextViewText(R.id.widget_updated, "")
         views.setTextViewText(
             R.id.widget_allclear_checked,
-            updated.replaceFirst("Updated", "Checked").ifBlank { "Checked just now" }
+            updated.ifBlank { "Checked just now" }
         )
     }
 }

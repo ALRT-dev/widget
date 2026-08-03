@@ -94,6 +94,9 @@ class HomeWidgetPayload {
   Map<String, dynamic> toJson() => {
         'state': isAllClear ? 'all_clear' : 'alert',
         'updatedLabel': updatedLabel,
+        // Stamped at push time so the widget can render a live relative
+        // "Checked X min ago" on every timeline refresh.
+        'updatedAtMillis': DateTime.now().millisecondsSinceEpoch,
         'deeplink': deeplink,
         'activeCount': activeCount,
         if (primary != null) 'primary': primary!.toJson(),
