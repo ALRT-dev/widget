@@ -168,6 +168,10 @@ class FamilyService {
     return _familyRepository.getFamilyCheckIns(limit: limit);
   }
 
+  Future<Either<List<FamilyCircleSummary>, AppError>> getFamilyCircles() {
+    return _familyRepository.getFamilyCircles();
+  }
+
   Future<Either<FamilyScheduledCheckIn, AppError>>
   createFamilyScheduledCheckIn({
     required final String timeOfDay,

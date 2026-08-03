@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -80,6 +81,7 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
   @override
   Widget build(BuildContext context) {
     final circle = ref.watch(providerOfFamily.select((s) => s.circle));
+    final circles = ref.watch(providerOfFamily.select((s) => s.circles));
 
     return Scaffold(
       backgroundColor: AlrtPlusStyle.body,
@@ -90,12 +92,16 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
             child: ListView(
               padding: EdgeInsets.fromLTRB(18.spMin, 16.spMin, 18.spMin, 24.spMin),
               children: [
-                _sectionLabelBuilder(circle),
+                _sectionLabelBuilder(circle, circles),
                 SizedBox(height: 8.spMin),
-                _seatCardBuilder(circle),
+                _seatCardBuilder(circle, circles),
                 SizedBox(height: 10.spMin),
                 if (circle != null) ...[
                   _membersCardBuilder(circle),
+                  SizedBox(height: 10.spMin),
+                ],
+                if (circles.any((c) => !c.isOwned)) ...[
+                  _otherPlansCardBuilder(circles),
                   SizedBox(height: 10.spMin),
                 ],
                 _actionsCardBuilder(circle),
@@ -220,15 +226,32 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
     return parts.isEmpty ? 'ALRT + is active on this account' : parts.join(' · ');
   }
 
-  int _seatTotalOf(final FamilyCircle? circle) =>
-      circle?.maxMembers ?? AlrtPlusManageScreen.totalSeats;
+  /// Circles the user pays for. Every membership row in one of these
+  /// consumes a seat, per the locked seat model (8 across up to 4 circles).
+  List<FamilyCircleSummary> _ownedOf(final List<FamilyCircleSummary> circles) =>
+      circles.where((c) => c.isOwned).toList();
 
-  Widget _sectionLabelBuilder(final FamilyCircle? circle) {
-    final used = circle?.members.length ?? 1;
+  int _seatsUsedOf(
+    final FamilyCircle? circle,
+    final List<FamilyCircleSummary> circles,
+  ) {
+    final owned = _ownedOf(circles);
+    if (owned.isNotEmpty) {
+      return owned.fold(0, (sum, c) => sum + c.memberCount);
+    }
+    // Fallback before the circles list has loaded.
+    return circle?.members.length ?? 1;
+  }
+
+  Widget _sectionLabelBuilder(
+    final FamilyCircle? circle,
+    final List<FamilyCircleSummary> circles,
+  ) {
+    final used = _seatsUsedOf(circle, circles);
     return Padding(
       padding: EdgeInsets.only(left: 4.spMin),
       child: Text(
-        'SEATS · $used OF ${_seatTotalOf(circle)} USED',
+        'SEATS · $used OF ${AlrtPlusManageScreen.totalSeats} USED',
         style: TextStyle(
           fontSize: 10.5.spMin,
           fontWeight: FontWeight.w700,
@@ -239,9 +262,13 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
     );
   }
 
-  Widget _seatCardBuilder(final FamilyCircle? circle) {
-    final used = circle?.members.length ?? 1;
-    final total = _seatTotalOf(circle);
+  Widget _seatCardBuilder(
+    final FamilyCircle? circle,
+    final List<FamilyCircleSummary> circles,
+  ) {
+    final owned = _ownedOf(circles);
+    final used = _seatsUsedOf(circle, circles);
+    const total = AlrtPlusManageScreen.totalSeats;
     final free = (total - used).clamp(0, total);
     return _cardBuilder(
       child: Column(
@@ -252,7 +279,9 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                circle?.name ?? 'Your circle',
+                owned.length > 1
+                    ? 'Your ${owned.length} groups'
+                    : (owned.firstOrNull?.name ?? circle?.name ?? 'Your circle'),
                 style: TextStyle(
                   fontSize: 13.5.spMin,
                   fontWeight: FontWeight.w700,
@@ -294,9 +323,79 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
               );
             }),
           ),
+          if (owned.length > 1) ...[
+            SizedBox(height: 7.spMin),
+            Text(
+              [
+                for (final c in owned) '${c.name} ${c.memberCount}',
+                if (free > 0) '$free spare',
+              ].join(' · '),
+              style: TextStyle(
+                fontSize: 11.spMin,
+                fontWeight: FontWeight.w600,
+                color: AlrtPlusStyle.inkSoft,
+              ),
+            ),
+          ],
           SizedBox(height: 7.spMin),
           Text(
             'Members keep the free tier if your plan lapses',
+            style: TextStyle(
+              fontSize: 10.5.spMin,
+              color: AlrtPlusStyle.inkFaint,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Groups where the user sits on someone else's plan — these never touch
+  /// the user's own seat count.
+  Widget _otherPlansCardBuilder(final List<FamilyCircleSummary> circles) {
+    final others = circles.where((c) => !c.isOwned).toList();
+    return _cardBuilder(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'ON SOMEONE ELSE\'S PLAN',
+            style: TextStyle(
+              fontSize: 10.5.spMin,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.2,
+              color: AlrtPlusStyle.label,
+            ),
+          ),
+          SizedBox(height: 8.spMin),
+          Wrap(
+            spacing: 8.spMin,
+            runSpacing: 8.spMin,
+            children: [
+              for (final c in others)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.spMin,
+                    vertical: 6.spMin,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AlrtPlusStyle.seatEmpty),
+                    borderRadius: BorderRadius.circular(16.spMin),
+                  ),
+                  child: Text(
+                    c.name,
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: AlrtPlusStyle.inkSoft,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: 6.spMin),
+          Text(
+            'Their subscription covers your seat while you\'re in the group.',
             style: TextStyle(
               fontSize: 10.5.spMin,
               color: AlrtPlusStyle.inkFaint,

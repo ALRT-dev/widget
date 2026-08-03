@@ -59,6 +59,7 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             _headerBuilder(circle, memberIdsNearAlert),
+            _circleSwitcherBuilder(circle),
             const SliverToBoxAdapter(child: BillingIssueBanner()),
             SliverToBoxAdapter(
               child: Padding(
@@ -83,6 +84,71 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Group switcher chips — only rendered when the user belongs to more
+  /// than one circle. Tapping a chip rescopes the whole family tab.
+  Widget _circleSwitcherBuilder(final FamilyCircle circle) {
+    final circles = ref.watch(providerOfFamily.select((s) => s.circles));
+    if (circles.length < 2) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+
+    return SliverToBoxAdapter(
+      child: Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(vertical: 10.spMin),
+        child: SizedBox(
+          height: 36.spMin,
+          child: ListView.separated(
+            padding: EdgeInsets.symmetric(horizontal: 20.spMin),
+            scrollDirection: Axis.horizontal,
+            itemCount: circles.length,
+            separatorBuilder: (_, _) => SizedBox(width: 8.spMin),
+            itemBuilder: (context, index) {
+              final summary = circles[index];
+              final isSelected = summary.circleId == circle.id;
+
+              return GestureDetector(
+                onTap: () => ref
+                    .read(providerOfFamily.notifier)
+                    .selectCircle(summary.circleId),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 14.spMin),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? FamilyColors.indigo
+                        : const Color(0xFFF4F4F6),
+                    borderRadius: BorderRadius.circular(18.spMin),
+                  ),
+                  child: Row(
+                    children: [
+                      if (summary.isOwned) ...[
+                        Icon(
+                          LucideIcons.crown,
+                          size: 13.spMin,
+                          color: isSelected ? Colors.white : AppColors.grey,
+                        ),
+                        SizedBox(width: 5.spMin),
+                      ],
+                      Text(
+                        summary.name,
+                        style: TextStyle(
+                          fontSize: 13.spMin,
+                          fontWeight: FontWeight.w700,
+                          color: isSelected ? Colors.white : AppColors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );

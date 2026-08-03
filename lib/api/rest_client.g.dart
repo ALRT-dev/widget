@@ -1086,9 +1086,10 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<HttpResponse<dynamic>> getFamilyCircle() async {
+  Future<HttpResponse<dynamic>> getFamilyCircle({String? circleId}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(
@@ -1105,6 +1106,38 @@ class _RestClient implements RestClient {
     final _value = _result.data;
     final httpResponse = HttpResponse(_value, _result);
     return httpResponse;
+  }
+
+  @override
+  Future<List<FamilyCircleSummary>> getFamilyCircles() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<FamilyCircleSummary>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/family/circles',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<FamilyCircleSummary> _value;
+    try {
+      _value = _result.data!
+          .map(
+            (dynamic i) =>
+                FamilyCircleSummary.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
   }
 
   @override
@@ -1138,9 +1171,10 @@ class _RestClient implements RestClient {
   Future<HttpResponse<dynamic>> updateFamilyCircle({
     String? name,
     String? themeColor,
+    String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {'name': name, 'themeColor': themeColor};
@@ -1162,9 +1196,10 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<HttpResponse<dynamic>> deleteFamilyCircle() async {
+  Future<HttpResponse<dynamic>> deleteFamilyCircle({String? circleId}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(
@@ -1184,9 +1219,10 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<HttpResponse<dynamic>> leaveFamilyCircle() async {
+  Future<HttpResponse<dynamic>> leaveFamilyCircle({String? circleId}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(
@@ -1234,9 +1270,10 @@ class _RestClient implements RestClient {
     String? nickname,
     String? sharingLevel,
     String? colorHex,
+    String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {
@@ -1264,9 +1301,11 @@ class _RestClient implements RestClient {
   @override
   Future<HttpResponse<dynamic>> updateOwnFamilyMemberPhoto({
     required File photo,
+    String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = FormData();
     _data.files.add(
@@ -1300,9 +1339,10 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<FamilyInvite> createFamilyInvite() async {
+  Future<FamilyInvite> createFamilyInvite({String? circleId}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<FamilyInvite>(
@@ -1327,9 +1367,10 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<List<FamilyInvite>> getFamilyInvites() async {
+  Future<List<FamilyInvite>> getFamilyInvites({String? circleId}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<List<FamilyInvite>>(
@@ -1415,9 +1456,10 @@ class _RestClient implements RestClient {
     double? heading,
     int? batteryLevel,
     bool? isMoving,
+    String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {
@@ -1553,9 +1595,10 @@ class _RestClient implements RestClient {
     double? longitude,
     String? requestId,
     String? hazardId,
+    String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {
@@ -1592,9 +1635,10 @@ class _RestClient implements RestClient {
   Future<FamilyCheckInRequest> requestFamilyCheckIn({
     String? message,
     String? hazardId,
+    String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {'message': message, 'hazardId': hazardId};
@@ -1624,9 +1668,10 @@ class _RestClient implements RestClient {
   Future<FamilyScheduledCheckIn> createFamilyScheduledCheckIn({
     required String timeOfDay,
     String? mode,
+    String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {'timeOfDay': timeOfDay, 'mode': mode};
@@ -1653,9 +1698,12 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<List<FamilyScheduledCheckIn>> getFamilyScheduledCheckIns() async {
+  Future<List<FamilyScheduledCheckIn>> getFamilyScheduledCheckIns({
+    String? circleId,
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<List<FamilyScheduledCheckIn>>(
@@ -1706,9 +1754,15 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<List<FamilyCheckIn>> getFamilyCheckIns({int? limit}) async {
+  Future<List<FamilyCheckIn>> getFamilyCheckIns({
+    int? limit,
+    String? circleId,
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'limit': limit};
+    final queryParameters = <String, dynamic>{
+      r'limit': limit,
+      r'circleId': circleId,
+    };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
@@ -1736,9 +1790,10 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<List<FamilySavedPlace>> getFamilyPlaces() async {
+  Future<List<FamilySavedPlace>> getFamilyPlaces({String? circleId}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<List<FamilySavedPlace>>(
@@ -1774,9 +1829,10 @@ class _RestClient implements RestClient {
     required double longitude,
     int? radiusMeters,
     String? address,
+    String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {
@@ -1917,9 +1973,10 @@ class _RestClient implements RestClient {
   Future<FamilySosEvent> triggerFamilySos({
     double? latitude,
     double? longitude,
+    String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     final _data = {'latitude': latitude, 'longitude': longitude};
@@ -1946,9 +2003,12 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<List<FamilySosEvent>> getActiveFamilySosEvents() async {
+  Future<List<FamilySosEvent>> getActiveFamilySosEvents({
+    String? circleId,
+  }) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'circleId': circleId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<List<FamilySosEvent>>(

@@ -239,6 +239,30 @@ abstract class FamilyCheckIn with _$FamilyCheckIn {
       _$FamilyCheckInFromJson(json);
 }
 
+/// One row of GET /api/family/circles — a circle the user belongs to,
+/// with just enough for the group switcher and the ALRT+ seat ledger.
+@freezed
+abstract class FamilyCircleSummary with _$FamilyCircleSummary {
+  const factory FamilyCircleSummary({
+    required final String circleId,
+    required final String name,
+    final String? themeColor,
+    @JsonKey(unknownEnumValue: FamilyRole.adult)
+    @Default(FamilyRole.adult)
+    final FamilyRole role,
+    required final String myMemberId,
+    @Default(0) final int memberCount,
+
+    /// True when the caller owns (pays for) this circle — its members
+    /// consume the caller's seats.
+    @Default(false) final bool isOwned,
+    final DateTime? joinedAt,
+  }) = _FamilyCircleSummary;
+
+  factory FamilyCircleSummary.fromJson(Map<String, dynamic> json) =>
+      _$FamilyCircleSummaryFromJson(json);
+}
+
 @freezed
 abstract class FamilyScheduledCheckIn with _$FamilyScheduledCheckIn {
   const factory FamilyScheduledCheckIn({

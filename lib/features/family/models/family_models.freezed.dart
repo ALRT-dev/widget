@@ -2378,6 +2378,294 @@ $FamilyMemberSnippetCopyWith<$Res>? get member {
 
 
 /// @nodoc
+mixin _$FamilyCircleSummary {
+
+ String get circleId; String get name; String? get themeColor;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role; String get myMemberId; int get memberCount;/// True when the caller owns (pays for) this circle — its members
+/// consume the caller's seats.
+ bool get isOwned; DateTime? get joinedAt;
+/// Create a copy of FamilyCircleSummary
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilyCircleSummaryCopyWith<FamilyCircleSummary> get copyWith => _$FamilyCircleSummaryCopyWithImpl<FamilyCircleSummary>(this as FamilyCircleSummary, _$identity);
+
+  /// Serializes this FamilyCircleSummary to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyCircleSummary&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.role, role) || other.role == role)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.isOwned, isOwned) || other.isOwned == isOwned)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,role,myMemberId,memberCount,isOwned,joinedAt);
+
+@override
+String toString() {
+  return 'FamilyCircleSummary(circleId: $circleId, name: $name, themeColor: $themeColor, role: $role, myMemberId: $myMemberId, memberCount: $memberCount, isOwned: $isOwned, joinedAt: $joinedAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilyCircleSummaryCopyWith<$Res>  {
+  factory $FamilyCircleSummaryCopyWith(FamilyCircleSummary value, $Res Function(FamilyCircleSummary) _then) = _$FamilyCircleSummaryCopyWithImpl;
+@useResult
+$Res call({
+ String circleId, String name, String? themeColor,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, String myMemberId, int memberCount, bool isOwned, DateTime? joinedAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$FamilyCircleSummaryCopyWithImpl<$Res>
+    implements $FamilyCircleSummaryCopyWith<$Res> {
+  _$FamilyCircleSummaryCopyWithImpl(this._self, this._then);
+
+  final FamilyCircleSummary _self;
+  final $Res Function(FamilyCircleSummary) _then;
+
+/// Create a copy of FamilyCircleSummary
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? role = null,Object? myMemberId = null,Object? memberCount = null,Object? isOwned = null,Object? joinedAt = freezed,}) {
+  return _then(_self.copyWith(
+circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,themeColor: freezed == themeColor ? _self.themeColor : themeColor // ignore: cast_nullable_to_non_nullable
+as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as FamilyRole,myMemberId: null == myMemberId ? _self.myMemberId : myMemberId // ignore: cast_nullable_to_non_nullable
+as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
+as int,isOwned: null == isOwned ? _self.isOwned : isOwned // ignore: cast_nullable_to_non_nullable
+as bool,joinedAt: freezed == joinedAt ? _self.joinedAt : joinedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FamilyCircleSummary].
+extension FamilyCircleSummaryPatterns on FamilyCircleSummary {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilyCircleSummary value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilyCircleSummary() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilyCircleSummary value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyCircleSummary():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilyCircleSummary value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyCircleSummary() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  bool isOwned,  DateTime? joinedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilyCircleSummary() when $default != null:
+return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.isOwned,_that.joinedAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  bool isOwned,  DateTime? joinedAt)  $default,) {final _that = this;
+switch (_that) {
+case _FamilyCircleSummary():
+return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.isOwned,_that.joinedAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  bool isOwned,  DateTime? joinedAt)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilyCircleSummary() when $default != null:
+return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.isOwned,_that.joinedAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilyCircleSummary implements FamilyCircleSummary {
+  const _FamilyCircleSummary({required this.circleId, required this.name, this.themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult) this.role = FamilyRole.adult, required this.myMemberId, this.memberCount = 0, this.isOwned = false, this.joinedAt});
+  factory _FamilyCircleSummary.fromJson(Map<String, dynamic> json) => _$FamilyCircleSummaryFromJson(json);
+
+@override final  String circleId;
+@override final  String name;
+@override final  String? themeColor;
+@override@JsonKey(unknownEnumValue: FamilyRole.adult) final  FamilyRole role;
+@override final  String myMemberId;
+@override@JsonKey() final  int memberCount;
+/// True when the caller owns (pays for) this circle — its members
+/// consume the caller's seats.
+@override@JsonKey() final  bool isOwned;
+@override final  DateTime? joinedAt;
+
+/// Create a copy of FamilyCircleSummary
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilyCircleSummaryCopyWith<_FamilyCircleSummary> get copyWith => __$FamilyCircleSummaryCopyWithImpl<_FamilyCircleSummary>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilyCircleSummaryToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyCircleSummary&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.role, role) || other.role == role)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.isOwned, isOwned) || other.isOwned == isOwned)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,role,myMemberId,memberCount,isOwned,joinedAt);
+
+@override
+String toString() {
+  return 'FamilyCircleSummary(circleId: $circleId, name: $name, themeColor: $themeColor, role: $role, myMemberId: $myMemberId, memberCount: $memberCount, isOwned: $isOwned, joinedAt: $joinedAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilyCircleSummaryCopyWith<$Res> implements $FamilyCircleSummaryCopyWith<$Res> {
+  factory _$FamilyCircleSummaryCopyWith(_FamilyCircleSummary value, $Res Function(_FamilyCircleSummary) _then) = __$FamilyCircleSummaryCopyWithImpl;
+@override @useResult
+$Res call({
+ String circleId, String name, String? themeColor,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, String myMemberId, int memberCount, bool isOwned, DateTime? joinedAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$FamilyCircleSummaryCopyWithImpl<$Res>
+    implements _$FamilyCircleSummaryCopyWith<$Res> {
+  __$FamilyCircleSummaryCopyWithImpl(this._self, this._then);
+
+  final _FamilyCircleSummary _self;
+  final $Res Function(_FamilyCircleSummary) _then;
+
+/// Create a copy of FamilyCircleSummary
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? role = null,Object? myMemberId = null,Object? memberCount = null,Object? isOwned = null,Object? joinedAt = freezed,}) {
+  return _then(_FamilyCircleSummary(
+circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,themeColor: freezed == themeColor ? _self.themeColor : themeColor // ignore: cast_nullable_to_non_nullable
+as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as FamilyRole,myMemberId: null == myMemberId ? _self.myMemberId : myMemberId // ignore: cast_nullable_to_non_nullable
+as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
+as int,isOwned: null == isOwned ? _self.isOwned : isOwned // ignore: cast_nullable_to_non_nullable
+as bool,joinedAt: freezed == joinedAt ? _self.joinedAt : joinedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$FamilyScheduledCheckIn {
 
  String get id; String get circleId; String get memberId;/// "HH:mm" 24h, Australia/Brisbane local time.

@@ -49,6 +49,7 @@ class FamilyProviderState {
     this.activeSosEvents = const <FamilySosEvent>[],
     this.recentCheckIns = const <FamilyCheckIn>[],
     this.scheduledCheckIns = const <FamilyScheduledCheckIn>[],
+    this.circles = const <FamilyCircleSummary>[],
     this.invites = const <FamilyInvite>[],
     this.memberIdsNearAlert = const <String>{},
     this.invitesLoadState = const FamilyActionState.initial(),
@@ -82,6 +83,10 @@ class FamilyProviderState {
   /// The circle's scheduled daily check-ins (sorted by time of day).
   final List<FamilyScheduledCheckIn> scheduledCheckIns;
 
+  /// Every circle the user belongs to (drives the group switcher and the
+  /// ALRT+ seat ledger). [circle] is the currently selected one, in full.
+  final List<FamilyCircleSummary> circles;
+
   /// The circle's active invites.
   final List<FamilyInvite> invites;
 
@@ -112,6 +117,7 @@ class FamilyProviderState {
     final List<FamilySosEvent>? activeSosEvents,
     final List<FamilyCheckIn>? recentCheckIns,
     final List<FamilyScheduledCheckIn>? scheduledCheckIns,
+    final List<FamilyCircleSummary>? circles,
     final List<FamilyInvite>? invites,
     final Set<String>? memberIdsNearAlert,
     final FamilyActionState? invitesLoadState,
@@ -133,6 +139,7 @@ class FamilyProviderState {
       activeSosEvents: activeSosEvents ?? this.activeSosEvents,
       recentCheckIns: recentCheckIns ?? this.recentCheckIns,
       scheduledCheckIns: scheduledCheckIns ?? this.scheduledCheckIns,
+      circles: circles ?? this.circles,
       invites: invites ?? this.invites,
       memberIdsNearAlert: memberIdsNearAlert ?? this.memberIdsNearAlert,
       invitesLoadState: invitesLoadState ?? this.invitesLoadState,

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_socket_manager_provider.dart';
+import 'package:hazard_app/features/family/providers/selected_circle_provider.dart';
 import 'package:hazard_app/features/family/providers/states/family_provider_state.dart';
 import 'package:hazard_app/features/family/services/family_location_service.dart';
 import 'package:hazard_app/features/family/services/family_service.dart';
@@ -171,6 +172,8 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
       state = state.copyWith(loadState: const FamilyActionState.loading());
     }
 
+    await _refreshCircleList();
+
     final result = await _familyService.getFamilyCircle();
     if (!mounted) return;
 
@@ -199,6 +202,31 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
         );
       },
     );
+  }
+
+  /// Refreshes the list of all circles the user belongs to, and drops a
+  /// stale selection (e.g. after leaving the selected circle).
+  Future<void> _refreshCircleList() async {
+    final result = await _familyService.getFamilyCircles();
+    if (!mounted) return;
+
+    result.whenSuccess((circles) {
+      state = state.copyWith(circles: circles);
+
+      final selected = _ref.read(providerOfSelectedCircleId);
+      if (selected != null && !circles.any((c) => c.circleId == selected)) {
+        _ref.read(providerOfSelectedCircleId.notifier).select(null);
+      }
+      return null;
+    });
+  }
+
+  /// Switches the family tab to [circleId] (null = first circle) and
+  /// reloads everything under the new scope.
+  Future<void> selectCircle(final String? circleId) async {
+    if (_ref.read(providerOfSelectedCircleId) == circleId) return;
+    _ref.read(providerOfSelectedCircleId.notifier).select(circleId);
+    await load();
   }
 
   Future<void> createCircle({required final String name}) async {

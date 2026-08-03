@@ -229,7 +229,12 @@ abstract class RestClient {
   /// Returns the user's family circle, or a null body when they have none —
   /// handled as dynamic so the repository can map null -> no circle.
   @GET(kUrlFamilyCircle)
-  Future<HttpResponse<dynamic>> getFamilyCircle();
+  Future<HttpResponse<dynamic>> getFamilyCircle({
+    @Query('circleId') final String? circleId,
+  });
+
+  @GET(kUrlFamilyCircles)
+  Future<List<FamilyCircleSummary>> getFamilyCircles();
 
   @POST(kUrlFamilyCircle)
   Future<FamilyCircle> createFamilyCircle({
@@ -240,13 +245,18 @@ abstract class RestClient {
   Future<HttpResponse> updateFamilyCircle({
     @Field() final String? name,
     @Field() final String? themeColor,
+    @Query('circleId') final String? circleId,
   });
 
   @DELETE(kUrlFamilyCircle)
-  Future<HttpResponse> deleteFamilyCircle();
+  Future<HttpResponse> deleteFamilyCircle({
+    @Query('circleId') final String? circleId,
+  });
 
   @POST(kUrlFamilyCircleLeave)
-  Future<HttpResponse> leaveFamilyCircle();
+  Future<HttpResponse> leaveFamilyCircle({
+    @Query('circleId') final String? circleId,
+  });
 
   @DELETE('$kUrlFamilyMembers/{memberId}')
   Future<HttpResponse> removeFamilyMember({
@@ -258,19 +268,25 @@ abstract class RestClient {
     @Field() final String? nickname,
     @Field() final String? sharingLevel,
     @Field() final String? colorHex,
+    @Query('circleId') final String? circleId,
   });
 
   @PUT(kUrlFamilyMemberMePhoto)
   @MultiPart()
   Future<HttpResponse> updateOwnFamilyMemberPhoto({
     @Part(name: 'profilePictureFile') required final File photo,
+    @Query('circleId') final String? circleId,
   });
 
   @POST(kUrlFamilyInvites)
-  Future<FamilyInvite> createFamilyInvite();
+  Future<FamilyInvite> createFamilyInvite({
+    @Query('circleId') final String? circleId,
+  });
 
   @GET(kUrlFamilyInvites)
-  Future<List<FamilyInvite>> getFamilyInvites();
+  Future<List<FamilyInvite>> getFamilyInvites({
+    @Query('circleId') final String? circleId,
+  });
 
   @POST(kUrlFamilyInviteRevoke)
   Future<HttpResponse> revokeFamilyInvite({
@@ -291,6 +307,7 @@ abstract class RestClient {
     @Field() final double? heading,
     @Field() final int? batteryLevel,
     @Field() final bool? isMoving,
+    @Query('circleId') final String? circleId,
   });
 
   @POST(kUrlFamilyLocationRequest)
@@ -317,22 +334,27 @@ abstract class RestClient {
     @Field() final double? longitude,
     @Field() final String? requestId,
     @Field() final String? hazardId,
+    @Query('circleId') final String? circleId,
   });
 
   @POST(kUrlFamilyCheckInRequest)
   Future<FamilyCheckInRequest> requestFamilyCheckIn({
     @Field() final String? message,
     @Field() final String? hazardId,
+    @Query('circleId') final String? circleId,
   });
 
   @POST(kUrlFamilyScheduledCheckIns)
   Future<FamilyScheduledCheckIn> createFamilyScheduledCheckIn({
     @Field() required final String timeOfDay,
     @Field() final String? mode,
+    @Query('circleId') final String? circleId,
   });
 
   @GET(kUrlFamilyScheduledCheckIns)
-  Future<List<FamilyScheduledCheckIn>> getFamilyScheduledCheckIns();
+  Future<List<FamilyScheduledCheckIn>> getFamilyScheduledCheckIns({
+    @Query('circleId') final String? circleId,
+  });
 
   @DELETE(kUrlFamilyScheduledCheckIn)
   Future<void> deleteFamilyScheduledCheckIn({
@@ -342,10 +364,13 @@ abstract class RestClient {
   @GET(kUrlFamilyCheckIns)
   Future<List<FamilyCheckIn>> getFamilyCheckIns({
     @Query('limit') final int? limit,
+    @Query('circleId') final String? circleId,
   });
 
   @GET(kUrlFamilyPlaces)
-  Future<List<FamilySavedPlace>> getFamilyPlaces();
+  Future<List<FamilySavedPlace>> getFamilyPlaces({
+    @Query('circleId') final String? circleId,
+  });
 
   @POST(kUrlFamilyPlaces)
   Future<FamilySavedPlace> createFamilyPlace({
@@ -355,6 +380,7 @@ abstract class RestClient {
     @Field() required final double longitude,
     @Field() final int? radiusMeters,
     @Field() final String? address,
+    @Query('circleId') final String? circleId,
   });
 
   @PUT('$kUrlFamilyPlaces/{placeId}')
@@ -385,10 +411,13 @@ abstract class RestClient {
   Future<FamilySosEvent> triggerFamilySos({
     @Field() final double? latitude,
     @Field() final double? longitude,
+    @Query('circleId') final String? circleId,
   });
 
   @GET(kUrlFamilySosActive)
-  Future<List<FamilySosEvent>> getActiveFamilySosEvents();
+  Future<List<FamilySosEvent>> getActiveFamilySosEvents({
+    @Query('circleId') final String? circleId,
+  });
 
   @POST(kUrlFamilySosRespond)
   Future<FamilySosResponse> respondToFamilySos({

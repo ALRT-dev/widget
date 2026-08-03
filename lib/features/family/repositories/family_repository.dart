@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/api/rest_client.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/family/providers/selected_circle_provider.dart';
 import 'package:hazard_app/features/shared/providers/rest_client_provider.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -11,12 +12,17 @@ import 'package:hazard_app/features/shared/utils/either.dart';
 final providerOfFamilyRepository = Provider<FamilyRepository>((ref) {
   return FamilyRepositoryImpl(
     restClient: ref.watch(providerOfRestClient),
+    // Read at call time so switching circles never rebuilds the repository.
+    selectedCircleId: () => ref.read(providerOfSelectedCircleId),
   );
 });
 
 abstract class FamilyRepository {
   /// Returns the user's family circle, or `null` when they have none.
   Future<Either<FamilyCircle?, AppError>> getFamilyCircle();
+
+  /// All circles the user belongs to (for the switcher and seat ledger).
+  Future<Either<List<FamilyCircleSummary>, AppError>> getFamilyCircles();
 
   Future<Either<FamilyCircle, AppError>> createFamilyCircle({
     required final String name,
@@ -164,21 +170,39 @@ abstract class FamilyRepository {
 class FamilyRepositoryImpl implements FamilyRepository {
   FamilyRepositoryImpl({
     required RestClient restClient,
-  }) : _restClient = restClient;
+    final String? Function()? selectedCircleId,
+  }) : _restClient = restClient,
+       _selectedCircleId = selectedCircleId ?? (() => null);
 
   final RestClient _restClient;
+
+  /// Resolves the circle every family call is scoped to; null = first circle.
+  final String? Function() _selectedCircleId;
+  String? get _circleId => _selectedCircleId();
 
   @override
   Future<Either<FamilyCircle?, AppError>> getFamilyCircle() {
     return runAsyncCall(
       name: 'getFamilyCircle',
       future: () async {
-        final response = await _restClient.getFamilyCircle();
+        final response = await _restClient.getFamilyCircle(circleId: _circleId);
         final data = response.data;
         if (data == null) return const Success(null);
         return Success(
           FamilyCircle.fromJson(Map<String, dynamic>.from(data as Map)),
         );
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<List<FamilyCircleSummary>, AppError>> getFamilyCircles() {
+    return runAsyncCall(
+      name: 'getFamilyCircles',
+      future: () async {
+        final result = await _restClient.getFamilyCircles();
+        return Success(result);
       },
       onError: Failure.new,
     );
@@ -206,7 +230,11 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return runAsyncCall(
       name: 'updateFamilyCircle',
       future: () async {
-        await _restClient.updateFamilyCircle(name: name, themeColor: themeColor);
+        await _restClient.updateFamilyCircle(
+          name: name,
+          themeColor: themeColor,
+          circleId: _circleId,
+        );
         return const Success(null);
       },
       onError: Failure.new,
@@ -218,7 +246,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return runAsyncCall(
       name: 'deleteFamilyCircle',
       future: () async {
-        await _restClient.deleteFamilyCircle();
+        await _restClient.deleteFamilyCircle(circleId: _circleId);
         return const Success(null);
       },
       onError: Failure.new,
@@ -230,7 +258,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return runAsyncCall(
       name: 'leaveFamilyCircle',
       future: () async {
-        await _restClient.leaveFamilyCircle();
+        await _restClient.leaveFamilyCircle(circleId: _circleId);
         return const Success(null);
       },
       onError: Failure.new,
@@ -264,6 +292,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
           nickname: nickname,
           sharingLevel: sharingLevel?.name,
           colorHex: colorHex,
+          circleId: _circleId,
         );
         return const Success(null);
       },
@@ -278,7 +307,10 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return runAsyncCall(
       name: 'updateOwnFamilyMemberPhoto',
       future: () async {
-        await _restClient.updateOwnFamilyMemberPhoto(photo: photo);
+        await _restClient.updateOwnFamilyMemberPhoto(
+          photo: photo,
+          circleId: _circleId,
+        );
         return const Success(null);
       },
       onError: Failure.new,
@@ -290,7 +322,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return runAsyncCall(
       name: 'createFamilyInvite',
       future: () async {
-        final result = await _restClient.createFamilyInvite();
+        final result = await _restClient.createFamilyInvite(circleId: _circleId);
         return Success(result);
       },
       onError: Failure.new,
@@ -302,7 +334,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return runAsyncCall(
       name: 'getFamilyInvites',
       future: () async {
-        final result = await _restClient.getFamilyInvites();
+        final result = await _restClient.getFamilyInvites(circleId: _circleId);
         return Success(result);
       },
       onError: Failure.new,
@@ -356,6 +388,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
           speed: speed,
           batteryLevel: batteryLevel,
           isMoving: isMoving,
+          circleId: _circleId,
         );
         return const Success(null);
       },
@@ -434,6 +467,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
           longitude: longitude,
           requestId: requestId,
           hazardId: hazardId,
+          circleId: _circleId,
         );
         return Success(result);
       },
@@ -452,6 +486,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
         final result = await _restClient.requestFamilyCheckIn(
           message: message,
           hazardId: hazardId,
+          circleId: _circleId,
         );
         return Success(result);
       },
@@ -466,7 +501,10 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return runAsyncCall(
       name: 'getFamilyCheckIns',
       future: () async {
-        final result = await _restClient.getFamilyCheckIns(limit: limit);
+        final result = await _restClient.getFamilyCheckIns(
+          limit: limit,
+          circleId: _circleId,
+        );
         return Success(result);
       },
       onError: Failure.new,
@@ -485,6 +523,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
         final result = await _restClient.createFamilyScheduledCheckIn(
           timeOfDay: timeOfDay,
           mode: mode?.name,
+          circleId: _circleId,
         );
         return Success(result);
       },
@@ -498,7 +537,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return runAsyncCall(
       name: 'getFamilyScheduledCheckIns',
       future: () async {
-        final result = await _restClient.getFamilyScheduledCheckIns();
+        final result = await _restClient.getFamilyScheduledCheckIns(circleId: _circleId);
         return Success(result);
       },
       onError: Failure.new,
@@ -526,7 +565,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return runAsyncCall(
       name: 'getFamilyPlaces',
       future: () async {
-        final result = await _restClient.getFamilyPlaces();
+        final result = await _restClient.getFamilyPlaces(circleId: _circleId);
         return Success(result);
       },
       onError: Failure.new,
@@ -552,6 +591,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
           longitude: longitude,
           radiusMeters: radiusMeters,
           address: address,
+          circleId: _circleId,
         );
         return Success(result);
       },
@@ -632,6 +672,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
         final result = await _restClient.triggerFamilySos(
           latitude: latitude,
           longitude: longitude,
+          circleId: _circleId,
         );
         return Success(result);
       },
@@ -644,7 +685,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
     return runAsyncCall(
       name: 'getActiveFamilySosEvents',
       future: () async {
-        final result = await _restClient.getActiveFamilySosEvents();
+        final result = await _restClient.getActiveFamilySosEvents(circleId: _circleId);
         return Success(result);
       },
       onError: Failure.new,

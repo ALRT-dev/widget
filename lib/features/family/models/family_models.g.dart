@@ -314,6 +314,39 @@ const _$FamilyCheckInStatusEnumMap = {
   FamilyCheckInStatus.needsHelp: 'needsHelp',
 };
 
+_FamilyCircleSummary _$FamilyCircleSummaryFromJson(Map<String, dynamic> json) =>
+    _FamilyCircleSummary(
+      circleId: json['circleId'] as String,
+      name: json['name'] as String,
+      themeColor: json['themeColor'] as String?,
+      role:
+          $enumDecodeNullable(
+            _$FamilyRoleEnumMap,
+            json['role'],
+            unknownValue: FamilyRole.adult,
+          ) ??
+          FamilyRole.adult,
+      myMemberId: json['myMemberId'] as String,
+      memberCount: (json['memberCount'] as num?)?.toInt() ?? 0,
+      isOwned: json['isOwned'] as bool? ?? false,
+      joinedAt: json['joinedAt'] == null
+          ? null
+          : DateTime.parse(json['joinedAt'] as String),
+    );
+
+Map<String, dynamic> _$FamilyCircleSummaryToJson(
+  _FamilyCircleSummary instance,
+) => <String, dynamic>{
+  'circleId': instance.circleId,
+  'name': instance.name,
+  'themeColor': ?instance.themeColor,
+  'role': _$FamilyRoleEnumMap[instance.role]!,
+  'myMemberId': instance.myMemberId,
+  'memberCount': instance.memberCount,
+  'isOwned': instance.isOwned,
+  'joinedAt': ?instance.joinedAt?.toIso8601String(),
+};
+
 _FamilyScheduledCheckIn _$FamilyScheduledCheckInFromJson(
   Map<String, dynamic> json,
 ) => _FamilyScheduledCheckIn(

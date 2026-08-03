@@ -72,6 +72,7 @@ const kUrlSupport = '$kUrlApi/support';
 const kUrlFamily = '$kUrlApi/family';
 
 const kUrlFamilyCircle = '$kUrlFamily/circle';
+const kUrlFamilyCircles = '$kUrlFamily/circles';
 const kUrlFamilyCircleLeave = '$kUrlFamilyCircle/leave';
 const kUrlFamilyMembers = '$kUrlFamily/members';
 const kUrlFamilyMemberMe = '$kUrlFamilyMembers/me';
