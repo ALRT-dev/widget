@@ -13,6 +13,8 @@ import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
 import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/enums/category_image_type.dart';
+import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/features/report/models/report_taxonomy.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -454,42 +456,76 @@ class _CreateUpdateReportScreenState
   }) {
     final dotColor =
         category.color ?? fallbackCategoryColorFor(category.name);
+    final iconImage = category.categoryImageByType(CategoryImageType.user);
 
     return GestureDetector(
       onTap: () => _handleCategoryTap(category),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 9.spMin),
+        padding: EdgeInsets.fromLTRB(14.spMin, 8.spMin, 14.spMin, 6.spMin),
         decoration: BoxDecoration(
           color: isSelected
               ? dotColor.withValues(alpha: 0.1)
               : AppColors.white,
-          borderRadius: BorderRadius.circular(20.spMin),
+          borderRadius: BorderRadius.circular(18.spMin),
           border: Border.all(
             color: isSelected ? dotColor : AppColors.white,
             width: 1.5,
           ),
-          boxShadow: const [
-            BoxShadow(color: AppColors.shadowColorLight, blurRadius: 4.0),
+          // Each pill glows softly in its own category colour.
+          boxShadow: [
+            BoxShadow(
+              color: dotColor.withValues(alpha: isSelected ? 0.45 : 0.25),
+              blurRadius: isSelected ? 12.0 : 8.0,
+              offset: const Offset(0, 2),
+            ),
           ],
         ),
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 8.spMin,
-              height: 8.spMin,
-              decoration: BoxDecoration(
-                color: dotColor,
-                shape: BoxShape.circle,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Small category icon (v4 set from the server); the colour
+                // dot stands in when a category has no icon yet.
+                if (iconImage != null && iconImage.url.isNotEmpty)
+                  AppCachedNetworkImage(
+                    imageUrl: iconImage.url,
+                    cacheKey: iconImage.s3Key,
+                    width: 16.spMin,
+                    height: 16.spMin,
+                    fit: BoxFit.contain,
+                  )
+                else
+                  Container(
+                    width: 8.spMin,
+                    height: 8.spMin,
+                    decoration: BoxDecoration(
+                      color: dotColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                SizedBox(width: 7.spMin),
+                Text(
+                  category.name ?? 'Category',
+                  style: TextStyle(
+                    fontSize: 13.spMin,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected ? dotColor : AppColors.black,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: 7.spMin),
-            Text(
-              category.name ?? 'Category',
-              style: TextStyle(
-                fontSize: 13.spMin,
-                fontWeight: FontWeight.w700,
-                color: isSelected ? dotColor : AppColors.black,
+            SizedBox(height: 5.spMin),
+            // The category's accent line.
+            Container(
+              height: 2.5,
+              width: 30.spMin,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? dotColor
+                    : dotColor.withValues(alpha: 0.45),
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
           ],
