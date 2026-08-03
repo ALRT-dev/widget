@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALRT + supporting screens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#232326; --ink-soft:#75757E; --ink-faint:#ABABB2;
+    --purple-deep:#2A0E45; --purple-band:#3A1560;
+    --body:#F4F1F8; --card:#FFFFFF; --card-line:#EDE8F2;
+    --magenta:#A63BD4;
+    --cta-grad:linear-gradient(115deg,#C13BD4 0%,#8F2BBE 100%);
+    --band-grad:
+      radial-gradient(90% 70% at 90% 0%, rgba(255,107,0,.20), transparent 55%),
+      radial-gradient(70% 60% at 0% 100%, rgba(166,59,212,.35), transparent 60%),
+      linear-gradient(170deg,#42186C 0%,#2A0E45 100%);
+    --lav-box:linear-gradient(135deg,#F6ECFC 0%,#EFE3FA 100%);
+    --lav-text:#7B3FA0;
+    --label:#9B7BC0;
+    --green:#17B26A; --green-grad:linear-gradient(120deg,#1FC97A 0%,#0FA45C 100%);
+    --gold-bg:#FBF0D9; --gold-text:#B07D1E;
+    --amber-grad:linear-gradient(130deg,#FFF3DC 0%,#FFE6C2 100%);
+    --dark:#232326;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'DM Sans',sans-serif;background:#ECEAE6;color:var(--ink);
+    min-height:100vh;padding:44px 16px 64px;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .board-head{max-width:860px;text-align:center;margin-bottom:32px}
+  .board-head h1{font-family:'Raleway',sans-serif;font-weight:800;font-size:25px;letter-spacing:-.01em}
+  .board-head p{color:var(--ink-soft);font-size:14px;margin-top:7px;line-height:1.55}
+
+  .row{display:flex;flex-wrap:wrap;gap:28px;justify-content:center;align-items:flex-start}
+  .col{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .col-label{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+
+  .phone{
+    width:320px;height:672px;
+    border-radius:40px;border:9px solid var(--dark);
+    box-shadow:0 22px 44px rgba(30,30,38,.18);
+    overflow:hidden;position:relative;
+    background:var(--body);
+    display:flex;flex-direction:column;
+  }
+  .statusbar{display:flex;justify-content:space-between;font-size:12px;font-weight:600;padding:14px 20px 0}
+  .band .statusbar{color:#fff;opacity:.95}
+  .light .statusbar{color:var(--ink)}
+
+  .band{background:var(--band-grad);color:#fff;padding:0 0 22px;position:relative}
+  .band-inner{padding:8px 22px 0}
+  .tier-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(255,255,255,.15);border-radius:999px;padding:5px 12px;
+    font-family:'Raleway',sans-serif;font-weight:800;font-size:11.5px;letter-spacing:.03em;
+  }
+  .band h2{font-family:'Raleway',sans-serif;font-weight:800;font-size:23px;line-height:1.18;letter-spacing:-.015em;margin-top:12px}
+  .band .sub{font-size:13px;color:rgba(255,255,255,.78);line-height:1.55;margin-top:7px}
+  .m-close{
+    position:absolute;top:40px;right:18px;
+    width:30px;height:30px;border-radius:50%;
+    background:rgba(255,255,255,.16);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;color:#fff;
+  }
+
+  .body-pad{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
+  .sec-label{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--label);margin:0 4px 8px}
+
+  .wcard{
+    background:var(--card);border-radius:16px;
+    padding:13px 15px;box-shadow:0 4px 14px rgba(58,21,96,.07);
+  }
+  .lav-note{
+    margin-top:10px;background:var(--lav-box);border-radius:14px;
+    padding:10px 13px;font-size:11.5px;color:var(--lav-text);line-height:1.55;
+  }
+  .lav-note b{font-weight:700}
+
+  .cta{
+    display:block;width:100%;border:none;cursor:pointer;
+    background:var(--cta-grad);color:#fff;
+    font-family:'Raleway',sans-serif;font-weight:800;font-size:14.5px;
+    border-radius:999px;padding:15px;
+    box-shadow:0 10px 24px rgba(166,59,212,.30), inset 0 1.5px 0 rgba(255,255,255,.25);
+  }
+  .ghost{display:block;text-align:center;margin-top:11px;font-size:12.5px;font-weight:600;color:var(--ink-soft);text-decoration:none}
+  .renew{text-align:center;font-size:10.5px;color:var(--ink-faint);margin-top:9px;line-height:1.5}
+  .spacer{flex:1}
+
+  /* A: upsell sheet over blurred map */
+  .ctx{position:absolute;inset:0;padding:14px 14px 0}
+  .ctx .bar{height:10px;border-radius:6px;background:#E4E0DA;margin-bottom:9px}
+  .ctx .maparea{
+    background:
+      radial-gradient(circle at 30% 30%, rgba(23,178,106,.12), transparent 45%),
+      radial-gradient(circle at 75% 60%, rgba(166,59,212,.10), transparent 40%),
+      #EFEBE5;
+    border-radius:16px;height:300px;position:relative;margin-bottom:11px;
+  }
+  .ctx .pin{position:absolute;width:13px;height:13px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--cta-grad)}
+  .ctx .block{background:#fff;border-radius:16px;border:1px solid var(--card-line);height:100px;margin-bottom:11px}
+  .scrim{position:absolute;inset:0;background:rgba(42,14,69,.30);backdrop-filter:blur(2.5px)}
+  .sheetup{
+    position:absolute;left:8px;right:8px;bottom:8px;
+    background:linear-gradient(180deg,#FDFBFF 0%,#F6F0FB 100%);
+    border-radius:26px;padding:10px 20px 18px;
+    box-shadow:0 18px 44px rgba(30,10,50,.30);
+  }
+  .grab{width:36px;height:4px;border-radius:3px;background:#E2DBEA;margin:0 auto 14px}
+  .sheet-pill{
+    display:inline-flex;align-items:center;gap:5px;
+    background:linear-gradient(120deg,rgba(166,59,212,.12),rgba(143,43,190,.10));
+    color:var(--magenta);border-radius:999px;padding:4px 11px;
+    font-family:'Raleway',sans-serif;font-weight:800;font-size:10.5px;letter-spacing:.04em;
+  }
+  .sheetup h3{font-family:'Raleway',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.01em;line-height:1.25;margin-top:10px;color:var(--ink)}
+  .sheetup .lead{font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin-top:7px}
+  .sheetup .lead b{color:var(--ink);font-weight:600}
+  .price-line{text-align:center;font-size:11px;color:var(--ink-faint);margin-top:9px}
+  .price-line b{color:var(--ink-soft);font-weight:600}
+
+  /* B: success */
+  .halo{
+    width:84px;height:84px;border-radius:24px;margin:26px auto 0;
+    background:linear-gradient(160deg,#FFFFFF 0%,#FFF4EC 60%,#FFE9DA 100%);
+    display:flex;align-items:center;justify-content:center;position:relative;
+    box-shadow:0 16px 36px rgba(255,80,10,.24), inset 0 1.5px 0 rgba(255,255,255,.9);
+  }
+  .halo::before{
+    content:"";position:absolute;inset:-22px;border-radius:50%;z-index:-1;
+    background:radial-gradient(50% 50% at 50% 50%, rgba(255,107,0,.22), transparent 70%);
+  }
+  .halo svg{width:54px;height:auto}
+  .succ-h{font-family:'Raleway',sans-serif;font-weight:800;font-size:23px;text-align:center;margin-top:16px;letter-spacing:-.015em}
+  .succ-sub{font-size:13px;color:var(--ink-soft);text-align:center;line-height:1.6;margin-top:7px;padding:0 10px}
+  .seat-row{display:flex;justify-content:center;gap:6px;margin-top:18px}
+  .seat-row i{width:15px;height:15px;border-radius:50%}
+  .seat-row i.you{background:var(--cta-grad)}
+  .seat-row i.open{border:1.6px dashed #CDB8E0}
+
+  /* C: manage */
+  .segs{display:flex;gap:4px;margin-top:9px}
+  .segs i{flex:1;height:7px;border-radius:4px;background:#EDE6F4}
+  .segs i.host{background:var(--cta-grad)}
+  .segs i.used{background:var(--green-grad)}
+  .l-top{display:flex;justify-content:space-between;align-items:baseline}
+  .l-top b{font-size:13.5px;font-weight:700}
+  .l-top span{font-size:11px;color:var(--ink-soft)}
+  .l-note{font-size:10.5px;color:var(--ink-faint);margin-top:7px}
+  .member{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--card-line)}
+  .member:last-of-type{border-bottom:none}
+  .member .av{flex:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:'Raleway',sans-serif;color:#fff}
+  .av.a1{background:var(--cta-grad)}
+  .av.a2{background:var(--green-grad)}
+  .member b{display:block;font-size:12.5px;font-weight:700}
+  .member span{display:block;font-size:10.5px;color:var(--ink-soft)}
+  .member .m-tag{margin-left:auto;font-size:9px;font-weight:700;color:var(--label);background:#F3EDF9;border-radius:999px;padding:3px 8px}
+  .m-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 2px;border-bottom:1px solid var(--card-line);
+    font-size:12.5px;font-weight:600;cursor:pointer;
+  }
+  .m-row:last-child{border-bottom:none}
+  .m-row .chev{color:#C9BFD6}
+  .gold-badge{
+    display:inline-flex;align-items:center;gap:4px;
+    background:var(--gold-bg);color:var(--gold-text);
+    border-radius:999px;padding:4px 10px;
+    font-family:'Raleway',sans-serif;font-weight:800;font-size:10px;letter-spacing:.05em;
+  }
+
+  /* D: billing issue */
+  .warn{
+    background:var(--amber-grad);border-radius:16px;padding:13px 15px;
+    display:flex;gap:11px;align-items:flex-start;
+    box-shadow:0 4px 14px rgba(176,125,30,.12);
+  }
+  .warn .w-ic{
+    flex:none;width:30px;height:30px;border-radius:10px;background:#fff;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .warn .w-ic svg{width:16px;height:16px}
+  .warn b{font-size:12.5px;font-weight:700;color:#6E4E10;display:block}
+  .warn span{font-size:11.5px;color:#8A6A24;line-height:1.5;display:block;margin-top:2px}
+  .warn-cta{
+    margin-top:10px;display:inline-block;background:var(--cta-grad);color:#fff;
+    font-family:'Raleway',sans-serif;font-weight:800;font-size:11.5px;
+    border-radius:999px;padding:8px 16px;border:none;cursor:pointer;
+  }
+  .dim{opacity:.55}
+
+  .notes{max-width:760px;margin-top:32px;background:#fff;border-radius:20px;border:1px solid #F1EEE9;padding:20px 24px}
+  .notes h3{font-family:'Raleway',sans-serif;font-weight:700;font-size:15px;margin-bottom:10px}
+  .notes ul{list-style:none}
+  .notes li{font-size:13px;color:var(--ink-soft);line-height:1.6;padding-left:18px;position:relative;margin-bottom:6px}
+  .notes li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--magenta)}
+  .notes li b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div class="board-head">
+  <h1>ALRT + supporting screens</h1>
+  <p>The rest of the subscription flow in your family style. Blended gradients and glows instead of solid blocks, and no dashes anywhere in the copy.</p>
+</div>
+
+<div class="row">
+
+  <!-- ===== A · UPSELL SHEET ===== -->
+  <div class="col">
+    <span class="col-label">A &middot; Gate sheet &middot; on Share journey</span>
+    <div class="phone">
+      <div class="ctx">
+        <div class="bar" style="width:55%"></div>
+        <div class="maparea">
+          <div class="pin" style="left:22%;top:20%"></div>
+          <div class="pin" style="left:70%;top:62%"></div>
+        </div>
+        <div class="block"></div>
+      </div>
+      <div class="scrim"></div>
+      <div class="sheetup">
+        <div class="grab"></div>
+        <span class="sheet-pill">ALRT +</span>
+        <h3>Let your family see you arrive</h3>
+        <p class="lead">Navigation is free for everyone. With ALRT + your group gets a snapshot when you arrive, and you can switch on live sharing for this trip if you want them following along.</p>
+        <div class="lav-note"><b>You stay in control.</b> Live sharing is off unless you turn it on, and it stops when you arrive.</div>
+        <button class="cta" style="margin-top:13px">Start free month</button>
+        <p class="price-line">1 month free, then <b>$9.99 a month</b> or <b>$99.99 a year</b> &middot; 8 seats &middot; cancel anytime</p>
+        <a class="ghost" href="#">Maybe later</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== B · SUCCESS ===== -->
+  <div class="col">
+    <span class="col-label">B &middot; Welcome &middot; after purchase</span>
+    <div class="phone">
+      <div class="band">
+        <div class="statusbar"><span>9:41</span><span>&#9679;&#9679;&#9679;&#9679;</span></div>
+        <div class="band-inner">
+          <span class="tier-pill">ALRT +</span>
+        </div>
+      </div>
+      <div class="body-pad">
+        <div class="halo">
+          <svg viewBox="205 266 336 253" xmlns="http://www.w3.org/2000/svg">
+            <path d="M486.4,460.7c-5.4-4.6-12.3-7.3-19.9-7.3H241c-16.9,0-30.6,13.7-30.6,30.6v0c0,16.9,13.7,30.6,30.6,30.6h225.5c7.6,0,14.5-2.8,19.9-7.3c6.6-5.6,10.7-14,10.7-23.3v0C497.2,474.7,493,466.4,486.4,460.7z" fill="#FF0004"/>
+            <path d="M506.1,453.4c-7.5,0-14.4,2.8-19.7,7.3c-6.4,5.5-10.5,13.7-10.5,22.9v0.8c0,9.1,4.1,17.3,10.5,22.9c5.3,4.6,12.2,7.3,19.7,7.3c16.7,0,30.2-13.5,30.2-30.2v-0.8C536.4,466.9,522.8,453.4,506.1,453.4z" fill="#FF6B00"/>
+            <path d="M523.1,371.9c-5.4-4.6-12.3-7.3-19.9-7.3H322.7c-16.9,0-30.6,13.7-30.6,30.6v0c0,16.9,13.7,30.6,30.6,30.6h180.5c7.6,0,14.5-2.8,19.9-7.3c6.6-5.6,10.7-14,10.7-23.3v0C533.9,385.9,529.7,377.6,523.1,371.9z" fill="#FF6B00"/>
+            <path d="M239.6,364.6c-7.5,0-14.4,2.8-19.7,7.3c-6.4,5.5-10.5,13.7-10.5,22.9v0.8c0,9.1,4.1,17.3,10.5,22.9c5.3,4.6,12.2,7.3,19.7,7.3c16.7,0,30.2-13.5,30.2-30.2v-0.8C269.8,378.1,256.3,364.6,239.6,364.6z" fill="#FF6B00"/>
+            <path d="M497.2,484c0-9.3-4.2-17.7-10.7-23.3c-6.4,5.5-10.5,13.7-10.5,22.9v0.8c0,9.1,4.1,17.3,10.5,22.9C493,501.7,497.2,493.4,497.2,484z" fill="#DE3A3A"/>
+            <path d="M486.4,278.3c-5.4-4.6-12.3-7.3-19.9-7.3H241c-16.9,0-30.6,13.7-30.6,30.6v0c0,16.9,13.7,30.6,30.6,30.6h225.5c7.6,0,14.5-2.8,19.9-7.3c6.6-5.6,10.7-14,10.7-23.3v0C497.2,292.2,493,283.9,486.4,278.3z" fill="#FF0004"/>
+            <path d="M506.1,270.9c-7.5,0-14.4,2.8-19.7,7.3c-6.4,5.5-10.5,13.7-10.5,22.9v0.8c0,9.1,4.1,17.3,10.5,22.9c5.3,4.6,12.2,7.3,19.7,7.3c16.7,0,30.2-13.5,30.2-30.2v-0.8C536.4,284.5,522.8,270.9,506.1,270.9z" fill="#FF6B00"/>
+            <path d="M497.2,301.6c0-9.3-4.2-17.7-10.7-23.3c-6.4,5.5-10.5,13.7-10.5,22.9v0.8c0,9.1,4.1,17.3,10.5,22.9C493,319.3,497.2,310.9,497.2,301.6z" fill="#DE3A3A"/>
+          </svg>
+        </div>
+        <h2 class="succ-h">Welcome to ALRT +</h2>
+        <p class="succ-sub">Your free month has started. The family layer is on, and there are 7 seats waiting for your people.</p>
+        <div class="seat-row">
+          <i class="you"></i><i class="open"></i><i class="open"></i><i class="open"></i>
+          <i class="open"></i><i class="open"></i><i class="open"></i><i class="open"></i>
+        </div>
+        <div class="lav-note" style="margin-top:18px"><b>No surprises.</b> We remind you a week before your free month ends. First payment 31 August unless you cancel.</div>
+        <div class="spacer"></div>
+        <button class="cta">Invite your family</button>
+        <a class="ghost" href="#">I'll do this later</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== C · MANAGE ===== -->
+  <div class="col">
+    <span class="col-label">C &middot; Manage &middot; from profile seat card</span>
+    <div class="phone">
+      <div class="band">
+        <div class="statusbar"><span>9:41</span><span>&#9679;&#9679;&#9679;&#9679;</span></div>
+        <div class="band-inner">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <h2 style="margin-top:2px">Your ALRT +</h2>
+            <span class="gold-badge">ACTIVE</span>
+          </div>
+          <p class="sub">Yearly &middot; renews 12 Aug 2026 &middot; $99.99 a year</p>
+        </div>
+      </div>
+      <div class="body-pad">
+        <p class="sec-label">Seats &middot; 2 of 8 used</p>
+        <div class="wcard">
+          <div class="l-top"><b>Nixon Family</b><span>2 used &middot; 6 free</span></div>
+          <div class="segs">
+            <i class="host"></i><i class="used"></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+          <p class="l-note">Members keep the free tier if your plan lapses</p>
+        </div>
+        <div class="wcard" style="margin-top:10px;padding-top:4px;padding-bottom:4px">
+          <div class="member">
+            <span class="av a1">SN</span>
+            <div><b>You</b><span>Host &middot; Nixon Family</span></div>
+            <span class="m-tag">PAYER</span>
+          </div>
+          <div class="member">
+            <span class="av a2">TN</span>
+            <div><b>Tom</b><span>Nixon Family</span></div>
+            <span class="m-tag">SEAT</span>
+          </div>
+        </div>
+        <div class="wcard" style="margin-top:10px;padding-top:2px;padding-bottom:2px">
+          <div class="m-row">Invite to a seat <span class="chev">&rsaquo;</span></div>
+          <div class="m-row">Change plan <span class="chev">&rsaquo;</span></div>
+          <div class="m-row">Transfer billing to a member <span class="chev">&rsaquo;</span></div>
+          <div class="m-row">Manage in App Store <span class="chev">&rsaquo;</span></div>
+        </div>
+        <div class="spacer"></div>
+        <p class="renew">Cancelling stops renewal. ALRT + stays active until 12 Aug 2026.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== D · BILLING ISSUE ===== -->
+  <div class="col">
+    <span class="col-label">D &middot; Billing issue &middot; banner on family screen</span>
+    <div class="phone">
+      <div class="band">
+        <div class="statusbar"><span>9:41</span><span>&#9679;&#9679;&#9679;&#9679;</span></div>
+        <div class="band-inner">
+          <span class="tier-pill">Nixon Family</span>
+          <h2 style="font-size:25px">Everyone's OK</h2>
+          <p class="sub">4 of 5 checked in &middot; last snapshot 10 min ago</p>
+        </div>
+      </div>
+      <div class="body-pad">
+        <div class="warn">
+          <span class="w-ic">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2.5" stroke="#B07D1E" stroke-width="1.9"/><path d="M3 10.5h18" stroke="#B07D1E" stroke-width="1.9"/></svg>
+          </span>
+          <div>
+            <b>We couldn't renew ALRT +</b>
+            <span>Your family layer stays on until Friday while we retry. Update your payment method to keep everyone covered.</span>
+            <button class="warn-cta">Update payment</button>
+          </div>
+        </div>
+        <div class="wcard dim" style="margin-top:12px;padding-top:4px;padding-bottom:4px">
+          <div class="member">
+            <span class="av a1">SN</span>
+            <div><b>Sarah (You)</b><span>Home &middot; 10 min ago &middot; host</span></div>
+          </div>
+          <div class="member">
+            <span class="av a2">TN</span>
+            <div><b>Tom</b><span>Arrived School &middot; 8:42 am &middot; auto check-in</span></div>
+          </div>
+        </div>
+        <div class="spacer"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notes">
+  <h3>Style and flow notes</h3>
+  <ul>
+    <li><b>Blended colour throughout:</b> the purple band carries a warm orange glow in one corner and a magenta bloom in the other, the CTA is a magenta to violet gradient with a soft top highlight, the welcome screen leads with the ALRT mark on a warm-lit tile, seat segments and avatars use the same gradients. No flat blocks anywhere.</li>
+    <li><b>No dashes:</b> every line rewritten with commas and full stops. Middot separators stay, matching your member rows.</li>
+    <li><b>Opt-in live woven in:</b> the gate sheet sells the snapshot first and mentions live as a per-trip switch, with the control rule in the lavender box. Same consent language family as your scheduled check-ins screen.</li>
+    <li><b>Success screen has one job:</b> celebrate briefly, show the 7 open seats, and push the single highest value action, inviting family. The trial reminder promise sits in the lavender box so trust is built at the moment of purchase.</li>
+    <li><b>Billing banner is calm, not scary:</b> amber card in the blended style, states the grace period plainly, one action. Family screen stays visible but dimmed underneath so the stakes are shown, not shouted. Driven by the RevenueCat billing issue webhook.</li>
+  </ul>
+</div>
+
+</body>
+</html>

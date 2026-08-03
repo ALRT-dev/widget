@@ -25,6 +25,7 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
+import 'package:hazard_app/features/subscription/views/widgets/alrt_plus_seat_card.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_wrapper.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -58,6 +59,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   24.spMin.hSizedBox,
                   _buildFamilySafetyCard(),
                   14.spMin.hSizedBox,
+                  const AlrtPlusSeatCard(),
                   _buildLearnAndPrepareCard(),
                   24.spMin.hSizedBox,
                   _buildSubmittedHazardsSection(),

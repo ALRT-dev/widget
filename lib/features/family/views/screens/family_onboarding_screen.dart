@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
-import 'package:hazard_app/features/subscription/views/screens/alrt_plus_paywall_screen.dart';
+import 'package:hazard_app/features/subscription/views/widgets/alrt_plus_gate_sheet.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -244,8 +244,8 @@ class _FamilyOnboardingScreenState
     final isPlus = await ref.read(providerOfAlrtPlus.future);
     if (!isPlus) {
       if (!mounted) return;
-      final subscribed = await context.push<bool>(AlrtPlusPaywallScreen.route);
-      if (subscribed != true) return;
+      final subscribed = await AlrtPlusGateSheet.show(context);
+      if (!subscribed) return;
     }
     if (!mounted) return;
     ref.read(providerOfFamily.notifier).createCircle(name: name);
