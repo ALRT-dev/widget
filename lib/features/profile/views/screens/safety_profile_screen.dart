@@ -104,10 +104,10 @@ class SafetyProfileScreen extends ConsumerWidget {
           ),
           SizedBox(height: 12.spMin),
           Text(
-            'Guidance currently covers fire, smoke, flood, storms, air '
-            'quality, power outages and chemical incidents. Other alert '
-            'types show no card by design, and more arrive as wording is '
-            'reviewed.',
+            'Guidance covers 27 hazard types, from bushfires and floods to '
+            'heatwaves, snakes and boil-water notices. A few alert types '
+            '(police operations, crashes, road closures, events) show no '
+            'card by design: no genuine group difference, no line.',
             style: TextStyle(
               fontSize: 11.5.spMin,
               height: 1.55,

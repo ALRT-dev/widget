@@ -15,11 +15,15 @@ class ForYouCard extends ConsumerStatefulWidget {
   const ForYouCard({
     super.key,
     required this.categoryName,
+    this.title,
     this.isAws = false,
   });
 
   /// The alert's (parent) category name, used to pick the hazard bucket.
   final String? categoryName;
+
+  /// The alert title, checked for specific hazards (cyclone, snakes...).
+  final String? title;
 
   /// Whether the alert is an AWS warning (drives the visitor explainer).
   final bool isAws;
@@ -36,7 +40,10 @@ class _ForYouCardState extends ConsumerState<ForYouCard> {
     final ticked = ref.watch(providerOfSafetyProfile);
     if (ticked.isEmpty) return const SizedBox.shrink();
 
-    final bucket = ForYouLibrary.bucketForCategory(widget.categoryName);
+    final bucket = ForYouLibrary.bucketFor(
+      categoryName: widget.categoryName,
+      title: widget.title,
+    );
     if (bucket == null) return const SizedBox.shrink();
     final rows = ForYouLibrary.rows[bucket];
     if (rows == null) return const SizedBox.shrink();

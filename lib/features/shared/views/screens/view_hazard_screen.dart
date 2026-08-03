@@ -763,7 +763,14 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 (value) => value.hazard?.isAwsCompliant ?? false,
               ),
             );
-            return ForYouCard(categoryName: categoryName, isAws: isAws);
+            final title = ref.watch(
+              provider.select((value) => value.hazard?.title),
+            );
+            return ForYouCard(
+              categoryName: categoryName,
+              title: title,
+              isAws: isAws,
+            );
           },
         ),
 
