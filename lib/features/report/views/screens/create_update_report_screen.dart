@@ -30,6 +30,9 @@ import 'package:hazard_app/others/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+/// The V3 section label / helper text colour from the design screenshots.
+const _sectionLabelColor = Color(0xFFB84500);
+
 class CreateUpdateReportScreenArgs {
   CreateUpdateReportScreenArgs({this.hazardToUpdate});
 
@@ -152,6 +155,14 @@ class _CreateUpdateReportScreenState
           ),
           10.hSizedBox,
           _categoriesBuilder(),
+          10.hSizedBox,
+          Text(
+            'Tapping what you can see helps neighbours act faster.',
+            style: TextStyle(
+              fontSize: 12.spMin,
+              color: _sectionLabelColor,
+            ),
+          ),
           Consumer(
             builder: (context, ref, child) {
               final hasSelectedCategory = ref.watch(
@@ -165,6 +176,7 @@ class _CreateUpdateReportScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 24.spMin,
                 children: [
+                  _headlinePreviewBuilder(),
                   _locationBuilder(),
                   // _titleBuilder(),
                   _descriptionBuilder(),
@@ -528,18 +540,18 @@ class _CreateUpdateReportScreenState
 
   Widget _sectionTitleBuilder({
     required final String title,
-    final Color? color,
     final bool isRequired = false,
     final Widget? requiredWidget,
   }) {
     return Row(
       children: [
         Text(
-          title,
+          title.toUpperCase(),
           style: TextStyle(
-            fontSize: 14.spMin,
-            color: color,
-            fontWeight: FontWeight.w600,
+            fontSize: 10.5.spMin,
+            color: _sectionLabelColor,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.0,
           ),
         ),
         isRequired
@@ -568,9 +580,9 @@ class _CreateUpdateReportScreenState
                     ),
                   ).pL(5.0)
             : Text(
-                ' (Optional)',
+                '  optional',
                 style: TextStyle(
-                  fontSize: 12.sp,
+                  fontSize: 10.5.spMin,
                   fontWeight: FontWeight.w400,
                   color: AppColors.grey.withValues(alpha: 0.6),
                 ),
@@ -588,10 +600,20 @@ class _CreateUpdateReportScreenState
     final TextCapitalization textCapitalization = TextCapitalization.none,
     final TextInputType? keyboardType,
     final EdgeInsetsGeometry? contentPadding,
+    final double? borderRadius,
     final bool enabled = true,
     final VoidCallback? onPressed,
     final Function(String)? onChanged,
   }) {
+    final border = borderRadius == null
+        ? null
+        : OutlineInputBorder(
+            borderRadius: BorderRadius.circular(borderRadius.spMin),
+            borderSide: BorderSide(
+              color: AppColors.lightGrey,
+            ),
+          );
+
     return TextFormField(
       enabled: enabled,
       minLines: minLines,
@@ -612,6 +634,14 @@ class _CreateUpdateReportScreenState
         filled: true,
         fillColor: AppColors.white,
         contentPadding: contentPadding,
+        border: border,
+        enabledBorder: border,
+        focusedBorder: border?.copyWith(
+          borderSide: BorderSide(
+            color: AppColors.orange,
+            width: 1.2,
+          ),
+        ),
         disabledBorder: context.theme.inputDecorationTheme.border?.copyWith(
           borderSide: BorderSide(
             color: AppColors.lightGrey,
@@ -667,20 +697,79 @@ class _CreateUpdateReportScreenState
     );
   }
 
+  Widget _headlinePreviewBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final categoryName = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.hazardToCreateOrUpdate.category?.name,
+          ),
+        );
+        final locationName = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.hazardToCreateOrUpdate.locationName,
+          ),
+        );
+        if (categoryName == null) return const SizedBox.shrink();
+
+        final headline = locationName == null
+            ? '$categoryName report'
+            : '$categoryName report - $locationName';
+
+        return Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: AppColors.lightGrey.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(12.spMin),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 14.spMin,
+            vertical: 10.spMin,
+          ),
+          child: Text.rich(
+            TextSpan(
+              style: TextStyle(
+                fontFamily: AppTheme.defaultFontFamily,
+              ),
+              children: [
+                TextSpan(
+                  text: 'Headline preview: ',
+                ),
+                TextSpan(
+                  text: headline,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
+                ),
+              ],
+            ),
+            style: TextStyle(
+              fontSize: 12.spMin,
+              fontWeight: FontWeight.w400,
+              color: AppColors.mediumGrey,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _descriptionBuilder() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10.spMin,
       children: [
-        _sectionTitleBuilder(title: 'Description'),
+        _sectionTitleBuilder(title: 'Add details'),
         _inputBuilder(
-          hintText: "Describe what you're seeing...",
+          hintText: 'Water over both lanes near the bridge...',
           controller: _descriptionController,
           minLines: 5,
           maxLines: 10,
           textCapitalization: TextCapitalization.sentences,
           keyboardType: TextInputType.multiline,
           contentPadding: EdgeInsets.all(15.spMin),
+          borderRadius: 16.0,
           onChanged: (value) => _updateDescription(value.trim()),
         ),
       ],
@@ -790,10 +879,28 @@ class _CreateUpdateReportScreenState
 
         final hasAllRequiredDataEntered = _hasAllRequiredDataEntered(ref);
 
-        return Button.gradient(
-          value: 'Submit Report',
-          icon: Icon(Icons.check_rounded),
-          onPressed: !hasAllRequiredDataEntered ? null : _handleSubmitReport,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Button.gradient(
+              value: 'Submit report',
+              icon: Icon(Icons.check_rounded),
+              borderRadius: 16.0,
+              onPressed: !hasAllRequiredDataEntered
+                  ? null
+                  : _handleSubmitReport,
+            ),
+            8.hSizedBox,
+            Text(
+              'This shows as unverified until confirmed by others nearby. '
+              'No points for posting, points for being right.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 10.5.spMin,
+                color: AppColors.grey.withValues(alpha: 0.8),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -1067,7 +1174,8 @@ class _CreateUpdateReportScreenState
       ..updateMedias(widget.args?.hazardToUpdate?.processedMedias ?? [])
       ..updateShowCategoriesSelector(
         widget.args?.hazardToUpdate?.category == null,
-      );
+      )
+      ..prefillLocationFromCurrentPosition();
   }
 
   /// Navigates to the Select Location screen.

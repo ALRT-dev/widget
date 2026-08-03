@@ -20,7 +20,6 @@ import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/profile/views/widgets/for_you_card.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/followed_alerts_provider.dart';
-import 'package:hazard_app/features/shared/utils/share_alert.dart';
 import 'package:hazard_app/features/shared/models/video_id_priority_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/view_hazard_provider_state.dart';
@@ -598,7 +597,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               ),
             if (isLive)
               _v3PillBuilder(
-                label: '● Live · updated ${updatedAt!.timeAgo}',
+                label: '● Live · updated ${updatedAt.timeAgo}',
                 backgroundColor: AlertCardStyle.livePillBackground,
                 foregroundColor: AlertCardStyle.livePillForeground,
               ),
