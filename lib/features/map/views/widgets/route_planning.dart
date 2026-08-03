@@ -3,6 +3,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hazard_app/features/map/extensions/travel_mode_extension.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/utils/dialogs.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
@@ -255,13 +256,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
             for (final route in travelModeRoutes.entries)
               Expanded(
                 child: _travelModeItemBuilder(
-                  icon: switch (route.key) {
-                    TravelMode.driving => Icons.directions_car_rounded,
-                    TravelMode.transit => Icons.directions_train_rounded,
-                    TravelMode.walking => Icons.directions_walk_rounded,
-                    TravelMode.bicycling => Icons.directions_bike_rounded,
-                    _ => Icons.directions,
-                  },
+                  icon: route.key.iconData,
                   duration: route.value.currentRoute.durationMinutes != null
                       ? '${route.value.currentRoute.durationMinutes?.toStringAsFixed(0)}m'
                       : null,

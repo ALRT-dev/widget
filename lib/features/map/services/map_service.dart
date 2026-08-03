@@ -135,13 +135,22 @@ class MapService {
         .expand((response) => response.routes)
         .toList();
 
-    final bounds = allRoutes
+    if (allRoutes.isEmpty) {
+      return const Failure(
+        AppError(message: 'No routes found between these locations.'),
+      );
+    }
+
+    final boundsPoints = allRoutes
         .expand(
-          (route) => route.polylinePoints!
-              .map((e) => LatLng(e.latitude, e.longitude))
-              .toList(),
+          (route) => (route.polylinePoints ?? const <PointLatLng>[])
+              .map((e) => LatLng(e.latitude, e.longitude)),
         )
-        .toList()
+        .toList();
+
+    final bounds = (boundsPoints.isNotEmpty
+            ? boundsPoints
+            : [origin.latLng, destination.latLng])
         .toBounds();
 
     final hazardsToAvoidResult = await _hazardService.getAllHazards(
@@ -194,18 +203,32 @@ class MapService {
       ),
     );
 
+    final travelModeRoutes = <TravelMode, SafestFastestRoutes>{
+      if (travelModeDriving != null) TravelMode.driving: travelModeDriving,
+      if (travelModeTransit != null) TravelMode.transit: travelModeTransit,
+      if (travelModeWalking != null) TravelMode.walking: travelModeWalking,
+      if (travelModeBicycling != null)
+        TravelMode.bicycling: travelModeBicycling,
+    };
+
+    if (travelModeRoutes.isEmpty) {
+      return const Failure(
+        AppError(message: 'No routes found between these locations.'),
+      );
+    }
+
     return Success(
       RoutePlan(
         origin: origin,
         destination: destination,
         hazardsToAvoid: hazardsToAvoid ?? <Hazard>[],
-        travelModeRoutes: {
-          if (travelModeDriving != null) TravelMode.driving: travelModeDriving,
-          if (travelModeTransit != null) TravelMode.transit: travelModeTransit,
-          if (travelModeWalking != null) TravelMode.walking: travelModeWalking,
-          if (travelModeBicycling != null)
-            TravelMode.bicycling: travelModeBicycling,
-        },
+        // Default to driving when available, otherwise the first mode that
+        // returned a route — the selected mode must always exist in the map
+        // so a chip is highlighted and a polyline is drawn.
+        selectedTravelMode: travelModeRoutes.containsKey(TravelMode.driving)
+            ? TravelMode.driving
+            : travelModeRoutes.keys.first,
+        travelModeRoutes: travelModeRoutes,
       ),
     );
   }

@@ -1392,6 +1392,17 @@ class MapProvider extends StateNotifier<MapProviderState> {
     final destination = routePlan.destination;
     final selectedMode = routePlan.selectedTravelMode;
 
+    // The Routes API rejects `intermediates` for TRANSIT, so a bypass
+    // waypoint detour can never succeed on a transit route.
+    if (selectedMode == TravelMode.transit) {
+      state = state.copyWith(
+        takeAlternateRouteState: const TakeAlternateRouteState.error(
+          'Detours are not available for transit routes.',
+        ),
+      );
+      return;
+    }
+
     state = state.copyWith(
       takeAlternateRouteState: const TakeAlternateRouteState.loading(),
     );
