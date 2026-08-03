@@ -1,0 +1,578 @@
+<title>ALRT — Example Alert Screens</title>
+<style>
+  :root{
+    --bg:#EFF0F2; --panel:#FFFFFF; --ink:#1B1D22; --muted:#6A6F78;
+    --line:#DDDFE4; --accent:#F26522; --chip:#E7E9EC; --new:#0B8043;
+    /* ALRT app palette — fixed, from lib/others/app_colors.dart */
+    --a-red:#EE2E24; --a-orange:#F26522; --a-yellow:#FCDD00; --a-blue:#3478F5;
+    --a-green:#34A853; --a-purple:#6A0DAD; --a-black:#111111;
+    --a-scaffold:#F4F4F4; --a-grey:#757575; --a-lightgrey:#D9D9D9;
+    --cat-health:#FCC27B; --cat-weather:#97D7FA; --cat-traffic:#86DF9D;
+    --cat-community:#AB87F1; --cat-security:#FC9493; --cat-utilities:#FFE47A;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#16181D; --panel:#1F2228; --ink:#ECEDEF; --muted:#9AA0AA;
+           --line:#2E323A; --chip:#2A2E35; --new:#5BBF7A; }
+  }
+  :root[data-theme="dark"]{ --bg:#16181D; --panel:#1F2228; --ink:#ECEDEF;
+    --muted:#9AA0AA; --line:#2E323A; --chip:#2A2E35; --new:#5BBF7A; }
+  :root[data-theme="light"]{ --bg:#EFF0F2; --panel:#FFFFFF; --ink:#1B1D22;
+    --muted:#6A6F78; --line:#DDDFE4; --chip:#E7E9EC; --new:#0B8043; }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif;
+    line-height:1.55; font-size:15px;
+  }
+  .wrap{max-width:1060px; margin:0 auto; padding:40px 20px 80px}
+  header.page h1{font-size:1.7rem; margin:0 0 6px; text-wrap:balance; letter-spacing:-.01em}
+  header.page p{color:var(--muted); max-width:62ch; margin:.2rem 0}
+  .mono{font-family:ui-monospace,'Cascadia Code',Menlo,Consolas,monospace; font-size:.86em}
+  .newtag{display:inline-block; font-size:.62rem; font-weight:700; letter-spacing:.08em;
+    color:#fff; background:var(--new); border-radius:4px; padding:1px 6px; vertical-align:2px}
+
+  /* shape key */
+  .shapekey{display:flex; flex-wrap:wrap; gap:14px; margin:26px 0 8px}
+  .shapekey .k{flex:1 1 170px; background:var(--panel); border:1px solid var(--line);
+    border-radius:12px; padding:14px 16px; display:flex; gap:12px; align-items:center}
+  .k b{display:block; font-size:.85rem}
+  .k span{display:block; font-size:.72rem; color:var(--muted); line-height:1.35}
+
+  /* shapes */
+  .sh{width:30px; height:30px; flex:none; position:relative}
+  .sh-tri{width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;
+    border-bottom:27px solid var(--a-red)}
+  .sh-dia{width:22px;height:22px;border:3px solid var(--a-orange);transform:rotate(45deg);margin:4px}
+  .sh-hex{width:30px;height:26px;background:var(--a-blue);
+    clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+  .sh-hex.outline{background:transparent;position:relative}
+  .sh-cir{width:24px;height:24px;border:3px solid var(--a-purple);border-radius:50%;margin:3px}
+  .sh-sq{width:24px;height:24px;background:var(--a-green);border-radius:5px;margin:3px}
+
+  section.type{margin-top:52px}
+  section.type>h2{font-size:1.15rem; display:flex; align-items:center; gap:12px; margin:0 0 2px}
+  section.type>h2 .sh{transform:scale(.8)}
+  section.type>.sub{color:var(--muted); font-size:.85rem; margin:0 0 18px; max-width:70ch}
+
+  .screens{display:flex; flex-wrap:wrap; gap:26px; align-items:flex-start}
+
+  /* phone frame — app is light-only by design */
+  .phone{width:375px; flex:none; background:var(--a-scaffold); border:1px solid var(--line);
+    border-radius:26px; padding:14px 12px 18px; box-shadow:0 6px 24px rgba(0,0,0,.10); color:#1a1a1a}
+  .phone .lbl{font-size:.68rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--a-grey); margin:0 4px 8px}
+  @media (max-width:430px){ .phone{width:100%} }
+
+  /* callout number */
+  .n{display:inline-flex; width:17px; height:17px; border-radius:50%; background:#3b3f46; color:#fff;
+    font-size:.62rem; font-weight:700; align-items:center; justify-content:center;
+    vertical-align:2px; margin-right:6px; flex:none; font-family:system-ui}
+
+  /* ---- alert CARD (mirrors common_hazards_list_item.dart) ---- */
+  .card{background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 1px 5px rgba(0,0,0,.12)}
+  .band{padding:9px 12px; display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+  .pill{display:inline-flex; align-items:center; gap:5px; border-radius:20px; padding:3px 10px;
+    font-size:.62rem; font-weight:700; letter-spacing:.04em; background:rgba(255,255,255,.92); color:#111}
+  .pill i{width:7px;height:7px;border-radius:50%;display:inline-block}
+  .band.on-light .pill{background:rgba(0,0,0,.78); color:#fff}
+  .cbody{padding:12px 14px 10px}
+  .crow{display:flex; gap:12px; align-items:flex-start}
+  .cicon{width:48px;height:48px;flex:none;display:flex;align-items:center;justify-content:center;position:relative}
+  .cicon .glyph{position:absolute; font-size:15px; inset:0; display:flex; align-items:center; justify-content:center}
+  .ctitle{font-weight:700; font-size:16px; line-height:1.3; margin:0}
+  .cmeta{display:flex; gap:12px; color:var(--a-grey); font-size:12px; margin-top:3px; flex-wrap:wrap}
+  .cdesc{font-size:13px; color:#333; margin:10px 0 0; line-height:1.5}
+  .votes{margin-left:auto; font-size:12px; font-weight:700; color:var(--a-green);
+    background:rgba(52,168,83,.12); border-radius:10px; padding:3px 8px; flex:none}
+  .confirmrow{display:flex; gap:10px; margin-top:12px}
+  .confirmrow button{flex:1; border-radius:10px; padding:8px 0; font-size:13px; font-weight:600;
+    font-family:inherit; cursor:default}
+  .btn-not{border:1.5px solid var(--a-lightgrey); background:#fff; color:#333}
+  .btn-con{border:none; background:var(--a-green); color:#fff}
+  .cfoot{display:flex; align-items:center; gap:10px; border-top:1px solid #EDEDED;
+    margin-top:12px; padding:10px 14px 12px}
+  .catchip{font-size:11px; font-weight:600; border-radius:12px; padding:3px 10px; border:1.2px solid}
+  .follow{margin-left:auto; font-size:12px; font-weight:700; border:1.5px solid var(--a-orange);
+    color:var(--a-orange); border-radius:16px; padding:4px 12px; background:#fff}
+  .follow.on{background:var(--a-orange); color:#fff}
+  .shareic,.morec{font-size:15px; color:#444}
+  .view{font-size:12px; font-weight:600; color:#111}
+
+  /* ---- DETAIL screen (mirrors view_hazard_screen.dart) ---- */
+  .det{background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 1px 5px rgba(0,0,0,.12)}
+  .dbar{padding:12px; display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+  .rbtn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.92);display:inline-flex;
+    align-items:center;justify-content:center;font-size:13px;margin-left:6px;flex:none}
+  .dbar .sp{flex:1}
+  .dbody{padding:14px}
+  .dhead{display:flex; gap:14px; align-items:center}
+  .dicon{width:64px;height:64px;flex:none;position:relative;display:flex;align-items:center;justify-content:center}
+  .dtitle{font-weight:700;font-size:17px;line-height:1.25;margin:0}
+  .dchips{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .kmpill{font-size:11px;background:var(--a-scaffold);border-radius:12px;padding:3px 10px;color:#333}
+  .lvl{margin-top:12px;font-size:13px;font-weight:600}
+  .lvl b{font-weight:800}
+  .followbig{display:block;width:100%;margin-top:12px;border:none;border-radius:12px;background:var(--a-orange);
+    color:#fff;font-weight:700;font-size:14px;padding:11px 0;font-family:inherit}
+  .mapc{margin-top:14px;border:1px solid #ECECEC;border-radius:14px;overflow:hidden}
+  .map{height:110px;background:
+    repeating-linear-gradient(45deg,#E8EFE4 0 14px,#DFE9DA 14px 28px);
+    position:relative}
+  .map .mk{position:absolute;left:46%;top:34%}
+  .maprow{display:flex;gap:10px;padding:10px 12px;font-size:12px;color:#333;align-items:flex-start}
+  .maprow+.maprow{border-top:1px solid #F0F0F0}
+  .maprow .ic{flex:none}
+  .updated{display:inline-block;font-size:10.5px;color:#fff;background:var(--a-blue);
+    border-radius:8px;padding:1px 7px;font-weight:700;margin-left:6px}
+  .sect{margin-top:14px;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.55}
+  .sect h4{margin:0 0 6px;font-size:12.5px;font-weight:800;letter-spacing:.02em}
+  .s-know{background:rgba(252,221,0,.07);border:1px solid rgba(252,221,0,.45);border-left:4px solid var(--a-yellow)}
+  .s-do{background:rgba(255,126,34,.06);border:1px solid rgba(255,126,34,.4);border-left:4px solid #FF7E22}
+  .s-do ul{margin:4px 0 0;padding-left:18px}
+  .s-do li{margin:3px 0}
+  .s-src{background:rgba(55,202,255,.05);border:1px solid rgba(55,202,255,.4);border-left:4px solid #37CAFF}
+  .s-src .srcline{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+  .s-src .lic{font-size:10px;font-weight:700;background:#111;color:#fff;border-radius:4px;padding:1px 6px}
+  .s-src small{display:block;color:#555;font-size:11px;margin-top:4px;line-height:1.45}
+  .s-adv{background:rgba(52,120,245,.05);border:1px solid rgba(52,120,245,.35);border-left:4px solid var(--a-blue)}
+  .srct{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+  .srct td{padding:5px 6px;border-top:1px solid #EAEAEA}
+  .srct td:last-child{text-align:right;font-weight:700}
+  .kwbadge{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:12px;font-weight:600;
+    background:rgba(106,13,173,.08);border:1px solid rgba(106,13,173,.35);color:var(--a-purple);
+    border-radius:10px;padding:5px 10px}
+  .blockrow{margin-top:14px;border-top:1px solid #EFEFEF;padding-top:10px;display:flex;gap:16px;
+    font-size:12px;color:#B3261E;font-weight:600}
+
+  /* field tables */
+  .fields{margin-top:22px; background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    overflow-x:auto}
+  .fields table{width:100%; border-collapse:collapse; font-size:.8rem; min-width:640px}
+  .fields th{text-align:left; font-size:.68rem; letter-spacing:.07em; text-transform:uppercase;
+    color:var(--muted); padding:10px 14px; border-bottom:1px solid var(--line)}
+  .fields td{padding:8px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+  .fields tr:last-child td{border-bottom:none}
+  .fields td:first-child{white-space:nowrap}
+  footer{margin-top:56px; color:var(--muted); font-size:.78rem; max-width:70ch}
+</style>
+
+<div class="wrap">
+<header class="page">
+  <h1>ALRT — how each alert type shows its information</h1>
+  <p>One example per alert type, drawn exactly as the app lays it out (card in the feed, then the
+  detail screen). Every numbered dot maps to the table underneath it: the piece of information,
+  the API field that feeds it, and the rule for when it shows. Items marked
+  <span class="newtag">NEW</span> don’t exist in the app yet — they’re the additions from the brief.</p>
+</header>
+
+<div class="shapekey">
+  <div class="k"><div class="sh sh-tri" style="border-bottom-color:var(--a-red)"></div>
+    <div><b>AWS — triangle</b><span>The only type with severity words: Advice / Watch &amp; Act / Emergency Warning</span></div></div>
+  <div class="k"><div class="sh"><div class="sh-dia"></div></div>
+    <div><b>Official — diamond</b><span>Verified agencies. Colour band only, no severity words</span></div></div>
+  <div class="k"><div class="sh sh-hex"></div>
+    <div><b>ALRT Advisory — hexagon <span class="newtag">NEW</span></b><span>Our own consolidated advisories (proposed shape — your call)</span></div></div>
+  <div class="k"><div class="sh"><div class="sh-cir"></div></div>
+    <div><b>Community — circle</b><span>User reports. Voting, reporter status, block &amp; report</span></div></div>
+  <div class="k"><div class="sh"><div class="sh-sq"></div></div>
+    <div><b>Global — square</b><span>Green / orange / red impact squares</span></div></div>
+</div>
+
+<!-- ================================ AWS ================================ -->
+<section class="type">
+  <h2><span class="sh sh-tri" style="border-bottom-color:var(--a-red)"></span> 1 · AWS — Australian Warning System</h2>
+  <p class="sub">Example: an Emergency Warning bushfire from NSW RFS. Header band and triangle take the
+  severity colour. This is the <b>only</b> type where severity words appear.</p>
+
+  <div class="screens">
+    <div class="phone"><p class="lbl">Card — in the feed</p>
+      <div class="card">
+        <div class="band" style="background:var(--a-red)">
+          <span class="n">1</span>
+          <span class="pill"><i style="background:var(--a-red)"></i>EMERGENCY WARNING</span>
+          <span class="pill">AWS</span><span class="pill">OFFICIAL</span>
+        </div>
+        <div class="cbody">
+          <div class="crow">
+            <div class="cicon"><span class="n">2</span><div class="sh-tri" style="transform:scale(1.35);border-bottom-color:var(--a-red)"></div><span class="glyph" style="color:#fff;padding-top:8px">🔥</span></div>
+            <div>
+              <p class="ctitle"><span class="n">3</span>Bushfire — Emergency Warning</p>
+              <div class="cmeta"><span><span class="n">4</span>🕐 12 min ago</span><span>📍 3.2 km</span></div>
+            </div>
+          </div>
+          <p class="cdesc"><span class="n">5</span>An out-of-control bushfire is burning towards Kinglake West and residents in its path are in danger.</p>
+        </div>
+        <div class="cfoot">
+          <span class="n">6</span><span class="catchip" style="border-color:#4C9ED9;color:#22699C;background:rgba(151,215,250,.2)">Weather &amp; Environment</span>
+          <span class="follow"><span class="n">7</span>Follow</span>
+          <span class="shareic">⇪</span><span class="view">View Details →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone"><p class="lbl">Detail screen</p>
+      <div class="det">
+        <div class="dbar" style="background:var(--a-red)">
+          <span class="pill"><i style="background:var(--a-red)"></i>EMERGENCY WARNING</span>
+          <span class="pill">AWS</span><span class="pill">OFFICIAL</span>
+          <span class="sp"></span><span class="rbtn">⇪</span><span class="rbtn">✕</span>
+        </div>
+        <div class="dbody">
+          <div class="dhead">
+            <div class="dicon"><div class="sh-tri" style="transform:scale(1.8);border-bottom-color:var(--a-red)"></div><span class="glyph" style="position:absolute;color:#fff;padding-top:10px">🔥</span></div>
+            <div>
+              <p class="dtitle">Bushfire — Emergency Warning</p>
+              <div class="dchips">
+                <span class="catchip" style="border-color:#4C9ED9;color:#22699C;background:rgba(151,215,250,.2)">Weather &amp; Environment</span>
+                <span class="kmpill">3.2 km away</span>
+              </div>
+            </div>
+          </div>
+          <p class="lvl"><span class="n">8</span>Alert Level: <b style="color:var(--a-red)">Emergency Warning</b></p>
+          <button class="followbig"><span class="n">7</span>Follow this alert — get notified when it changes</button>
+          <div class="mapc">
+            <div class="map"><div class="mk"><div class="sh-tri" style="border-bottom-color:var(--a-red);transform:scale(.8)"></div></div></div>
+            <div class="maprow"><span class="ic">📍</span><span><b>Kinglake West VIC</b><br>3.2 km from your location</span></div>
+            <div class="maprow"><span class="ic">🕐</span><span><span class="n">9</span>Posted 43 min ago
+              <span class="updated">UPDATED 12 min ago</span><br>
+              <span style="color:#777">Severity raised: Watch &amp; Act → Emergency Warning</span></span></div>
+          </div>
+          <div class="sect s-know"><h4><span class="n">10</span>WHAT WE KNOW</h4>
+            An emergency-level bushfire is moving fast towards Kinglake West and nearby properties are under direct threat.</div>
+          <div class="sect s-do"><h4><span class="n">11</span>WHAT TO DO</h4>
+            <ul><li>Leave now towards Whittlesea if the path is clear.</li>
+            <li>Follow the directions of emergency services.</li>
+            <li>Call 000 if your life is in danger.</li></ul></div>
+          <div class="sect s-src"><h4><span class="n">12</span>DATA ATTRIBUTION</h4>
+            <div class="srcline">🛡 NSW Rural Fire Service <span class="lic">CC BY 4.0</span></div>
+            <small>Official Source · Used under CC BY 4.0 license.</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fields"><table>
+    <tr><th>#</th><th>What shows</th><th>API field</th><th>Rule</th></tr>
+    <tr><td><span class="n">1</span></td><td>Severity pill + red band</td><td class="mono">severity, severityBand.colorAws</td><td>Pill shows only when <span class="mono">isAwsCompliant == true</span>. Never on other types.</td></tr>
+    <tr><td><span class="n">2</span></td><td>Filled triangle icon</td><td class="mono">isAwsCompliant, categoryId, severityBand</td><td>Asset <span class="mono">aws/{category}_{band}.png</span></td></tr>
+    <tr><td><span class="n">3</span></td><td>Title</td><td class="mono">title</td><td>AI-standardised, max 80 characters</td></tr>
+    <tr><td><span class="n">4</span></td><td>Time + distance</td><td class="mono">updatedAt ?? occurredAt ?? createdAt</td><td>Relative time; distance computed from <span class="mono">latitude/longitude</span></td></tr>
+    <tr><td><span class="n">5</span></td><td>Card description</td><td class="mono">aiSummary</td><td>Fix: show the real summary, not the synthesised “&lt;Category&gt; alert near &lt;Location&gt;.”</td></tr>
+    <tr><td><span class="n">6</span></td><td>Category chip</td><td class="mono">category.parent.name, category.color</td><td>On every alert type; text darkened for contrast</td></tr>
+    <tr><td><span class="n">7</span></td><td>Follow button <span class="newtag">NEW</span></td><td class="mono">HazardFollower (new table)</td><td>Follow ↔ Following; push sent on <span class="mono">updateHazard</span>. Zero AI.</td></tr>
+    <tr><td><span class="n">8</span></td><td>Alert Level row</td><td class="mono">severity.titleAws</td><td>AWS only — hidden on all other types</td></tr>
+    <tr><td><span class="n">9</span></td><td>Updated badge <span class="newtag">NEW</span></td><td class="mono">updatedAt &gt; createdAt</td><td>Only when genuinely changed — plus one line saying what changed</td></tr>
+    <tr><td><span class="n">10</span></td><td>What We Know</td><td class="mono">aiSummary</td><td>Hidden when empty</td></tr>
+    <tr><td><span class="n">11</span></td><td>What To Do</td><td class="mono">callsToAction[]</td><td>2–4 verb-first bullets from the AI prompt</td></tr>
+    <tr><td><span class="n">12</span></td><td>Attribution</td><td class="mono">source.name, source.license</td><td>Licence badge + copyright link</td></tr>
+  </table></div>
+</section>
+
+<!-- ================================ OFFICIAL ================================ -->
+<section class="type">
+  <h2><span class="sh"><span class="sh-dia"></span></span> 2 · Official (non-AWS)</h2>
+  <p class="sub">Example: a multi-vehicle crash from QLD Traffic. The diamond and header take the urgency
+  band colour (this one is the “action” band = orange) — but <b>no severity words appear anywhere</b>.
+  A low-urgency official alert has a plain white header with no colour at all.</p>
+
+  <div class="screens">
+    <div class="phone"><p class="lbl">Card — in the feed</p>
+      <div class="card">
+        <div class="band" style="background:var(--a-orange)">
+          <span class="n">1</span><span class="pill">OFFICIAL</span>
+        </div>
+        <div class="cbody">
+          <div class="crow">
+            <div class="cicon"><span class="n">2</span><div class="sh-dia" style="transform:rotate(45deg) scale(1.5)"></div><span class="glyph">🚗</span></div>
+            <div>
+              <p class="ctitle">Multi-vehicle crash — Bruce Hwy northbound</p>
+              <div class="cmeta"><span>🕐 25 min ago</span><span>📍 6.8 km</span></div>
+            </div>
+          </div>
+          <p class="cdesc"><span class="n">3</span>A multi-vehicle crash has closed two northbound lanes of the Bruce Highway at Caboolture, causing long delays.</p>
+        </div>
+        <div class="cfoot">
+          <span class="catchip" style="border-color:#3FA45B;color:#1F7A3A;background:rgba(134,223,157,.25)">Traffic &amp; Transport</span>
+          <span class="follow">Follow</span><span class="shareic">⇪</span><span class="view">View Details →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone"><p class="lbl">Detail screen</p>
+      <div class="det">
+        <div class="dbar" style="background:var(--a-orange)">
+          <span class="pill">OFFICIAL</span><span class="sp"></span><span class="rbtn">⇪</span><span class="rbtn">✕</span>
+        </div>
+        <div class="dbody">
+          <div class="dhead">
+            <div class="dicon"><div class="sh-dia" style="transform:rotate(45deg) scale(2)"></div><span class="glyph" style="position:absolute">🚗</span></div>
+            <div><p class="dtitle">Multi-vehicle crash — Bruce Hwy northbound</p>
+              <div class="dchips"><span class="catchip" style="border-color:#3FA45B;color:#1F7A3A;background:rgba(134,223,157,.25)">Traffic &amp; Transport</span>
+              <span class="kmpill">6.8 km away</span></div></div>
+          </div>
+          <p class="lvl" style="color:#888;font-weight:500"><span class="n">4</span><i>No “Alert Level” row — severity words are AWS-only.</i></p>
+          <button class="followbig" style="background:#fff;color:var(--a-orange);border:2px solid var(--a-orange)">Following ✓</button>
+          <div class="mapc">
+            <div class="map" style="background:repeating-linear-gradient(45deg,#EAEAEA 0 14px,#E0E0E0 14px 28px)"><div class="mk"><div class="sh-dia" style="transform:rotate(45deg) scale(.9)"></div></div></div>
+            <div class="maprow"><span class="ic">📍</span><span><b>Caboolture QLD</b><br>6.8 km from your location</span></div>
+            <div class="maprow"><span class="ic">🕐</span><span>Posted 25 min ago</span></div>
+          </div>
+          <div class="sect s-know"><h4>WHAT WE KNOW</h4>
+            Two northbound lanes are closed at Caboolture after a multi-vehicle crash, with delays of up to 40 minutes.</div>
+          <div class="sect s-do"><h4>WHAT TO DO</h4>
+            <ul><li>Avoid the Bruce Highway northbound at Caboolture.</li>
+            <li>Use the D’Aguilar Highway as an alternative route.</li>
+            <li>Follow the directions of traffic controllers.</li></ul></div>
+          <div class="sect s-src"><h4>DATA ATTRIBUTION</h4>
+            <div class="srcline">🛡 QLD Traffic <span class="lic">CC BY 4.0</span></div>
+            <small>Official Source · Used under CC BY 4.0 license.</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fields"><table>
+    <tr><th>#</th><th>What shows</th><th>API field</th><th>Rule</th></tr>
+    <tr><td><span class="n">1</span></td><td>OFFICIAL pill only</td><td class="mono">sourceId != null, isAwsCompliant == false</td><td>No severity pill, ever</td></tr>
+    <tr><td><span class="n">2</span></td><td>Diamond outline icon</td><td class="mono">categoryId + severityBand</td><td>Asset <span class="mono">non_aws/{category}_{band}.png</span>; colour from <span class="mono">severityBand.colorNonAws</span> (info band = white/no colour)</td></tr>
+    <tr><td><span class="n">3</span></td><td>Description</td><td class="mono">aiSummary</td><td>Same fix as AWS — show real content on the card</td></tr>
+    <tr><td><span class="n">4</span></td><td>No Alert Level</td><td class="mono">severity == "unknown"</td><td>Backend leaves <span class="mono">severity</span> unset for non-AWS; only <span class="mono">severityBand</span> drives colour</td></tr>
+  </table></div>
+</section>
+
+<!-- ================================ ADVISORY ================================ -->
+<section class="type">
+  <h2><span class="sh sh-hex" style="background:var(--a-orange)"></span> 3 · ALRT Advisory <span class="newtag">NEW TYPE</span></h2>
+  <p class="sub">Our own consolidated alert — <b>one advisory per country</b> outside Australia, built from
+  several sources at once. Example: Indonesia, combining Smartraveller Level 3 and a GDACS orange
+  volcano event. The hexagon is the proposed shape (it’s the one simple shape not yet taken).
+  Header colour comes from the most serious source level. Built from templates — at most one AI
+  summary per country per day, and only when a source changed.</p>
+
+  <div class="screens">
+    <div class="phone"><p class="lbl">Card — in the feed</p>
+      <div class="card">
+        <div class="band" style="background:var(--a-orange)">
+          <span class="n">1</span><span class="pill">ALRT ADVISORY</span>
+        </div>
+        <div class="cbody">
+          <div class="crow">
+            <div class="cicon"><span class="n">2</span><div class="sh-hex" style="background:var(--a-orange);transform:scale(1.4)"></div><span class="glyph" style="color:#fff">🌏</span></div>
+            <div>
+              <p class="ctitle">Indonesia — Travel &amp; Hazard Advisory</p>
+              <div class="cmeta"><span>🕐 Updated today 6:00 am</span></div>
+            </div>
+          </div>
+          <p class="cdesc"><span class="n">3</span>Reconsider your need to travel. Volcanic activity at Mt Lewotobi is disrupting flights to and from Bali, and DFAT advises a high degree of caution across Indonesia.</p>
+        </div>
+        <div class="cfoot">
+          <span class="catchip" style="border-color:#8A6BC9;color:#5B3E96;background:rgba(171,135,241,.2)">Community/Info</span>
+          <span class="follow">Follow</span><span class="shareic">⇪</span><span class="view">View Details →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone"><p class="lbl">Detail screen</p>
+      <div class="det">
+        <div class="dbar" style="background:var(--a-orange)">
+          <span class="pill">ALRT ADVISORY</span><span class="sp"></span><span class="rbtn">⇪</span><span class="rbtn">✕</span>
+        </div>
+        <div class="dbody">
+          <div class="dhead">
+            <div class="dicon"><div class="sh-hex" style="background:var(--a-orange);transform:scale(1.9)"></div><span class="glyph" style="position:absolute;color:#fff">🌏</span></div>
+            <div><p class="dtitle">Indonesia — Travel &amp; Hazard Advisory</p>
+              <div class="dchips"><span class="kmpill">Country-wide</span></div></div>
+          </div>
+          <button class="followbig">Follow Indonesia — get notified when this changes</button>
+          <div class="sect s-adv"><h4><span class="n">4</span>SOURCES IN THIS ADVISORY</h4>
+            <table class="srct">
+              <tr><td>Smartraveller (DFAT)</td><td>Level 3 — Reconsider travel</td></tr>
+              <tr><td>GDACS — Mt Lewotobi volcano</td><td style="color:#C75B00">Orange</td></tr>
+              <tr><td>USGS — no significant quakes</td><td style="color:#3FA45B">Clear</td></tr>
+            </table></div>
+          <div class="sect s-know"><h4><span class="n">5</span>WHAT WE KNOW</h4>
+            Volcanic ash from Mt Lewotobi is cancelling flights in eastern Indonesia and Bali, and Australia’s official travel advice for Indonesia is “reconsider your need to travel”.</div>
+          <div class="sect s-do"><h4>WHAT TO DO</h4>
+            <ul><li>Check your airline before travelling to or from Bali.</li>
+            <li>Follow the advice of local authorities.</li>
+            <li>Contact DFAT on 1300 555 135 if you need consular help.</li></ul></div>
+          <div class="sect s-src"><h4>DATA ATTRIBUTION</h4>
+            <div class="srcline">🛡 ALRT Advisory</div>
+            <small>Compiled by ALRT from Smartraveller (CC BY 4.0), GDACS and USGS. For official travel advice, visit smartraveller.gov.au.</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fields"><table>
+    <tr><th>#</th><th>What shows</th><th>API field</th><th>Rule</th></tr>
+    <tr><td><span class="n">1</span></td><td>ALRT ADVISORY pill + band</td><td class="mono">source.id == "alrtAdvisory" (new)</td><td>Band colour = worst source level, mapped in code: Smartraveller L1–4 and GDACS green/orange/red → band. No AI needed.</td></tr>
+    <tr><td><span class="n">2</span></td><td>Hexagon icon</td><td class="mono">new asset set</td><td>Proposed shape — needs your sign-off; must also be added to the ALRT Key legend</td></tr>
+    <tr><td><span class="n">3</span></td><td>Summary</td><td class="mono">aiSummary</td><td>Template first; optional AI rewrite max once per country per day, only when a source changed</td></tr>
+    <tr><td><span class="n">4</span></td><td>Sources table</td><td class="mono">advisory sources (new field)</td><td>One row per contributing feed with its own level — this is the “various sources in one alert” you asked for</td></tr>
+    <tr><td><span class="n">5</span></td><td>What We Know / What To Do</td><td class="mono">aiSummary, callsToAction[]</td><td>Same layout as every other type — nothing new to build visually</td></tr>
+  </table></div>
+</section>
+
+<!-- ================================ COMMUNITY ================================ -->
+<section class="type">
+  <h2><span class="sh"><span class="sh-cir"></span></span> 4 · Community (user-reported)</h2>
+  <p class="sub">Example: a smoke report from a verified reporter. Header takes the <b>reporter’s status
+  colour</b> (green = verified, brown = emerging, grey = unverified) — not a severity. Voting buttons,
+  the safety-profile match badge, and block/report are Community-specific.</p>
+
+  <div class="screens">
+    <div class="phone"><p class="lbl">Card — in the feed</p>
+      <div class="card">
+        <div class="band" style="background:var(--a-green)">
+          <span class="n">1</span><span class="pill">USER</span>
+        </div>
+        <div class="cbody">
+          <div class="crow">
+            <div class="cicon"><span class="n">2</span><div class="sh-cir" style="transform:scale(1.5)"></div><span class="glyph">💨</span></div>
+            <div>
+              <p class="ctitle">Smoke</p>
+              <div class="cmeta"><span>🕐 8 min ago</span><span>📍 450 m</span></div>
+            </div>
+            <span class="votes"><span class="n">3</span>👍 4</span>
+          </div>
+          <p class="cdesc">A user has reported thick smoke drifting across Windsor Rd near the school. This report is unverified.</p>
+          <span class="kwbadge"><span class="n">4</span>⚑ Matches your safety profile: <b>asthma</b></span>
+          <div class="confirmrow"><span class="n">5</span>
+            <button class="btn-not">Not There</button><button class="btn-con">Confirm</button>
+          </div>
+        </div>
+        <div class="cfoot">
+          <span class="catchip" style="border-color:#D19A45;color:#96660F;background:rgba(252,194,123,.25)">Health &amp; Air</span>
+          <span class="follow">Follow</span><span class="shareic">⇪</span><span class="morec"><span class="n">6</span>⋮</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone"><p class="lbl">Detail screen</p>
+      <div class="det">
+        <div class="dbar" style="background:var(--a-green)">
+          <span class="pill">USER</span><span class="sp"></span><span class="rbtn">⇪</span><span class="rbtn">✕</span>
+        </div>
+        <div class="dbody">
+          <div class="dhead">
+            <div class="dicon"><div class="sh-cir" style="transform:scale(2)"></div><span class="glyph" style="position:absolute">💨</span></div>
+            <div><p class="dtitle">Smoke</p>
+              <div class="dchips"><span class="catchip" style="border-color:#D19A45;color:#96660F;background:rgba(252,194,123,.25)">Health &amp; Air</span>
+              <span class="kmpill">450 m away</span>
+              <span class="kmpill" style="background:rgba(52,168,83,.15);color:#1F7A3A"><span class="n">7</span>✓ Verified reporter</span></div></div>
+          </div>
+          <span class="kwbadge">⚑ Matches your safety profile: <b>asthma</b></span>
+          <button class="followbig">Follow this alert — get notified when it changes</button>
+          <div class="mapc">
+            <div class="map"><div class="mk"><div class="sh-cir" style="transform:scale(.9)"></div></div></div>
+            <div class="maprow"><span class="ic">📍</span><span><b>Windsor Rd, Kellyville NSW</b><br>450 m from your location</span></div>
+            <div class="maprow"><span class="ic">🕐</span><span>Posted 8 min ago</span></div>
+          </div>
+          <div class="sect s-know"><h4>WHAT WE KNOW</h4>
+            A user has reported thick smoke near Windsor Rd; the cause has not been confirmed by authorities.</div>
+          <div class="sect s-do"><h4>WHAT TO DO</h4>
+            <ul><li>Keep windows closed if smoke reaches you.</li>
+            <li>Monitor official sources for any fire alerts nearby.</li>
+            <li>Call 000 if you see flames or feel unsafe.</li></ul></div>
+          <div class="sect s-src"><h4>DATA ATTRIBUTION</h4>
+            <div class="srcline">👤 Community Report</div>
+            <small>Reported by an ALRT user · reviewed automatically before publishing.</small></div>
+          <div class="blockrow"><span class="n">6</span><span>🚫 Block this reporter</span><span>⚠ Report this alert</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fields"><table>
+    <tr><th>#</th><th>What shows</th><th>API field</th><th>Rule</th></tr>
+    <tr><td><span class="n">1</span></td><td>USER pill + header colour</td><td class="mono">reportedBy != null, reportedBy.reportsStatus</td><td>Green verified / brown emerging / grey unverified — never a severity colour</td></tr>
+    <tr><td><span class="n">2</span></td><td>Purple circle icon</td><td class="mono">categoryId</td><td>Asset <span class="mono">non_aws/{category}_user.png</span></td></tr>
+    <tr><td><span class="n">3</span></td><td>Vote count</td><td class="mono">upvoteCount − downvoteCount</td><td>Hidden at zero; green positive, red negative</td></tr>
+    <tr><td><span class="n">4</span></td><td>Safety-profile badge <span class="newtag">NEW</span></td><td class="mono">user profile keywords × category.keywords</td><td>Plain string match — zero AI. Shows which keyword matched</td></tr>
+    <tr><td><span class="n">5</span></td><td>Confirm / Not There</td><td class="mono">POST /api/hazards/{id}/vote</td><td>Only within 1 km, never on your own report</td></tr>
+    <tr><td><span class="n">6</span></td><td>Block / Report <span class="newtag">NEW</span></td><td class="mono">blocked-users table + report endpoint</td><td>Blocked reporters filtered out of every feed. App-store requirement</td></tr>
+    <tr><td><span class="n">7</span></td><td>Reporter status chip</td><td class="mono">reportedBy.reportsStatus</td><td>Makes the header colour meaning explicit in words</td></tr>
+  </table></div>
+</section>
+
+<!-- ================================ GLOBAL ================================ -->
+<section class="type">
+  <h2><span class="sh"><span class="sh-sq" style="background:var(--a-red)"></span></span> 5 · Global</h2>
+  <p class="sub">Example: a major earthquake in Japan from USGS/GDACS. Green / orange / red squares show
+  impact — this is the fix for today’s bug where these render as black diamonds. Impact is shown as an
+  “Impact” row (not “severity” — that word stays AWS-only).</p>
+
+  <div class="screens">
+    <div class="phone"><p class="lbl">Card — in the feed</p>
+      <div class="card">
+        <div class="band" style="background:var(--a-red)">
+          <span class="n">1</span><span class="pill">GLOBAL</span>
+        </div>
+        <div class="cbody">
+          <div class="crow">
+            <div class="cicon"><span class="n">2</span><div class="sh-sq" style="background:var(--a-red);transform:scale(1.5)"></div><span class="glyph" style="color:#fff">🌐</span></div>
+            <div>
+              <p class="ctitle">M 7.2 earthquake — near Sendai, Japan</p>
+              <div class="cmeta"><span>🕐 31 min ago</span></div>
+            </div>
+          </div>
+          <p class="cdesc">A magnitude 7.2 earthquake has struck off the coast of Sendai, Japan, and a tsunami evaluation is under way.</p>
+        </div>
+        <div class="cfoot">
+          <span class="catchip" style="border-color:#4C9ED9;color:#22699C;background:rgba(151,215,250,.2)">Weather &amp; Environment</span>
+          <span class="follow">Follow</span><span class="shareic">⇪</span><span class="view">View Details →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone"><p class="lbl">Detail screen</p>
+      <div class="det">
+        <div class="dbar" style="background:var(--a-red)">
+          <span class="pill">GLOBAL</span><span class="sp"></span><span class="rbtn">⇪</span><span class="rbtn">✕</span>
+        </div>
+        <div class="dbody">
+          <div class="dhead">
+            <div class="dicon"><div class="sh-sq" style="background:var(--a-red);transform:scale(2)"></div><span class="glyph" style="position:absolute;color:#fff">🌐</span></div>
+            <div><p class="dtitle">M 7.2 earthquake — near Sendai, Japan</p>
+              <div class="dchips"><span class="catchip" style="border-color:#4C9ED9;color:#22699C;background:rgba(151,215,250,.2)">Weather &amp; Environment</span></div></div>
+          </div>
+          <p class="lvl"><span class="n">3</span>Impact: <b style="color:var(--a-red)">High</b> <span style="color:#888;font-weight:400">(red square)</span></p>
+          <button class="followbig">Follow this alert — get notified when it changes</button>
+          <div class="mapc">
+            <div class="map" style="background:repeating-linear-gradient(45deg,#DFE9F2 0 14px,#D3E1ED 14px 28px)"><div class="mk"><div class="sh-sq" style="background:var(--a-red)"></div></div></div>
+            <div class="maprow"><span class="ic">📍</span><span><b>Off the coast of Sendai, Japan</b></span></div>
+            <div class="maprow"><span class="ic">🕐</span><span>Posted 31 min ago</span></div>
+          </div>
+          <div class="sect s-know"><h4>WHAT WE KNOW</h4>
+            A magnitude 7.2 earthquake struck off Sendai at a depth of 40 km, and authorities are assessing tsunami risk for the region.</div>
+          <div class="sect s-do"><h4>WHAT TO DO</h4>
+            <ul><li>Avoid travel to the affected region until authorities advise it is safe.</li>
+            <li>Check on family or contacts in the area.</li>
+            <li>Monitor official channels for tsunami updates.</li></ul></div>
+          <div class="sect s-src"><h4>DATA ATTRIBUTION</h4>
+            <div class="srcline">🛡 USGS Earthquake Hazards Program</div>
+            <small>Official Source · Public domain data, used with attribution.</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fields"><table>
+    <tr><th>#</th><th>What shows</th><th>API field</th><th>Rule</th></tr>
+    <tr><td><span class="n">1</span></td><td>GLOBAL pill</td><td class="mono">source.id ∈ {earthquakeUsgs, gdacsGlobal, …} (new "global" flag)</td><td>Today these render as generic OFFICIAL — needs its own type flag</td></tr>
+    <tr><td><span class="n">2</span></td><td>Impact square</td><td class="mono">severityBand → green/orange/red</td><td>Fix: new square assets — currently falls back to black diamond <span class="mono">other_*.png</span></td></tr>
+    <tr><td><span class="n">3</span></td><td>Impact row</td><td class="mono">severityBand</td><td>Worded as “Impact”, matching the ALRT Key (Low/Medium/High) — never “severity”. GDACS colour maps directly, no AI</td></tr>
+  </table></div>
+</section>
+
+<footer>
+  Colours are exactly the app palette (<span class="mono">app_colors.dart</span>): emergency
+  <span class="mono">#EE2E24</span>, watch &amp; act <span class="mono">#F26522</span>, advice
+  <span class="mono">#FCDD00</span>, green <span class="mono">#34A853</span>, purple
+  <span class="mono">#6A0DAD</span>. Card and detail layouts mirror
+  <span class="mono">common_hazards_list_item.dart</span> and <span class="mono">view_hazard_screen.dart</span>.
+  Everything tagged NEW is specified in ALERT_SCREENS_BRIEF_FOR_MATT.md.
+</footer>
+</div>
