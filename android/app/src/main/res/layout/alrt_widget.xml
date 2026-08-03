@@ -37,6 +37,15 @@
             android:textColor="#8B8B95"
             android:textSize="10sp"
             android:maxLines="1" />
+
+        <!-- ALRT mark so the card is recognisable at a glance. -->
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="15dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/alrt_logo"
+            android:scaleType="fitCenter"
+            android:contentDescription="ALRT" />
     </LinearLayout>
 
     <!-- ALERT block -->
