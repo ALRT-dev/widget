@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App-icon long-press shortcuts (app_name itself comes from gradle resValue per flavor). -->
+    <string name="shortcut_pin_alerts_short">Add Alerts widget</string>
+    <string name="shortcut_pin_alerts_long">Add Nearby Alerts widget</string>
+    <string name="shortcut_pin_family_short">Add Family widget</string>
+    <string name="shortcut_pin_family_long">Add Family widget</string>
+</resources>

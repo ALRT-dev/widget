@@ -18,6 +18,7 @@ import 'package:hazard_app/features/profile/providers/states/profile_provider_st
 import 'package:hazard_app/features/profile/views/screens/delete_account_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/profile/views/widgets/accepted_hazards_widgets/my_accepted_hazards_list.dart';
+import 'package:hazard_app/features/profile/views/widgets/add_widget_sheet.dart';
 import 'package:hazard_app/features/profile/views/widgets/profile_trust_card.dart';
 import 'package:hazard_app/features/profile/views/widgets/profile_xp_progress.dart';
 import 'package:hazard_app/features/profile/views/widgets/rejected_hazards_widgets/my_rejected_hazards_list.dart';
@@ -451,6 +452,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 icon: LucideIcons.globe,
                 color: AppColors.purple,
                 onTap: _showLanguagePicker,
+              ),
+              _buildAccountSettingsItem(
+                title: 'Add widget to your home screen',
+                subtitle: 'Nearby alerts or family at a glance',
+                icon: LucideIcons.layoutGrid,
+                color: AppColors.orange,
+                onTap: () => showAddWidgetSheet(context),
               ),
               _buildAccountSettingsItem(
                 title: 'Support Request',
