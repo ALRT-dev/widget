@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// The locked alert-card treatments (product-rules §6/§31):
@@ -40,6 +41,26 @@ abstract final class AlertCardStyle {
     if (isAws) return LucideIcons.triangleAlert;
     if (isOfficial) return LucideIcons.diamond;
     return LucideIcons.circle;
+  }
+
+  // ── Pre-coloured severity sets (shape-severity/, locked hexes) ─────────
+  // Diamond/shield render at the band hex; the shield carries colour only —
+  // the band word is never written next to it. Community circles take the
+  // category colour instead, never a band hex.
+
+  static const bandInfo = Color(0xFF8A93A0);
+  static const bandMonitor = Color(0xFFF5C518);
+  static const bandAction = Color(0xFFF07E1B);
+  static const bandCritical = Color(0xFFDA1F2D);
+
+  /// The locked hex for an official severity shape.
+  static Color bandShapeColor(final HazardSeverityBand? band) {
+    return switch (band) {
+      HazardSeverityBand.monitor => bandMonitor,
+      HazardSeverityBand.action => bandAction,
+      HazardSeverityBand.critical => bandCritical,
+      HazardSeverityBand.info || null => bandInfo,
+    };
   }
 
   // ── V3 expanded-card treatments (alert detail screen) ──────────────────

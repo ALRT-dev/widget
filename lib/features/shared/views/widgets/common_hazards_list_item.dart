@@ -381,11 +381,16 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   isOfficial: isVerified,
                 ),
                 size: 14.spMin,
+                // Official shapes carry the locked band hex; community
+                // circles take the category colour, never a band hex.
                 color: isOfficialCritical
                     ? AppColors.white
                     : hazardColor == AppColors.transparent ||
                             hazardColor.isLight
-                        ? AppColors.grey
+                        ? (isVerified
+                              ? AlertCardStyle.bandShapeColor(severityBand)
+                              : widget.hazard.category?.color ??
+                                    AppColors.grey)
                         : AppColors.white,
               ),
               if (isAwsCompliant &&
