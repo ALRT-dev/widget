@@ -188,18 +188,37 @@ private struct AlrtWidgetView: View {
 
     private func allClearBody(updated: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            header(updated)
+            header("")
             Spacer(minLength: 4)
-            HStack(spacing: 8) {
-                Circle().fill(successGreen).frame(width: 12, height: 12)
-                Text("All clear")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(successGreen)
+            HStack(spacing: 9) {
+                ZStack {
+                    Circle().fill(successGreen).frame(width: 22, height: 22)
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.white)
+                }
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("You\u{2019}re all clear")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                    Text("No warnings near you.")
+                        .font(.system(size: 12))
+                        .foregroundColor(Color(white: 0.8))
+                        .lineLimit(1)
+                }
             }
-            Text("No active alerts near you")
-                .font(.system(size: 12))
-                .foregroundColor(Color(white: 0.8))
-                .lineLimit(2)
+            HStack(spacing: 8) {
+                Text("ALL CLEAR")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundColor(Color(red: 0.04, green: 0.24, blue: 0.16))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(successGreen))
+                Text(updated.replacingOccurrences(of: "Updated", with: "Checked"))
+                    .font(.system(size: 11))
+                    .foregroundColor(Color(white: 0.55))
+                    .lineLimit(1)
+            }
             Spacer(minLength: 0)
         }
     }

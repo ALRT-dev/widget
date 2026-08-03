@@ -148,6 +148,12 @@ class AlrtAlertsWidgetProvider : HomeWidgetProvider() {
         views.setViewVisibility(R.id.widget_alert_block, android.view.View.GONE)
         views.setViewVisibility(R.id.widget_allclear_block, android.view.View.VISIBLE)
         resetDarkCardText(views)
-        views.setTextViewText(R.id.widget_updated, updated)
+        // The calm state carries its own "Checked ..." line; hide the header
+        // updated label so the time appears once.
+        views.setTextViewText(R.id.widget_updated, "")
+        views.setTextViewText(
+            R.id.widget_allclear_checked,
+            updated.replaceFirst("Updated", "Checked").ifBlank { "Checked just now" }
+        )
     }
 }
