@@ -8,6 +8,7 @@ import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
 import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
+import 'package:hazard_app/features/profile/views/screens/safety_profile_screen.dart';
 import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
 import 'package:hazard_app/features/subscription/views/screens/alrt_plus_manage_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/support_request_screen.dart';
@@ -423,6 +424,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   color: const Color(0xFFA63BD4),
                   onTap: () => context.push(AlrtPlusManageScreen.route),
                 ),
+              _buildAccountSettingsItem(
+                title: 'Safety profile',
+                subtitle: 'Tailored For You guidance · stays on your phone',
+                icon: LucideIcons.shieldCheck,
+                color: AppColors.blue,
+                onTap: () => context.push(SafetyProfileScreen.route),
+              ),
               _buildAccountSettingsItem(
                 title: 'Notifications',
                 subtitle: 'Alert preferences & push settings',

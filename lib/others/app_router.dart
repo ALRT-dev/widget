@@ -15,6 +15,7 @@ import 'package:hazard_app/features/profile/views/screens/how_points_work_screen
 import 'package:hazard_app/features/profile/views/screens/leaderboard_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/points_breakdown_screen.dart';
 import 'package:hazard_app/features/auth/views/screens/email_auth_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/safety_profile_screen.dart';
 import 'package:hazard_app/features/subscription/views/screens/alrt_plus_manage_screen.dart';
 import 'package:hazard_app/features/subscription/views/screens/alrt_plus_paywall_screen.dart';
 import 'package:hazard_app/features/subscription/views/screens/alrt_plus_welcome_screen.dart';
@@ -223,6 +224,10 @@ class AppRouter {
         GoRoute(
           path: AlrtPlusManageScreen.route,
           builder: (context, state) => const AlrtPlusManageScreen(),
+        ),
+        GoRoute(
+          path: SafetyProfileScreen.route,
+          builder: (context, state) => const SafetyProfileScreen(),
         ),
         GoRoute(
           path: EmailAuthScreen.route,
