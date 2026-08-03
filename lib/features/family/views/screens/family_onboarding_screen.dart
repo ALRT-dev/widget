@@ -57,87 +57,53 @@ class _FamilyOnboardingScreenState
               SizedBox(height: 20.spMin),
               _pitchCardBuilder(),
               SizedBox(height: 24.spMin),
-              _sectionCardBuilder(
-                title: 'Create a circle',
-                subtitle: 'Start a new family circle and invite the others.',
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _nameController,
-                      textCapitalization: TextCapitalization.words,
-                      maxLength: 50,
-                      decoration: const InputDecoration(
-                        hintText: 'Circle name, e.g. Nixon Family',
-                        counterText: '',
-                      ),
+              // Locked V3 empty state: a value pitch and two buttons.
+              // No price on this screen; the paywall appears only after
+              // tapping Create a group. The invite path never sees one.
+              SizedBox(
+                height: 52.spMin,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FamilyColors.indigo,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.spMin),
                     ),
-                    SizedBox(height: 12.spMin),
-                    SizedBox(
-                      height: 48.spMin,
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: FamilyColors.indigo,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14.spMin),
+                  ),
+                  onPressed: createState.isLoading ? null : _showCreateSheet,
+                  child: createState.isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                          'Create a group',
+                          style: TextStyle(
+                            fontSize: 16.spMin,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                        onPressed: createState.isLoading ? null : _onCreate,
-                        child: createState.isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : Text(
-                                'Create circle',
-                                style: TextStyle(
-                                  fontSize: 15.spMin,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                      ),
-                    ),
-                  ],
                 ),
               ),
-              SizedBox(height: 16.spMin),
-              _sectionCardBuilder(
-                title: 'Join with a code',
-                subtitle: 'Got an invite code from your family? Enter it here.',
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _codeController,
-                      textCapitalization: TextCapitalization.characters,
-                      decoration: const InputDecoration(
-                        hintText: 'e.g. ALRT-7F3K2',
-                      ),
+              SizedBox(height: 12.spMin),
+              SizedBox(
+                height: 52.spMin,
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: FamilyColors.indigo,
+                    side: const BorderSide(color: FamilyColors.indigo),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.spMin),
                     ),
-                    SizedBox(height: 12.spMin),
-                    SizedBox(
-                      height: 48.spMin,
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: FamilyColors.indigo,
-                          side: const BorderSide(color: FamilyColors.indigo),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14.spMin),
+                  ),
+                  onPressed: joinState.isLoading ? null : _showJoinSheet,
+                  child: joinState.isLoading
+                      ? const CircularProgressIndicator()
+                      : Text(
+                          'I have an invite code',
+                          style: TextStyle(
+                            fontSize: 16.spMin,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                        onPressed: joinState.isLoading ? null : _onJoin,
-                        child: joinState.isLoading
-                            ? const CircularProgressIndicator()
-                            : Text(
-                                'Join circle',
-                                style: TextStyle(
-                                  fontSize: 15.spMin,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                      ),
-                    ),
-                  ],
                 ),
               ),
               SizedBox(height: 20.spMin),
@@ -201,43 +167,110 @@ class _FamilyOnboardingScreenState
     );
   }
 
-  Widget _sectionCardBuilder({
+  /// A rounded input sheet used by both paths; keyboard-safe.
+  Future<void> _showFieldSheet({
     required final String title,
     required final String subtitle,
-    required final Widget child,
+    required final TextEditingController controller,
+    required final String hint,
+    required final String buttonLabel,
+    required final VoidCallback onSubmit,
+    final TextCapitalization capitalization = TextCapitalization.words,
   }) {
-    return Container(
-      padding: EdgeInsets.all(18.spMin),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.spMin),
-        boxShadow: [
-          BoxShadow(color: AppColors.shadowColorLight, blurRadius: 2.0),
-        ],
+    return showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.spMin)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(fontSize: 17.spMin, fontWeight: FontWeight.w700),
-          ),
-          SizedBox(height: 2.spMin),
-          Text(
-            subtitle,
-            style: TextStyle(fontSize: 12.spMin, color: AppColors.grey),
-          ),
-          SizedBox(height: 12.spMin),
-          child,
-        ],
+      builder: (sheetContext) => Padding(
+        padding: EdgeInsets.fromLTRB(
+          20.spMin,
+          20.spMin,
+          20.spMin,
+          MediaQuery.of(sheetContext).viewInsets.bottom + 20.spMin,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style:
+                  TextStyle(fontSize: 17.spMin, fontWeight: FontWeight.w700),
+            ),
+            SizedBox(height: 2.spMin),
+            Text(
+              subtitle,
+              style: TextStyle(fontSize: 12.spMin, color: AppColors.grey),
+            ),
+            SizedBox(height: 14.spMin),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              textCapitalization: capitalization,
+              decoration: InputDecoration(hintText: hint, counterText: ''),
+            ),
+            SizedBox(height: 14.spMin),
+            SizedBox(
+              height: 48.spMin,
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: FamilyColors.indigo,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14.spMin),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(sheetContext).pop();
+                  onSubmit();
+                },
+                child: Text(
+                  buttonLabel,
+                  style: TextStyle(
+                    fontSize: 15.spMin,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  void _showCreateSheet() {
+    _showFieldSheet(
+      title: 'Name your group',
+      subtitle: 'e.g. Nixon Family, Netball Mums, Site Crew',
+      controller: _nameController,
+      hint: 'Group name',
+      buttonLabel: 'Create a group',
+      onSubmit: _onCreate,
+    );
+  }
+
+  void _showJoinSheet() {
+    _showFieldSheet(
+      title: 'Join with a code',
+      subtitle: 'Got an invite code from your family? Enter it here.',
+      controller: _codeController,
+      hint: 'e.g. ALRT-7F3K2',
+      buttonLabel: 'Join group',
+      capitalization: TextCapitalization.characters,
+      onSubmit: _onJoin,
     );
   }
 
   Future<void> _onCreate() async {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
-      context.showErrorToast(message: 'Give your circle a name first');
+      context.showErrorToast(message: 'Give your group a name first');
       return;
     }
     // ALRT+ moment: HOSTING a circle needs an ALRT+ subscription (1-month free
