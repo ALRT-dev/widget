@@ -9,6 +9,12 @@
 * Server-driven hazard category images.
 * Matches live 1.0.4+34 behaviour: Learn hub toggle and Spanish language option stay hidden.
 * Removed dead code (temp provider, dummy data).
+* V3 alert experience: source-system alert detail (AWS/official/community headers, plain-terms box), map rail (layers, Ask ALRT, locate, list), Map details sheet with per-system toggles, Around You list, Ask ALRT grounded chat, safety profile with For You cards.
+
+
+## v1.0.4+34 - 2026/07/26
+* Learn hub toggle hidden until the content experience is finalised.
+* Spanish language option hidden until full localisation lands.
 
 
 ## v1.0.3+33 - 2026/07/08

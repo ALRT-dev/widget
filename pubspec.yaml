@@ -48,6 +48,7 @@ dependencies:
   flutter_compass: ^0.8.1
   firebase_core: ^4.1.1
   firebase_messaging: ^16.0.2
+  cloud_functions: ^6.0.0
   socket_io_client: ^3.1.2
   carousel_slider: ^5.1.1
   flutter_cache_manager: ^3.4.1
