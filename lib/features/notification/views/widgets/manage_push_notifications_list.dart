@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/notification/providers/manage_notifications_provider.dart';
@@ -139,58 +140,60 @@ class _ManagePushNotificationsListState
               },
             ),
             16.hSizedBox,
+            // The four bands mirror how alerts render on the front screen
+            // (locked hexes; shapes carry the source system there).
             _filterToggleCard(
-              title: 'Emergency',
-              description: 'Immediate threat to life and property',
+              title: 'Critical',
+              description: 'Emergency warnings - immediate danger',
               isEnabled: awsEmergency,
               onToggle: (value) {
                 filterProvider.updateAwsEmergency(value);
               },
-              color: Colors.red,
+              color: AlertCardStyle.bandCritical,
               icon: Icons.warning_rounded,
             ),
             12.hSizedBox,
             _filterToggleCard(
-              title: 'Watch and Act',
-              description: 'Conditions are changing - prepare now',
+              title: 'Action',
+              description: 'Conditions are changing - act now',
               isEnabled: awsWatchAndAct,
               onToggle: (value) {
                 filterProvider.updateAwsWatchAndAct(value);
               },
-              color: Colors.orange,
+              color: AlertCardStyle.bandAction,
               icon: Icons.visibility_rounded,
             ),
             12.hSizedBox,
             _filterToggleCard(
-              title: 'Advice',
-              description: 'Stay informed and monitor conditions',
+              title: 'Monitor',
+              description: 'Stay informed and watch conditions',
               isEnabled: awsAdvice,
               onToggle: (value) {
                 filterProvider.updateAwsAdvice(value);
               },
-              color: Colors.amber,
-              icon: Icons.info_outline_rounded,
+              color: AlertCardStyle.bandMonitor,
+              icon: Icons.visibility_outlined,
             ),
             12.hSizedBox,
             _filterToggleCard(
-              title: 'Official Non-AWS',
-              description: 'Official sources other than AWS',
+              title: 'Info',
+              description: 'Official updates and general information',
               isEnabled: officialNonAws,
               onToggle: (value) {
                 filterProvider.updateOfficialNonAws(value);
               },
-              color: Colors.blue,
-              icon: Icons.account_balance_rounded,
+              color: AlertCardStyle.bandInfo,
+              icon: Icons.info_outline_rounded,
             ),
             12.hSizedBox,
             _filterToggleCard(
-              title: 'User Reported',
-              description: 'Community and user submissions',
+              title: 'Community reports',
+              description: 'Posted by people nearby - unverified',
               isEnabled: isUserReported,
               onToggle: (value) {
                 filterProvider.updateUserReported(value);
               },
-              color: Colors.green,
+              color: const Color(0xFF9C27B0),
               icon: Icons.group_rounded,
             ),
           ],
