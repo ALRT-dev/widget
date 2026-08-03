@@ -17,6 +17,9 @@ on:
   push:
     branches: [claude/safety-alert-repo-audit-8exgvn]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -60,3 +63,13 @@ jobs:
           name: ALRT-android-apk
           path: build/app/outputs/flutter-apk/app-dev-release.apk
           retention-days: 14
+
+      # Publish to a fixed public URL so a QR code can point straight at the
+      # APK: https://github.com/ALRT-dev/widget/releases/download/dev-latest/app-dev-release.apk
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dev-latest
+          name: "[Dev] ALRT — latest Android test build"
+          prerelease: true
+          body: "Scan-to-install test build. Installs alongside the store app as [Dev] ALRT. Not for the Play Store."
+          files: build/app/outputs/flutter-apk/app-dev-release.apk
