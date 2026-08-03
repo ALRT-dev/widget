@@ -11,6 +11,7 @@ import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
+import 'package:hazard_app/features/report/models/report_taxonomy.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_categories_list.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
 import 'package:hazard_app/features/shared/enums/category_image_type.dart';
@@ -18,7 +19,6 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
-import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
@@ -63,6 +63,15 @@ class _CreateUpdateReportScreenState
     extends ConsumerState<CreateUpdateReportScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _descriptionFocusNode = FocusNode();
+
+  /// "What can you see?" — selected observation chip ids (locked taxonomy).
+  final Set<String> _selectedChipIds = {};
+
+  /// "How would you describe it?" — the active wording. Pre-selected from
+  /// the tapped chips until the user picks one themselves.
+  ReportSeverityWording? _pickedWording;
+  bool _wordingTouched = false;
 
   MediaService get _mediaService => ref.read(providerOfMediaService);
 
@@ -148,6 +157,8 @@ class _CreateUpdateReportScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _emergencyBannerBuilder(),
+          16.hSizedBox,
           _sectionTitleBuilder(
             title: 'Select Category',
             isRequired: true,
@@ -155,14 +166,6 @@ class _CreateUpdateReportScreenState
           ),
           10.hSizedBox,
           _categoriesBuilder(),
-          10.hSizedBox,
-          Text(
-            'Tapping what you can see helps neighbours act faster.',
-            style: TextStyle(
-              fontSize: 12.spMin,
-              color: _sectionLabelColor,
-            ),
-          ),
           Consumer(
             builder: (context, ref, child) {
               final hasSelectedCategory = ref.watch(
@@ -176,17 +179,213 @@ class _CreateUpdateReportScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 24.spMin,
                 children: [
-                  _headlinePreviewBuilder(),
                   _locationBuilder(),
-                  // _titleBuilder(),
+                  _chipsBuilder(),
+                  _severityWordingBuilder(),
                   _descriptionBuilder(),
                   _mediaBuilder(),
-                  _submitButtonBuilder().pT(10.0),
+                  _headlinePreviewBuilder(),
+                  _submitButtonBuilder(),
                 ],
               ).pT(24.0);
             },
           ),
         ],
+      ),
+    );
+  }
+
+  /// The locked V3 emergency line — always the first thing on the form.
+  Widget _emergencyBannerBuilder() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.red.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12.spMin),
+        border: Border.all(color: AppColors.red.withValues(alpha: 0.25)),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 10.spMin),
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: 'Emergency? Call Triple Zero (000) first. ',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+            TextSpan(text: 'Report only what you can see safely.'),
+          ],
+        ),
+        style: TextStyle(
+          fontSize: 12.5.spMin,
+          color: AppColors.red,
+          fontFamily: AppTheme.defaultFontFamily,
+        ),
+      ),
+    );
+  }
+
+  /// "What can you see?" — observation chips, never a diagnosis. Multi-tap;
+  /// "Something else" focuses the details field instead of adding data.
+  Widget _chipsBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final categoryName = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.hazardToCreateOrUpdate.category?.name,
+          ),
+        );
+        final chips = chipsForCategoryName(categoryName);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _sectionTitleBuilder(title: 'What can you see?'),
+            4.hSizedBox,
+            Text(
+              'Tap any — this is an observation, not a diagnosis.',
+              style: TextStyle(fontSize: 12.spMin, color: _sectionLabelColor),
+            ),
+            10.hSizedBox,
+            Wrap(
+              spacing: 8.spMin,
+              runSpacing: 8.spMin,
+              children: [
+                for (final chip in chips) _chipItemBuilder(chip),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _chipItemBuilder(final ReportChip chip) {
+    final isSelected = _selectedChipIds.contains(chip.id);
+
+    return GestureDetector(
+      onTap: () => _handleChipTap(chip),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 8.spMin),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? _sectionLabelColor.withValues(alpha: 0.12)
+              : AppColors.white,
+          borderRadius: BorderRadius.circular(18.spMin),
+          border: Border.all(
+            color: isSelected ? _sectionLabelColor : AppColors.lightGrey,
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Text(
+          chip.label,
+          style: TextStyle(
+            fontSize: 13.spMin,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected ? _sectionLabelColor : AppColors.black,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleChipTap(final ReportChip chip) {
+    setState(() {
+      if (_selectedChipIds.contains(chip.id)) {
+        _selectedChipIds.remove(chip.id);
+      } else {
+        _selectedChipIds.add(chip.id);
+      }
+      if (!_wordingTouched) _pickedWording = _preselectedWording();
+    });
+
+    // "Something else" asks for words instead of adding taxonomy data.
+    if (chip.isOther && _selectedChipIds.contains(chip.id)) {
+      _descriptionFocusNode.requestFocus();
+    }
+  }
+
+  /// Highest severityDefault across the selected chips (spec A.3), or null
+  /// when nothing selected — then no wording is highlighted.
+  ReportSeverityWording? _preselectedWording() {
+    final categoryName = ref
+        .read(providerOfCreateReport)
+        .hazardToCreateOrUpdate
+        .category
+        ?.name;
+    int? maxDefault;
+    for (final chip in chipsForCategoryName(categoryName)) {
+      if (!_selectedChipIds.contains(chip.id)) continue;
+      final d = chip.severityDefault;
+      if (d != null && (maxDefault == null || d > maxDefault)) maxDefault = d;
+    }
+    return ReportSeverityWording.fromDefault(maxDefault);
+  }
+
+  /// "How would you describe it?" — severity is declared by the reporter,
+  /// pre-selected from the chips, never imposed.
+  Widget _severityWordingBuilder() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitleBuilder(title: 'How would you describe it?'),
+        4.hSizedBox,
+        Text(
+          'Auto-set from what you picked — tap to change.',
+          style: TextStyle(fontSize: 12.spMin, color: _sectionLabelColor),
+        ),
+        10.hSizedBox,
+        Row(
+          spacing: 8.spMin,
+          children: [
+            for (final wording in ReportSeverityWording.values)
+              Expanded(child: _wordingItemBuilder(wording)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _wordingItemBuilder(final ReportSeverityWording wording) {
+    final isSelected = _pickedWording == wording;
+
+    return GestureDetector(
+      onTap: () => setState(() {
+        _wordingTouched = true;
+        _pickedWording = isSelected ? null : wording;
+      }),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.spMin, vertical: 10.spMin),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? _sectionLabelColor.withValues(alpha: 0.12)
+              : AppColors.white,
+          borderRadius: BorderRadius.circular(14.spMin),
+          border: Border.all(
+            color: isSelected ? _sectionLabelColor : AppColors.lightGrey,
+            width: isSelected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(
+              wording.label,
+              style: TextStyle(
+                fontSize: 13.spMin,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? _sectionLabelColor : AppColors.black,
+              ),
+            ),
+            2.hSizedBox,
+            Text(
+              wording.sub,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 10.5.spMin,
+                color: AppColors.mediumGrey,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -528,8 +727,6 @@ class _CreateUpdateReportScreenState
             textAlign: TextAlign.center,
           ),
           20.hSizedBox,
-          _xpPointsBuilder(),
-          12.hSizedBox,
           _submitAnotherButtonBuilder(),
           12.hSizedBox,
           _seeActiveReportsButtonBuilder(),
@@ -594,6 +791,7 @@ class _CreateUpdateReportScreenState
   Widget _inputBuilder({
     required final String hintText,
     final TextEditingController? controller,
+    final FocusNode? focusNode,
     final String? value,
     final int? maxLines,
     final int? minLines,
@@ -621,6 +819,7 @@ class _CreateUpdateReportScreenState
       textCapitalization: textCapitalization,
       keyboardType: keyboardType,
       controller: controller ?? TextEditingController(text: value),
+      focusNode: focusNode,
       style: TextStyle(
         color: AppColors.black,
         fontWeight: FontWeight.w600,
@@ -685,11 +884,62 @@ class _CreateUpdateReportScreenState
                 (value) => value.hazardToCreateOrUpdate.locationName,
               ),
             );
-            return _inputBuilder(
-              hintText: 'Where is it happening?',
-              value: locationName,
-              enabled: false,
-              onPressed: _gotoSelectLocationScreen,
+            return GestureDetector(
+              onTap: _gotoSelectLocationScreen,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(16.spMin),
+                  border: Border.all(color: AppColors.lightGrey),
+                ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 15.spMin,
+                  vertical: 12.spMin,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      LucideIcons.mapPin,
+                      size: 18.spMin,
+                      color: _sectionLabelColor,
+                    ),
+                    SizedBox(width: 10.spMin),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            locationName ?? 'Finding your location…',
+                            style: TextStyle(
+                              fontSize: 14.spMin,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          2.hSizedBox,
+                          Text(
+                            locationName == null
+                                ? 'Tap to set it manually'
+                                : 'Your current location · auto-filled',
+                            style: TextStyle(
+                              fontSize: 11.5.spMin,
+                              color: AppColors.mediumGrey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      'Adjust',
+                      style: TextStyle(
+                        fontSize: 13.spMin,
+                        fontWeight: FontWeight.w700,
+                        color: _sectionLabelColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
           },
         ),
@@ -712,9 +962,10 @@ class _CreateUpdateReportScreenState
         );
         if (categoryName == null) return const SizedBox.shrink();
 
-        final headline = locationName == null
-            ? '$categoryName report'
-            : '$categoryName report - $locationName';
+        final headline = _assembleHeadline(
+          categoryName: categoryName,
+          locationName: locationName,
+        );
 
         return Container(
           width: double.infinity,
@@ -755,22 +1006,60 @@ class _CreateUpdateReportScreenState
     );
   }
 
+  /// Headline fallback ladder (locked spec A.4), first match wins:
+  /// chips → chip fragment; details → first sentence to 60 chars;
+  /// otherwise "{category} report — {suburb}".
+  String _assembleHeadline({
+    required final String categoryName,
+    required final String? locationName,
+  }) {
+    final suffix = locationName == null ? '' : ' — $locationName';
+
+    final selectedChips = chipsForCategoryName(categoryName)
+        .where((c) => _selectedChipIds.contains(c.id) && !c.isOther)
+        .toList();
+    if (selectedChips.isNotEmpty) {
+      selectedChips.sort(
+        (a, b) => (b.severityDefault ?? -1).compareTo(a.severityDefault ?? -1),
+      );
+      return '${selectedChips.first.headline}$suffix';
+    }
+
+    final details = _descriptionController.text.trim();
+    if (details.isNotEmpty) {
+      var sentence = details.split(RegExp(r'[.\n!?]')).first.trim();
+      if (sentence.length > 60) sentence = '${sentence.substring(0, 57)}…';
+      if (sentence.isNotEmpty) return '$sentence$suffix';
+    }
+
+    return '$categoryName report$suffix';
+  }
+
   Widget _descriptionBuilder() {
+    final hasOtherChip = _selectedChipIds.any((id) => id.endsWith('_other'));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10.spMin,
       children: [
         _sectionTitleBuilder(title: 'Add details'),
         _inputBuilder(
-          hintText: 'Water over both lanes near the bridge...',
+          hintText: hasOtherChip
+              ? 'Tell us what you can see…'
+              : 'Water over both lanes near the bridge...',
           controller: _descriptionController,
+          focusNode: _descriptionFocusNode,
           minLines: 5,
           maxLines: 10,
           textCapitalization: TextCapitalization.sentences,
           keyboardType: TextInputType.multiline,
           contentPadding: EdgeInsets.all(15.spMin),
           borderRadius: 16.0,
-          onChanged: (value) => _updateDescription(value.trim()),
+          onChanged: (value) {
+            _updateDescription(value.trim());
+            // The headline ladder can depend on the details text.
+            setState(() {});
+          },
         ),
       ],
     );
@@ -901,111 +1190,6 @@ class _CreateUpdateReportScreenState
               ),
             ),
           ],
-        );
-      },
-    );
-  }
-
-  Widget _xpPointsBuilder() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final xpPointsAfterSubmission = ref.watch(
-          providerOfLoggedInUser.select(
-            (value) => (value?.xpPoints ?? 0) + 10,
-          ),
-        );
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16.spMin),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColorLight,
-                blurRadius: 6.0,
-                offset: const Offset(0.0, 0.0),
-              ),
-            ],
-          ),
-          padding: EdgeInsets.all(16.spMin),
-          child: Row(
-            spacing: 14.spMin,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.spMin),
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.orange300,
-                      AppColors.red200,
-                    ],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadowColor,
-                      blurRadius: 10.0,
-                      offset: Offset(0, 0.0),
-                    ),
-                  ],
-                ),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 12.spMin,
-                  vertical: 7.spMin,
-                ),
-                child: Row(
-                  spacing: 5.spMin,
-                  children: [
-                    Icon(
-                      LucideIcons.star,
-                      size: 16.spMin,
-                      color: AppColors.white,
-                    ),
-                    Text(
-                      '+10',
-                      style: TextStyle(
-                        fontSize: 16.spMin,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Points pending approval',
-                      style: TextStyle(
-                        fontSize: 12.spMin,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          'Your total: ',
-                          style: TextStyle(
-                            fontSize: 12.spMin,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.grey.withValues(alpha: 0.6),
-                          ),
-                        ),
-                        Text(
-                          '$xpPointsAfterSubmission',
-                          style: TextStyle(
-                            fontSize: 14.spMin,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.orange,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         );
       },
     );
@@ -1237,7 +1421,47 @@ class _CreateUpdateReportScreenState
     context.unfocusInputs();
     _titleController.clear();
     _descriptionController.clear();
+    setState(() {
+      _selectedChipIds.clear();
+      _pickedWording = null;
+      _wordingTouched = false;
+    });
     ref.read(providerOfCreateReport.notifier).resetAllFields();
+  }
+
+  /// Folds the tap-first taxonomy into the report payload right before
+  /// submitting: declared severity, the assembled headline as the title,
+  /// and the chip labels prefixed to the details so reviewers and
+  /// corroborators see exactly what was tapped.
+  void _applyTaxonomyToReport() {
+    final notifier = ref.read(providerOfCreateReport.notifier);
+    final hazard = ref.read(providerOfCreateReport).hazardToCreateOrUpdate;
+    final categoryName = hazard.category?.name;
+    if (categoryName == null) return;
+
+    if (_pickedWording != null) {
+      notifier.updateSeverity(_pickedWording!.severity);
+    }
+
+    notifier.updateTitle(
+      _assembleHeadline(
+        categoryName: categoryName,
+        locationName: hazard.locationName,
+      ),
+    );
+
+    final chipLabels = chipsForCategoryName(categoryName)
+        .where((c) => _selectedChipIds.contains(c.id) && !c.isOther)
+        .map((c) => c.label)
+        .toList();
+    if (chipLabels.isNotEmpty) {
+      final details = _descriptionController.text.trim();
+      notifier.updateDescription(
+        details.isEmpty
+            ? 'Seen: ${chipLabels.join(', ')}.'
+            : 'Seen: ${chipLabels.join(', ')}.\n$details',
+      );
+    }
   }
 
   /// Handles the submission of the report.
@@ -1260,6 +1484,7 @@ class _CreateUpdateReportScreenState
         },
       );
     } else {
+      _applyTaxonomyToReport();
       ref.read(providerOfCreateReport.notifier).createOrUpdateReport();
       _clearAll();
     }
