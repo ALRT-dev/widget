@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/subscription/services/revenuecat_service.dart';
@@ -12,6 +13,10 @@ final providerOfRevenueCat = Provider<RevenueCatService>(
 final providerOfAlrtPlus = FutureProvider.autoDispose<bool>((ref) async {
   final userId = ref.watch(providerOfLoggedInUser)?.id;
   if (userId == null) return false;
+  // Test-build escape hatch: sideloaded QA builds can't complete store
+  // purchases, so CI sets ALRT_PLUS_TEST_UNLOCK=true in .env to open the
+  // ALRT+ gates. Never set in store builds.
+  if (dotenv.env['ALRT_PLUS_TEST_UNLOCK'] == 'true') return true;
   final rc = ref.watch(providerOfRevenueCat);
   await rc.ensureConfigured(userId);
   return rc.isPlus();

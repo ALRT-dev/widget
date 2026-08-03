@@ -48,6 +48,7 @@ jobs:
             echo "REVENUECAT_API_KEY_APPLE=${{ secrets.REVENUECAT_API_KEY_APPLE }}"
             echo "REVENUECAT_API_KEY_GOOGLE=${{ secrets.REVENUECAT_API_KEY_GOOGLE }}"
             echo "DEV_BASE_URL=https://api.safetyalrt.com"
+            echo "ALRT_PLUS_TEST_UNLOCK=true"
           } > .env
 
       - run: flutter pub get
