@@ -7,6 +7,7 @@ import 'package:hazard_app/features/family/views/widgets/family_safe_strip.dart'
 import 'package:hazard_app/features/learn/views/widgets/guide_strip_card.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
+import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/video_priority_types.dart';

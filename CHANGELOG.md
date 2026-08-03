@@ -7,7 +7,7 @@
 * Email + password sign-in / sign-up.
 * Server-driven hazard category images.
 * Matches live 1.0.4+34 behaviour: Learn hub toggle and Spanish language option stay hidden.
-* Removed dead code (temp provider, dummy data, unused AI-confidence enum).
+* Removed dead code (temp provider, dummy data).
 
 
 ## v1.0.3+33 - 2026/07/08
