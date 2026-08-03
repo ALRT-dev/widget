@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 
 /// Bundled quick-report taxonomy (locked spec: chips are observations, not
@@ -165,4 +167,28 @@ List<ReportChip> chipsForCategoryName(final String? categoryName) {
     return _utilityChips;
   }
   return _defaultChips;
+}
+
+
+/// The locked category dot colours (icon sheet). Used when the server
+/// category carries no colour of its own.
+Color fallbackCategoryColorFor(final String? categoryName) {
+  final name = categoryName?.toLowerCase() ?? '';
+  if (name.contains('weather') || name.contains('environment')) {
+    return const Color(0xFF4DA8FF);
+  }
+  if (name.contains('health') || name.contains('air')) {
+    return const Color(0xFFFF8C42);
+  }
+  if (name.contains('security') || name.contains('crime')) {
+    return const Color(0xFFFF4757);
+  }
+  if (name.contains('traffic') || name.contains('transport')) {
+    return const Color(0xFF00B383);
+  }
+  if (name.contains('utilit')) return const Color(0xFFF5A623);
+  if (name.contains('community') || name.contains('info')) {
+    return const Color(0xFF9C27B0);
+  }
+  return const Color(0xFF8B6F47);
 }

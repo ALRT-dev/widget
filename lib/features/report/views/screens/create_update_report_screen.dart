@@ -11,10 +11,10 @@ import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
+import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/report/models/report_taxonomy.dart';
-import 'package:hazard_app/features/report/views/widgets/create_report_categories_list.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
-import 'package:hazard_app/features/shared/enums/category_image_type.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -22,7 +22,6 @@ import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
-import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
 import 'package:hazard_app/features/shared/views/widgets/dotted_border_container.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -398,101 +397,115 @@ class _CreateUpdateReportScreenState
     );
   }
 
+  /// Compact category pills (V3.1 mock): coloured dot + name, everything
+  /// on one page, no descriptions — the observation chips below act as
+  /// the examples.
   Widget _categoriesBuilder() {
     return Consumer(
       builder: (context, ref, child) {
-        final showCategoriesSelector = ref.watch(
+        final getCategoriesState = ref.watch(
           providerOfCreateReport.select(
-            (value) => value.showCategoriesSelector,
+            (value) => value.getCategoriesToSelectState,
           ),
         );
-        final selectedCategory = ref.watch(
+        final categories = ref.watch(
           providerOfCreateReport.select(
-            (value) => value.hazardToCreateOrUpdate.category,
+            (value) => value.categoriesToSelect,
           ),
         );
-        if (showCategoriesSelector || selectedCategory == null) {
-          return CreateReportCategoriesList(
-            onCategorySelected: (_) => _updateShowCategoriesSelector(false),
+        final selectedCategoryId = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.hazardToCreateOrUpdate.category?.id,
+          ),
+        );
+
+        if (categories.isEmpty) {
+          return getCategoriesState.maybeWhen(
+            loading: () => Text(
+              'Loading categories…',
+              style: TextStyle(fontSize: 12.spMin, color: AppColors.grey),
+            ),
+            error: (error) => Text(
+              'Could not load categories. Please try again.',
+              style: TextStyle(fontSize: 12.spMin, color: AppColors.grey),
+            ),
+            orElse: () => const SizedBox.shrink(),
           );
         }
 
-        final categoryColor = selectedCategory.color ?? AppColors.orange;
-        final categoryImage = selectedCategory.categoryImageByType(
-          CategoryImageType.user,
-        );
-
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(20.spMin),
-            boxShadow: [
-              BoxShadow(
-                color: categoryColor.withValues(alpha: 0.4),
-                blurRadius: 6.0,
-                offset: Offset(0.0, 0.0),
+        return Wrap(
+          spacing: 8.spMin,
+          runSpacing: 8.spMin,
+          children: [
+            for (final category in categories)
+              _categoryPillBuilder(
+                category: category,
+                isSelected: category.id == selectedCategoryId,
               ),
-            ],
-            border: Border.all(
-              color: categoryColor,
-              width: 1.5,
-            ),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(18.spMin),
-            ),
-            padding: EdgeInsets.all(15.spMin),
-            child: Row(
-              children: [
-                AppCachedNetworkImage(
-                  imageUrl: categoryImage?.url ?? '',
-                  cacheKey: categoryImage?.s3Key,
-                  width: 50.spMin,
-                  height: 50.spMin,
-                  fit: BoxFit.contain,
-                ),
-                12.wSizedBox,
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        selectedCategory.name ?? 'Unnamed Category',
-                        style: TextStyle(
-                          fontSize: 16.spMin,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.extraLightGrey,
-                    borderRadius: BorderRadius.circular(10.spMin),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 10.spMin,
-                    vertical: 5.spMin,
-                  ),
-                  child: Text(
-                    'Change',
-                    style: TextStyle(
-                      fontSize: 12.spMin,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.orange,
-                    ),
-                  ),
-                ).onPressed(() => _updateShowCategoriesSelector(true)),
-              ],
-            ),
-          ),
+          ],
         );
       },
     );
+  }
+
+  Widget _categoryPillBuilder({
+    required final HazardCategory category,
+    required final bool isSelected,
+  }) {
+    final dotColor =
+        category.color ?? fallbackCategoryColorFor(category.name);
+
+    return GestureDetector(
+      onTap: () => _handleCategoryTap(category),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 9.spMin),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? dotColor.withValues(alpha: 0.1)
+              : AppColors.white,
+          borderRadius: BorderRadius.circular(20.spMin),
+          border: Border.all(
+            color: isSelected ? dotColor : AppColors.white,
+            width: 1.5,
+          ),
+          boxShadow: const [
+            BoxShadow(color: AppColors.shadowColorLight, blurRadius: 4.0),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 8.spMin,
+              height: 8.spMin,
+              decoration: BoxDecoration(
+                color: dotColor,
+                shape: BoxShape.circle,
+              ),
+            ),
+            SizedBox(width: 7.spMin),
+            Text(
+              category.name ?? 'Category',
+              style: TextStyle(
+                fontSize: 13.spMin,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? dotColor : AppColors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleCategoryTap(final HazardCategory category) {
+    ref.read(providerOfCreateReport.notifier).updateCategory(category);
+    // The observation chips are per-category: a switch clears them and any
+    // wording they pre-selected.
+    setState(() {
+      _selectedChipIds.clear();
+      if (!_wordingTouched) _pickedWording = null;
+    });
   }
 
   Widget _submittedAppbarTitleBuilder() {
@@ -1535,10 +1548,4 @@ class _CreateUpdateReportScreenState
     );
   }
 
-  /// Updates the show categories selector in the state.
-  void _updateShowCategoriesSelector(final bool showCategoriesSelector) {
-    ref
-        .read(providerOfCreateReport.notifier)
-        .updateShowCategoriesSelector(showCategoriesSelector);
-  }
 }
