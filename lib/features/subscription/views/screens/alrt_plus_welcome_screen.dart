@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
 import 'package:hazard_app/features/subscription/views/widgets/alrt_plus_style.dart';
 
 /// Shown once, right after an ALRT+ purchase: celebrate briefly, show the
 /// open seats, and push the single highest-value action — inviting family.
-class AlrtPlusWelcomeScreen extends StatelessWidget {
+class AlrtPlusWelcomeScreen extends ConsumerWidget {
   const AlrtPlusWelcomeScreen({super.key});
 
   static const route = '/alrt-plus/welcome';
@@ -13,7 +15,7 @@ class AlrtPlusWelcomeScreen extends StatelessWidget {
   static const _totalSeats = 8;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AlrtPlusStyle.body,
       body: Column(
@@ -22,7 +24,14 @@ class AlrtPlusWelcomeScreen extends StatelessWidget {
           Expanded(
             child: SafeArea(
               top: false,
-              child: Padding(
+              child: LayoutBuilder(
+                builder: (context, constraints) => SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Padding(
                 padding: EdgeInsets.fromLTRB(18.spMin, 16.spMin, 18.spMin, 18.spMin),
                 child: Column(
                   children: [
@@ -59,7 +68,12 @@ class AlrtPlusWelcomeScreen extends StatelessWidget {
                     const Spacer(),
                     AlrtPlusCta(
                       label: 'Invite your family',
-                      onPressed: () => context.pop(true),
+                      onPressed: () {
+                        ref
+                            .read(providerOfPendingFamilyInvite.notifier)
+                            .state = true;
+                        context.pop(true);
+                      },
                     ),
                     SizedBox(height: 11.spMin),
                     TextButton(
@@ -74,6 +88,10 @@ class AlrtPlusWelcomeScreen extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+                    ),
+                  ),
                 ),
               ),
             ),

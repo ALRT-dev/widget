@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
-import 'package:hazard_app/features/subscription/views/screens/alrt_plus_manage_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
 import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
+import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
+import 'package:hazard_app/features/subscription/views/screens/alrt_plus_manage_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/support_request_screen.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
@@ -415,7 +415,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           child: Column(
             children: [
-              if (ref.watch(providerOfAlrtPlus).valueOrNull == true)
+              if (ref.watch(providerOfAlrtPlus).value == true)
                 _buildAccountSettingsItem(
                   title: 'Your ALRT+',
                   subtitle: 'Plan, seats and billing',

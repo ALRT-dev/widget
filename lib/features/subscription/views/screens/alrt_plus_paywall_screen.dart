@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
 import 'package:hazard_app/features/subscription/views/screens/alrt_plus_welcome_screen.dart';
 import 'package:hazard_app/features/subscription/views/widgets/alrt_plus_style.dart';
@@ -52,7 +53,10 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
   Future<void> _finishEntitled() async {
     ref.invalidate(providerOfAlrtPlus);
     if (!mounted) return;
-    await context.push(AlrtPlusWelcomeScreen.route);
+    // The welcome moment is for new hosts; a plan change from an existing
+    // circle skips straight back.
+    final hasCircle = ref.read(providerOfFamily).circle != null;
+    if (!hasCircle) await context.push(AlrtPlusWelcomeScreen.route);
     if (mounted) Navigator.of(context).pop(true);
   }
 

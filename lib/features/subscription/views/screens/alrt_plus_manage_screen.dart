@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/screens/family_invite_screen.dart';
+import 'package:hazard_app/features/home/views/screens/home_screen.dart';
 import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
 import 'package:hazard_app/features/subscription/views/screens/alrt_plus_paywall_screen.dart';
 import 'package:hazard_app/features/subscription/views/widgets/alrt_plus_style.dart';
@@ -61,7 +62,19 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
       }
       return;
     }
-    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Manage your subscription in your app store account settings.',
+            ),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -81,8 +94,10 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
                 SizedBox(height: 8.spMin),
                 _seatCardBuilder(circle),
                 SizedBox(height: 10.spMin),
-                if (circle != null) _membersCardBuilder(circle),
-                SizedBox(height: 10.spMin),
+                if (circle != null) ...[
+                  _membersCardBuilder(circle),
+                  SizedBox(height: 10.spMin),
+                ],
                 _actionsCardBuilder(circle),
                 SizedBox(height: 18.spMin),
                 Text(
@@ -117,7 +132,8 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           IconButton(
-            onPressed: () => context.pop(),
+            onPressed: () =>
+                context.canPop() ? context.pop() : context.go(HomeScreen.route),
             icon: Icon(
               LucideIcons.arrowLeft,
               color: Colors.white,
@@ -204,12 +220,15 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
     return parts.isEmpty ? 'ALRT + is active on this account' : parts.join(' · ');
   }
 
+  int _seatTotalOf(final FamilyCircle? circle) =>
+      circle?.maxMembers ?? AlrtPlusManageScreen.totalSeats;
+
   Widget _sectionLabelBuilder(final FamilyCircle? circle) {
     final used = circle?.members.length ?? 1;
     return Padding(
       padding: EdgeInsets.only(left: 4.spMin),
       child: Text(
-        'SEATS · $used OF ${AlrtPlusManageScreen.totalSeats} USED',
+        'SEATS · $used OF ${_seatTotalOf(circle)} USED',
         style: TextStyle(
           fontSize: 10.5.spMin,
           fontWeight: FontWeight.w700,
@@ -222,6 +241,8 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
 
   Widget _seatCardBuilder(final FamilyCircle? circle) {
     final used = circle?.members.length ?? 1;
+    final total = _seatTotalOf(circle);
+    final free = (total - used).clamp(0, total);
     return _cardBuilder(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +260,7 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
                 ),
               ),
               Text(
-                '$used used · ${AlrtPlusManageScreen.totalSeats - used} free',
+                '$used used · $free free',
                 style: TextStyle(
                   fontSize: 11.spMin,
                   color: AlrtPlusStyle.inkSoft,
@@ -249,7 +270,7 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
           ),
           SizedBox(height: 9.spMin),
           Row(
-            children: List.generate(AlrtPlusManageScreen.totalSeats, (index) {
+            children: List.generate(total, (index) {
               final Gradient? gradient;
               if (index == 0) {
                 gradient = AlrtPlusStyle.ctaGradient;
@@ -262,9 +283,7 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
                 child: Container(
                   height: 7.spMin,
                   margin: EdgeInsets.only(
-                    right: index == AlrtPlusManageScreen.totalSeats - 1
-                        ? 0
-                        : 4.spMin,
+                    right: index == total - 1 ? 0 : 4.spMin,
                   ),
                   decoration: BoxDecoration(
                     gradient: gradient,

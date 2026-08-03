@@ -14,7 +14,7 @@ class BillingIssueBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final hasIssue = ref.watch(providerOfAlrtPlusBillingIssue).valueOrNull;
+    final hasIssue = ref.watch(providerOfAlrtPlusBillingIssue).value;
     if (hasIssue != true) return const SizedBox.shrink();
 
     return Container(
@@ -123,6 +123,18 @@ class BillingIssueBanner extends ConsumerWidget {
       }
       return;
     }
-    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    try {
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Update your payment method in your app store account settings.',
+            ),
+          ),
+        );
+      }
+    }
   }
 }

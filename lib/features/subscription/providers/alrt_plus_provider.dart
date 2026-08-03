@@ -35,3 +35,7 @@ final providerOfAlrtPlusBillingIssue = FutureProvider.autoDispose<bool>((
   final entitlement = await rc.plusEntitlement();
   return entitlement?.billingIssueDetectedAt != null;
 });
+
+/// One-shot intent: set by the welcome screen's "Invite your family" CTA,
+/// consumed by the family onboarding after the circle is created.
+final providerOfPendingFamilyInvite = StateProvider<bool>((ref) => false);

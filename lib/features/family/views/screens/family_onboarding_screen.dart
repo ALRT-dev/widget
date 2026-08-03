@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/screens/family_invite_screen.dart';
 import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
 import 'package:hazard_app/features/subscription/views/screens/alrt_plus_paywall_screen.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -267,6 +268,14 @@ class _FamilyOnboardingScreenState
     ) {
       if (prev != next && next.isError && next.error != null) {
         context.showErrorToast(message: next.error!.message);
+      }
+      // Honour the welcome screen's "Invite your family" intent once the
+      // circle actually exists.
+      if (prev != next &&
+          next.isSuccess &&
+          ref.read(providerOfPendingFamilyInvite)) {
+        ref.read(providerOfPendingFamilyInvite.notifier).state = false;
+        context.push(FamilyInviteScreen.route);
       }
     });
     ref.listen(providerOfFamily.select((s) => s.joinCircleState), (
