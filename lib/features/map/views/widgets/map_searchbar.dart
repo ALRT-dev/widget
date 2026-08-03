@@ -6,7 +6,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/map/providers/map_search_text_editing_controller_provider.dart';
+import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
+import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/places_search_results_menu_content.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -103,6 +106,7 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
                               TextSelection.collapsed(offset: text.length);
                           _handleSearchChanged(text);
                         },
+                        onReportTranscript: _handleReportDictation,
                       )
                     else
                       IconButton(
@@ -127,6 +131,13 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
         );
       },
     );
+  }
+
+  /// Spoken hazard descriptions skip search: they land in Post an ALRT
+  /// with the words already in the details field.
+  void _handleReportDictation(final String transcript) {
+    ref.read(providerOfCreateReport.notifier).updateDescription(transcript);
+    context.push(CreateUpdateReportScreen.createRoute);
   }
 
   /// Handles changes in the search input field with a debounce.

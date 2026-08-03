@@ -12,10 +12,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// text back via [onTranscript]. If recognition is unavailable or the user
 /// declines the microphone, the mic quietly hides itself — typing still works.
 class VoiceSearchMicButton extends ConsumerStatefulWidget {
-  const VoiceSearchMicButton({super.key, required this.onTranscript});
+  const VoiceSearchMicButton({
+    super.key,
+    required this.onTranscript,
+    this.onReportTranscript,
+  });
 
   /// Called with the recognised text once the speaker stops.
   final void Function(String transcript) onTranscript;
+
+  /// When provided, the listening sheet detects intent live: words that
+  /// sound like a hazard report land here instead of [onTranscript], and
+  /// the sheet labels where the dictation is headed while speaking.
+  final void Function(String transcript)? onReportTranscript;
 
   static const _kPrimedKey = 'voice_priming_shown';
 
@@ -51,9 +60,20 @@ class _VoiceSearchMicButtonState extends ConsumerState<VoiceSearchMicButton> {
       }
 
       if (!mounted) return;
-      final text = await VoiceListeningSheet.show(context, controller);
-      if (text != null && text.trim().isNotEmpty) {
-        widget.onTranscript(text.trim());
+      if (widget.onReportTranscript == null) {
+        final text = await VoiceListeningSheet.show(context, controller);
+        if (text != null && text.trim().isNotEmpty) {
+          widget.onTranscript(text.trim());
+        }
+      } else {
+        final dictation = await VoiceListeningSheet.showForIntent(
+          context,
+          controller,
+        );
+        if (dictation == null) return;
+        dictation.intent == VoiceIntent.report
+            ? widget.onReportTranscript!(dictation.text)
+            : widget.onTranscript(dictation.text);
       }
     } finally {
       _busy = false;

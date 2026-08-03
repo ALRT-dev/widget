@@ -5,6 +5,7 @@ import 'package:hazard_app/features/ask_alrt/models/ask_alrt_message.dart';
 import 'package:hazard_app/features/ask_alrt/providers/ask_alrt_provider.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
+import 'package:hazard_app/features/shared/views/widgets/voice/voice_search_mic_button.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Opens the Ask ALRT assistant as a dark bottom sheet.
@@ -277,6 +278,12 @@ class _AskAlrtSheetState extends ConsumerState<AskAlrtSheet> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          VoiceSearchMicButton(
+            onTranscript: (text) {
+              // Spoken questions go straight to Ask ALRT.
+              _send(text);
+            },
+          ),
           Expanded(
             child: TextField(
               controller: _inputController,

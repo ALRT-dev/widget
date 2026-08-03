@@ -6,6 +6,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hazard_app/features/map/models/google_place_model.dart';
 import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/places_search_results_menu_content.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
+import 'package:hazard_app/features/report/views/screens/create_update_report_screen.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
@@ -152,6 +155,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
                               TextSelection.collapsed(offset: text.length);
                           _handleSearchChanged(text);
                         },
+                        onReportTranscript: _handleReportDictation,
                       )
                     else
                       IconButton(
@@ -178,6 +182,13 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
     );
   }
 
+
+  /// Spoken hazard descriptions skip search: they land in Post an ALRT
+  /// with the words already in the details field.
+  void _handleReportDictation(final String transcript) {
+    ref.read(providerOfCreateReport.notifier).updateDescription(transcript);
+    context.push(CreateUpdateReportScreen.createRoute);
+  }
   /// Updates the state with the given search string.
   void _handleSearchChanged(String value) {
     if (value.trim().isEmpty) {

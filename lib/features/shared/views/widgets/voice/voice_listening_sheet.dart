@@ -8,10 +8,24 @@ import 'package:speech_to_text/speech_to_text.dart';
 /// The dark "listening" sheet: a live waveform, the running transcript and the
 /// on-device privacy promise. Starts listening on open and pops with the
 /// recognised text the moment the speaker stops (or null if cancelled/empty).
+/// What a finished dictation is for: searching a place or posting an ALRT.
+enum VoiceIntent { search, report }
+
+/// A finished dictation plus the detected intent.
+typedef VoiceDictation = ({String text, VoiceIntent intent});
+
 class VoiceListeningSheet extends StatefulWidget {
-  const VoiceListeningSheet({super.key, required this.controller});
+  const VoiceListeningSheet({
+    super.key,
+    required this.controller,
+    this.detectIntent = false,
+  });
 
   final VoiceInputController controller;
+
+  /// When true the sheet shows a live "→ Search locations" /
+  /// "→ Post an ALRT" line while speaking and returns the detected intent.
+  final bool detectIntent;
 
   static Future<String?> show(
     BuildContext context,
@@ -25,6 +39,58 @@ class VoiceListeningSheet extends StatefulWidget {
       enableDrag: false,
       builder: (_) => VoiceListeningSheet(controller: controller),
     );
+  }
+
+  /// Same sheet, but the caller also learns whether the words sounded like
+  /// something to search for or something to report.
+  static Future<VoiceDictation?> showForIntent(
+    BuildContext context,
+    VoiceInputController controller,
+  ) async {
+    final text = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: false,
+      enableDrag: false,
+      builder: (_) =>
+          VoiceListeningSheet(controller: controller, detectIntent: true),
+    );
+    if (text == null || text.trim().isEmpty) return null;
+    return (text: text.trim(), intent: detectIntentOf(text));
+  }
+
+  /// Lightweight on-device heuristic. Search phrasing wins outright
+  /// ("find", "where is", "take me to"); otherwise first-person hazard
+  /// phrasing and hazard nouns read as a report.
+  static VoiceIntent detectIntentOf(final String transcript) {
+    final t = ' ${transcript.toLowerCase().trim()} ';
+
+    const searchStarts = [
+      'search', 'find', 'where', 'show me', 'take me', 'navigate',
+      'directions', 'go to', 'look up',
+    ];
+    for (final phrase in searchStarts) {
+      if (t.trimLeft().startsWith(phrase)) return VoiceIntent.search;
+    }
+
+    const reportPhrases = [
+      'report', "there's a", 'there is a', 'i can see', 'i see ',
+      'i want to report', 'happening on', 'happening at',
+    ];
+    const hazardNouns = [
+      ' fire ', ' smoke ', ' flood', ' floodwater', ' water rising',
+      ' crash ', ' accident ', ' fallen tree', ' tree down',
+      ' powerline', ' power line', ' power out', ' gas leak', ' spill ',
+      ' storm damage', ' road blocked', ' road closed', ' hazard ',
+    ];
+    for (final phrase in reportPhrases) {
+      if (t.contains(phrase)) return VoiceIntent.report;
+    }
+    for (final noun in hazardNouns) {
+      if (t.contains(noun)) return VoiceIntent.report;
+    }
+    return VoiceIntent.search;
   }
 
   @override
@@ -103,8 +169,10 @@ class _VoiceListeningSheetState extends State<VoiceListeningSheet>
         borderRadius: BorderRadius.vertical(top: Radius.circular(24.spMin)),
         border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
       ),
-      padding: EdgeInsets.fromLTRB(18.spMin, 18.spMin, 18.spMin, 26.spMin),
-      child: Column(
+      padding: EdgeInsets.fromLTRB(18.spMin, 18.spMin, 18.spMin, 14.spMin),
+      child: SafeArea(
+        top: false,
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           _waveBuilder(),
@@ -121,10 +189,24 @@ class _VoiceListeningSheetState extends State<VoiceListeningSheet>
               letterSpacing: -0.3,
             ),
           ),
+          if (widget.detectIntent && _transcript.isNotEmpty) ...[
+            SizedBox(height: 6.spMin),
+            Text(
+              VoiceListeningSheet.detectIntentOf(_transcript) ==
+                      VoiceIntent.report
+                  ? '\u2192 Post an ALRT'
+                  : '\u2192 Search locations',
+              style: TextStyle(
+                fontSize: 11.spMin,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFFFF8C00),
+              ),
+            ),
+          ],
           SizedBox(height: 8.spMin),
           Text(
             'Listening · recognised on this phone · nothing is recorded or sent\n'
-            'Releases to search the moment you stop speaking',
+            'Releases the moment you stop speaking',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 9.5.spMin,
@@ -156,6 +238,7 @@ class _VoiceListeningSheetState extends State<VoiceListeningSheet>
             ),
           ),
         ],
+        ),
       ),
     );
   }
