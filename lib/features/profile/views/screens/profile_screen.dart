@@ -682,11 +682,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 title: 'English',
                 subtitle: 'English',
               ),
-              languageTile(
-                code: 'es',
-                title: 'Español',
-                subtitle: 'Spanish',
-              ),
+              // Spanish hidden until the app is actually localised — only ~5
+              // strings are translated today, so switching locale changes
+              // nothing visible. Restore this tile when full l10n lands.
+              // languageTile(
+              //   code: 'es',
+              //   title: 'Español',
+              //   subtitle: 'Spanish',
+              // ),
               Padding(
                 padding: EdgeInsets.all(16.spMin),
                 child: Text(

@@ -16,7 +16,7 @@ config).
 | Repo | Branch | Contents |
 |---|---|---|
 | `ALRT-dev/V2-Claude` (frontend) | `integrate/navigation-update` (24 commits) | Navigation upgrade, Leaderboard/points, Voice search, ALRT+ paywall, Email login |
-| `ALRT-dev/backend-` | `feature/alrt-plus-subscription` | ALRT+ entitlement fields + migration + RevenueCat webhook |
+| `ALRT-dev/backendV2` | ⚠️ **missing** | ALRT+ entitlement fields + migration + RevenueCat webhook were written in the old `ALRT-dev/backend-` repo, which no longer exists. They are NOT in `backendV2` yet and must be re-added before ALRT+ can go live. |
 
 Backup: a `alrtap-frontend-v2-changes.bundle` patch file was also provided.
 
@@ -64,8 +64,10 @@ existing backend `/api/auth/email-password/*` endpoints.
 6. Bump `version:` in `pubspec.yaml`.
 7. Build + upload to **TestFlight / Play internal testing** for Sarah to try.
 
-### Backend (`backend-` → into `SafetyALRT/alrtap-backend`)
-1. Pull `feature/alrt-plus-subscription`.
+### Backend (`backendV2` → into `SafetyALRT/alrtap-backend`)
+1. ⚠️ The old `backend-` repo (and its `feature/alrt-plus-subscription` branch) is gone —
+   re-implement the ALRT+ entitlement fields + migration + `POST /api/revenuecat/webhook`
+   in `backendV2` first.
 2. `npm/yarn install && npx prisma generate && npx tsc --noEmit` — **verify it
    compiles** (it was written without a local Node check).
 3. Set env `REVENUECAT_WEBHOOK_AUTH` (matches the RevenueCat dashboard).

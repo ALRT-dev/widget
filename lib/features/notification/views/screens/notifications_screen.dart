@@ -47,8 +47,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         slivers: [
           NotificationsAppBar(),
           10.hSizedBox.sliverBox,
-          _modeToggleBuilder().sliverBox,
-          10.hSizedBox.sliverBox,
+          // Learn hub toggle hidden until the content experience is finalised.
+          // Restore these two slivers to bring back the Live Alerts / Learn switch.
+          // _modeToggleBuilder().sliverBox,
+          // 10.hSizedBox.sliverBox,
           if (_mode == _FeedMode.liveAlerts) ...[
             SubscribedLocationsFiltersList().sliverBox,
             10.hSizedBox.sliverBox,
