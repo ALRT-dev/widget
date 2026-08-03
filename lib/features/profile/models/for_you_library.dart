@@ -22,6 +22,8 @@ abstract final class ForYouLibrary {
     }
     if (name.contains('air')) return 'air_quality';
     if (name.contains('health')) return 'air_quality';
+    if (name.contains('utilit')) return 'utility_outage';
+    if (name.contains('chemical')) return 'chemical';
     return null;
   }
 
@@ -106,6 +108,40 @@ abstract final class ForYouLibrary {
           'Poor air can build symptoms slowly across a day. Following your '
           'usual care plan, keeping medication within reach and skipping '
           'strenuous activity is advisable.',
+    },
+    'utility_outage': {
+      SafetyCohort.older:
+          'Outages hit lifts, hot water and phones together. Checking your '
+          'phone\'s charge now and keeping a torch within reach is advisable.',
+      SafetyCohort.kids:
+          'Outages unsettle bedtime fast. Finding torches before dark and '
+          'charging a device for the kids now is advisable.',
+      SafetyCohort.medical:
+          'If powered medical equipment or refrigerated medication applies, '
+          'acting on your backup plan early, before batteries run down, is '
+          'advisable.',
+      SafetyCohort.pets:
+          'Aquariums, heat lamps and electric fences stop with the power. '
+          'Checking any animal setup that relies on it early is advisable.',
+      SafetyCohort.visitor:
+          'Outages can affect card payments and fuel pumps locally. Keeping '
+          'some cash and a charged phone while the outage lasts is advisable.',
+    },
+    'chemical': {
+      SafetyCohort.older:
+          'Chemical incidents usually call for shelter, not evacuation. '
+          'Going indoors, shutting windows and turning off the aircon is '
+          'advisable.',
+      SafetyCohort.kids:
+          'Children are more affected by fumes. Bringing kids indoors, '
+          'shutting windows and turning off any air intake is advisable.',
+      SafetyCohort.medical:
+          'Fumes and stress can both trigger symptoms quickly. Sealing your '
+          'room, keeping medication with you, and seeking help early if '
+          'symptoms start is advisable.',
+      SafetyCohort.pets:
+          'Pets shelter with you in a chemical incident. Bringing them '
+          'indoors now and keeping them in until the all clear is advisable.',
     },
   };
 }
