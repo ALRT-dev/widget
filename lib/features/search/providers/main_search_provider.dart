@@ -7,11 +7,15 @@ import 'package:hazard_app/features/profile/providers/my_location_subscriptions_
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/hazard_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
+import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/services/user_service.dart';
+import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
+import 'package:hazard_app/features/subscription/views/screens/alrt_plus_paywall_screen.dart';
 
 final providerOfMainSearch =
     StateNotifierProvider.autoDispose<
@@ -287,6 +291,27 @@ class MainSearchProvider extends StateNotifier<MainSearchProviderState> {
   Future<void> toggleSubscription() async {
     final subscriptionId = state.subscriptionId;
     if (subscriptionId == null) {
+      // Free tier saves at most 3 locations, no matter what; the fourth
+      // save opens the ALRT+ paywall. Own-location follow never counts.
+      final savedCount = _ref
+          .read(providerOfMyLocationSubscriptions)
+          .locationSubscriptions
+          .where((subscription) => !subscription.isOwnLocation)
+          .length;
+      if (savedCount >= kFreeSavedLocationsLimit) {
+        final isPlus = await _ref.read(providerOfAlrtPlus.future);
+        if (!mounted) return;
+        if (!isPlus) {
+          final context = _ref
+              .read(providerOfGlobalNavigatorKey)
+              .currentContext;
+          if (context == null || !context.mounted) return;
+          final purchased = await context.push<bool>(
+            AlrtPlusPaywallScreen.route,
+          );
+          if (!mounted || purchased != true) return;
+        }
+      }
       return subscribeToLocation();
     } else {
       return unsubscribeFromLocation(

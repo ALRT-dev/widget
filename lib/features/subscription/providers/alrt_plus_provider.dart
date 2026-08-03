@@ -7,6 +7,10 @@ final providerOfRevenueCat = Provider<RevenueCatService>(
   (ref) => RevenueCatService(),
 );
 
+/// The free tier saves at most this many locations, no matter what
+/// (locked ALRT+ limits; moves to Remote Config in a later pass).
+const kFreeSavedLocationsLimit = 3;
+
 /// True when the signed-in user has an active ALRT+ entitlement. Ensures
 /// RevenueCat is configured for the current user before reading status.
 /// `ref.refresh(providerOfAlrtPlus)` re-checks after a purchase.

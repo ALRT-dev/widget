@@ -37,6 +37,14 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
   void initState() {
     super.initState();
     _load();
+    // The seat ledger reads the circles list; make sure it's loaded even
+    // when this screen is opened before the family tab.
+    Future.microtask(() {
+      if (!mounted) return;
+      if (!ref.read(providerOfFamily).hasLoadedOnce) {
+        ref.read(providerOfFamily.notifier).load(silent: true);
+      }
+    });
   }
 
   Future<void> _load() async {

@@ -11,6 +11,7 @@ import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
 import 'package:hazard_app/features/profile/views/screens/safety_profile_screen.dart';
 import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
 import 'package:hazard_app/features/subscription/views/screens/alrt_plus_manage_screen.dart';
+import 'package:hazard_app/features/subscription/views/screens/alrt_plus_paywall_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/support_request_screen.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
@@ -424,6 +425,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   icon: LucideIcons.crown,
                   color: const Color(0xFFA63BD4),
                   onTap: () => context.push(AlrtPlusManageScreen.route),
+                )
+              else
+                _buildAccountSettingsItem(
+                  title: 'ALRT+',
+                  subtitle: 'You pay once, everyone else joins free',
+                  icon: LucideIcons.crown,
+                  color: const Color(0xFFA63BD4),
+                  onTap: () => context.push(AlrtPlusPaywallScreen.route),
                 ),
               _buildAccountSettingsItem(
                 title: 'Safety profile',
