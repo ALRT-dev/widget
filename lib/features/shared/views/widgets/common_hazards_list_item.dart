@@ -373,10 +373,13 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           child: Row(
             spacing: 10.spMin,
             children: [
-              // Severity is shown by shape as well as colour, never colour
-              // alone (accessibility rule).
+              // V3 rule: shape identifies the source system, colour carries
+              // urgency — never colour alone.
               Icon(
-                AlertCardStyle.shapeIcon(severityBand),
+                AlertCardStyle.systemShapeIcon(
+                  isAws: isAwsCompliant,
+                  isOfficial: isVerified,
+                ),
                 size: 14.spMin,
                 color: isOfficialCritical
                     ? AppColors.white

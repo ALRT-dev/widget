@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// The locked alert-card treatments (product-rules §6/§31):
@@ -29,15 +28,18 @@ abstract final class AlertCardStyle {
   /// Dashed needs-attention type colour.
   static const dashedTextColor = Color(0xFFCC1010);
 
-  /// The severity shape: triangle for critical, diamond for advice-level,
-  /// circle otherwise (mirrors the accessibility spec's shape language).
-  static IconData shapeIcon(final HazardSeverityBand? band) {
-    return switch (band) {
-      HazardSeverityBand.critical => LucideIcons.triangleAlert,
-      HazardSeverityBand.action => LucideIcons.triangleAlert,
-      HazardSeverityBand.monitor => LucideIcons.diamond,
-      HazardSeverityBand.info || null => LucideIcons.circle,
-    };
+  /// The source-system shape (V3 alert rendering spec): shape says WHICH
+  /// SYSTEM an alert came from, colour says how urgent it is.
+  ///
+  /// AWS = triangle, other official sources = diamond, community = circle.
+  /// (GDACS square and ALRT Intel shield join when those feeds exist.)
+  static IconData systemShapeIcon({
+    required final bool isAws,
+    required final bool isOfficial,
+  }) {
+    if (isAws) return LucideIcons.triangleAlert;
+    if (isOfficial) return LucideIcons.diamond;
+    return LucideIcons.circle;
   }
 }
 
