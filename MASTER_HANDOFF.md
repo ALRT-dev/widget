@@ -16,7 +16,7 @@ config).
 | Repo | Branch | Contents |
 |---|---|---|
 | `ALRT-dev/V2-Claude` (frontend) | `integrate/navigation-update` (24 commits) | Navigation upgrade, Leaderboard/points, Voice search, ALRT+ paywall, Email login |
-| `ALRT-dev/backendV2` | ⚠️ **missing** | ALRT+ entitlement fields + migration + RevenueCat webhook were written in the old `ALRT-dev/backend-` repo, which no longer exists. They are NOT in `backendV2` yet and must be re-added before ALRT+ can go live. |
+| `ALRT-dev/backendV2` | `claude/safety-alert-repo-audit-8exgvn` | ALRT+ entitlement fields + migration `add_alrt_plus_entitlement` + `POST /api/revenuecat/webhook` (rebuilt Aug 2026 — the original was lost with the old `backend-` repo). Type-checked with `prisma generate && tsc`. |
 
 Backup: a `alrtap-frontend-v2-changes.bundle` patch file was also provided.
 
@@ -38,7 +38,7 @@ On-device dictation in the map + Search bars. iOS/Android mic permissions added.
 - **To ship:** **on-device test** (mic can't be tested by the compiler).
 
 ### 4. ALRT+ subscription  — ✅ frontend compiles / ⚠️ backend needs Node build
-Paywall (store prices, monthly $7.99 / yearly $79.99, 1-month free trial),
+Paywall (store prices, monthly $9.99 / yearly $99.99, 1-month free trial),
 RevenueCat wiring, gate on **hosting** a family circle (joining stays free).
 Backend: entitlement fields + migration + `POST /api/revenuecat/webhook`.
 - **To ship:** follow **`ALRT_PLUS_SETUP.md`** (store products, banking,
@@ -65,11 +65,11 @@ existing backend `/api/auth/email-password/*` endpoints.
 7. Build + upload to **TestFlight / Play internal testing** for Sarah to try.
 
 ### Backend (`backendV2` → into `SafetyALRT/alrtap-backend`)
-1. ⚠️ The old `backend-` repo (and its `feature/alrt-plus-subscription` branch) is gone —
-   re-implement the ALRT+ entitlement fields + migration + `POST /api/revenuecat/webhook`
-   in `backendV2` first.
-2. `npm/yarn install && npx prisma generate && npx tsc --noEmit` — **verify it
-   compiles** (it was written without a local Node check).
+1. Pull branch `claude/safety-alert-repo-audit-8exgvn` — it contains the rebuilt
+   ALRT+ entitlement fields, migration `add_alrt_plus_entitlement`, and
+   `POST /api/revenuecat/webhook` (the old `backend-` repo version was lost).
+2. `npm/yarn install && npx prisma generate && npx tsc --noEmit` — already
+   verified clean on the branch; re-check after merging.
 3. Set env `REVENUECAT_WEBHOOK_AUTH` (matches the RevenueCat dashboard).
 4. Deploy — runs migration `add_alrt_plus_entitlement`.
 
