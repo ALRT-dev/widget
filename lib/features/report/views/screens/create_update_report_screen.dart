@@ -159,8 +159,10 @@ class _CreateUpdateReportScreenState
         children: [
           _emergencyBannerBuilder(),
           16.hSizedBox,
+          _locationBuilder(),
+          20.hSizedBox,
           _sectionTitleBuilder(
-            title: 'Select Category',
+            title: 'Category',
             isRequired: true,
             requiredWidget: const SizedBox(),
           ),
@@ -179,10 +181,16 @@ class _CreateUpdateReportScreenState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 24.spMin,
                 children: [
-                  _locationBuilder(),
                   _chipsBuilder(),
                   _severityWordingBuilder(),
                   _descriptionBuilder(),
+                  Text(
+                    'Tapping what you can see helps neighbours act faster.',
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      color: _sectionLabelColor,
+                    ),
+                  ),
                   _mediaBuilder(),
                   _headlinePreviewBuilder(),
                   _submitButtonBuilder(),
@@ -242,7 +250,7 @@ class _CreateUpdateReportScreenState
             _sectionTitleBuilder(title: 'What can you see?'),
             4.hSizedBox,
             Text(
-              'Tap any — this is an observation, not a diagnosis.',
+              'tap any, this is an observation not a diagnosis',
               style: TextStyle(fontSize: 12.spMin, color: _sectionLabelColor),
             ),
             10.hSizedBox,
@@ -330,7 +338,7 @@ class _CreateUpdateReportScreenState
         _sectionTitleBuilder(title: 'How would you describe it?'),
         4.hSizedBox,
         Text(
-          'Auto-set from what you picked — tap to change.',
+          'auto-set from what you picked, tap to change',
           style: TextStyle(fontSize: 12.spMin, color: _sectionLabelColor),
         ),
         10.hSizedBox,
@@ -873,10 +881,6 @@ class _CreateUpdateReportScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 10.spMin,
       children: [
-        _sectionTitleBuilder(
-          title: 'Location',
-          isRequired: true,
-        ),
         Consumer(
           builder: (context, ref, child) {
             final locationName = ref.watch(

@@ -28,9 +28,9 @@ class ReportChip {
 /// The three community severity wordings ("How would you describe it?").
 /// Maps onto the non-AWS severity tiers the backend already stores.
 enum ReportSeverityWording {
-  minor(HazardSeverity.advice, 'Minor', 'Worth knowing about'),
-  significant(HazardSeverity.watchAndAct, 'Significant', 'Take care around this'),
-  dangerous(HazardSeverity.emergency, 'Dangerous', 'Keep well away');
+  minor(HazardSeverity.advice, 'Minor', 'worth knowing'),
+  significant(HazardSeverity.watchAndAct, 'Significant', 'consider avoiding'),
+  dangerous(HazardSeverity.emergency, 'Dangerous', 'risk to people');
 
   const ReportSeverityWording(this.severity, this.label, this.sub);
 
@@ -68,13 +68,14 @@ const _fireChips = [
   ReportChip(id: 'fi_other', label: _somethingElseLabel),
 ];
 
-const _stormChips = [
-  ReportChip(id: 'st_tree_down', label: 'Tree down', severityDefault: 1, headline: 'Tree down'),
-  ReportChip(id: 'st_powerlines_down', label: 'Powerlines down', severityDefault: 2, headline: 'Powerlines down'),
-  ReportChip(id: 'st_roof_damage', label: 'Roof damage', severityDefault: 1, headline: 'Roof damage'),
-  ReportChip(id: 'st_large_hail', label: 'Large hail', severityDefault: 1, headline: 'Large hail'),
-  ReportChip(id: 'st_debris_on_road', label: 'Debris on road', severityDefault: 1, headline: 'Debris on road'),
-  ReportChip(id: 'st_other', label: _somethingElseLabel),
+// Weather & Environment per the V3.1 mock.
+const _weatherChips = [
+  ReportChip(id: 'wx_water_rising', label: 'Water rising', severityDefault: 2, headline: 'Water rising'),
+  ReportChip(id: 'wx_flash_flooding', label: 'Flash flooding', severityDefault: 2, headline: 'Flash flooding'),
+  ReportChip(id: 'wx_flooded_road', label: 'Flooded road', severityDefault: 1, headline: 'Flooded road'),
+  ReportChip(id: 'wx_fallen_tree', label: 'Fallen tree', severityDefault: 1, headline: 'Fallen tree'),
+  ReportChip(id: 'wx_storm_damage', label: 'Storm damage', severityDefault: 1, headline: 'Storm damage'),
+  ReportChip(id: 'wx_other', label: _somethingElseLabel),
 ];
 
 const _trafficChips = [
@@ -136,7 +137,7 @@ List<ReportChip> chipsForCategoryName(final String? categoryName) {
       name.contains('weather') ||
       name.contains('wind') ||
       name.contains('cyclone')) {
-    return _stormChips;
+    return _weatherChips;
   }
   if (name.contains('traffic') ||
       name.contains('road') ||
