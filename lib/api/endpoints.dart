@@ -89,6 +89,9 @@ const kUrlFamilyLocationRequestRespond =
 const kUrlFamilyCheckIn = '$kUrlFamily/check-in';
 const kUrlFamilyCheckInRequest = '$kUrlFamilyCheckIn/request';
 const kUrlFamilyCheckIns = '$kUrlFamily/check-ins';
+const kUrlFamilyScheduledCheckIns = '$kUrlFamily/scheduled-check-ins';
+const kUrlFamilyScheduledCheckIn =
+    '$kUrlFamilyScheduledCheckIns/{scheduledCheckInId}';
 const kUrlFamilyPlaces = '$kUrlFamily/places';
 const kUrlFamilyPlacePrefs = '$kUrlFamilyPlaces/{placeId}/prefs';
 const kUrlFamilySos = '$kUrlFamily/sos';

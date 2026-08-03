@@ -314,6 +314,49 @@ const _$FamilyCheckInStatusEnumMap = {
   FamilyCheckInStatus.needsHelp: 'needsHelp',
 };
 
+_FamilyScheduledCheckIn _$FamilyScheduledCheckInFromJson(
+  Map<String, dynamic> json,
+) => _FamilyScheduledCheckIn(
+  id: json['id'] as String,
+  circleId: json['circleId'] as String,
+  memberId: json['memberId'] as String,
+  timeOfDay: json['timeOfDay'] as String,
+  mode:
+      $enumDecodeNullable(
+        _$FamilyScheduledCheckInModeEnumMap,
+        json['mode'],
+        unknownValue: FamilyScheduledCheckInMode.prompted,
+      ) ??
+      FamilyScheduledCheckInMode.prompted,
+  lastFiredAt: json['lastFiredAt'] == null
+      ? null
+      : DateTime.parse(json['lastFiredAt'] as String),
+  member: json['member'] == null
+      ? null
+      : FamilyMemberSnippet.fromJson(json['member'] as Map<String, dynamic>),
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+);
+
+Map<String, dynamic> _$FamilyScheduledCheckInToJson(
+  _FamilyScheduledCheckIn instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'circleId': instance.circleId,
+  'memberId': instance.memberId,
+  'timeOfDay': instance.timeOfDay,
+  'mode': _$FamilyScheduledCheckInModeEnumMap[instance.mode]!,
+  'lastFiredAt': ?instance.lastFiredAt?.toIso8601String(),
+  'member': ?instance.member?.toJson(),
+  'createdAt': ?instance.createdAt?.toIso8601String(),
+};
+
+const _$FamilyScheduledCheckInModeEnumMap = {
+  FamilyScheduledCheckInMode.automatic: 'automatic',
+  FamilyScheduledCheckInMode.prompted: 'prompted',
+};
+
 _FamilyCheckInRequest _$FamilyCheckInRequestFromJson(
   Map<String, dynamic> json,
 ) => _FamilyCheckInRequest(

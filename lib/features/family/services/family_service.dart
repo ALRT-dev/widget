@@ -168,6 +168,30 @@ class FamilyService {
     return _familyRepository.getFamilyCheckIns(limit: limit);
   }
 
+  Future<Either<FamilyScheduledCheckIn, AppError>>
+  createFamilyScheduledCheckIn({
+    required final String timeOfDay,
+    final FamilyScheduledCheckInMode? mode,
+  }) {
+    return _familyRepository.createFamilyScheduledCheckIn(
+      timeOfDay: timeOfDay,
+      mode: mode,
+    );
+  }
+
+  Future<Either<List<FamilyScheduledCheckIn>, AppError>>
+  getFamilyScheduledCheckIns() {
+    return _familyRepository.getFamilyScheduledCheckIns();
+  }
+
+  Future<Either<void, AppError>> deleteFamilyScheduledCheckIn({
+    required final String scheduledCheckInId,
+  }) {
+    return _familyRepository.deleteFamilyScheduledCheckIn(
+      scheduledCheckInId: scheduledCheckInId,
+    );
+  }
+
   Future<Either<List<FamilySavedPlace>, AppError>> getFamilyPlaces() {
     return _familyRepository.getFamilyPlaces();
   }

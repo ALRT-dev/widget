@@ -99,6 +99,19 @@ abstract class FamilyRepository {
     final int? limit,
   });
 
+  Future<Either<FamilyScheduledCheckIn, AppError>>
+  createFamilyScheduledCheckIn({
+    required final String timeOfDay,
+    final FamilyScheduledCheckInMode? mode,
+  });
+
+  Future<Either<List<FamilyScheduledCheckIn>, AppError>>
+  getFamilyScheduledCheckIns();
+
+  Future<Either<void, AppError>> deleteFamilyScheduledCheckIn({
+    required final String scheduledCheckInId,
+  });
+
   Future<Either<List<FamilySavedPlace>, AppError>> getFamilyPlaces();
 
   Future<Either<FamilySavedPlace, AppError>> createFamilyPlace({
@@ -455,6 +468,54 @@ class FamilyRepositoryImpl implements FamilyRepository {
       future: () async {
         final result = await _restClient.getFamilyCheckIns(limit: limit);
         return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilyScheduledCheckIn, AppError>>
+  createFamilyScheduledCheckIn({
+    required String timeOfDay,
+    FamilyScheduledCheckInMode? mode,
+  }) {
+    return runAsyncCall(
+      name: 'createFamilyScheduledCheckIn',
+      future: () async {
+        final result = await _restClient.createFamilyScheduledCheckIn(
+          timeOfDay: timeOfDay,
+          mode: mode?.name,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<List<FamilyScheduledCheckIn>, AppError>>
+  getFamilyScheduledCheckIns() {
+    return runAsyncCall(
+      name: 'getFamilyScheduledCheckIns',
+      future: () async {
+        final result = await _restClient.getFamilyScheduledCheckIns();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> deleteFamilyScheduledCheckIn({
+    required String scheduledCheckInId,
+  }) {
+    return runAsyncCall(
+      name: 'deleteFamilyScheduledCheckIn',
+      future: () async {
+        await _restClient.deleteFamilyScheduledCheckIn(
+          scheduledCheckInId: scheduledCheckInId,
+        );
+        return const Success(null);
       },
       onError: Failure.new,
     );

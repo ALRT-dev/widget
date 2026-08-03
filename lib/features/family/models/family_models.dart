@@ -29,6 +29,11 @@ enum FamilyCheckInStatus {
   needsHelp,
 }
 
+enum FamilyScheduledCheckInMode {
+  automatic,
+  prompted,
+}
+
 enum FamilySosStatus {
   active,
   resolved,
@@ -232,6 +237,27 @@ abstract class FamilyCheckIn with _$FamilyCheckIn {
 
   factory FamilyCheckIn.fromJson(Map<String, dynamic> json) =>
       _$FamilyCheckInFromJson(json);
+}
+
+@freezed
+abstract class FamilyScheduledCheckIn with _$FamilyScheduledCheckIn {
+  const factory FamilyScheduledCheckIn({
+    required final String id,
+    required final String circleId,
+    required final String memberId,
+
+    /// "HH:mm" 24h, Australia/Brisbane local time.
+    required final String timeOfDay,
+    @JsonKey(unknownEnumValue: FamilyScheduledCheckInMode.prompted)
+    @Default(FamilyScheduledCheckInMode.prompted)
+    final FamilyScheduledCheckInMode mode,
+    final DateTime? lastFiredAt,
+    final FamilyMemberSnippet? member,
+    final DateTime? createdAt,
+  }) = _FamilyScheduledCheckIn;
+
+  factory FamilyScheduledCheckIn.fromJson(Map<String, dynamic> json) =>
+      _$FamilyScheduledCheckInFromJson(json);
 }
 
 @freezed

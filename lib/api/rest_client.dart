@@ -325,6 +325,20 @@ abstract class RestClient {
     @Field() final String? hazardId,
   });
 
+  @POST(kUrlFamilyScheduledCheckIns)
+  Future<FamilyScheduledCheckIn> createFamilyScheduledCheckIn({
+    @Field() required final String timeOfDay,
+    @Field() final String? mode,
+  });
+
+  @GET(kUrlFamilyScheduledCheckIns)
+  Future<List<FamilyScheduledCheckIn>> getFamilyScheduledCheckIns();
+
+  @DELETE(kUrlFamilyScheduledCheckIn)
+  Future<void> deleteFamilyScheduledCheckIn({
+    @Path() required final String scheduledCheckInId,
+  });
+
   @GET(kUrlFamilyCheckIns)
   Future<List<FamilyCheckIn>> getFamilyCheckIns({
     @Query('limit') final int? limit,

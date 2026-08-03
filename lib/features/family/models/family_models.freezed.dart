@@ -2378,6 +2378,316 @@ $FamilyMemberSnippetCopyWith<$Res>? get member {
 
 
 /// @nodoc
+mixin _$FamilyScheduledCheckIn {
+
+ String get id; String get circleId; String get memberId;/// "HH:mm" 24h, Australia/Brisbane local time.
+ String get timeOfDay;@JsonKey(unknownEnumValue: FamilyScheduledCheckInMode.prompted) FamilyScheduledCheckInMode get mode; DateTime? get lastFiredAt; FamilyMemberSnippet? get member; DateTime? get createdAt;
+/// Create a copy of FamilyScheduledCheckIn
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilyScheduledCheckInCopyWith<FamilyScheduledCheckIn> get copyWith => _$FamilyScheduledCheckInCopyWithImpl<FamilyScheduledCheckIn>(this as FamilyScheduledCheckIn, _$identity);
+
+  /// Serializes this FamilyScheduledCheckIn to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyScheduledCheckIn&&(identical(other.id, id) || other.id == id)&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.memberId, memberId) || other.memberId == memberId)&&(identical(other.timeOfDay, timeOfDay) || other.timeOfDay == timeOfDay)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.lastFiredAt, lastFiredAt) || other.lastFiredAt == lastFiredAt)&&(identical(other.member, member) || other.member == member)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,circleId,memberId,timeOfDay,mode,lastFiredAt,member,createdAt);
+
+@override
+String toString() {
+  return 'FamilyScheduledCheckIn(id: $id, circleId: $circleId, memberId: $memberId, timeOfDay: $timeOfDay, mode: $mode, lastFiredAt: $lastFiredAt, member: $member, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilyScheduledCheckInCopyWith<$Res>  {
+  factory $FamilyScheduledCheckInCopyWith(FamilyScheduledCheckIn value, $Res Function(FamilyScheduledCheckIn) _then) = _$FamilyScheduledCheckInCopyWithImpl;
+@useResult
+$Res call({
+ String id, String circleId, String memberId, String timeOfDay,@JsonKey(unknownEnumValue: FamilyScheduledCheckInMode.prompted) FamilyScheduledCheckInMode mode, DateTime? lastFiredAt, FamilyMemberSnippet? member, DateTime? createdAt
+});
+
+
+$FamilyMemberSnippetCopyWith<$Res>? get member;
+
+}
+/// @nodoc
+class _$FamilyScheduledCheckInCopyWithImpl<$Res>
+    implements $FamilyScheduledCheckInCopyWith<$Res> {
+  _$FamilyScheduledCheckInCopyWithImpl(this._self, this._then);
+
+  final FamilyScheduledCheckIn _self;
+  final $Res Function(FamilyScheduledCheckIn) _then;
+
+/// Create a copy of FamilyScheduledCheckIn
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? circleId = null,Object? memberId = null,Object? timeOfDay = null,Object? mode = null,Object? lastFiredAt = freezed,Object? member = freezed,Object? createdAt = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
+as String,memberId: null == memberId ? _self.memberId : memberId // ignore: cast_nullable_to_non_nullable
+as String,timeOfDay: null == timeOfDay ? _self.timeOfDay : timeOfDay // ignore: cast_nullable_to_non_nullable
+as String,mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
+as FamilyScheduledCheckInMode,lastFiredAt: freezed == lastFiredAt ? _self.lastFiredAt : lastFiredAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,member: freezed == member ? _self.member : member // ignore: cast_nullable_to_non_nullable
+as FamilyMemberSnippet?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+/// Create a copy of FamilyScheduledCheckIn
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FamilyMemberSnippetCopyWith<$Res>? get member {
+    if (_self.member == null) {
+    return null;
+  }
+
+  return $FamilyMemberSnippetCopyWith<$Res>(_self.member!, (value) {
+    return _then(_self.copyWith(member: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [FamilyScheduledCheckIn].
+extension FamilyScheduledCheckInPatterns on FamilyScheduledCheckIn {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilyScheduledCheckIn value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilyScheduledCheckIn() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilyScheduledCheckIn value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyScheduledCheckIn():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilyScheduledCheckIn value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyScheduledCheckIn() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String circleId,  String memberId,  String timeOfDay, @JsonKey(unknownEnumValue: FamilyScheduledCheckInMode.prompted)  FamilyScheduledCheckInMode mode,  DateTime? lastFiredAt,  FamilyMemberSnippet? member,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilyScheduledCheckIn() when $default != null:
+return $default(_that.id,_that.circleId,_that.memberId,_that.timeOfDay,_that.mode,_that.lastFiredAt,_that.member,_that.createdAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String circleId,  String memberId,  String timeOfDay, @JsonKey(unknownEnumValue: FamilyScheduledCheckInMode.prompted)  FamilyScheduledCheckInMode mode,  DateTime? lastFiredAt,  FamilyMemberSnippet? member,  DateTime? createdAt)  $default,) {final _that = this;
+switch (_that) {
+case _FamilyScheduledCheckIn():
+return $default(_that.id,_that.circleId,_that.memberId,_that.timeOfDay,_that.mode,_that.lastFiredAt,_that.member,_that.createdAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String circleId,  String memberId,  String timeOfDay, @JsonKey(unknownEnumValue: FamilyScheduledCheckInMode.prompted)  FamilyScheduledCheckInMode mode,  DateTime? lastFiredAt,  FamilyMemberSnippet? member,  DateTime? createdAt)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilyScheduledCheckIn() when $default != null:
+return $default(_that.id,_that.circleId,_that.memberId,_that.timeOfDay,_that.mode,_that.lastFiredAt,_that.member,_that.createdAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilyScheduledCheckIn implements FamilyScheduledCheckIn {
+  const _FamilyScheduledCheckIn({required this.id, required this.circleId, required this.memberId, required this.timeOfDay, @JsonKey(unknownEnumValue: FamilyScheduledCheckInMode.prompted) this.mode = FamilyScheduledCheckInMode.prompted, this.lastFiredAt, this.member, this.createdAt});
+  factory _FamilyScheduledCheckIn.fromJson(Map<String, dynamic> json) => _$FamilyScheduledCheckInFromJson(json);
+
+@override final  String id;
+@override final  String circleId;
+@override final  String memberId;
+/// "HH:mm" 24h, Australia/Brisbane local time.
+@override final  String timeOfDay;
+@override@JsonKey(unknownEnumValue: FamilyScheduledCheckInMode.prompted) final  FamilyScheduledCheckInMode mode;
+@override final  DateTime? lastFiredAt;
+@override final  FamilyMemberSnippet? member;
+@override final  DateTime? createdAt;
+
+/// Create a copy of FamilyScheduledCheckIn
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilyScheduledCheckInCopyWith<_FamilyScheduledCheckIn> get copyWith => __$FamilyScheduledCheckInCopyWithImpl<_FamilyScheduledCheckIn>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilyScheduledCheckInToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyScheduledCheckIn&&(identical(other.id, id) || other.id == id)&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.memberId, memberId) || other.memberId == memberId)&&(identical(other.timeOfDay, timeOfDay) || other.timeOfDay == timeOfDay)&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.lastFiredAt, lastFiredAt) || other.lastFiredAt == lastFiredAt)&&(identical(other.member, member) || other.member == member)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,circleId,memberId,timeOfDay,mode,lastFiredAt,member,createdAt);
+
+@override
+String toString() {
+  return 'FamilyScheduledCheckIn(id: $id, circleId: $circleId, memberId: $memberId, timeOfDay: $timeOfDay, mode: $mode, lastFiredAt: $lastFiredAt, member: $member, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilyScheduledCheckInCopyWith<$Res> implements $FamilyScheduledCheckInCopyWith<$Res> {
+  factory _$FamilyScheduledCheckInCopyWith(_FamilyScheduledCheckIn value, $Res Function(_FamilyScheduledCheckIn) _then) = __$FamilyScheduledCheckInCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String circleId, String memberId, String timeOfDay,@JsonKey(unknownEnumValue: FamilyScheduledCheckInMode.prompted) FamilyScheduledCheckInMode mode, DateTime? lastFiredAt, FamilyMemberSnippet? member, DateTime? createdAt
+});
+
+
+@override $FamilyMemberSnippetCopyWith<$Res>? get member;
+
+}
+/// @nodoc
+class __$FamilyScheduledCheckInCopyWithImpl<$Res>
+    implements _$FamilyScheduledCheckInCopyWith<$Res> {
+  __$FamilyScheduledCheckInCopyWithImpl(this._self, this._then);
+
+  final _FamilyScheduledCheckIn _self;
+  final $Res Function(_FamilyScheduledCheckIn) _then;
+
+/// Create a copy of FamilyScheduledCheckIn
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? circleId = null,Object? memberId = null,Object? timeOfDay = null,Object? mode = null,Object? lastFiredAt = freezed,Object? member = freezed,Object? createdAt = freezed,}) {
+  return _then(_FamilyScheduledCheckIn(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
+as String,memberId: null == memberId ? _self.memberId : memberId // ignore: cast_nullable_to_non_nullable
+as String,timeOfDay: null == timeOfDay ? _self.timeOfDay : timeOfDay // ignore: cast_nullable_to_non_nullable
+as String,mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
+as FamilyScheduledCheckInMode,lastFiredAt: freezed == lastFiredAt ? _self.lastFiredAt : lastFiredAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,member: freezed == member ? _self.member : member // ignore: cast_nullable_to_non_nullable
+as FamilyMemberSnippet?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+/// Create a copy of FamilyScheduledCheckIn
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$FamilyMemberSnippetCopyWith<$Res>? get member {
+    if (_self.member == null) {
+    return null;
+  }
+
+  return $FamilyMemberSnippetCopyWith<$Res>(_self.member!, (value) {
+    return _then(_self.copyWith(member: value));
+  });
+}
+}
+
+
+/// @nodoc
 mixin _$FamilyCheckInRequest {
 
  String get id; String get circleId; String get requestedById; String? get hazardId; String? get message; FamilyMemberSnippet? get requestedBy; List<FamilyCheckIn> get checkIns; DateTime? get createdAt;

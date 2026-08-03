@@ -44,6 +44,11 @@ class LocalNotificationService {
   static const categoryLowBand = 'ALRT_LOW_BAND';
   static const categoryLowBandFollowing = 'ALRT_LOW_BAND_FOLLOWING';
   static const categoryHighBand = 'ALRT_HIGH_BAND';
+  static const categoryCheckInPrompt = 'ALRT_CHECKIN_PROMPT';
+
+  /// Backend push type for a scheduled daily check-in prompt (the only
+  /// family push that carries an action button).
+  static const _typeScheduledCheckInPrompt = 'familyScheduledCheckInPrompt';
 
   final _plugin = FlutterLocalNotificationsPlugin();
   bool _initialized = false;
@@ -144,8 +149,19 @@ class LocalNotificationService {
   }
 
   /// Band-matched action buttons. Only hazard pushes (payloads carrying a
-  /// severityBand) get actions; family/system pushes render button-free.
+  /// severityBand) get actions; family/system pushes render button-free —
+  /// except the scheduled check-in prompt, which gets one-tap "I'm safe".
   List<AndroidNotificationAction>? _actionsFor(Map<String, dynamic> data) {
+    if (data['notificationType'] == _typeScheduledCheckInPrompt) {
+      return const [
+        AndroidNotificationAction(
+          actionImSafe,
+          "I'm safe",
+          showsUserInterface: true,
+        ),
+      ];
+    }
+
     final hazard = _hazardPayloadOf(data);
     final alertId = hazard?['id']?.toString();
     final band = (hazard?['severityBand'] as String?)?.toLowerCase();
@@ -226,6 +242,16 @@ class LocalNotificationService {
             options: {DarwinNotificationActionOption.foreground},
           ),
           viewDetails,
+        ],
+      ),
+      DarwinNotificationCategory(
+        categoryCheckInPrompt,
+        actions: [
+          DarwinNotificationAction.plain(
+            actionImSafe,
+            "I'm safe",
+            options: {DarwinNotificationActionOption.foreground},
+          ),
         ],
       ),
     ];

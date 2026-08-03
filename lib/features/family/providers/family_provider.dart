@@ -561,6 +561,64 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     });
   }
 
+  // ------------------------ SCHEDULED CHECK-INS ------------------------
+
+  Future<void> loadScheduledCheckIns() async {
+    final result = await _familyService.getFamilyScheduledCheckIns();
+    if (!mounted) return;
+
+    result.whenSuccess((schedules) {
+      state = state.copyWith(scheduledCheckIns: schedules);
+      return null;
+    });
+  }
+
+  /// Adds (or updates the mode of) a daily check-in at [timeOfDay] ("HH:mm").
+  Future<bool> addScheduledCheckIn({
+    required final String timeOfDay,
+    final FamilyScheduledCheckInMode mode = FamilyScheduledCheckInMode.prompted,
+  }) async {
+    final result = await _familyService.createFamilyScheduledCheckIn(
+      timeOfDay: timeOfDay,
+      mode: mode,
+    );
+    if (!mounted) return false;
+
+    return result.when(
+      (schedule) {
+        state = state.copyWith(
+          scheduledCheckIns: [
+            ...state.scheduledCheckIns.where((s) => s.id != schedule.id),
+            schedule,
+          ]..sort((a, b) => a.timeOfDay.compareTo(b.timeOfDay)),
+        );
+        return true;
+      },
+      (_) => false,
+    );
+  }
+
+  Future<bool> removeScheduledCheckIn({
+    required final String scheduledCheckInId,
+  }) async {
+    final result = await _familyService.deleteFamilyScheduledCheckIn(
+      scheduledCheckInId: scheduledCheckInId,
+    );
+    if (!mounted) return false;
+
+    return result.when(
+      (_) {
+        state = state.copyWith(
+          scheduledCheckIns: state.scheduledCheckIns
+              .where((s) => s.id != scheduledCheckInId)
+              .toList(),
+        );
+        return true;
+      },
+      (_) => false,
+    );
+  }
+
   // ---------------------------- INVITES ----------------------------
 
   Future<void> loadInvites() async {

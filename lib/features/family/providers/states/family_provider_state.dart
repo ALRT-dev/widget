@@ -48,6 +48,7 @@ class FamilyProviderState {
     this.loadState = const FamilyActionState.initial(),
     this.activeSosEvents = const <FamilySosEvent>[],
     this.recentCheckIns = const <FamilyCheckIn>[],
+    this.scheduledCheckIns = const <FamilyScheduledCheckIn>[],
     this.invites = const <FamilyInvite>[],
     this.memberIdsNearAlert = const <String>{},
     this.invitesLoadState = const FamilyActionState.initial(),
@@ -78,6 +79,9 @@ class FamilyProviderState {
   /// The most recent check-ins of the circle (newest first).
   final List<FamilyCheckIn> recentCheckIns;
 
+  /// The circle's scheduled daily check-ins (sorted by time of day).
+  final List<FamilyScheduledCheckIn> scheduledCheckIns;
+
   /// The circle's active invites.
   final List<FamilyInvite> invites;
 
@@ -107,6 +111,7 @@ class FamilyProviderState {
     final FamilyActionState? loadState,
     final List<FamilySosEvent>? activeSosEvents,
     final List<FamilyCheckIn>? recentCheckIns,
+    final List<FamilyScheduledCheckIn>? scheduledCheckIns,
     final List<FamilyInvite>? invites,
     final Set<String>? memberIdsNearAlert,
     final FamilyActionState? invitesLoadState,
@@ -127,6 +132,7 @@ class FamilyProviderState {
       loadState: loadState ?? this.loadState,
       activeSosEvents: activeSosEvents ?? this.activeSosEvents,
       recentCheckIns: recentCheckIns ?? this.recentCheckIns,
+      scheduledCheckIns: scheduledCheckIns ?? this.scheduledCheckIns,
       invites: invites ?? this.invites,
       memberIdsNearAlert: memberIdsNearAlert ?? this.memberIdsNearAlert,
       invitesLoadState: invitesLoadState ?? this.invitesLoadState,

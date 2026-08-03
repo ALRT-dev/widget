@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 import 'package:hazard_app/features/family/views/widgets/family_member_avatar.dart';
@@ -40,6 +41,9 @@ class _FamilyCircleProfileScreenState
     final me = ref.read(providerOfFamily).circle?.me;
     _nicknameController = TextEditingController(text: me?.name ?? '');
     _selectedColorHex = me?.colorHex;
+    Future.microtask(
+      () => ref.read(providerOfFamily.notifier).loadScheduledCheckIns(),
+    );
   }
 
   @override
@@ -148,6 +152,23 @@ class _FamilyCircleProfileScreenState
                 _swatchBuilder(color),
             ],
           ),
+          SizedBox(height: 20.spMin),
+          Text(
+            'DAILY CHECK-IN',
+            style: TextStyle(
+              fontSize: 12.spMin,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+              color: AppColors.grey,
+            ),
+          ),
+          SizedBox(height: 4.spMin),
+          Text(
+            'A daily reminder to let your family know you are safe.',
+            style: TextStyle(fontSize: 12.spMin, color: AppColors.grey),
+          ),
+          SizedBox(height: 8.spMin),
+          _scheduledCheckInsBuilder(),
           SizedBox(height: 28.spMin),
           SizedBox(
             height: 52.spMin,
@@ -182,6 +203,123 @@ class _FamilyCircleProfileScreenState
         ],
       ),
     );
+  }
+
+  Widget _scheduledCheckInsBuilder() {
+    final me = ref.read(providerOfFamily).circle?.me;
+    final mySchedules = ref
+        .watch(providerOfFamily.select((s) => s.scheduledCheckIns))
+        .where((s) => s.memberId == me?.id)
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final schedule in mySchedules)
+          Container(
+            margin: EdgeInsets.only(bottom: 8.spMin),
+            padding: EdgeInsets.symmetric(horizontal: 14.spMin),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14.spMin),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  LucideIcons.alarmClock,
+                  size: 18.spMin,
+                  color: FamilyColors.indigo,
+                ),
+                SizedBox(width: 10.spMin),
+                Expanded(
+                  child: Text(
+                    '${schedule.timeOfDay} — '
+                    '${schedule.mode == FamilyScheduledCheckInMode.automatic ? 'checks in for you' : 'reminds you'}',
+                    style: TextStyle(
+                      fontSize: 14.spMin,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    LucideIcons.trash2,
+                    size: 18.spMin,
+                    color: AppColors.grey,
+                  ),
+                  onPressed: () => ref
+                      .read(providerOfFamily.notifier)
+                      .removeScheduledCheckIn(scheduledCheckInId: schedule.id),
+                ),
+              ],
+            ),
+          ),
+        TextButton.icon(
+          onPressed: _addScheduledCheckIn,
+          icon: Icon(LucideIcons.plus, size: 16.spMin),
+          label: Text(
+            'Add check-in time',
+            style: TextStyle(fontSize: 14.spMin, fontWeight: FontWeight.w700),
+          ),
+          style: TextButton.styleFrom(foregroundColor: FamilyColors.indigo),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _addScheduledCheckIn() async {
+    final time = await showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 9, minute: 0),
+    );
+    if (time == null || !mounted) return;
+
+    final mode = await showModalBottomSheet<FamilyScheduledCheckInMode>(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.spMin)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: 8.spMin),
+            ListTile(
+              leading: const Icon(LucideIcons.bellRing),
+              title: const Text('Remind me to check in'),
+              subtitle: const Text('You get a one-tap "I\'m safe" prompt'),
+              onTap: () => Navigator.of(
+                sheetContext,
+              ).pop(FamilyScheduledCheckInMode.prompted),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.checkCheck),
+              title: const Text('Check in for me automatically'),
+              subtitle: const Text('Your family sees you as safe at this time'),
+              onTap: () => Navigator.of(
+                sheetContext,
+              ).pop(FamilyScheduledCheckInMode.automatic),
+            ),
+            SizedBox(height: 8.spMin),
+          ],
+        ),
+      ),
+    );
+    if (mode == null || !mounted) return;
+
+    final timeOfDay =
+        '${time.hour.toString().padLeft(2, '0')}:'
+        '${time.minute.toString().padLeft(2, '0')}';
+    final added = await ref
+        .read(providerOfFamily.notifier)
+        .addScheduledCheckIn(timeOfDay: timeOfDay, mode: mode);
+    if (!mounted) return;
+
+    added
+        ? context.showSuccessToast(message: 'Daily check-in set for $timeOfDay.')
+        : context.showErrorToast(
+            message: 'Could not save the check-in time. Please try again.',
+          );
   }
 
   Widget _swatchBuilder(final Color color) {
