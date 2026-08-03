@@ -54,6 +54,7 @@
       <string>msauthv2</string>
       <string>msauthv3</string>
       <string>microsoftauthenticator</string>
+      <string>https</string>
     </array>
     <key>LSRequiresIPhoneOS</key>
     <true />
@@ -94,10 +95,6 @@
       <string>UIInterfaceOrientationPortraitUpsideDown</string>
       <string>UIInterfaceOrientationLandscapeLeft</string>
       <string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-      <string>https</string>
     </array>
   </dict>
 </plist>

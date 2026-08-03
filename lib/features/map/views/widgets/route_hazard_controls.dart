@@ -241,9 +241,9 @@ class _RouteHazardControlsState extends ConsumerState<RouteHazardControls> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: severity.colorAws.withOpacity(0.2),
+        color: severity.colorAws.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: severity.colorAws.withOpacity(0.5)),
+        border: Border.all(color: severity.colorAws.withValues(alpha: 0.5)),
       ),
       child: Text(
         label,
@@ -259,30 +259,30 @@ class _RouteHazardControlsState extends ConsumerState<RouteHazardControls> {
   Color _getBackgroundColor(RouteRiskLevel riskLevel) {
     switch (riskLevel) {
       case RouteRiskLevel.emergency:
-        return AppColors.emergency.withOpacity(0.1);
+        return AppColors.emergency.withValues(alpha: 0.1);
       case RouteRiskLevel.high:
-        return AppColors.watchAndAct.withOpacity(0.1);
+        return AppColors.watchAndAct.withValues(alpha: 0.1);
       case RouteRiskLevel.medium:
-        return AppColors.advice.withOpacity(0.1);
+        return AppColors.advice.withValues(alpha: 0.1);
       case RouteRiskLevel.low:
-        return AppColors.info.withOpacity(0.1);
+        return AppColors.info.withValues(alpha: 0.1);
       case RouteRiskLevel.safe:
-        return Colors.green.withOpacity(0.1);
+        return Colors.green.withValues(alpha: 0.1);
     }
   }
 
   Color _getBorderColor(RouteRiskLevel riskLevel) {
     switch (riskLevel) {
       case RouteRiskLevel.emergency:
-        return AppColors.emergency.withOpacity(0.3);
+        return AppColors.emergency.withValues(alpha: 0.3);
       case RouteRiskLevel.high:
-        return AppColors.watchAndAct.withOpacity(0.3);
+        return AppColors.watchAndAct.withValues(alpha: 0.3);
       case RouteRiskLevel.medium:
-        return AppColors.advice.withOpacity(0.3);
+        return AppColors.advice.withValues(alpha: 0.3);
       case RouteRiskLevel.low:
-        return AppColors.info.withOpacity(0.3);
+        return AppColors.info.withValues(alpha: 0.3);
       case RouteRiskLevel.safe:
-        return Colors.green.withOpacity(0.3);
+        return Colors.green.withValues(alpha: 0.3);
     }
   }
 

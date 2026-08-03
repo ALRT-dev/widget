@@ -38,7 +38,8 @@ class AppBootstrap {
       EasyLocalization(
         supportedLocales: [
           Locale('en'),
-          Locale('es'),
+          // Spanish returns when full localisation lands (only ~5 strings
+          // are translated today).
         ],
         path: 'assets/translations',
         fallbackLocale: Locale('en'),

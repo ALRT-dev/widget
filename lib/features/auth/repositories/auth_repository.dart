@@ -209,30 +209,3 @@ class AuthRepositoryImpl implements AuthRepository {
     );
   }
 }
-
-class MockAuthRepository extends AuthRepositoryImpl {
-  MockAuthRepository({
-    required super.restClient,
-    required super.googleSignIn,
-  });
-
-  @override
-  Future<Either<AuthSuccess, AppError>> signInWithGoogle() {
-    return runAsyncCall(
-      name: 'signInWithGoogle',
-      future: () async {
-        final json = {
-          "accessToken":
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MzBhNzE1Zi01ZGIzLTQ1ODItODM4ZS1kZWZhMmQxMWFlNDIiLCJpYXQiOjE3NjA0Mzk3NTYsImV4cCI6MTc2MDQ0MzM1Nn0.SgKcnPFCfZ0MK4yeX7bX9XpCAzKuGUhYNBrzI5UB9_Y",
-          "refreshToken":
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MzBhNzE1Zi01ZGIzLTQ1ODItODM4ZS1kZWZhMmQxMWFlNDIiLCJpYXQiOjE3NjA0Mzk3NTYsImV4cCI6MTc2NTYyMzc1Nn0.SJGb3mjaZ_QRThfzyI8eebnuh2eUsolcwsUUUPyD4dA",
-        };
-
-        return Success(
-          AuthSuccess.fromJson(json),
-        );
-      },
-      onError: Failure.new,
-    );
-  }
-}

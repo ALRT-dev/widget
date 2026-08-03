@@ -50,7 +50,7 @@ android {
     defaultConfig {
         applicationId = "com.safetyalrt.alrt"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 35 // Play requires >= 35; pinned per Aug 2026 audit
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
