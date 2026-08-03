@@ -5,11 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
-import 'package:hazard_app/features/map/utils/dialogs.dart';
 import 'package:hazard_app/features/map/providers/map_display_settings_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/custom_compass_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_hazard_info_window.dart';
-import 'package:hazard_app/features/map/views/widgets/map_keys_button.dart';
 import 'package:hazard_app/features/map/views/widgets/map_rail.dart';
 import 'package:hazard_app/features/map/views/widgets/map_searchbar.dart';
 import 'package:hazard_app/features/map/views/widgets/navigation/navigation_mode_overlay.dart';
@@ -20,9 +18,6 @@ import 'package:hazard_app/features/map/views/widgets/route_source_and_destinati
 import 'package:hazard_app/features/map/views/widgets/selected_location_preview.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
-import 'package:hazard_app/features/shared/views/widgets/button.dart';
-import 'package:hazard_app/features/shared/views/widgets/filter_widgets/hazard_filters_button.dart';
-import 'package:hazard_app/others/app_colors.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -169,12 +164,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                         child: MapRail(),
                                       ),
                                     ),
-                                    Positioned(
-                                      bottom: 0.0,
-                                      left: 0.0,
-                                      right: 0.0,
-                                      child: _viewListButtonBuilder(),
-                                    ),
                                   ],
                                 ),
                               ),
@@ -216,83 +205,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
+  // The V3 map rail owns layers/keys and filtering; only the compass
+  // remains as a floating action.
   Widget _mapActionButtons() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       spacing: 10.spMin,
       children: [
         CustomCompassButton(),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(14.spMin),
-            boxShadow: const [
-              BoxShadow(
-                color: AppColors.shadowColor,
-                blurRadius: 10.0,
-                offset: Offset(0, 0.0),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(14.spMin),
-            child: Column(
-              children: [
-                HazardFiltersButton(
-                  filtersKey: MapScreen.filtersKey,
-                  onFiltersUpdated: () => _getMapHazards(),
-                ),
-                MapKeysButton(),
-              ],
-            ),
-          ),
-        ),
       ],
     );
   }
 
-  Widget _viewListButtonBuilder() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final hasMapHazards = ref.watch(
-          providerOfMap.select(
-            (value) => value.hazards.isNotEmpty,
-          ),
-        );
-        if (!hasMapHazards) {
-          return const SizedBox.shrink();
-        }
-
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 50.spMin,
-              width: 140.spMin,
-              child: Button.filled(
-                onPressed: () => showMapHazardsListBottomSheet(
-                  context: context,
-                ),
-                borderRadius: 50.0,
-                color: AppColors.white,
-                icon: Icon(
-                  Icons.list_rounded,
-                  size: 22.0,
-                  color: AppColors.black,
-                ),
-                value: 'View List',
-                valueStyle: TextStyle(
-                  color: AppColors.black,
-                ),
-                elevation: 3.0,
-                padding: EdgeInsets.zero,
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   /// Handles the map movement by updating the camera position in the provider.
   void _handleMapMoved(CameraPosition position) {
@@ -315,11 +239,4 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  /// Fetches the hazards for the current map view.
-  void _getMapHazards() {
-    ref.read(providerOfMap.notifier).getMapHazards();
-
-    // also update the hazards to avoid for the route if route planning is active
-    ref.read(providerOfMap.notifier).getRoutePlanHazardsToAvoid();
-  }
 }

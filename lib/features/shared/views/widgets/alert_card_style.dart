@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// The locked alert-card treatments (product-rules §6/§31):
@@ -60,6 +61,60 @@ abstract final class AlertCardStyle {
       HazardSeverityBand.action => bandAction,
       HazardSeverityBand.critical => bandCritical,
       HazardSeverityBand.info || null => bandInfo,
+    };
+  }
+
+  /// "In plain terms" — one fixed sentence per official severity level, so
+  /// anyone can read what the warning actually means. Deterministic copy,
+  /// zero AI at render time; action wording is always attributed to the
+  /// services, never spoken in ALRT's own voice. Community reports return
+  /// null — unverified posts don't get an authority strip.
+  static String? plainTermsOf({
+    required final bool isOfficial,
+    required final bool isAws,
+    final HazardSeverity? severity,
+    final HazardSeverityBand? band,
+    final String? categoryName,
+  }) {
+    if (!isOfficial) return null;
+
+    final category = categoryName?.toLowerCase() ?? '';
+
+    // Air quality reads better with its own line at the serious end.
+    final isAir = category.contains('air') || category.contains('health');
+    final isSevere = isAws
+        ? severity == HazardSeverity.emergency ||
+              severity == HazardSeverity.watchAndAct
+        : band == HazardSeverityBand.action ||
+              band == HazardSeverityBand.critical;
+    if (isAir && isSevere) {
+      return 'the air outside is bad enough to affect anyone, '
+          'not just people with health conditions.';
+    }
+
+    if (isAws) {
+      return switch (severity) {
+        HazardSeverity.emergency =>
+          'this is as serious as official warnings get. Emergency services '
+              'say act immediately.',
+        HazardSeverity.watchAndAct =>
+          'a hazard nearby is getting worse. The emergency services say '
+              'start acting now, before it becomes an emergency.',
+        HazardSeverity.advice =>
+          'no immediate danger, but stay aware — conditions can change.',
+        _ => null,
+      };
+    }
+
+    return switch (band) {
+      HazardSeverityBand.critical =>
+        'officials consider this dangerous right now. Take it seriously.',
+      HazardSeverityBand.action =>
+        'officials say this needs your attention now.',
+      HazardSeverityBand.monitor =>
+        'worth keeping an eye on if you are nearby.',
+      HazardSeverityBand.info || null =>
+        'for your awareness — nothing to act on right now.',
     };
   }
 

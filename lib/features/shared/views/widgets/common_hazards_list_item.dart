@@ -20,6 +20,7 @@ import 'package:hazard_app/features/shared/views/widgets/app_cached_network_imag
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:hazard_app/others/app_theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -142,6 +143,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _coloredHeaderBuilder(),
+              _plainTermsBuilder(),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -182,6 +184,52 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         ),
       ),
     ).pX(widget.horizontalPadding);
+  }
+
+  /// The V3 "In plain terms" strip: a dark band under the header that says
+  /// what the warning means in ordinary words. Official alerts only.
+  Widget _plainTermsBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final hazard = ref.watch(provider.select((value) => value.hazard));
+        if (hazard == null) return const SizedBox.shrink();
+
+        final plainTerms = AlertCardStyle.plainTermsOf(
+          isOfficial: !hazard.isUserReported,
+          isAws: hazard.isAwsCompliant ?? false,
+          severity: hazard.severity,
+          band: hazard.severityBand,
+          categoryName: hazard.category?.name,
+        );
+        if (plainTerms == null) return const SizedBox.shrink();
+
+        return Container(
+          width: double.infinity,
+          color: const Color(0xFF23252B),
+          padding: EdgeInsets.symmetric(
+            horizontal: 16.spMin,
+            vertical: 9.spMin,
+          ),
+          child: Text.rich(
+            TextSpan(
+              children: [
+                const TextSpan(
+                  text: 'In plain terms: ',
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
+                TextSpan(text: plainTerms),
+              ],
+            ),
+            style: TextStyle(
+              fontSize: 12.spMin,
+              height: 1.35,
+              color: Colors.white,
+              fontFamily: AppTheme.defaultFontFamily,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   // ignore: unused_element

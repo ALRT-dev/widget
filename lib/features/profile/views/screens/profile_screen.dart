@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -432,6 +433,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   subtitle: 'You pay once, everyone else joins free',
                   icon: LucideIcons.crown,
                   color: const Color(0xFFA63BD4),
+                  onTap: () => context.push(AlrtPlusPaywallScreen.route),
+                ),
+              // QA builds ship with the test unlock on, which hides every
+              // paywall gate — this row lets the paywall itself be reviewed.
+              if (dotenv.env['ALRT_PLUS_TEST_UNLOCK'] == 'true')
+                _buildAccountSettingsItem(
+                  title: 'Preview ALRT+ paywall',
+                  subtitle: 'QA build only — gates are unlocked for testing',
+                  icon: LucideIcons.eye,
+                  color: AppColors.grey,
                   onTap: () => context.push(AlrtPlusPaywallScreen.route),
                 ),
               _buildAccountSettingsItem(
