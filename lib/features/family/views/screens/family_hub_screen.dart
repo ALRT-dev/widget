@@ -15,6 +15,7 @@ import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 import 'package:hazard_app/features/family/views/widgets/family_member_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
+import 'package:hazard_app/features/subscription/views/widgets/billing_issue_banner.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -58,6 +59,7 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             _headerBuilder(circle, memberIdsNearAlert),
+            const SliverToBoxAdapter(child: BillingIssueBanner()),
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(20.spMin),

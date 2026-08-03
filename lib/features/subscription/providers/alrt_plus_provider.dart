@@ -21,3 +21,17 @@ final providerOfAlrtPlus = FutureProvider.autoDispose<bool>((ref) async {
   await rc.ensureConfigured(userId);
   return rc.isPlus();
 });
+
+/// True when the active ALRT+ entitlement has a detected billing issue
+/// (payment failed, store is retrying). Drives the calm amber banner on the
+/// family screen.
+final providerOfAlrtPlusBillingIssue = FutureProvider.autoDispose<bool>((
+  ref,
+) async {
+  final userId = ref.watch(providerOfLoggedInUser)?.id;
+  if (userId == null) return false;
+  final rc = ref.watch(providerOfRevenueCat);
+  await rc.ensureConfigured(userId);
+  final entitlement = await rc.plusEntitlement();
+  return entitlement?.billingIssueDetectedAt != null;
+});

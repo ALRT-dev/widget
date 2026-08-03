@@ -2,6 +2,7 @@
 * In-map navigation mode: travel modes, alternate routes, hazard corridors and bypass re-routing.
 * Home-screen widgets: Nearby Alerts + Family status (Android fully wired; iOS needs the Xcode target step in ios/AlrtWidget/SETUP.md).
 * ALRT+ subscription paywall (RevenueCat) gating hosting a family circle.
+* ALRT+ flow screens in the blended purple style: redesigned gate sheet, post-purchase welcome, Your ALRT+ manage screen (seats, members, store management), billing-issue banner on the family hub.
 * Leaderboard and points breakdown screens on the existing XP endpoints.
 * Voice search (tap-to-talk) in map and hazard search.
 * Email + password sign-in / sign-up.

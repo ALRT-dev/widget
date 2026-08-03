@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
+import 'package:hazard_app/features/subscription/views/screens/alrt_plus_welcome_screen.dart';
+import 'package:hazard_app/features/subscription/views/widgets/alrt_plus_style.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
-/// The ALRT+ paywall. Per the product rules this appears only at the
+/// The ALRT+ gate sheet. Per the product rules this appears only at the
 /// "premium moment" (hosting a family circle), never during onboarding, and
 /// always renders store prices — never hardcoded ones. Pops `true` if the user
 /// ends up entitled to ALRT+.
@@ -20,8 +23,6 @@ class AlrtPlusPaywallScreen extends ConsumerStatefulWidget {
 }
 
 class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
-  static const _accent = Color(0xFFFF5000);
-
   Offering? _offering;
   Package? _selected;
   bool _loading = true;
@@ -43,9 +44,16 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
       _selected = offering?.annual ?? offering?.availablePackages.firstOrNull;
       _loading = false;
       _error = offering == null
-          ? 'ALRT+ is not available right now. Please try again later.'
+          ? 'ALRT + is not available right now. Please try again later.'
           : null;
     });
+  }
+
+  Future<void> _finishEntitled() async {
+    ref.invalidate(providerOfAlrtPlus);
+    if (!mounted) return;
+    await context.push(AlrtPlusWelcomeScreen.route);
+    if (mounted) Navigator.of(context).pop(true);
   }
 
   Future<void> _subscribe() async {
@@ -54,10 +62,7 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
     setState(() => _busy = true);
     try {
       final ok = await ref.read(providerOfRevenueCat).purchase(package);
-      if (ok) {
-        ref.invalidate(providerOfAlrtPlus);
-        if (mounted) Navigator.of(context).pop(true);
-      }
+      if (ok) await _finishEntitled();
     } catch (_) {
       if (mounted) {
         setState(() => _error = 'That purchase could not be completed.');
@@ -78,7 +83,7 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
       Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No previous ALRT+ purchase found.')),
+        const SnackBar(content: Text('No previous ALRT + purchase found.')),
       );
     }
   }
@@ -86,212 +91,213 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF141416),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: SafeArea(
-        child: _loading
-            ? const Center(
-                child: CircularProgressIndicator(color: _accent),
-              )
-            : ListView(
-                padding: EdgeInsets.fromLTRB(22.spMin, 8.spMin, 22.spMin, 28.spMin),
-                children: [
-                  _headerBuilder(),
-                  SizedBox(height: 22.spMin),
-                  ..._benefits(),
-                  SizedBox(height: 22.spMin),
-                  if (_offering != null) ...[
-                    if (_offering!.annual != null)
-                      _planCardBuilder(_offering!.annual!, badge: 'BEST VALUE'),
-                    if (_offering!.monthly != null)
-                      _planCardBuilder(_offering!.monthly!),
-                  ],
-                  if (_error != null)
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10.spMin),
-                      child: Text(
-                        _error!,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: const Color(0xFFE5928D),
-                          fontSize: 13.spMin,
+      backgroundColor: AlrtPlusStyle.body,
+      body: Column(
+        children: [
+          _bandBuilder(context),
+          Expanded(
+            child: _loading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      color: AlrtPlusStyle.magenta,
+                    ),
+                  )
+                : ListView(
+                    padding: EdgeInsets.fromLTRB(
+                      18.spMin,
+                      16.spMin,
+                      18.spMin,
+                      24.spMin,
+                    ),
+                    children: [
+                      const AlrtPlusLavNote(
+                        lead: 'You stay in control.',
+                        text:
+                            'You pay once, everyone else joins free. Core '
+                            'safety alerts, the map and emergency guidance '
+                            'stay free for everyone, always.',
+                      ),
+                      SizedBox(height: 14.spMin),
+                      if (_offering != null) _planRowBuilder(),
+                      if (_error != null)
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.spMin),
+                          child: Text(
+                            _error!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: const Color(0xFFCC1010),
+                              fontSize: 13.spMin,
+                            ),
+                          ),
+                        ),
+                      SizedBox(height: 14.spMin),
+                      AlrtPlusCta(
+                        label: 'Start free month',
+                        busy: _busy,
+                        onPressed: _selected == null ? null : _subscribe,
+                      ),
+                      SizedBox(height: 9.spMin),
+                      _priceLineBuilder(),
+                      TextButton(
+                        onPressed: _busy
+                            ? null
+                            : () => Navigator.of(context).pop(false),
+                        child: Text(
+                          'Maybe later',
+                          style: TextStyle(
+                            fontSize: 12.5.spMin,
+                            fontWeight: FontWeight.w600,
+                            color: AlrtPlusStyle.inkSoft,
+                          ),
                         ),
                       ),
-                    ),
-                  SizedBox(height: 8.spMin),
-                  _subscribeButtonBuilder(),
-                  SizedBox(height: 12.spMin),
-                  _legalBuilder(),
-                ],
-              ),
+                      TextButton(
+                        onPressed: _busy ? null : _restore,
+                        child: Text(
+                          'Restore purchases',
+                          style: TextStyle(
+                            fontSize: 12.spMin,
+                            color: AlrtPlusStyle.inkFaint,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Billed through your app store after the free month. '
+                        'Cancel anytime in your store account.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 10.spMin,
+                          height: 1.6,
+                          color: AlrtPlusStyle.inkFaint,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _headerBuilder() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              'ALRT',
-              style: TextStyle(
-                fontSize: 30.spMin,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
+  Widget _bandBuilder(final BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(gradient: AlrtPlusStyle.bandGradient),
+      padding: EdgeInsets.only(
+        top: MediaQuery.paddingOf(context).top + 4.spMin,
+        left: 10.spMin,
+        right: 22.spMin,
+        bottom: 22.spMin,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          IconButton(
+            onPressed: _busy ? null : () => Navigator.of(context).pop(false),
+            icon: Icon(
+              LucideIcons.arrowLeft,
+              color: Colors.white,
+              size: 22.spMin,
             ),
-            Text(
-              '+',
-              style: TextStyle(
-                fontSize: 30.spMin,
-                fontWeight: FontWeight.w800,
-                color: _accent,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 8.spMin),
-        Text(
-          'Start your free month',
-          style: TextStyle(
-            fontSize: 22.spMin,
-            fontWeight: FontWeight.w800,
-            color: Colors.white,
-            height: 1.2,
           ),
-        ),
-        SizedBox(height: 6.spMin),
-        Text(
-          'Host your own family circles and keep everyone connected. '
-          'Core safety alerts are always free.',
-          style: TextStyle(
-            fontSize: 13.spMin,
-            color: Colors.white.withValues(alpha: 0.6),
-            height: 1.6,
-          ),
-        ),
-      ],
-    );
-  }
-
-  List<Widget> _benefits() {
-    const items = [
-      ('Host family circles', LucideIcons.users),
-      ('Live location during an SOS', LucideIcons.mapPin),
-      ('Saved places and arrival alerts', LucideIcons.house),
-      ('Unlimited check-ins', LucideIcons.circleCheck),
-    ];
-    return items
-        .map(
-          (item) => Padding(
-            padding: EdgeInsets.only(bottom: 12.spMin),
-            child: Row(
+          Padding(
+            padding: EdgeInsets.only(left: 12.spMin),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(item.$2, size: 18.spMin, color: _accent),
-                SizedBox(width: 12.spMin),
+                const AlrtPlusPill(onDark: true),
+                SizedBox(height: 12.spMin),
                 Text(
-                  item.$1,
+                  'Let your family stay connected',
                   style: TextStyle(
-                    fontSize: 14.spMin,
+                    fontSize: 23.spMin,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.3,
+                    height: 1.18,
                     color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 7.spMin),
+                Text(
+                  'Host your own family circle with check-ins, saved places '
+                  'and SOS. Joining a circle is always free.',
+                  style: TextStyle(
+                    fontSize: 13.spMin,
+                    height: 1.55,
+                    color: Colors.white.withValues(alpha: 0.78),
                   ),
                 ),
               ],
             ),
           ),
-        )
-        .toList();
+        ],
+      ),
+    );
   }
 
-  Widget _planCardBuilder(final Package package, {final String? badge}) {
+  Widget _planRowBuilder() {
+    final monthly = _offering?.monthly;
+    final annual = _offering?.annual;
+    return Row(
+      children: [
+        if (monthly != null)
+          Expanded(child: _planCardBuilder(monthly, title: 'MONTHLY')),
+        if (monthly != null && annual != null) SizedBox(width: 10.spMin),
+        if (annual != null)
+          Expanded(child: _planCardBuilder(annual, title: 'YEARLY')),
+      ],
+    );
+  }
+
+  Widget _planCardBuilder(final Package package, {required final String title}) {
     final selected = _selected == package;
     final product = package.storeProduct;
-    final isAnnual = package.packageType == PackageType.annual;
     return GestureDetector(
       onTap: () => setState(() => _selected = package),
       child: Container(
-        margin: EdgeInsets.only(bottom: 12.spMin),
-        padding: EdgeInsets.all(16.spMin),
+        padding: EdgeInsets.symmetric(vertical: 14.spMin, horizontal: 10.spMin),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: selected ? 0.08 : 0.03),
-          borderRadius: BorderRadius.circular(16.spMin),
+          color: selected ? const Color(0xFFF9F0FC) : Colors.white,
+          borderRadius: BorderRadius.circular(18.spMin),
           border: Border.all(
-            color: selected ? _accent : Colors.white.withValues(alpha: 0.12),
+            color: selected ? AlrtPlusStyle.magenta : AlrtPlusStyle.cardLine,
             width: selected ? 2 : 1,
           ),
         ),
-        child: Row(
+        child: Column(
           children: [
-            Icon(
-              selected
-                  ? LucideIcons.circleCheck
-                  : LucideIcons.circle,
-              color: selected ? _accent : Colors.white.withValues(alpha: 0.4),
-              size: 22.spMin,
-            ),
-            SizedBox(width: 14.spMin),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        isAnnual ? 'Yearly' : 'Monthly',
-                        style: TextStyle(
-                          fontSize: 15.spMin,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
-                      if (badge != null) ...[
-                        SizedBox(width: 8.spMin),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.spMin,
-                            vertical: 2.spMin,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _accent,
-                            borderRadius: BorderRadius.circular(6.spMin),
-                          ),
-                          child: Text(
-                            badge,
-                            style: TextStyle(
-                              fontSize: 9.spMin,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  SizedBox(height: 2.spMin),
-                  Text(
-                    '1 month free, then ${product.priceString}'
-                    '${isAnnual ? '/yr' : '/mo'}',
-                    style: TextStyle(
-                      fontSize: 12.spMin,
-                      color: Colors.white.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ],
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 10.spMin,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.6,
+                color: selected
+                    ? AlrtPlusStyle.magenta
+                    : AlrtPlusStyle.inkFaint,
               ),
             ),
+            SizedBox(height: 5.spMin),
             Text(
               product.priceString,
               style: TextStyle(
-                fontSize: 16.spMin,
+                fontSize: 22.spMin,
                 fontWeight: FontWeight.w800,
-                color: Colors.white,
+                letterSpacing: -0.5,
+                color: AlrtPlusStyle.ink,
+              ),
+            ),
+            SizedBox(height: 2.spMin),
+            Text(
+              package.packageType == PackageType.annual
+                  ? 'per year'
+                  : 'per month',
+              style: TextStyle(
+                fontSize: 11.spMin,
+                color: selected
+                    ? AlrtPlusStyle.magenta
+                    : AlrtPlusStyle.inkSoft,
               ),
             ),
           ],
@@ -300,66 +306,20 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
     );
   }
 
-  Widget _subscribeButtonBuilder() {
-    final enabled = _selected != null && !_busy;
-    return SizedBox(
-      width: double.infinity,
-      height: 52.spMin,
-      child: ElevatedButton(
-        onPressed: enabled ? _subscribe : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _accent,
-          disabledBackgroundColor: _accent.withValues(alpha: 0.4),
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.spMin),
-          ),
-        ),
-        child: _busy
-            ? SizedBox(
-                width: 22.spMin,
-                height: 22.spMin,
-                child: const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.5,
-                ),
-              )
-            : Text(
-                'Start free month',
-                style: TextStyle(
-                  fontSize: 15.spMin,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
+  Widget _priceLineBuilder() {
+    final monthly = _offering?.monthly?.storeProduct.priceString;
+    final annual = _offering?.annual?.storeProduct.priceString;
+    final pricePart = (monthly != null && annual != null)
+        ? '1 month free, then $monthly a month or $annual a year'
+        : '1 month free, then the price shown above';
+    return Text(
+      '$pricePart · 8 seats · cancel anytime',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 11.spMin,
+        height: 1.5,
+        color: AlrtPlusStyle.inkFaint,
       ),
-    );
-  }
-
-  Widget _legalBuilder() {
-    return Column(
-      children: [
-        TextButton(
-          onPressed: _busy ? null : _restore,
-          child: Text(
-            'Restore purchases',
-            style: TextStyle(
-              fontSize: 13.spMin,
-              color: Colors.white.withValues(alpha: 0.7),
-            ),
-          ),
-        ),
-        Text(
-          'Billed through your app store after the free month. '
-          'Cancel anytime in your store account.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 10.spMin,
-            color: Colors.white.withValues(alpha: 0.4),
-            height: 1.6,
-          ),
-        ),
-      ],
     );
   }
 }
