@@ -19,6 +19,8 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/profile/views/widgets/for_you_card.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/providers/followed_alerts_provider.dart';
+import 'package:hazard_app/features/shared/utils/share_alert.dart';
 import 'package:hazard_app/features/shared/models/video_id_priority_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/view_hazard_provider_state.dart';
@@ -772,10 +774,85 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         // Medias Section
         _buildMediasSection(),
 
+        // Share + Follow (V3 CTA row)
+        _buildShareFollowRow(),
+        12.hSizedBox,
+
         // Source Section
         _buildSourceSection(),
         40.hSizedBox,
       ],
+    );
+  }
+
+  Widget _buildShareFollowRow() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final hazard = ref.watch(provider.select((value) => value.hazard));
+        final id = hazard?.id;
+        if (hazard == null || id == null) return const SizedBox.shrink();
+        final canShare = isAlertShareable(hazard);
+        final isFollowing =
+            ref.watch(providerOfFollowedAlerts).contains(id);
+
+        Widget action({
+          required final String label,
+          required final VoidCallback onTap,
+          final bool highlighted = false,
+        }) {
+          return Expanded(
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(11.spMin),
+              child: Container(
+                height: 40.spMin,
+                decoration: BoxDecoration(
+                  color: highlighted
+                      ? const Color(0xFFFFF0E4)
+                      : AppColors.white,
+                  borderRadius: BorderRadius.circular(11.spMin),
+                  border: Border.all(
+                    color: highlighted
+                        ? const Color(0xFFB84500)
+                        : const Color(0xFFD8D4DE),
+                    width: 1.5,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12.5.spMin,
+                      fontWeight: FontWeight.w800,
+                      color: highlighted
+                          ? const Color(0xFFB84500)
+                          : const Color(0xFF5F5C66),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return Row(
+          children: [
+            if (canShare) ...[
+              action(
+                label: 'Share',
+                onTap: () => shareAlert(hazard: hazard, from: 'detail'),
+              ),
+              8.wSizedBox,
+            ],
+            action(
+              label: isFollowing ? 'Following' : 'Follow',
+              highlighted: isFollowing,
+              onTap: () =>
+                  ref.read(providerOfFollowedAlerts.notifier).toggle(id),
+            ),
+          ],
+        ).pX(16.0);
+      },
     );
   }
 
