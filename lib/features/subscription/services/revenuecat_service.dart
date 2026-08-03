@@ -93,4 +93,25 @@ class RevenueCatService {
       return false;
     }
   }
+
+  /// The current RevenueCat customer info, or null when unavailable.
+  Future<CustomerInfo?> customerInfo() async {
+    if (!_hasKeys) return null;
+    try {
+      return await Purchases.getCustomerInfo();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The active ALRT+ entitlement, or null when not subscribed.
+  Future<EntitlementInfo?> plusEntitlement() async {
+    final info = await customerInfo();
+    return info?.entitlements.active[entitlementId];
+  }
+
+  /// The store's subscription-management URL for this customer, if known.
+  Future<String?> managementUrl() async {
+    return (await customerInfo())?.managementURL;
+  }
 }

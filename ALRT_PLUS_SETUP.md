@@ -22,16 +22,16 @@ top to bottom.
    to **15%** (you qualify under US$1M/year).
 3. Your app → **Subscriptions** → create a **Subscription Group** ("ALRT+").
 4. Add two subscriptions in that group:
-   - **Monthly** — product id `alrt_plus_monthly`, price **$7.99**
-   - **Yearly** — product id `alrt_plus_yearly`, price **$79.99**
+   - **Monthly** — product id `alrt_plus_monthly`, price **$9.99**
+   - **Yearly** — product id `alrt_plus_yearly`, price **$99.99**
 5. On each, add an **Introductory Offer → Free Trial → 1 month**.
 
 ## 2. Google Play Console (Android) — create the products
 1. **Setup → Payments profile** → add **bank account + tax info**. *(Google pays
    you here.)* Google's subscription cut is already **15%**.
 2. **Monetise → Subscriptions** → create subscription `alrt_plus_monthly`
-   (base plan monthly, **$7.99**) and `alrt_plus_yearly` (base plan yearly,
-   **$79.99**).
+   (base plan monthly, **$9.99**) and `alrt_plus_yearly` (base plan yearly,
+   **$99.99**).
 3. On each base plan add an **Offer → Free trial → 1 month**.
 4. Keep the **product ids identical to Apple's** (`alrt_plus_monthly`,
    `alrt_plus_yearly`).
