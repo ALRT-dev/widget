@@ -71,7 +71,7 @@ class AlrtPlusWelcomeScreen extends ConsumerWidget {
                       onPressed: () {
                         ref
                             .read(providerOfPendingFamilyInvite.notifier)
-                            .state = true;
+                            .set(true);
                         context.pop(true);
                       },
                     ),

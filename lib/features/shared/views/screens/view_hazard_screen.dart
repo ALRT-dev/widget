@@ -26,7 +26,7 @@ import 'package:hazard_app/features/shared/providers/view_hazard_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/utils/open_link.dart';
 import 'package:hazard_app/features/shared/utils/share_alert.dart';
-import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
+import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
 import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -110,7 +110,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     _buildEditDeleteRow(),
                     16.hSizedBox,
                   ],
-                  _buildHeaderV2(),
+                  _buildHeaderV3(),
                   16.hSizedBox,
 
                   // Review feedback section (if applicable)
@@ -384,9 +384,26 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     ).onPressed(() => _handleDeleteHazard());
   }
 
-  Widget _buildHeaderV2() {
+  /// The V3 "expanded card" header: gradient band by source system (kicker,
+  /// title, byline), then the pills row and the "In plain terms:" summary box.
+  Widget _buildHeaderV3() {
     return Consumer(
       builder: (context, ref, child) {
+        final isUserReported = ref.watch(
+          provider.select(
+            (value) => value.hazard?.isUserReported ?? false,
+          ),
+        );
+        final isAwsCompliant = ref.watch(
+          provider.select(
+            (value) => value.hazard?.isAwsCompliant ?? false,
+          ),
+        );
+        final sourceName = ref.watch(
+          provider.select(
+            (value) => value.hazard?.source?.name,
+          ),
+        );
         final title = ref.watch(
           provider.select(
             (value) => value.hazard?.isUserReported ?? false
@@ -394,9 +411,126 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 : value.hazard?.title ?? 'Alert',
           ),
         );
-        final categoryId = ref.watch(
+        final postedAt = ref.watch(
           provider.select(
-            (value) => value.hazard?.category?.id,
+            (value) => value.hazard?.createdAt ?? value.hazard?.occurredAt,
+          ),
+        );
+
+        // AWS treatment applies to AWS-compliant OFFICIAL alerts only.
+        final isAws = !isUserReported && isAwsCompliant && sourceName != null;
+
+        final kicker = isUserReported
+            ? 'COMMUNITY REPORT · UNVERIFIED'
+            : isAws
+            ? 'AWS · EMERGENCY WARNING SYSTEM'
+            : 'OFFICIAL SOURCE';
+
+        final byline = isUserReported
+            ? 'Reported by a community member'
+            : [
+                if (sourceName != null) sourceName,
+                if (postedAt != null) 'posted ${postedAt.timeAgo}',
+              ].join(' · ');
+
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(16.spMin),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 2.0,
+                offset: Offset(0.0, 0.0),
+              ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Gradient header band: colour says which source system.
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: isUserReported
+                      ? AlertCardStyle.communityHeaderGradient
+                      : AlertCardStyle.officialHeaderGradient,
+                ),
+                padding: EdgeInsets.fromLTRB(
+                  16.spMin,
+                  16.spMin,
+                  16.spMin,
+                  13.spMin,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      kicker,
+                      style: TextStyle(
+                        fontSize: 10.spMin,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                        color: AppColors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                    4.hSizedBox,
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 19.spMin,
+                        fontWeight: FontWeight.w800,
+                        height: 1.2,
+                        color: AppColors.white,
+                      ),
+                    ),
+                    if (byline.isNotEmpty) ...[
+                      3.hSizedBox,
+                      Text(
+                        byline,
+                        style: TextStyle(
+                          fontSize: 11.spMin,
+                          color: AppColors.white.withValues(alpha: 0.9),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              // Pills row + plain-terms summary.
+              Padding(
+                padding: EdgeInsets.all(16.spMin),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildV3PillsRow(
+                      isAws: isAws,
+                      isUserReported: isUserReported,
+                    ),
+                    _buildPlainTermsBox(isUserReported: isUserReported),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// The V3 pills row. AWS is the ONLY system whose pill shows a level word;
+  /// official non-AWS and community alerts show their category instead.
+  Widget _buildV3PillsRow({
+    required final bool isAws,
+    required final bool isUserReported,
+  }) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final severityTitle = ref.watch(
+          provider.select(
+            (value) => value.hazard?.severityTitle ?? '',
           ),
         );
         final categoryName = ref.watch(
@@ -407,15 +541,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 'Other',
           ),
         );
-        final categoryColor = ref.watch(
-          provider.select(
-            (value) =>
-                value.hazard?.category?.effectiveColor ?? AppColors.black,
-          ),
+        final updatedAt = ref.watch(
+          provider.select((value) => value.hazard?.updatedAt),
         );
-        final darkenCategoryColor = categoryId == 'utilitiesAndInfrastructure'
-            ? categoryColor.darken(0.3)
-            : categoryColor.darken(0.2);
 
         final latitude = ref.watch(
           provider.select((value) => value.hazard?.latitude),
@@ -431,201 +559,130 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 ),
               );
 
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16.spMin),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColorLight,
-                blurRadius: 2.0,
-                offset: Offset(0.0, 0.0),
-              ),
-            ],
-          ),
-          padding: EdgeInsets.all(16.spMin),
-          child: Column(
-            children: [
-              Row(
-                spacing: 12.spMin,
-                children: [
-                  _buildIcon(),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 6.spMin,
-                      children: [
-                        // Title of the hazard
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16.spMin,
-                          ),
-                        ),
+        final hasAwsLevel =
+            isAws && severityTitle.isNotEmpty && severityTitle != 'Unknown';
+        final isLive =
+            updatedAt != null &&
+            DateTime.now().difference(updatedAt) < const Duration(hours: 24);
 
-                        // Category Pill
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              10.hSizedBox,
-              Row(
-                spacing: 10.spMin,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 14.spMin,
-                      vertical: 6.spMin,
-                    ),
-                    decoration: BoxDecoration(
-                      color: categoryColor.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(20.spMin),
-                      border: Border.all(
-                        color: darkenCategoryColor,
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Text(
-                      categoryName,
-                      style: TextStyle(
-                        fontSize: 12.spMin,
-                        fontWeight: FontWeight.w600,
-                        color: darkenCategoryColor,
-                      ),
-                    ),
-                  ),
-                  if (distance != null)
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.extraLightGrey,
-                        border: Border.all(
-                          color: AppColors.grey.withValues(alpha: 0.5),
-                          width: 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(20.spMin),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 14.spMin,
-                        vertical: 6.spMin,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            LucideIcons.mapPin,
-                            size: 14.spMin,
-                            color: AppColors.grey.withValues(alpha: 0.8),
-                          ),
-                          4.wSizedBox,
-                          Text(
-                            '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} away',
-                            style: TextStyle(
-                              fontSize: 12.spMin,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.grey.withValues(alpha: 0.8),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
-              _buildAwsAlertLevel(),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildIcon() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final categoryImage = ref.watch(
-          provider.select(
-            (value) => value.hazard?.categoryImage,
-          ),
-        );
-        final hazardColor = ref.watch(
-          provider.select(
-            (value) => value.hazard?.color ?? AppColors.black,
-          ),
-        );
-        final fallbackIconPath = ref.watch(
-          provider.select(
-            (value) => value.hazard?.fallbackIconPath ?? '',
-          ),
-        );
-
-        return SizedBox(
-          height: 70.spMin,
-          width: 70.spMin,
-          child: AppCachedNetworkImage(
-            imageUrl: categoryImage?.url ?? '',
-            cacheKey: categoryImage?.s3Key,
-            fit: BoxFit.contain,
-            errorWidget: (context, url, error) => Image.asset(
-              fallbackIconPath,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Container(
-                decoration: BoxDecoration(
-                  color: hazardColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12.spMin),
-                ),
-                child: Icon(
-                  Icons.error,
-                  size: 24.spMin,
-                  color: hazardColor == AppColors.transparent
-                      ? AppColors.grey
-                      : hazardColor,
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildAwsAlertLevel() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final isAwsCompliant = ref.watch(
-          provider.select(
-            (value) => value.hazard?.isAwsCompliant ?? false,
-          ),
-        );
-        if (!isAwsCompliant) return const SizedBox.shrink();
-
-        final alrtLevelTitle = ref.watch(
-          provider.select(
-            (value) => value.hazard?.severity?.titleAws,
-          ),
-        );
-
-        if (alrtLevelTitle == null) {
-          return const SizedBox.shrink();
-        }
-
-        return Row(
+        return Wrap(
+          spacing: 8.spMin,
+          runSpacing: 8.spMin,
+          crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Text(
-              'Alert Level: ',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16.spMin,
+            // AWS: the verbatim level word. Never shown for any other system.
+            if (hasAwsLevel)
+              _v3PillBuilder(
+                label: severityTitle,
+                backgroundColor: AlertCardStyle.awsLevelPillBackground,
+                foregroundColor: AlertCardStyle.awsLevelPillForeground,
+                borderColor: AlertCardStyle.awsLevelPillBorder,
+              )
+            // Everyone else: the category, never a severity word.
+            else if (isUserReported)
+              _v3PillBuilder(
+                label: categoryName,
+                backgroundColor: AlertCardStyle.communityCategoryPillBackground,
+                foregroundColor: AlertCardStyle.communityCategoryPillForeground,
+                borderColor: AlertCardStyle.communityCategoryPillForeground,
+              )
+            else
+              _v3PillBuilder(
+                label: categoryName,
+                backgroundColor: AlertCardStyle.officialCategoryPillBackground,
+                foregroundColor: AlertCardStyle.officialCategoryPillForeground,
+                borderColor: AlertCardStyle.officialCategoryPillBorder,
               ),
-            ),
-            Text(
-              alrtLevelTitle,
-              style: TextStyle(
-                fontSize: 16.spMin,
+            if (isLive)
+              _v3PillBuilder(
+                label: '● Live · updated ${updatedAt!.timeAgo}',
+                backgroundColor: AlertCardStyle.livePillBackground,
+                foregroundColor: AlertCardStyle.livePillForeground,
               ),
-            ),
+            if (distance != null)
+              _v3PillBuilder(
+                label:
+                    '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} away',
+                backgroundColor: AppColors.extraLightGrey,
+                foregroundColor: AppColors.grey,
+              ),
           ],
-        ).pT(16.0);
+        );
       },
+    );
+  }
+
+  /// The "In plain terms:" summary box (the AI summary, tinted per system).
+  Widget _buildPlainTermsBox({required final bool isUserReported}) {
+    return Consumer(
+      builder: (context, ref, child) {
+        final aiSummary = ref.watch(
+          provider.select((value) => value.hazard?.aiSummary),
+        );
+
+        if (aiSummary?.isEmpty ?? true) return const SizedBox.shrink();
+
+        return Container(
+          width: double.infinity,
+          margin: EdgeInsets.only(top: 10.spMin),
+          decoration: BoxDecoration(
+            color: isUserReported
+                ? AlertCardStyle.communitySummaryBackground
+                : AlertCardStyle.officialSummaryBackground,
+            borderRadius: BorderRadius.circular(10.spMin),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 11.spMin,
+            vertical: 9.spMin,
+          ),
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: 'In plain terms: ',
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                ),
+                TextSpan(text: aiSummary),
+              ],
+            ),
+            style: TextStyle(
+              fontSize: 12.spMin,
+              height: 1.55,
+              color: AlertCardStyle.summaryTextColor,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _v3PillBuilder({
+    required final String label,
+    required final Color backgroundColor,
+    required final Color foregroundColor,
+    final Color? borderColor,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(999),
+        border: borderColor != null
+            ? Border.all(color: borderColor, width: 1.5)
+            : null,
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 10.spMin,
+        vertical: 4.spMin,
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10.spMin,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.3,
+          color: foregroundColor,
+        ),
+      ),
     );
   }
 
@@ -683,8 +740,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         _buildMapPreviewCard(),
         16.hSizedBox,
 
-        // What We Know Section
-        _buildWhatWeKnowSection(),
+        // "What we know" (the AI summary) now renders in the V3 header's
+        // "In plain terms:" box, so it is not repeated here.
 
         // What To Do Section
         _buildWhatToDoSection(),
@@ -940,89 +997,16 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
-  Widget _buildWhatWeKnowSection() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final aiSummary = ref.watch(
-          provider.select((value) => value.hazard?.aiSummary),
-        );
-
-        if (aiSummary?.isEmpty ?? true) return const SizedBox.shrink();
-
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16.spMin),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColorLight,
-                blurRadius: 2.0,
-                offset: Offset(0.0, 0.0),
-              ),
-            ],
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.yellow.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(16.spMin),
-              border: Border(
-                left: BorderSide(
-                  color: AppColors.yellow,
-                  width: 4,
-                ),
-                right: BorderSide(
-                  color: AppColors.yellow,
-                  width: 1,
-                ),
-                bottom: BorderSide(
-                  color: AppColors.yellow,
-                  width: 1,
-                ),
-                top: BorderSide(
-                  color: AppColors.yellow,
-                  width: 1,
-                ),
-              ),
-            ),
-            padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 8.spMin, 16.spMin),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'What We Know',
-                        style: TextStyle(
-                          color: AppColors.black,
-                          fontSize: 16.spMin,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      12.spMin.hSizedBox,
-                      Text(
-                        aiSummary!,
-                        style: TextStyle(
-                          fontSize: 14.spMin,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ).pB(16.0);
-      },
-    );
-  }
-
   Widget _buildWhatToDoSection() {
     return Consumer(
       builder: (context, ref, child) {
         final callsToAction = ref.watch(
           provider.select((value) => value.hazard?.callsToAction),
+        );
+        final isUserReported = ref.watch(
+          provider.select(
+            (value) => value.hazard?.isUserReported ?? false,
+          ),
         );
 
         final shouldShow = (callsToAction?.isNotEmpty ?? false);
@@ -1074,11 +1058,14 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'What To Do',
+                        'WHAT TO DO',
                         style: TextStyle(
-                          color: AppColors.black,
-                          fontSize: 16.spMin,
-                          fontWeight: FontWeight.w600,
+                          color: isUserReported
+                              ? AlertCardStyle.communitySectionHeaderColor
+                              : AlertCardStyle.officialSectionHeaderColor,
+                          fontSize: 10.5.spMin,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.6,
                         ),
                       ),
                       12.spMin.hSizedBox,

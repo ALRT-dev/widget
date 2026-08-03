@@ -274,7 +274,7 @@ class _FamilyOnboardingScreenState
       if (prev != next &&
           next.isSuccess &&
           ref.read(providerOfPendingFamilyInvite)) {
-        ref.read(providerOfPendingFamilyInvite.notifier).state = false;
+        ref.read(providerOfPendingFamilyInvite.notifier).set(false);
         context.push(FamilyInviteScreen.route);
       }
     });

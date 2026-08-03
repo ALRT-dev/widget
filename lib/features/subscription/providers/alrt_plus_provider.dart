@@ -38,4 +38,16 @@ final providerOfAlrtPlusBillingIssue = FutureProvider.autoDispose<bool>((
 
 /// One-shot intent: set by the welcome screen's "Invite your family" CTA,
 /// consumed by the family onboarding after the circle is created.
-final providerOfPendingFamilyInvite = StateProvider<bool>((ref) => false);
+/// (Notifier-based: StateProvider was removed in Riverpod 3.)
+class PendingFamilyInviteNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  // ignore: use_setters_to_change_properties
+  void set(final bool value) => state = value;
+}
+
+final providerOfPendingFamilyInvite =
+    NotifierProvider<PendingFamilyInviteNotifier, bool>(
+  PendingFamilyInviteNotifier.new,
+);

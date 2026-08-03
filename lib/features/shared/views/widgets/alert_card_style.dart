@@ -41,6 +41,51 @@ abstract final class AlertCardStyle {
     if (isOfficial) return LucideIcons.diamond;
     return LucideIcons.circle;
   }
+
+  // ── V3 expanded-card treatments (alert detail screen) ──────────────────
+
+  /// Official (AWS and non-AWS) expanded-card header band.
+  static const officialHeaderGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFF8C00), Color(0xFFFF6B01)],
+  );
+
+  /// Community/user-report expanded-card header band.
+  static const communityHeaderGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF5AB0FF), Color(0xFF3A90E5)],
+  );
+
+  /// AWS severity-level pill (the ONLY system whose pill shows a level word).
+  static const awsLevelPillBackground = Color(0xFFFFF6EF);
+  static const awsLevelPillForeground = Color(0xFFB84500);
+  static const awsLevelPillBorder = Color(0xFFFF6B01);
+
+  /// Official non-AWS category pill (never a band/severity word).
+  static const officialCategoryPillBackground = Color(0xFFE8FBF5);
+  static const officialCategoryPillForeground = Color(0xFF146C43);
+  static const officialCategoryPillBorder = Color(0xFF007A56);
+
+  /// Community category pill (never a severity word).
+  static const communityCategoryPillBackground = Color(0xFFE8F4FF);
+  static const communityCategoryPillForeground = Color(0xFF1565B5);
+
+  /// "Live · updated N ago" pill.
+  static const livePillBackground = Color(0xFFE4F7EE);
+  static const livePillForeground = Color(0xFF146C43);
+
+  /// "In plain terms:" summary box tints.
+  static const officialSummaryBackground = Color(0xFFFFF9F4);
+  static const communitySummaryBackground = Color(0xFFF4F9FF);
+
+  /// V3 section-header ink ("What we know" / "What to do").
+  static const officialSectionHeaderColor = Color(0xFFB84500);
+  static const communitySectionHeaderColor = Color(0xFF1565B5);
+
+  /// V3 body copy colour.
+  static const summaryTextColor = Color(0xFF44414C);
 }
 
 /// Paints a dashed rounded-rect outline (Flutter has no built-in dashed
