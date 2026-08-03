@@ -418,6 +418,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             (value) => value.hazard?.createdAt ?? value.hazard?.occurredAt,
           ),
         );
+        final severity = ref.watch(
+          provider.select((value) => value.hazard?.severity),
+        );
+        final severityBand = ref.watch(
+          provider.select((value) => value.hazard?.severityBand),
+        );
 
         // AWS treatment applies to AWS-compliant OFFICIAL alerts only.
         final isAws = !isUserReported && isAwsCompliant && sourceName != null;
@@ -455,9 +461,16 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
+                  // Community keeps blue; official bands designate their
+                  // level (Advice yellow, Watch and Act orange, red only
+                  // at the top tier).
                   gradient: isUserReported
                       ? AlertCardStyle.communityHeaderGradient
-                      : AlertCardStyle.officialHeaderGradient,
+                      : AlertCardStyle.officialHeaderGradientFor(
+                          isAws: isAws,
+                          severity: severity,
+                          band: severityBand,
+                        ),
                 ),
                 padding: EdgeInsets.fromLTRB(
                   16.spMin,
@@ -628,9 +641,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           width: double.infinity,
           margin: EdgeInsets.only(top: 10.spMin),
           decoration: BoxDecoration(
-            color: isUserReported
-                ? AlertCardStyle.communitySummaryBackground
-                : AlertCardStyle.officialSummaryBackground,
+            // The plain-terms surface is always the dark band (V3 mock).
+            color: AlertCardStyle.plainTermsBackground,
             borderRadius: BorderRadius.circular(10.spMin),
           ),
           padding: EdgeInsets.symmetric(
@@ -650,7 +662,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             style: TextStyle(
               fontSize: 12.spMin,
               height: 1.55,
-              color: AlertCardStyle.summaryTextColor,
+              color: Colors.white,
             ),
           ),
         );

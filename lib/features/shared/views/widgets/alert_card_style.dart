@@ -127,6 +127,49 @@ abstract final class AlertCardStyle {
     colors: [Color(0xFFFF8C00), Color(0xFFFF6B01)],
   );
 
+  /// Official expanded-card header, coloured by severity — the top of the
+  /// alert must designate the level: Advice/MONITOR yellow, Watch and
+  /// Act/ACTION orange, Emergency/CRITICAL red, info grey.
+  static LinearGradient officialHeaderGradientFor({
+    required final bool isAws,
+    final HazardSeverity? severity,
+    final HazardSeverityBand? band,
+  }) {
+    final bool isCriticalTier = isAws
+        ? severity == HazardSeverity.emergency
+        : band == HazardSeverityBand.critical;
+    final bool isActionTier = isAws
+        ? severity == HazardSeverity.watchAndAct
+        : band == HazardSeverityBand.action;
+    final bool isMonitorTier = isAws
+        ? severity == HazardSeverity.advice
+        : band == HazardSeverityBand.monitor;
+
+    if (isCriticalTier) {
+      return const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFFDA1F2D), Color(0xFF9E1520)],
+      );
+    }
+    if (isActionTier) return officialHeaderGradient;
+    if (isMonitorTier) {
+      return const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFFF5C518), Color(0xFFDCA900)],
+      );
+    }
+    return const LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [Color(0xFF8A93A0), Color(0xFF6E7683)],
+    );
+  }
+
+  /// The dark "In plain terms" surface (cards and the expanded alert).
+  static const plainTermsBackground = Color(0xFF23252B);
+
   /// Community/user-report expanded-card header band.
   static const communityHeaderGradient = LinearGradient(
     begin: Alignment.topLeft,

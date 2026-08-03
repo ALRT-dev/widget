@@ -205,7 +205,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
 
         return Container(
           width: double.infinity,
-          color: const Color(0xFF23252B),
+          color: AlertCardStyle.plainTermsBackground,
           padding: EdgeInsets.symmetric(
             horizontal: 16.spMin,
             vertical: 9.spMin,
