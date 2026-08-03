@@ -1,13 +1,21 @@
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/family/providers/family_provider.dart';
+import 'package:hazard_app/features/home/enums/home_tab_types.dart';
+import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
+import 'package:hazard_app/features/home/views/screens/home_screen.dart';
 import 'package:hazard_app/features/notification/providers/repository_providers.dart';
 import 'package:hazard_app/features/notification/repositories/notification_repository.dart';
 import 'package:hazard_app/features/notification/services/local_notification_service.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/shared/providers/followed_alerts_provider.dart';
+import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
@@ -102,10 +110,36 @@ class NotificationService {
     // (iOS); a tap routes into the same deep-link callback.
     await LocalNotificationService.instance.initialize(
       onNotificationTap: onMessageReceived,
+      isFollowing: (alertId) =>
+          _ref.read(providerOfFollowedAlerts).contains(alertId),
+      onFollowAction: (alertId) =>
+          _ref.read(providerOfFollowedAlerts.notifier).follow(alertId),
+      onOpenMapAction: () => _goToHomeTab(HomeTab.map),
+      onImSafeAction: _handleImSafeAction,
     );
     _foregroundMessageStreamSub = _notificationRepository
         .onForegroundPushNotificationMessage()
         .listen(LocalNotificationService.instance.showFromRemoteMessage);
+  }
+
+  /// "I'm safe" on an ACTION/CRITICAL notification fires the same family
+  /// check-in as the in-app button when a circle exists; without one it just
+  /// lands on the family tab so the user can set a circle up.
+  void _handleImSafeAction() {
+    if (_ref.read(providerOfFamily).circle != null) {
+      _ref.read(providerOfFamily.notifier).checkIn();
+    }
+    _goToHomeTab(HomeTab.family);
+  }
+
+  /// Navigates to the home shell and selects [tab] once the route settles
+  /// (same pattern as the widget deep-link handler).
+  void _goToHomeTab(final HomeTab tab) {
+    final context = _ref.read(providerOfGlobalNavigatorKey).currentContext;
+    if (context != null && context.mounted) context.go(HomeScreen.route);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ref.read(providerOfHomeTab.notifier).state = tab;
+    });
   }
 
   /// Disposes the stream.

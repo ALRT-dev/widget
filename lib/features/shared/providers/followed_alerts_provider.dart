@@ -27,6 +27,13 @@ class FollowedAlertsNotifier extends Notifier<Set<String>> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(_prefsKey, next.toList());
   }
+
+  /// Follow only, never unfollow — used by the notification action so a
+  /// repeat tap cannot silently unfollow an alert.
+  Future<void> follow(final String alertId) async {
+    if (state.contains(alertId)) return;
+    await toggle(alertId);
+  }
 }
 
 final providerOfFollowedAlerts =
