@@ -17,6 +17,7 @@ import 'package:hazard_app/features/shared/extensions/date_time_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/error_model.dart';
+import 'package:hazard_app/features/profile/views/widgets/for_you_card.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/video_id_priority_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
@@ -745,6 +746,25 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
         // What To Do Section
         _buildWhatToDoSection(),
+
+        // For You: profile-pinned guidance. On-device matching, zero AI.
+        Consumer(
+          builder: (context, ref, child) {
+            final categoryName = ref.watch(
+              provider.select(
+                (value) =>
+                    value.hazard?.category?.parent?.name ??
+                    value.hazard?.category?.name,
+              ),
+            );
+            final isAws = ref.watch(
+              provider.select(
+                (value) => value.hazard?.isAwsCompliant ?? false,
+              ),
+            );
+            return ForYouCard(categoryName: categoryName, isAws: isAws);
+          },
+        ),
 
         // Official Description Section
         // _buildOfficialDescriptionSection(),
