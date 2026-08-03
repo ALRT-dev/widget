@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +31,13 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
   bool _busy = false;
   String? _error;
 
+  /// QA builds without store keys show dummy plan cards so the whole
+  /// gate -> purchase -> welcome flow can be walked. Never true in store
+  /// builds (driven by ALRT_PLUS_TEST_UNLOCK, which CI sets only for the
+  /// sideloaded dev flavour).
+  bool _dummy = false;
+  bool _dummyYearlySelected = true;
+
   @override
   void initState() {
     super.initState();
@@ -40,11 +48,14 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
     final rc = ref.read(providerOfRevenueCat);
     final offering = await rc.currentOffering();
     if (!mounted) return;
+    final dummy = offering == null &&
+        dotenv.env['ALRT_PLUS_TEST_UNLOCK'] == 'true';
     setState(() {
       _offering = offering;
       _selected = offering?.annual ?? offering?.availablePackages.firstOrNull;
+      _dummy = dummy;
       _loading = false;
-      _error = offering == null
+      _error = (offering == null && !dummy)
           ? 'ALRT + is not available right now. Please try again later.'
           : null;
     });
@@ -61,6 +72,15 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
   }
 
   Future<void> _subscribe() async {
+    if (_dummy) {
+      if (_busy) return;
+      setState(() => _busy = true);
+      await Future<void>.delayed(const Duration(milliseconds: 900));
+      if (!mounted) return;
+      setState(() => _busy = false);
+      await _finishEntitled();
+      return;
+    }
     final package = _selected;
     if (package == null || _busy) return;
     setState(() => _busy = true);
@@ -123,6 +143,7 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
                       ),
                       SizedBox(height: 14.spMin),
                       if (_offering != null) _planRowBuilder(),
+                      if (_dummy) _dummyPlanRowBuilder(),
                       if (_error != null)
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 10.spMin),
@@ -139,7 +160,8 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
                       AlrtPlusCta(
                         label: 'Start free month',
                         busy: _busy,
-                        onPressed: _selected == null ? null : _subscribe,
+                        onPressed:
+                            (_selected == null && !_dummy) ? null : _subscribe,
                       ),
                       SizedBox(height: 9.spMin),
                       _priceLineBuilder(),
@@ -310,9 +332,109 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
     );
   }
 
+  Widget _dummyPlanRowBuilder() {
+    Widget card({
+      required final String title,
+      required final String price,
+      required final String per,
+      required final bool selected,
+      required final VoidCallback onTap,
+    }) {
+      return Expanded(
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              vertical: 14.spMin,
+              horizontal: 10.spMin,
+            ),
+            decoration: BoxDecoration(
+              color: selected ? const Color(0xFFF9F0FC) : Colors.white,
+              borderRadius: BorderRadius.circular(18.spMin),
+              border: Border.all(
+                color:
+                    selected ? AlrtPlusStyle.magenta : AlrtPlusStyle.cardLine,
+                width: selected ? 2 : 1,
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 10.spMin,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.6,
+                    color: selected
+                        ? AlrtPlusStyle.magenta
+                        : AlrtPlusStyle.inkFaint,
+                  ),
+                ),
+                SizedBox(height: 5.spMin),
+                Text(
+                  price,
+                  style: TextStyle(
+                    fontSize: 22.spMin,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                    color: AlrtPlusStyle.ink,
+                  ),
+                ),
+                SizedBox(height: 2.spMin),
+                Text(
+                  per,
+                  style: TextStyle(
+                    fontSize: 11.spMin,
+                    color: selected
+                        ? AlrtPlusStyle.magenta
+                        : AlrtPlusStyle.inkSoft,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            card(
+              title: 'MONTHLY',
+              price: '\$9.99',
+              per: 'per month',
+              selected: !_dummyYearlySelected,
+              onTap: () => setState(() => _dummyYearlySelected = false),
+            ),
+            SizedBox(width: 10.spMin),
+            card(
+              title: 'YEARLY',
+              price: '\$99.99',
+              per: 'per year',
+              selected: _dummyYearlySelected,
+              onTap: () => setState(() => _dummyYearlySelected = true),
+            ),
+          ],
+        ),
+        SizedBox(height: 8.spMin),
+        Text(
+          'Preview prices · test build only, no real purchase',
+          style: TextStyle(
+            fontSize: 10.spMin,
+            color: AlrtPlusStyle.inkFaint,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _priceLineBuilder() {
-    final monthly = _offering?.monthly?.storeProduct.priceString;
-    final annual = _offering?.annual?.storeProduct.priceString;
+    final monthly =
+        _dummy ? '\$9.99' : _offering?.monthly?.storeProduct.priceString;
+    final annual =
+        _dummy ? '\$99.99' : _offering?.annual?.storeProduct.priceString;
     final pricePart = (monthly != null && annual != null)
         ? '1 month free, then $monthly a month or $annual a year'
         : '1 month free, then the price shown above';
