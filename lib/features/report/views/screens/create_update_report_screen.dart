@@ -16,7 +16,6 @@ import 'package:hazard_app/features/report/providers/create_update_report_provid
 import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/enums/category_image_type.dart';
-import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
 import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/features/report/models/report_taxonomy.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
@@ -37,8 +36,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// The V3 section label / helper text colour from the design screenshots.
 const _sectionLabelColor = Color(0xFFB84500);
 
-/// Readable ink for text sitting on the Info-band grey disclosure band.
-const _bandInk = Color(0xFF4A525C);
+/// The soft grey the report page sits on, from the V3.1 prototype.
+const _pageColor = Color(0xFFF0EEF2);
 
 class CreateUpdateReportScreenArgs {
   CreateUpdateReportScreenArgs({this.hazardToUpdate});
@@ -100,7 +99,10 @@ class _CreateUpdateReportScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      // The soft grey page the prototype uses. White cards float on it, so
+      // each one reads as a distinct thing to do instead of dissolving into
+      // a single white sheet divided by hairlines.
+      backgroundColor: _pageColor,
       bottomNavigationBar: _submitBarBuilder(),
       appBar: AppBar(
         backgroundColor: AppColors.transparent,
@@ -185,48 +187,95 @@ class _CreateUpdateReportScreenState
   /// after a category is picked, so the whole job is visible up front.
   Widget _formBuilder() {
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20.spMin, 16.spMin, 20.spMin, 28.spMin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _disclosureBandBuilder(),
-          _cardBuilder(
-            step: 1,
-            title: 'Where',
-            isRequired: true,
-            child: _locationBuilder(),
+          Padding(
+            padding: EdgeInsets.fromLTRB(16.spMin, 12.spMin, 16.spMin, 28.spMin),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _locationBuilder(),
+                _sectionBuilder(
+                  label: 'Category',
+                  helper: 'one tap, pick the closest fit',
+                  child: _categoriesBuilder(),
+                ),
+                _sectionBuilder(
+                  label: 'What can you see?',
+                  helper: 'tap any, this is an observation not a diagnosis',
+                  child: _chipsBuilder(),
+                ),
+                _sectionBuilder(
+                  label: 'How would you describe it?',
+                  helper: 'auto-set from what you picked, tap to change',
+                  child: _severityWordingBuilder(),
+                ),
+                _sectionBuilder(
+                  label: 'Add details',
+                  helper: 'optional',
+                  child: _descriptionBuilder(),
+                ),
+                _sectionBuilder(
+                  label: 'Photos',
+                  helper: 'optional',
+                  child: _mediaBuilder(),
+                ),
+                _headlinePreviewBuilder(),
+              ],
+            ),
           ),
-          _cardBuilder(
-            step: 2,
-            title: 'Category',
-            isRequired: true,
-            helper: 'one tap, pick the closest fit',
-            child: _categoriesBuilder(),
+        ],
+      ),
+    );
+  }
+
+  /// One section: a small orange label with its helper set inline, then the
+  /// content straight onto the page.
+  ///
+  /// The numbered step circles and Required badges are gone. Six numbered
+  /// cards separated by hairlines read as a government form, which is what
+  /// made this screen feel like paperwork rather than telling a neighbour
+  /// what you can see. The label is the quietest thing in each section and
+  /// the content is the loudest, which is the right way round.
+  Widget _sectionBuilder({
+    required final String label,
+    required final Widget child,
+    final String? helper,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(top: 16.spMin),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(left: 2.spMin, bottom: 8.spMin),
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: label.toUpperCase()),
+                  if (helper != null)
+                    TextSpan(
+                      text: '  $helper',
+                      style: TextStyle(
+                        fontSize: 10.5.spMin,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0,
+                        color: AppColors.mediumGrey,
+                      ),
+                    ),
+                ],
+              ),
+              style: TextStyle(
+                fontSize: 10.5.spMin,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.7,
+                color: _sectionLabelColor,
+              ),
+            ),
           ),
-          _cardBuilder(
-            step: 3,
-            title: 'What can you see?',
-            helper: 'tap any, this is an observation not a diagnosis',
-            child: _chipsBuilder(),
-          ),
-          _cardBuilder(
-            step: 4,
-            title: 'How would you describe it?',
-            helper: 'auto-set from what you picked, tap to change',
-            child: _severityWordingBuilder(),
-          ),
-          _cardBuilder(
-            step: 5,
-            title: 'Add details',
-            helper: 'tapping what you can see helps neighbours act faster',
-            child: _descriptionBuilder(),
-          ),
-          _cardBuilder(
-            step: 6,
-            title: 'Photos',
-            child: _mediaBuilder(),
-          ),
-          _headlinePreviewBuilder(),
+          child,
         ],
       ),
     );
@@ -238,88 +287,51 @@ class _CreateUpdateReportScreenState
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AlertCardStyle.bandInfo.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(14.spMin),
-        border: Border.all(
-          color: AlertCardStyle.bandInfo.withValues(alpha: 0.35),
+        gradient: LinearGradient(
+          colors: [AppColors.orange300, AppColors.red200],
         ),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 12.spMin),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(LucideIcons.info, size: 17.spMin, color: _bandInk),
-          SizedBox(width: 10.spMin),
-          Expanded(
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: 'ALRT is a community report, '
-                        'not an emergency service.\n',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  TextSpan(
-                    text: 'Report only what you can see safely.',
-                    style: TextStyle(color: AppColors.mediumGrey),
-                  ),
-                ],
-              ),
-              style: TextStyle(
-                fontSize: 13.spMin,
-                height: 1.45,
-                color: _bandInk,
-                fontFamily: AppTheme.defaultFontFamily,
+      padding: EdgeInsets.fromLTRB(16.spMin, 0, 16.spMin, 14.spMin),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.black.withValues(alpha: 0.18),
+          borderRadius: BorderRadius.circular(11.spMin),
+          border: Border.all(
+            color: AppColors.white.withValues(alpha: 0.25),
+          ),
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: 11.spMin,
+          vertical: 9.spMin,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              LucideIcons.info,
+              size: 14.spMin,
+              color: AppColors.white,
+            ),
+            SizedBox(width: 8.spMin),
+            Expanded(
+              child: Text(
+                'ALRT is a community report, not an emergency service. '
+                'Report only what you can see safely.',
+                style: TextStyle(
+                  fontSize: 11.spMin,
+                  height: 1.4,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.white,
+                  fontFamily: AppTheme.defaultFontFamily,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  /// One white card per step: numbered label, optional helper line, content.
-  Widget _cardBuilder({
-    required final String title,
-    required final Widget child,
-    final int? step,
-    final String? helper,
-    final bool? isRequired = false,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 18.spMin),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: AppColors.lightGrey.withValues(alpha: 0.55),
-          ),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _sectionTitleBuilder(
-            title: title,
-            step: step,
-            isRequired: isRequired,
-          ),
-          if (helper != null) ...[
-            5.hSizedBox,
-            Text(
-              helper,
-              style: TextStyle(
-                fontSize: 12.5.spMin,
-                color: AppColors.mediumGrey,
-              ),
-            ),
-          ],
-          12.hSizedBox,
-          child,
-        ],
-      ),
-    );
-  }
 
   /// Shown in place of per-category content before a category is picked, so
   /// the step is still visible and says what will land in it.
@@ -1290,27 +1302,44 @@ class _CreateUpdateReportScreenState
           locationName: locationName,
         );
 
-        return _cardBuilder(
-          title: 'How it will read',
-          isRequired: null,
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.extraLightGrey,
-              borderRadius: BorderRadius.circular(12.spMin),
+        // The preview is a footnote, not a step: it reports back what the
+        // choices above already decided, so it takes the quietest treatment
+        // on the page rather than a section label of its own.
+        return Container(
+          width: double.infinity,
+          margin: EdgeInsets.only(top: 16.spMin),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF6F5F2),
+            borderRadius: BorderRadius.circular(12.spMin),
+            border: Border.all(color: AppColors.lightGrey.withValues(alpha: 0.6)),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 13.spMin,
+            vertical: 11.spMin,
+          ),
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: 'Headline preview:  ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.mediumGrey,
+                  ),
+                ),
+                TextSpan(
+                  text: headline,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.black,
+                  ),
+                ),
+              ],
             ),
-            padding: EdgeInsets.symmetric(
-              horizontal: 14.spMin,
-              vertical: 12.spMin,
-            ),
-            child: Text(
-              headline,
-              style: TextStyle(
-                fontSize: 15.spMin,
-                fontWeight: FontWeight.w700,
-                color: AppColors.black,
-                fontFamily: AppTheme.defaultFontFamily,
-              ),
+            style: TextStyle(
+              fontSize: 12.5.spMin,
+              height: 1.5,
+              fontFamily: AppTheme.defaultFontFamily,
             ),
           ),
         );
