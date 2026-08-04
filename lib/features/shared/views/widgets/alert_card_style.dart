@@ -185,6 +185,20 @@ abstract final class AlertCardStyle {
     );
   }
 
+  /// The dark stop of each band's gradient.
+  ///
+  /// Shape glyphs and text drawn on a band TINT use this rather than the
+  /// bright band hex, which has too little contrast against its own 12%
+  /// wash to stay legible.
+  static Color bandDarkStop(final HazardSeverityBand? band) {
+    return switch (band) {
+      HazardSeverityBand.critical => const Color(0xFF9E1520),
+      HazardSeverityBand.action => const Color(0xFFB8560E),
+      HazardSeverityBand.monitor => const Color(0xFF8A6D00),
+      HazardSeverityBand.info || null => const Color(0xFF5A6270),
+    };
+  }
+
   /// The dark "In plain terms" surface (cards and the expanded alert).
   static const plainTermsBackground = Color(0xFF23252B);
 

@@ -16,9 +16,9 @@ import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dar
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/utils/share_alert.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
-import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
+import 'package:hazard_app/features/shared/views/widgets/hazard_shape_badge.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -522,50 +522,27 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     );
   }
 
+  /// Triage in half a second: the source shape inside a band-tinted
+  /// rounded square. Shape = which system, tint = which band.
   Widget _iconBuilder() {
     return Consumer(
       builder: (context, ref, child) {
-        final categoryImage = ref.watch(
+        final isAwsCompliant = ref.watch(
           provider.select(
-            (value) => value.hazard!.categoryImage,
+            (value) => value.hazard?.isAwsCompliant ?? false,
           ),
         );
-        final hazardColor = ref.watch(
-          provider.select(
-            (value) => value.hazard?.color ?? AppColors.black,
-          ),
+        final isOfficial = ref.watch(
+          provider.select((value) => value.hazard?.source != null),
         );
-        final fallbackIconPath = ref.watch(
-          provider.select(
-            (value) => value.hazard?.fallbackIconPath ?? '',
-          ),
+        final severityBand = ref.watch(
+          provider.select((value) => value.hazard?.severityBand),
         );
 
-        return SizedBox(
-          width: 48.spMin,
-          height: 48.spMin,
-          child: AppCachedNetworkImage(
-            imageUrl: categoryImage?.url ?? '',
-            cacheKey: categoryImage?.s3Key,
-            fit: BoxFit.contain,
-            errorWidget: (context, url, error) => Image.asset(
-              fallbackIconPath,
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Container(
-                decoration: BoxDecoration(
-                  color: hazardColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12.spMin),
-                ),
-                child: Icon(
-                  Icons.error,
-                  size: 24.spMin,
-                  color: hazardColor == AppColors.transparent
-                      ? AppColors.grey
-                      : hazardColor,
-                ),
-              ),
-            ),
-          ),
+        return HazardShapeBadge(
+          isAws: isAwsCompliant,
+          isOfficial: isOfficial,
+          band: severityBand,
         );
       },
     );
