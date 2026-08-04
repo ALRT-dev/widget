@@ -9,6 +9,8 @@ import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
+import 'package:hazard_app/features/profile/providers/xp_summary_provider.dart';
+import 'package:hazard_app/features/profile/views/screens/how_points_work_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart';
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
 import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
@@ -903,11 +905,140 @@ class _CreateUpdateReportScreenState
             textAlign: TextAlign.center,
           ),
           20.hSizedBox,
+          _whatThisEarnsBuilder(),
+          20.hSizedBox,
           _submitAnotherButtonBuilder(),
           12.hSizedBox,
           _seeActiveReportsButtonBuilder(),
         ],
       ).pX(20.0),
+    );
+  }
+
+  /// What this report can earn, stated at the only moment the user is
+  /// certain to be looking: right after they sent it.
+  ///
+  /// Every line is conditional on purpose. Nothing is awarded at submission
+  /// — approval, corroboration and an official match all happen later — so
+  /// the card says "if", never "you earned". Claiming points that a
+  /// moderator has not granted would be the one dishonest screen in the app.
+  Widget _whatThisEarnsBuilder() {
+    final summary = ref.watch(providerOfXpSummary).value;
+    final streakDays = summary?.streakDays ?? 0;
+    final multiplierActive = summary?.streakMultiplierActive ?? false;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 16.spMin, vertical: 14.spMin),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF6EE),
+        borderRadius: BorderRadius.circular(16.spMin),
+        border: Border.all(color: const Color(0xFFF6DCC4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'WHAT THIS CAN EARN',
+            style: TextStyle(
+              fontSize: 10.spMin,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.6,
+              color: _sectionLabelColor,
+            ),
+          ),
+          10.hSizedBox,
+          _earnLineBuilder(
+            points: '+10',
+            text: 'when a moderator approves it',
+          ),
+          _earnLineBuilder(
+            points: '+5',
+            text: 'if someone nearby reports the same thing',
+          ),
+          _earnLineBuilder(
+            points: '+15',
+            text: 'if it matches an official warning',
+          ),
+          if (streakDays > 0) ...[
+            8.hSizedBox,
+            Row(
+              children: [
+                Icon(
+                  LucideIcons.flame,
+                  size: 14.spMin,
+                  color: const Color(0xFFE05A00),
+                ),
+                8.wSizedBox,
+                Expanded(
+                  child: Text(
+                    multiplierActive
+                        ? '$streakDays-day streak: approvals count 1.2x '
+                              'while it lasts.'
+                        : '$streakDays-day streak. Reach 3 days and '
+                              'approvals count 1.2x.',
+                    style: TextStyle(
+                      fontSize: 11.5.spMin,
+                      height: 1.45,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF8A5A2B),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          10.hSizedBox,
+          GestureDetector(
+            onTap: () => context.push(HowPointsWorkScreen.route),
+            child: Text(
+              'How points work',
+              style: TextStyle(
+                fontSize: 12.spMin,
+                fontWeight: FontWeight.w700,
+                color: _sectionLabelColor,
+                decoration: TextDecoration.underline,
+                decorationColor: _sectionLabelColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _earnLineBuilder({
+    required final String points,
+    required final String text,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 6.spMin),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 30.spMin,
+            child: Text(
+              points,
+              style: TextStyle(
+                fontSize: 13.spMin,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF0A8A58),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 12.5.spMin,
+                height: 1.4,
+                color: AppColors.mediumGrey,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
