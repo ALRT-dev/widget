@@ -281,6 +281,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
             context.push(FamilyCircleProfileScreen.route);
           case 'groupSettings':
             _showGroupSettingsSheet(circle);
+          case 'transferHosting':
+            _showTransferHostingSheet(circle);
           case 'leave':
             _confirmLeaveOrDelete(isOwner: isOwner);
         }
@@ -294,6 +296,11 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
           const PopupMenuItem(
             value: 'groupSettings',
             child: Text('Group settings'),
+          ),
+        if (isOwner)
+          const PopupMenuItem(
+            value: 'transferHosting',
+            child: Text('Transfer hosting'),
           ),
         PopupMenuItem(
           value: 'leave',
@@ -441,6 +448,147 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         ? context.showSuccessToast(message: 'Group settings saved.')
         : context.showErrorToast(
             message: 'Could not save settings. Please try again.',
+          );
+  }
+
+  /// Owner-only sheet (§29 TRANSFER): hand the circle to an eligible member.
+  /// Ineligible members are shown greyed with the reason, never hidden.
+  Future<void> _showTransferHostingSheet(final FamilyCircle circle) async {
+    final candidates = await ref
+        .read(providerOfFamily.notifier)
+        .loadTransferCandidates();
+    if (!mounted) return;
+    if (candidates == null) {
+      context.showErrorToast(
+        message: 'Could not load members. Please try again.',
+      );
+      return;
+    }
+    if (candidates.candidates.isEmpty) {
+      context.showErrorToast(
+        message: 'Invite someone first — there is no one to hand the '
+            'circle to yet.',
+      );
+      return;
+    }
+
+    final picked = await showModalBottomSheet<FamilyTransferCandidate>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.spMin)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(20.spMin, 20.spMin, 20.spMin, 12.spMin),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Transfer hosting',
+                style: TextStyle(
+                  fontSize: 17.spMin,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: 4.spMin),
+              Text(
+                'The new host covers everyone here with their own ALRT+ '
+                'seats. You stay on as a member.',
+                style: TextStyle(
+                  fontSize: 12.5.spMin,
+                  color: AppColors.mediumGrey,
+                ),
+              ),
+              SizedBox(height: 8.spMin),
+              ...candidates.candidates.map(
+                (candidate) => ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  enabled: candidate.eligible,
+                  onTap: candidate.eligible
+                      ? () => Navigator.of(sheetContext).pop(candidate)
+                      : null,
+                  leading: CircleAvatar(
+                    radius: 18.spMin,
+                    backgroundColor: FamilyColors.indigo.withValues(
+                      alpha: candidate.eligible ? 0.15 : 0.06,
+                    ),
+                    foregroundImage: candidate.profilePictureUrl != null
+                        ? NetworkImage(candidate.profilePictureUrl!)
+                        : null,
+                    child: Text(
+                      candidate.name.isEmpty
+                          ? '?'
+                          : candidate.name[0].toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 14.spMin,
+                        fontWeight: FontWeight.w700,
+                        color: candidate.eligible
+                            ? FamilyColors.indigo
+                            : AppColors.grey,
+                      ),
+                    ),
+                  ),
+                  title: Text(
+                    candidate.name,
+                    style: TextStyle(
+                      fontSize: 14.5.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: candidate.eligible
+                          ? Colors.black87
+                          : AppColors.grey,
+                    ),
+                  ),
+                  subtitle: candidate.eligible
+                      ? null
+                      : Text(
+                          candidate.reason ?? 'Not eligible right now',
+                          style: TextStyle(
+                            fontSize: 11.5.spMin,
+                            color: AppColors.grey,
+                          ),
+                        ),
+                  trailing: candidate.eligible
+                      ? Icon(
+                          LucideIcons.chevronRight,
+                          size: 18.spMin,
+                          color: AppColors.grey,
+                        )
+                      : null,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (picked == null || !mounted) return;
+
+    var confirmed = false;
+    await showConfirmationSheet(
+      context: context,
+      title: 'Hand the circle to ${picked.name}?',
+      description:
+          'Your ${candidates.memberCount} seats here move to '
+          '${picked.name}\'s plan and everything keeps working. You stay '
+          'on as a member — only ${picked.name} can hand hosting back.',
+      confirmButtonText: 'Transfer hosting',
+      onPressedConfirm: (_, __) => confirmed = true,
+    );
+    if (!confirmed || !mounted) return;
+
+    final ok = await ref
+        .read(providerOfFamily.notifier)
+        .transferOwnership(newOwnerMemberId: picked.memberId);
+    if (!mounted) return;
+    ok
+        ? context.showSuccessToast(
+            message: '${picked.name} is now hosting this circle.',
+          )
+        : context.showErrorToast(
+            message: 'Could not transfer hosting. Please try again.',
           );
   }
 

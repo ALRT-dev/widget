@@ -2673,6 +2673,561 @@ as DateTime?,
 
 
 /// @nodoc
+mixin _$FamilyTransferCandidate {
+
+ String get memberId; String get name; String? get profilePictureUrl;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role; bool get eligible;/// Why the member cannot take over, when [eligible] is false.
+ String? get reason;
+/// Create a copy of FamilyTransferCandidate
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilyTransferCandidateCopyWith<FamilyTransferCandidate> get copyWith => _$FamilyTransferCandidateCopyWithImpl<FamilyTransferCandidate>(this as FamilyTransferCandidate, _$identity);
+
+  /// Serializes this FamilyTransferCandidate to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyTransferCandidate&&(identical(other.memberId, memberId) || other.memberId == memberId)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.role, role) || other.role == role)&&(identical(other.eligible, eligible) || other.eligible == eligible)&&(identical(other.reason, reason) || other.reason == reason));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,memberId,name,profilePictureUrl,role,eligible,reason);
+
+@override
+String toString() {
+  return 'FamilyTransferCandidate(memberId: $memberId, name: $name, profilePictureUrl: $profilePictureUrl, role: $role, eligible: $eligible, reason: $reason)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilyTransferCandidateCopyWith<$Res>  {
+  factory $FamilyTransferCandidateCopyWith(FamilyTransferCandidate value, $Res Function(FamilyTransferCandidate) _then) = _$FamilyTransferCandidateCopyWithImpl;
+@useResult
+$Res call({
+ String memberId, String name, String? profilePictureUrl,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, bool eligible, String? reason
+});
+
+
+
+
+}
+/// @nodoc
+class _$FamilyTransferCandidateCopyWithImpl<$Res>
+    implements $FamilyTransferCandidateCopyWith<$Res> {
+  _$FamilyTransferCandidateCopyWithImpl(this._self, this._then);
+
+  final FamilyTransferCandidate _self;
+  final $Res Function(FamilyTransferCandidate) _then;
+
+/// Create a copy of FamilyTransferCandidate
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? memberId = null,Object? name = null,Object? profilePictureUrl = freezed,Object? role = null,Object? eligible = null,Object? reason = freezed,}) {
+  return _then(_self.copyWith(
+memberId: null == memberId ? _self.memberId : memberId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as FamilyRole,eligible: null == eligible ? _self.eligible : eligible // ignore: cast_nullable_to_non_nullable
+as bool,reason: freezed == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FamilyTransferCandidate].
+extension FamilyTransferCandidatePatterns on FamilyTransferCandidate {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilyTransferCandidate value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilyTransferCandidate() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilyTransferCandidate value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyTransferCandidate():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilyTransferCandidate value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyTransferCandidate() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String memberId,  String name,  String? profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  bool eligible,  String? reason)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilyTransferCandidate() when $default != null:
+return $default(_that.memberId,_that.name,_that.profilePictureUrl,_that.role,_that.eligible,_that.reason);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String memberId,  String name,  String? profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  bool eligible,  String? reason)  $default,) {final _that = this;
+switch (_that) {
+case _FamilyTransferCandidate():
+return $default(_that.memberId,_that.name,_that.profilePictureUrl,_that.role,_that.eligible,_that.reason);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String memberId,  String name,  String? profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  bool eligible,  String? reason)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilyTransferCandidate() when $default != null:
+return $default(_that.memberId,_that.name,_that.profilePictureUrl,_that.role,_that.eligible,_that.reason);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilyTransferCandidate implements FamilyTransferCandidate {
+  const _FamilyTransferCandidate({required this.memberId, required this.name, this.profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult) this.role = FamilyRole.adult, this.eligible = false, this.reason});
+  factory _FamilyTransferCandidate.fromJson(Map<String, dynamic> json) => _$FamilyTransferCandidateFromJson(json);
+
+@override final  String memberId;
+@override final  String name;
+@override final  String? profilePictureUrl;
+@override@JsonKey(unknownEnumValue: FamilyRole.adult) final  FamilyRole role;
+@override@JsonKey() final  bool eligible;
+/// Why the member cannot take over, when [eligible] is false.
+@override final  String? reason;
+
+/// Create a copy of FamilyTransferCandidate
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilyTransferCandidateCopyWith<_FamilyTransferCandidate> get copyWith => __$FamilyTransferCandidateCopyWithImpl<_FamilyTransferCandidate>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilyTransferCandidateToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyTransferCandidate&&(identical(other.memberId, memberId) || other.memberId == memberId)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.role, role) || other.role == role)&&(identical(other.eligible, eligible) || other.eligible == eligible)&&(identical(other.reason, reason) || other.reason == reason));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,memberId,name,profilePictureUrl,role,eligible,reason);
+
+@override
+String toString() {
+  return 'FamilyTransferCandidate(memberId: $memberId, name: $name, profilePictureUrl: $profilePictureUrl, role: $role, eligible: $eligible, reason: $reason)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilyTransferCandidateCopyWith<$Res> implements $FamilyTransferCandidateCopyWith<$Res> {
+  factory _$FamilyTransferCandidateCopyWith(_FamilyTransferCandidate value, $Res Function(_FamilyTransferCandidate) _then) = __$FamilyTransferCandidateCopyWithImpl;
+@override @useResult
+$Res call({
+ String memberId, String name, String? profilePictureUrl,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, bool eligible, String? reason
+});
+
+
+
+
+}
+/// @nodoc
+class __$FamilyTransferCandidateCopyWithImpl<$Res>
+    implements _$FamilyTransferCandidateCopyWith<$Res> {
+  __$FamilyTransferCandidateCopyWithImpl(this._self, this._then);
+
+  final _FamilyTransferCandidate _self;
+  final $Res Function(_FamilyTransferCandidate) _then;
+
+/// Create a copy of FamilyTransferCandidate
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? memberId = null,Object? name = null,Object? profilePictureUrl = freezed,Object? role = null,Object? eligible = null,Object? reason = freezed,}) {
+  return _then(_FamilyTransferCandidate(
+memberId: null == memberId ? _self.memberId : memberId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as FamilyRole,eligible: null == eligible ? _self.eligible : eligible // ignore: cast_nullable_to_non_nullable
+as bool,reason: freezed == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$FamilyTransferCandidates {
+
+ String get circleId; int get memberCount; List<FamilyTransferCandidate> get candidates;
+/// Create a copy of FamilyTransferCandidates
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilyTransferCandidatesCopyWith<FamilyTransferCandidates> get copyWith => _$FamilyTransferCandidatesCopyWithImpl<FamilyTransferCandidates>(this as FamilyTransferCandidates, _$identity);
+
+  /// Serializes this FamilyTransferCandidates to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyTransferCandidates&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&const DeepCollectionEquality().equals(other.candidates, candidates));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,circleId,memberCount,const DeepCollectionEquality().hash(candidates));
+
+@override
+String toString() {
+  return 'FamilyTransferCandidates(circleId: $circleId, memberCount: $memberCount, candidates: $candidates)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilyTransferCandidatesCopyWith<$Res>  {
+  factory $FamilyTransferCandidatesCopyWith(FamilyTransferCandidates value, $Res Function(FamilyTransferCandidates) _then) = _$FamilyTransferCandidatesCopyWithImpl;
+@useResult
+$Res call({
+ String circleId, int memberCount, List<FamilyTransferCandidate> candidates
+});
+
+
+
+
+}
+/// @nodoc
+class _$FamilyTransferCandidatesCopyWithImpl<$Res>
+    implements $FamilyTransferCandidatesCopyWith<$Res> {
+  _$FamilyTransferCandidatesCopyWithImpl(this._self, this._then);
+
+  final FamilyTransferCandidates _self;
+  final $Res Function(FamilyTransferCandidates) _then;
+
+/// Create a copy of FamilyTransferCandidates
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? circleId = null,Object? memberCount = null,Object? candidates = null,}) {
+  return _then(_self.copyWith(
+circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
+as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
+as int,candidates: null == candidates ? _self.candidates : candidates // ignore: cast_nullable_to_non_nullable
+as List<FamilyTransferCandidate>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FamilyTransferCandidates].
+extension FamilyTransferCandidatesPatterns on FamilyTransferCandidates {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilyTransferCandidates value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilyTransferCandidates() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilyTransferCandidates value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyTransferCandidates():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilyTransferCandidates value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyTransferCandidates() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String circleId,  int memberCount,  List<FamilyTransferCandidate> candidates)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilyTransferCandidates() when $default != null:
+return $default(_that.circleId,_that.memberCount,_that.candidates);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String circleId,  int memberCount,  List<FamilyTransferCandidate> candidates)  $default,) {final _that = this;
+switch (_that) {
+case _FamilyTransferCandidates():
+return $default(_that.circleId,_that.memberCount,_that.candidates);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String circleId,  int memberCount,  List<FamilyTransferCandidate> candidates)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilyTransferCandidates() when $default != null:
+return $default(_that.circleId,_that.memberCount,_that.candidates);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilyTransferCandidates implements FamilyTransferCandidates {
+  const _FamilyTransferCandidates({required this.circleId, this.memberCount = 0, final  List<FamilyTransferCandidate> candidates = const <FamilyTransferCandidate>[]}): _candidates = candidates;
+  factory _FamilyTransferCandidates.fromJson(Map<String, dynamic> json) => _$FamilyTransferCandidatesFromJson(json);
+
+@override final  String circleId;
+@override@JsonKey() final  int memberCount;
+ final  List<FamilyTransferCandidate> _candidates;
+@override@JsonKey() List<FamilyTransferCandidate> get candidates {
+  if (_candidates is EqualUnmodifiableListView) return _candidates;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_candidates);
+}
+
+
+/// Create a copy of FamilyTransferCandidates
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilyTransferCandidatesCopyWith<_FamilyTransferCandidates> get copyWith => __$FamilyTransferCandidatesCopyWithImpl<_FamilyTransferCandidates>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilyTransferCandidatesToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyTransferCandidates&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&const DeepCollectionEquality().equals(other._candidates, _candidates));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,circleId,memberCount,const DeepCollectionEquality().hash(_candidates));
+
+@override
+String toString() {
+  return 'FamilyTransferCandidates(circleId: $circleId, memberCount: $memberCount, candidates: $candidates)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilyTransferCandidatesCopyWith<$Res> implements $FamilyTransferCandidatesCopyWith<$Res> {
+  factory _$FamilyTransferCandidatesCopyWith(_FamilyTransferCandidates value, $Res Function(_FamilyTransferCandidates) _then) = __$FamilyTransferCandidatesCopyWithImpl;
+@override @useResult
+$Res call({
+ String circleId, int memberCount, List<FamilyTransferCandidate> candidates
+});
+
+
+
+
+}
+/// @nodoc
+class __$FamilyTransferCandidatesCopyWithImpl<$Res>
+    implements _$FamilyTransferCandidatesCopyWith<$Res> {
+  __$FamilyTransferCandidatesCopyWithImpl(this._self, this._then);
+
+  final _FamilyTransferCandidates _self;
+  final $Res Function(_FamilyTransferCandidates) _then;
+
+/// Create a copy of FamilyTransferCandidates
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? circleId = null,Object? memberCount = null,Object? candidates = null,}) {
+  return _then(_FamilyTransferCandidates(
+circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
+as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
+as int,candidates: null == candidates ? _self._candidates : candidates // ignore: cast_nullable_to_non_nullable
+as List<FamilyTransferCandidate>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$FamilyCircleSummary {
 
  String get circleId; String get name; String? get themeColor;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role; String get myMemberId; int get memberCount;/// True when the caller owns (pays for) this circle — its members

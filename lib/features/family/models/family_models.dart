@@ -261,6 +261,42 @@ abstract class FamilySosList with _$FamilySosList {
       _$FamilySosListFromJson(json);
 }
 
+/// A member the host could hand the circle to (§29 TRANSFER), with
+/// eligibility. Ineligible members are shown greyed with [reason],
+/// never hidden.
+@freezed
+abstract class FamilyTransferCandidate with _$FamilyTransferCandidate {
+  const factory FamilyTransferCandidate({
+    required final String memberId,
+    required final String name,
+    final String? profilePictureUrl,
+    @JsonKey(unknownEnumValue: FamilyRole.adult)
+    @Default(FamilyRole.adult)
+    final FamilyRole role,
+    @Default(false) final bool eligible,
+
+    /// Why the member cannot take over, when [eligible] is false.
+    final String? reason,
+  }) = _FamilyTransferCandidate;
+
+  factory FamilyTransferCandidate.fromJson(Map<String, dynamic> json) =>
+      _$FamilyTransferCandidateFromJson(json);
+}
+
+/// GET /api/family/circle/transfer-candidates response.
+@freezed
+abstract class FamilyTransferCandidates with _$FamilyTransferCandidates {
+  const factory FamilyTransferCandidates({
+    required final String circleId,
+    @Default(0) final int memberCount,
+    @Default(<FamilyTransferCandidate>[])
+    final List<FamilyTransferCandidate> candidates,
+  }) = _FamilyTransferCandidates;
+
+  factory FamilyTransferCandidates.fromJson(Map<String, dynamic> json) =>
+      _$FamilyTransferCandidatesFromJson(json);
+}
+
 /// One row of GET /api/family/circles — a circle the user belongs to,
 /// with just enough for the group switcher and the ALRT+ seat ledger.
 @freezed

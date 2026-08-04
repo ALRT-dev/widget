@@ -347,6 +347,56 @@ Map<String, dynamic> _$FamilySosListToJson(_FamilySosList instance) =>
       'createdAt': ?instance.createdAt?.toIso8601String(),
     };
 
+_FamilyTransferCandidate _$FamilyTransferCandidateFromJson(
+  Map<String, dynamic> json,
+) => _FamilyTransferCandidate(
+  memberId: json['memberId'] as String,
+  name: json['name'] as String,
+  profilePictureUrl: json['profilePictureUrl'] as String?,
+  role:
+      $enumDecodeNullable(
+        _$FamilyRoleEnumMap,
+        json['role'],
+        unknownValue: FamilyRole.adult,
+      ) ??
+      FamilyRole.adult,
+  eligible: json['eligible'] as bool? ?? false,
+  reason: json['reason'] as String?,
+);
+
+Map<String, dynamic> _$FamilyTransferCandidateToJson(
+  _FamilyTransferCandidate instance,
+) => <String, dynamic>{
+  'memberId': instance.memberId,
+  'name': instance.name,
+  'profilePictureUrl': ?instance.profilePictureUrl,
+  'role': _$FamilyRoleEnumMap[instance.role]!,
+  'eligible': instance.eligible,
+  'reason': ?instance.reason,
+};
+
+_FamilyTransferCandidates _$FamilyTransferCandidatesFromJson(
+  Map<String, dynamic> json,
+) => _FamilyTransferCandidates(
+  circleId: json['circleId'] as String,
+  memberCount: (json['memberCount'] as num?)?.toInt() ?? 0,
+  candidates:
+      (json['candidates'] as List<dynamic>?)
+          ?.map(
+            (e) => FamilyTransferCandidate.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const <FamilyTransferCandidate>[],
+);
+
+Map<String, dynamic> _$FamilyTransferCandidatesToJson(
+  _FamilyTransferCandidates instance,
+) => <String, dynamic>{
+  'circleId': instance.circleId,
+  'memberCount': instance.memberCount,
+  'candidates': instance.candidates.map((e) => e.toJson()).toList(),
+};
+
 _FamilyCircleSummary _$FamilyCircleSummaryFromJson(Map<String, dynamic> json) =>
     _FamilyCircleSummary(
       circleId: json['circleId'] as String,

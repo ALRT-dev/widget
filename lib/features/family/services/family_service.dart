@@ -52,6 +52,19 @@ class FamilyService {
     return _familyRepository.leaveFamilyCircle();
   }
 
+  Future<Either<FamilyTransferCandidates, AppError>>
+  getFamilyTransferCandidates() {
+    return _familyRepository.getFamilyTransferCandidates();
+  }
+
+  Future<Either<FamilyCircle, AppError>> transferFamilyOwnership({
+    required final String newOwnerMemberId,
+  }) {
+    return _familyRepository.transferFamilyOwnership(
+      newOwnerMemberId: newOwnerMemberId,
+    );
+  }
+
   Future<Either<void, AppError>> removeFamilyMember({
     required final String memberId,
   }) {

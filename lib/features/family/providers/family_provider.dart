@@ -253,6 +253,34 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     );
   }
 
+  /// Owner-only (§29 TRANSFER): members the host could hand the circle to,
+  /// with eligibility. Returns null on failure.
+  Future<FamilyTransferCandidates?> loadTransferCandidates() async {
+    final result = await _familyService.getFamilyTransferCandidates();
+    if (!mounted) return null;
+    return result.when((candidates) => candidates, (_) => null);
+  }
+
+  /// Owner-only (§29 TRANSFER): hands the circle — and its seats — to
+  /// [newOwnerMemberId]. The prior host stays on as an adult member.
+  Future<bool> transferOwnership({
+    required final String newOwnerMemberId,
+  }) async {
+    final result = await _familyService.transferFamilyOwnership(
+      newOwnerMemberId: newOwnerMemberId,
+    );
+    if (!mounted) return false;
+
+    return result.when(
+      (_) {
+        load(silent: true);
+        _refreshCircleList();
+        return true;
+      },
+      (_) => false,
+    );
+  }
+
   // ------------------------ SOS RECIPIENT PRESETS ------------------------
 
   Future<void> loadSosLists() async {

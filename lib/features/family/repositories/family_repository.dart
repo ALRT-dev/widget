@@ -40,6 +40,13 @@ abstract class FamilyRepository {
 
   Future<Either<void, AppError>> leaveFamilyCircle();
 
+  Future<Either<FamilyTransferCandidates, AppError>>
+  getFamilyTransferCandidates();
+
+  Future<Either<FamilyCircle, AppError>> transferFamilyOwnership({
+    required final String newOwnerMemberId,
+  });
+
   Future<Either<void, AppError>> removeFamilyMember({
     required final String memberId,
   });
@@ -289,6 +296,38 @@ class FamilyRepositoryImpl implements FamilyRepository {
       future: () async {
         await _restClient.leaveFamilyCircle(circleId: _circleId);
         return const Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilyTransferCandidates, AppError>>
+  getFamilyTransferCandidates() {
+    return runAsyncCall(
+      name: 'getFamilyTransferCandidates',
+      future: () async {
+        final candidates = await _restClient.getFamilyTransferCandidates(
+          circleId: _circleId,
+        );
+        return Success(candidates);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilyCircle, AppError>> transferFamilyOwnership({
+    required String newOwnerMemberId,
+  }) {
+    return runAsyncCall(
+      name: 'transferFamilyOwnership',
+      future: () async {
+        final circle = await _restClient.transferFamilyOwnership(
+          newOwnerMemberId: newOwnerMemberId,
+          circleId: _circleId,
+        );
+        return Success(circle);
       },
       onError: Failure.new,
     );

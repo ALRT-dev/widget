@@ -261,6 +261,17 @@ abstract class RestClient {
     @Query('circleId') final String? circleId,
   });
 
+  @GET(kUrlFamilyTransferCandidates)
+  Future<FamilyTransferCandidates> getFamilyTransferCandidates({
+    @Query('circleId') final String? circleId,
+  });
+
+  @POST(kUrlFamilyTransferOwnership)
+  Future<FamilyCircle> transferFamilyOwnership({
+    @Field() required final String newOwnerMemberId,
+    @Query('circleId') final String? circleId,
+  });
+
   @DELETE('$kUrlFamilyMembers/{memberId}')
   Future<HttpResponse> removeFamilyMember({
     @Path() required final String memberId,
