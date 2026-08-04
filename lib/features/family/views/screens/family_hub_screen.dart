@@ -13,6 +13,7 @@ import 'package:hazard_app/features/family/views/screens/family_sharing_level_sc
 import 'package:hazard_app/features/family/views/screens/family_sos_receiver_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_sos_screen.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_leave_confirm_sheet.dart';
 import 'package:hazard_app/features/family/views/widgets/family_member_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
@@ -1115,18 +1116,38 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
     );
   }
 
-  void _confirmLeaveOrDelete({required final bool isOwner}) {
-    showConfirmationSheet(
+  Future<void> _confirmLeaveOrDelete({required final bool isOwner}) async {
+    // Deleting a circle for everyone is a different decision from leaving
+    // one, so it keeps the plain destructive confirmation.
+    if (isOwner) {
+      showConfirmationSheet(
+        context: context,
+        title: 'Delete this circle for everyone?',
+        confirmButtonText: 'Delete',
+        onPressedConfirm: (_, __) =>
+            ref.read(providerOfFamily.notifier).deleteCircle(),
+      );
+      return;
+    }
+
+    final state = ref.read(providerOfFamily);
+    final circleName = state.circle?.name ?? 'this group';
+    final myMemberId = state.circle?.myMemberId;
+    // How many of your own SOS lists you drop off by leaving.
+    final sosListCount = myMemberId == null
+        ? 0
+        : state.sosLists
+              .where((list) => list.memberIds.contains(myMemberId))
+              .length;
+
+    final shouldLeave = await showFamilyLeaveConfirmSheet(
       context: context,
-      title: isOwner
-          ? 'Delete this circle for everyone?'
-          : 'Leave this family circle?',
-      confirmButtonText: isOwner ? 'Delete' : 'Leave',
-      onPressedConfirm: (_, __) {
-        final notifier = ref.read(providerOfFamily.notifier);
-        isOwner ? notifier.deleteCircle() : notifier.leave();
-      },
+      circleName: circleName,
+      sosListCount: sosListCount,
     );
+    if (!shouldLeave || !mounted) return;
+
+    await ref.read(providerOfFamily.notifier).leave();
   }
 
   void _listenToActionErrors() {
