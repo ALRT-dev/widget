@@ -217,10 +217,31 @@ class MapService {
       );
     }
 
+    // Why a mode is missing, so the option can still be offered and
+    // explained instead of quietly disappearing from the row.
+    const modeOrder = [
+      TravelMode.driving,
+      TravelMode.transit,
+      TravelMode.walking,
+      TravelMode.bicycling,
+    ];
+    final unavailableModes = <TravelMode, String>{};
+    for (var i = 0; i < modeOrder.length; i++) {
+      final mode = modeOrder[i];
+      if (travelModeRoutes.containsKey(mode)) continue;
+      final reason = result[i].whenFailure((failure) => failure.message);
+      unavailableModes[mode] = (reason?.isNotEmpty ?? false)
+          ? reason!
+          : mode == TravelMode.transit
+          ? 'No public transport route found for this trip.'
+          : 'No route found for this mode.';
+    }
+
     return Success(
       RoutePlan(
         origin: origin,
         destination: destination,
+        unavailableModes: unavailableModes,
         hazardsToAvoid: hazardsToAvoid ?? <Hazard>[],
         // Default to driving when available, otherwise the first mode that
         // returned a route — the selected mode must always exist in the map

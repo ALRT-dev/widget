@@ -8,6 +8,7 @@ import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/utils/dialogs.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -248,22 +249,53 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
             (value) => value.currentRoutePlan?.travelModeRoutes ?? {},
           ),
         );
+        final unavailableModes = ref.watch(
+          providerOfMap.select(
+            (value) => value.currentRoutePlan?.unavailableModes ?? {},
+          ),
+        );
+
+        // Every mode keeps its place in the row. A mode with no route is
+        // shown greyed and says why when tapped, instead of vanishing and
+        // leaving you wondering where public transport went.
+        const modeOrder = [
+          TravelMode.driving,
+          TravelMode.transit,
+          TravelMode.walking,
+          TravelMode.bicycling,
+        ];
 
         return Row(
           spacing: 5.spMin,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            for (final route in travelModeRoutes.entries)
-              Expanded(
-                child: _travelModeItemBuilder(
-                  icon: route.key.iconData,
-                  duration: route.value.currentRoute.durationMinutes != null
-                      ? '${route.value.currentRoute.durationMinutes?.toStringAsFixed(0)}m'
-                      : null,
-                  isSelected: selectedTravelMode == route.key,
-                  onTap: () => _handleTravelModeChange(route.key),
+            for (final mode in modeOrder)
+              if (travelModeRoutes.containsKey(mode) ||
+                  unavailableModes.containsKey(mode))
+                Expanded(
+                  child: travelModeRoutes.containsKey(mode)
+                      ? _travelModeItemBuilder(
+                          icon: mode.iconData,
+                          duration:
+                              travelModeRoutes[mode]!
+                                      .currentRoute
+                                      .durationMinutes !=
+                                  null
+                              ? '${travelModeRoutes[mode]!.currentRoute.durationMinutes?.toStringAsFixed(0)}m'
+                              : null,
+                          isSelected: selectedTravelMode == mode,
+                          onTap: () => _handleTravelModeChange(mode),
+                        )
+                      : _travelModeItemBuilder(
+                          icon: mode.iconData,
+                          duration: '--',
+                          isSelected: false,
+                          isUnavailable: true,
+                          onTap: () => context.showErrorToast(
+                            message: unavailableModes[mode]!,
+                          ),
+                        ),
                 ),
-              ),
           ],
         );
       },
@@ -275,6 +307,7 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
     final String? duration,
     required final bool isSelected,
     required final VoidCallback onTap,
+    final bool isUnavailable = false,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -299,14 +332,22 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
             Icon(
               icon,
               size: 16.spMin,
-              color: isSelected ? AppColors.primary : AppColors.black,
+              color: isUnavailable
+                  ? AppColors.grey.withValues(alpha: 0.5)
+                  : isSelected
+                  ? AppColors.primary
+                  : AppColors.black,
             ),
             if (duration != null)
               Text(
                 duration,
                 style: TextStyle(
                   fontSize: 12.spMin,
-                  color: isSelected ? AppColors.primary : AppColors.black,
+                  color: isUnavailable
+                      ? AppColors.grey.withValues(alpha: 0.5)
+                      : isSelected
+                      ? AppColors.primary
+                      : AppColors.black,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),

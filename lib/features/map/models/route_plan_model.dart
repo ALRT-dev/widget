@@ -29,6 +29,11 @@ abstract class RoutePlan with _$RoutePlan {
 
     /// Whether navigation is currently active.
     @Default(false) final bool isNavigating,
+
+    /// Modes that returned no usable route, with the reason. Kept so the
+    /// option can still be offered and explained instead of vanishing.
+    @Default(<TravelMode, String>{})
+    final Map<TravelMode, String> unavailableModes,
   }) = _RoutePlan;
 
   /// Gets the current route based on the selected travel mode.

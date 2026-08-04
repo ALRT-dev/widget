@@ -63,6 +63,10 @@ class ViewHazardScreen extends ConsumerStatefulWidget {
 class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   late final provider = providerOfViewHazard(widget.args.hazard.id!);
 
+  /// Attribution shows one compact line until the reader asks for the
+  /// licence and copyright detail.
+  bool _attributionExpanded = false;
+
   @override
   void initState() {
     super.initState();
@@ -1374,282 +1378,183 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
         final color = const Color(0xFF37CAFF);
 
+        final hasDetail =
+            !isUserReported &&
+            (license != null ||
+                (advisoryText?.isNotEmpty ?? false) ||
+                (copyrightText?.isNotEmpty ?? false));
+
+        // Attribution is a footnote, not a section: one compact line by
+        // default, with the licence and copyright a tap away. All of it is
+        // still here, it just no longer dominates the bottom of the alert.
         return Container(
           decoration: BoxDecoration(
             color: AppColors.white,
-            borderRadius: BorderRadius.circular(16.spMin),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColorLight,
-                blurRadius: 2.0,
-                offset: Offset(0.0, 0.0),
-              ),
-            ],
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.03),
-              borderRadius: BorderRadius.circular(16.spMin),
-              border: Border(
-                left: BorderSide(
-                  color: color,
-                  width: 4,
-                ),
-                right: BorderSide(
-                  color: color,
-                  width: 1,
-                ),
-                bottom: BorderSide(
-                  color: color,
-                  width: 1,
-                ),
-                top: BorderSide(
-                  color: color,
-                  width: 1,
-                ),
-              ),
+            borderRadius: BorderRadius.circular(12.spMin),
+            border: Border.all(
+              color: AppColors.lightGrey.withValues(alpha: 0.7),
             ),
-            padding: EdgeInsets.all(16.spMin),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Attribution Title
-                Text(
-                  'DATA ATTRIBUTION',
-                  style: TextStyle(
-                    color: AppColors.grey,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12.spMin,
-                  ),
-                ),
-                12.spMin.hSizedBox,
-
-                // Source Row
-                GestureDetector(
-                  onTap: sourceLink != null
-                      ? () => openLink(
-                          context: context,
-                          link: sourceLink,
-                        )
-                      : null,
-                  child: Container(
-                    padding: EdgeInsets.only(bottom: 12.spMin),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 12.spMin,
+            vertical: 10.spMin,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 26.spMin,
+                    height: 26.spMin,
                     decoration: BoxDecoration(
-                      border:
-                          isUserReported ||
-                              (license == null &&
-                                  (advisoryText?.isEmpty ?? true))
-                          ? null
-                          : Border(
-                              bottom: BorderSide(
-                                color: AppColors.lightGrey,
-                                width: 1,
-                              ),
-                            ),
+                      color: color.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(7.spMin),
                     ),
-                    child: Row(
-                      children: [
-                        // Source Icon
-                        Container(
-                          width: 40.spMin,
-                          height: 40.spMin,
-                          decoration: BoxDecoration(
-                            color: AppColors.blue.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8.spMin),
-                          ),
-                          child: Center(
-                            child: isUserReported == true
-                                ? Icon(
-                                    Icons.person_outline_rounded,
-                                    size: 24.spMin,
-                                    color: AppColors.blue,
-                                  )
-                                : SvgPicture.asset(
-                                    'assets/icons/shield.svg',
-                                    width: 24.spMin,
-                                    height: 24.spMin,
-                                    colorFilter: ColorFilter.mode(
-                                      AppColors.blue,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                        12.spMin.wSizedBox,
-
-                        // Source Info
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                source?.name ?? 'Community Report',
-                                style: TextStyle(
-                                  fontSize: 15.spMin,
-                                  color: AppColors.black,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                    child: Center(
+                      child: isUserReported
+                          ? Icon(
+                              Icons.person_outline_rounded,
+                              size: 15.spMin,
+                              color: AppColors.blue,
+                            )
+                          : SvgPicture.asset(
+                              'assets/icons/shield.svg',
+                              width: 15.spMin,
+                              height: 15.spMin,
+                              colorFilter: ColorFilter.mode(
+                                AppColors.blue,
+                                BlendMode.srcIn,
                               ),
-                              2.spMin.hSizedBox,
-                              Text(
-                                isUserReported
-                                    ? 'Community'
-                                    : 'Official Source',
-                                style: TextStyle(
-                                  fontSize: 12.spMin,
-                                  color: AppColors.grey,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // External Link Icon
-                        if (sourceLink != null)
-                          Container(
-                            width: 32.spMin,
-                            height: 32.spMin,
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGrey.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(8.spMin),
                             ),
-                            child: Icon(
-                              Icons.open_in_new,
-                              size: 16.spMin,
-                              color: AppColors.grey,
-                            ),
-                          ),
-                      ],
                     ),
                   ),
-                ),
-
-                // License Row (only for non-user-reported)
-                if (!isUserReported) ...[
-                  if (license != null) ...[
-                    12.spMin.hSizedBox,
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12.spMin,
-                        vertical: 10.spMin,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.lightGrey.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(8.spMin),
-                      ),
-                      child: Row(
+                  10.spMin.wSizedBox,
+                  Expanded(
+                    child: Text.rich(
+                      TextSpan(
                         children: [
-                          // License Badge
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8.spMin,
-                              vertical: 4.spMin,
-                            ),
-                            decoration: BoxDecoration(
-                              color: license.backgroundColor,
-                              borderRadius: BorderRadius.circular(4.spMin),
-                            ),
-                            child: Text(
-                              license.badgeText,
-                              style: TextStyle(
-                                fontSize: 11.spMin,
-                                fontWeight: FontWeight.w600,
-                                color: license.foregroundColor,
-                              ),
+                          TextSpan(
+                            text: source?.name ?? 'Community report',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.black,
                             ),
                           ),
-                          10.spMin.wSizedBox,
-
-                          // License Text
-                          Expanded(
-                            child: Text(
-                              license.licenseText,
-                              style: TextStyle(
-                                fontSize: 12.spMin,
-                                color: AppColors.grey,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                          TextSpan(
+                            text: isUserReported
+                                ? '  ·  Community'
+                                : '  ·  Official source',
                           ),
-
-                          // View Link
-                          if (copyrightLink != null || license.link != null)
-                            GestureDetector(
+                          if (license != null)
+                            TextSpan(text: '  ·  ${license.badgeText}'),
+                        ],
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11.5.spMin,
+                        height: 1.35,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ),
+                  if (sourceLink != null)
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => openLink(context: context, link: sourceLink),
+                      child: Padding(
+                        padding: EdgeInsets.all(5.spMin),
+                        child: Icon(
+                          Icons.open_in_new,
+                          size: 15.spMin,
+                          color: AppColors.grey,
+                        ),
+                      ),
+                    ),
+                  if (hasDetail)
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => setState(
+                        () => _attributionExpanded = !_attributionExpanded,
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(5.spMin),
+                        child: Icon(
+                          _attributionExpanded
+                              ? Icons.keyboard_arrow_up_rounded
+                              : Icons.keyboard_arrow_down_rounded,
+                          size: 18.spMin,
+                          color: AppColors.grey,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              if (hasDetail && _attributionExpanded) ...[
+                8.spMin.hSizedBox,
+                Divider(
+                  height: 1,
+                  color: AppColors.lightGrey.withValues(alpha: 0.7),
+                ),
+                8.spMin.hSizedBox,
+                if (license != null)
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(text: license.licenseText),
+                        if (copyrightLink != null || license.link != null) ...[
+                          const TextSpan(text: '  '),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: GestureDetector(
                               onTap: () => openLink(
                                 context: context,
                                 link: copyrightLink ?? license.link!,
                               ),
                               child: Text(
-                                'View',
+                                'View licence',
                                 style: TextStyle(
-                                  fontSize: 12.spMin,
+                                  fontSize: 11.spMin,
                                   color: AppColors.blue,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  // Advisory Text
-                  if (advisoryText?.isNotEmpty ?? false) ...[
-                    10.hSizedBox,
-                    Text(
-                      advisoryText!,
-                      style: TextStyle(
-                        fontSize: 11.spMin,
-                        color: AppColors.grey,
-                        height: 1.5,
-                      ),
-                    ),
-                  ],
-
-                  // Copyright Notice
-                  if (copyrightText?.isNotEmpty ?? false) ...[
-                    10.hSizedBox,
-                    Text.rich(
-                      TextSpan(
-                        style: TextStyle(
-                          fontSize: 11.spMin,
-                          color: AppColors.grey,
-                          height: 1.5,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: copyrightText,
                           ),
-                          if (license?.link?.isNotEmpty ?? false) ...[
-                            TextSpan(
-                              text: ' Used under ',
-                            ),
-                            WidgetSpan(
-                              child: GestureDetector(
-                                onTap: () => openLink(
-                                  context: context,
-                                  link: license.link!,
-                                ),
-                                child: Text(
-                                  license!.badgeText,
-                                  style: TextStyle(
-                                    fontSize: 11.spMin,
-                                    color: AppColors.blue,
-                                    decoration: TextDecoration.none,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            TextSpan(text: ' license.'),
-                          ],
                         ],
-                      ),
+                      ],
                     ),
-                  ],
+                    style: TextStyle(
+                      fontSize: 11.spMin,
+                      height: 1.45,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                if (advisoryText?.isNotEmpty ?? false) ...[
+                  6.spMin.hSizedBox,
+                  Text(
+                    advisoryText!,
+                    style: TextStyle(
+                      fontSize: 11.spMin,
+                      height: 1.45,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                ],
+                if (copyrightText?.isNotEmpty ?? false) ...[
+                  6.spMin.hSizedBox,
+                  Text(
+                    copyrightText!,
+                    style: TextStyle(
+                      fontSize: 11.spMin,
+                      height: 1.45,
+                      color: AppColors.grey,
+                    ),
+                  ),
                 ],
               ],
-            ),
+            ],
           ),
         );
       },
