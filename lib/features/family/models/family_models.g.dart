@@ -12,6 +12,10 @@ _FamilyCircle _$FamilyCircleFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       plan: json['plan'] as String? ?? 'plus',
       maxMembers: (json['maxMembers'] as num?)?.toInt() ?? 10,
+      anyoneCanRequestSnapshot:
+          json['anyoneCanRequestSnapshot'] as bool? ?? true,
+      sosToWholeGroup: json['sosToWholeGroup'] as bool? ?? true,
+      journeysSnapPointsOnly: json['journeysSnapPointsOnly'] as bool? ?? true,
       myMemberId: json['myMemberId'] as String,
       members:
           (json['members'] as List<dynamic>?)
@@ -45,6 +49,9 @@ Map<String, dynamic> _$FamilyCircleToJson(
   'name': instance.name,
   'plan': instance.plan,
   'maxMembers': instance.maxMembers,
+  'anyoneCanRequestSnapshot': instance.anyoneCanRequestSnapshot,
+  'sosToWholeGroup': instance.sosToWholeGroup,
+  'journeysSnapPointsOnly': instance.journeysSnapPointsOnly,
   'myMemberId': instance.myMemberId,
   'members': instance.members.map((e) => e.toJson()).toList(),
   'places': instance.places.map((e) => e.toJson()).toList(),

@@ -229,6 +229,30 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     await load();
   }
 
+  /// Owner-only: updates the circle's name and group rules, then reloads.
+  Future<bool> updateGroupSettings({
+    final String? name,
+    final bool? anyoneCanRequestSnapshot,
+    final bool? sosToWholeGroup,
+    final bool? journeysSnapPointsOnly,
+  }) async {
+    final result = await _familyService.updateFamilyCircle(
+      name: name,
+      anyoneCanRequestSnapshot: anyoneCanRequestSnapshot,
+      sosToWholeGroup: sosToWholeGroup,
+      journeysSnapPointsOnly: journeysSnapPointsOnly,
+    );
+    if (!mounted) return false;
+
+    return result.when(
+      (_) {
+        load(silent: true);
+        return true;
+      },
+      (_) => false,
+    );
+  }
+
   // ------------------------ SOS RECIPIENT PRESETS ------------------------
 
   Future<void> loadSosLists() async {

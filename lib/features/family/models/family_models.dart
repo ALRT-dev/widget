@@ -71,6 +71,11 @@ abstract class FamilyCircle with _$FamilyCircle {
     required final String name,
     @Default('plus') final String plan,
     @Default(10) final int maxMembers,
+
+    // Group rules (owner-set toggles, locked spec).
+    @Default(true) final bool anyoneCanRequestSnapshot,
+    @Default(true) final bool sosToWholeGroup,
+    @Default(true) final bool journeysSnapPointsOnly,
     required final String myMemberId,
     @Default(<FamilyMember>[]) final List<FamilyMember> members,
     @Default(<FamilySavedPlace>[]) final List<FamilySavedPlace> places,

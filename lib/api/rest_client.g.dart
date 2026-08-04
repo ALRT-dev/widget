@@ -1171,13 +1171,22 @@ class _RestClient implements RestClient {
   Future<HttpResponse<dynamic>> updateFamilyCircle({
     String? name,
     String? themeColor,
+    bool? anyoneCanRequestSnapshot,
+    bool? sosToWholeGroup,
+    bool? journeysSnapPointsOnly,
     String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = {'name': name, 'themeColor': themeColor};
+    final _data = {
+      'name': name,
+      'themeColor': themeColor,
+      'anyoneCanRequestSnapshot': anyoneCanRequestSnapshot,
+      'sosToWholeGroup': sosToWholeGroup,
+      'journeysSnapPointsOnly': journeysSnapPointsOnly,
+    };
     _data.removeWhere((k, v) => v == null);
     final _options = _setStreamType<HttpResponse<dynamic>>(
       Options(method: 'PUT', headers: _headers, extra: _extra)

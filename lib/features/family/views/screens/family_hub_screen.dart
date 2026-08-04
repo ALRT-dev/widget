@@ -279,6 +279,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
             context.push(FamilySharingLevelScreen.route);
           case 'profile':
             context.push(FamilyCircleProfileScreen.route);
+          case 'groupSettings':
+            _showGroupSettingsSheet(circle);
           case 'leave':
             _confirmLeaveOrDelete(isOwner: isOwner);
         }
@@ -288,6 +290,11 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         const PopupMenuItem(value: 'invite', child: Text('Invite members')),
         const PopupMenuItem(value: 'sharing', child: Text('My sharing level')),
         const PopupMenuItem(value: 'profile', child: Text('My circle profile')),
+        if (isOwner)
+          const PopupMenuItem(
+            value: 'groupSettings',
+            child: Text('Group settings'),
+          ),
         PopupMenuItem(
           value: 'leave',
           child: Text(
@@ -297,6 +304,144 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         ),
       ],
     );
+  }
+
+  /// Owner-only sheet: group name + the locked rule toggles.
+  Future<void> _showGroupSettingsSheet(final FamilyCircle circle) async {
+    final nameController = TextEditingController(text: circle.name);
+    var anyoneCanRequest = circle.anyoneCanRequestSnapshot;
+    var sosWholeGroup = circle.sosToWholeGroup;
+    var snapPointsOnly = circle.journeysSnapPointsOnly;
+
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.spMin)),
+      ),
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            20.spMin,
+            20.spMin,
+            20.spMin,
+            MediaQuery.of(sheetContext).viewInsets.bottom + 20.spMin,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Group settings',
+                style: TextStyle(
+                  fontSize: 17.spMin,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: 12.spMin),
+              TextField(
+                controller: nameController,
+                maxLength: 50,
+                textCapitalization: TextCapitalization.words,
+                decoration: const InputDecoration(
+                  labelText: 'Group name',
+                  counterText: '',
+                ),
+              ),
+              SizedBox(height: 6.spMin),
+              SwitchListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                activeThumbColor: FamilyColors.indigo,
+                value: anyoneCanRequest,
+                onChanged: (value) =>
+                    setSheetState(() => anyoneCanRequest = value),
+                title: Text(
+                  'Anyone can ask for a snapshot',
+                  style: TextStyle(fontSize: 14.spMin),
+                ),
+                subtitle: Text(
+                  'Off: only you can send location requests',
+                  style: TextStyle(fontSize: 11.5.spMin),
+                ),
+              ),
+              SwitchListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                activeThumbColor: FamilyColors.indigo,
+                value: sosWholeGroup,
+                onChanged: (value) =>
+                    setSheetState(() => sosWholeGroup = value),
+                title: Text(
+                  'SOS goes to the whole group',
+                  style: TextStyle(fontSize: 14.spMin),
+                ),
+                subtitle: Text(
+                  'Off: members are nudged to pick an SOS list',
+                  style: TextStyle(fontSize: 11.5.spMin),
+                ),
+              ),
+              SwitchListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                activeThumbColor: FamilyColors.indigo,
+                value: snapPointsOnly,
+                onChanged: (value) =>
+                    setSheetState(() => snapPointsOnly = value),
+                title: Text(
+                  'Journeys are snap points only',
+                  style: TextStyle(fontSize: 14.spMin),
+                ),
+                subtitle: Text(
+                  'Never a live trail — departure, ~10 min points, arrival',
+                  style: TextStyle(fontSize: 11.5.spMin),
+                ),
+              ),
+              SizedBox(height: 10.spMin),
+              SizedBox(
+                height: 48.spMin,
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FamilyColors.indigo,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.spMin),
+                    ),
+                  ),
+                  onPressed: () => Navigator.of(sheetContext).pop(true),
+                  child: Text(
+                    'Save settings',
+                    style: TextStyle(
+                      fontSize: 15.spMin,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final newName = nameController.text.trim();
+    if (saved != true || !mounted) return;
+
+    final ok = await ref.read(providerOfFamily.notifier).updateGroupSettings(
+          name: newName.isEmpty || newName == circle.name ? null : newName,
+          anyoneCanRequestSnapshot: anyoneCanRequest,
+          sosToWholeGroup: sosWholeGroup,
+          journeysSnapPointsOnly: snapPointsOnly,
+        );
+    if (!mounted) return;
+    ok
+        ? context.showSuccessToast(message: 'Group settings saved.')
+        : context.showErrorToast(
+            message: 'Could not save settings. Please try again.',
+          );
   }
 
   Widget _sosBannerBuilder(final FamilySosEvent sos) {

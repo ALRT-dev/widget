@@ -245,6 +245,9 @@ abstract class RestClient {
   Future<HttpResponse> updateFamilyCircle({
     @Field() final String? name,
     @Field() final String? themeColor,
+    @Field() final bool? anyoneCanRequestSnapshot,
+    @Field() final bool? sosToWholeGroup,
+    @Field() final bool? journeysSnapPointsOnly,
     @Query('circleId') final String? circleId,
   });
 

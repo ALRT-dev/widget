@@ -31,6 +31,9 @@ abstract class FamilyRepository {
   Future<Either<void, AppError>> updateFamilyCircle({
     final String? name,
     final String? themeColor,
+    final bool? anyoneCanRequestSnapshot,
+    final bool? sosToWholeGroup,
+    final bool? journeysSnapPointsOnly,
   });
 
   Future<Either<void, AppError>> deleteFamilyCircle();
@@ -246,6 +249,9 @@ class FamilyRepositoryImpl implements FamilyRepository {
   Future<Either<void, AppError>> updateFamilyCircle({
     String? name,
     String? themeColor,
+    bool? anyoneCanRequestSnapshot,
+    bool? sosToWholeGroup,
+    bool? journeysSnapPointsOnly,
   }) {
     return runAsyncCall(
       name: 'updateFamilyCircle',
@@ -253,6 +259,9 @@ class FamilyRepositoryImpl implements FamilyRepository {
         await _restClient.updateFamilyCircle(
           name: name,
           themeColor: themeColor,
+          anyoneCanRequestSnapshot: anyoneCanRequestSnapshot,
+          sosToWholeGroup: sosToWholeGroup,
+          journeysSnapPointsOnly: journeysSnapPointsOnly,
           circleId: _circleId,
         );
         return const Success(null);
