@@ -121,6 +121,8 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
               ],
             ),
             padding: EdgeInsets.symmetric(vertical: 1.spMin),
+            height: 48.spMin,
+            alignment: Alignment.center,
             child: TextFormField(
               focusNode: _searchFocusNode,
               controller: _searchController,
@@ -151,6 +153,10 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
                       color: AppColors.grey.withValues(alpha: 0.6),
                     ).pL(15.0),
                   ],
+                ),
+                suffixIconConstraints: BoxConstraints(
+                  minWidth: 44.spMin,
+                  minHeight: 44.spMin,
                 ),
                 suffixIcon: Row(
                   mainAxisSize: MainAxisSize.min,
