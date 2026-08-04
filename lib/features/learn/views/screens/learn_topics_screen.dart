@@ -74,6 +74,10 @@ class LearnTopicsView extends ConsumerWidget {
                 padding: EdgeInsets.only(bottom: 12.spMin),
                 child: LearnTopicCard(
                   topic: topic,
+                  // Lessons are the point of this screen, so they are open
+                  // on arrival. Collapsing is there for tidying up, not for
+                  // finding out the guides exist.
+                  initiallyExpanded: true,
                   onGuideTap: (guide) => _openGuide(context, topic, guide),
                 ),
               ),

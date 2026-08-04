@@ -37,6 +37,10 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
   static const _pillColor = Color(0xFF23252B);
   static const _activeCircleColor = Color(0xFF3A3D45);
 
+  /// The capsule sits on a soft purply-blue halo, matched by the search
+  /// bar's orange one, so the floating controls read as one set.
+  static const _glowColor = AppColors.footerGlow;
+
   @override
   Widget build(BuildContext context) {
     final currentTab = ref.watch(providerOfHomeTab);
@@ -51,6 +55,13 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
             color: _pillColor,
             borderRadius: BorderRadius.circular(40.spMin),
             boxShadow: [
+              // Wide, low-opacity halo first, then the grounding shadow.
+              BoxShadow(
+                color: _glowColor.withValues(alpha: 0.38),
+                blurRadius: 26.0,
+                spreadRadius: 1.0,
+                offset: const Offset(0, 6),
+              ),
               BoxShadow(
                 color: AppColors.black.withValues(alpha: 0.25),
                 blurRadius: 16.0,

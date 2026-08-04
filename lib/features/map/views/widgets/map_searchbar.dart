@@ -54,12 +54,20 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
           return Container(
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(30.r),
+              // Same capsule as the footer, lit with an orange halo so the
+              // two floating controls read as a matched pair.
+              borderRadius: BorderRadius.circular(40.spMin),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.shadowColor,
-                  blurRadius: 10.0,
-                  offset: Offset(0, 0.0),
+                  color: AppColors.searchGlow.withValues(alpha: 0.38),
+                  blurRadius: 26.0,
+                  spreadRadius: 1.0,
+                  offset: const Offset(0, 6),
+                ),
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.18),
+                  blurRadius: 16.0,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),

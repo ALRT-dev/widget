@@ -103,12 +103,20 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
           return Container(
             decoration: BoxDecoration(
               color: AppColors.white,
-              borderRadius: BorderRadius.circular(14.spMin),
+              // The same lit capsule the map search bar carries, so the
+              // shape follows you from the map into search.
+              borderRadius: BorderRadius.circular(40.spMin),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.shadowColor,
-                  blurRadius: 10.0,
-                  offset: Offset(0, 2.0),
+                  color: AppColors.searchGlow.withValues(alpha: 0.38),
+                  blurRadius: 26.0,
+                  spreadRadius: 1.0,
+                  offset: const Offset(0, 6),
+                ),
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.18),
+                  blurRadius: 16.0,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),

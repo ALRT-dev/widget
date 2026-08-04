@@ -42,6 +42,11 @@ class AppColors {
   static const darkGreen = Color(0xFF0B8043);
   static const brown = Color(0xFF8B4513);
 
+  // Halos behind the floating capsules: the footer sits on purply blue,
+  // the search bar on orange. Same shape, same treatment, different light.
+  static const footerGlow = Color(0xFF6B6BE8);
+  static const searchGlow = Color(0xFFFF6B01);
+
   static const info = blue;
   static const advice = yellow;
   static const watchAndAct = orange;
