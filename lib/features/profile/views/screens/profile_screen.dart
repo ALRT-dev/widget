@@ -459,13 +459,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 onTap: _gotoManageNotificationsScreen,
               ),
               _buildAccountSettingsItem(
-                title: 'Subscribed Locations',
-                subtitle: 'Manage your subscribed locations',
-                icon: LucideIcons.mapPin,
-                color: AppColors.blue,
-                onTap: _gotoSubscribedLocationsScreen,
-              ),
-              _buildAccountSettingsItem(
                 title: 'Language',
                 subtitle: _currentLanguageLabel(),
                 icon: LucideIcons.globe,
@@ -929,14 +922,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     context.push(
       ManageNotificationsScreen.route,
       extra: const ManageNotificationsScreenArgs(initialTab: 0),
-    );
-  }
-
-  /// Navigates to the Subscribed Locations screen.
-  void _gotoSubscribedLocationsScreen() {
-    context.push(
-      ManageNotificationsScreen.route,
-      extra: const ManageNotificationsScreenArgs(initialTab: 1),
     );
   }
 
