@@ -143,7 +143,10 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _coloredHeaderBuilder(),
-              _plainTermsBuilder(),
+              // The map callout is a glance, not a read: band, title, when
+              // and how far, and the way in. Everything longer waits for
+              // the detail screen.
+              if (!widget.isInfoWindow) _plainTermsBuilder(),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -173,8 +176,10 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                 8.hSizedBox,
                 _shortDescriptionBuilder().pX(16.0),
               ],
-              14.hSizedBox,
-              if (widget.showTrustMeter && widget.hazard.isUserReported) ...[
+              (widget.isInfoWindow ? 8 : 14).hSizedBox,
+              if (widget.showTrustMeter &&
+                  widget.hazard.isUserReported &&
+                  !widget.isInfoWindow) ...[
                 _confirmationButtonsBuilder().pX(16.0),
               ],
               _categoryAndViewDetailsBuilder(),
@@ -396,7 +401,10 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
 
         return Container(
           width: double.infinity,
-          padding: EdgeInsets.all(10.spMin),
+          padding: EdgeInsets.symmetric(
+            horizontal: 10.spMin,
+            vertical: 6.spMin,
+          ),
 
           decoration: BoxDecoration(
             gradient:
