@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
+import 'package:hazard_app/features/family/views/screens/family_share_ending_screen.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 import 'package:hazard_app/features/family/views/widgets/family_member_avatar.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -30,6 +31,9 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
 
   int _durationMinutes = 60;
   final Set<String> _recipientIds = {};
+
+  /// The prompt is raised once per journey, never on a loop.
+  String? _endingPromptShownFor;
 
   @override
   void initState() {
@@ -355,6 +359,14 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
     final endsAt = TimeOfDay.fromDateTime(journey.endsAt);
     final minutesLeft = journey.remaining.inMinutes;
 
+    // ALRT asks before sharing ends rather than letting it lapse quietly.
+    if (minutesLeft <= 10 && _endingPromptShownFor != journey.id) {
+      _endingPromptShownFor = journey.id;
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _showEndingPrompt(journey),
+      );
+    }
+
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 16.spMin, 28.spMin),
       child: Column(
@@ -513,6 +525,29 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
           fontSize: 12.spMin,
           height: 1.6,
           color: FamilyColors.v31NoteInk,
+        ),
+      ),
+    );
+  }
+
+  /// The last-minutes warning: extend, stop now, or do nothing and let it
+  /// end itself.
+  void _showEndingPrompt(final FamilyJourney journey) {
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        fullscreenDialog: true,
+        builder: (_) => FamilyShareEndingScreen(
+          args: FamilyShareEndingScreenArgs(
+            endsAt: journey.endsAt,
+            minutesLeft: journey.remaining.inMinutes,
+            isSos: false,
+            onExtend: journey.canExtend
+                ? () => ref.read(providerOfFamily.notifier).extendJourney()
+                : null,
+            onStopNow: () =>
+                ref.read(providerOfFamily.notifier).stopJourney(),
+          ),
         ),
       ),
     );
