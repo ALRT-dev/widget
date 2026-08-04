@@ -9,7 +9,6 @@ import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.da
 import 'package:hazard_app/features/subscription/views/screens/alrt_plus_paywall_screen.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Shown when the user has no family circle yet: create one or join with a
 /// code. Embedded as the Family tab body.
@@ -46,123 +45,258 @@ class _FamilyOnboardingScreenState
       providerOfFamily.select((s) => s.joinCircleState),
     );
 
+    // The prototype's empty state, in the family section's locked colours:
+    // gradient header carrying the promise, one card of what a group gives
+    // you, the privacy note, then the two paths. No price appears here —
+    // the paywall comes only after tapping Create, and the invite path
+    // never sees one.
     return Scaffold(
       backgroundColor: FamilyColors.v31Page,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(20.spMin),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: 20.spMin),
-              _pitchCardBuilder(),
-              SizedBox(height: 24.spMin),
-              // Locked V3 empty state: a value pitch and two buttons.
-              // No price on this screen; the paywall appears only after
-              // tapping Create a group. The invite path never sees one.
-              SizedBox(
-                height: 52.spMin,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FamilyColors.indigo,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.spMin),
-                    ),
+      body: ListView(
+        padding: EdgeInsets.only(bottom: 120.spMin),
+        children: [
+          Container(
+            padding: EdgeInsets.fromLTRB(16.spMin, 56.spMin, 16.spMin, 20.spMin),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment(-0.5, -1),
+                end: Alignment(0.5, 1),
+                stops: [0.0, 0.55, 1.0],
+                colors: [
+                  FamilyColors.v31HeaderTop,
+                  FamilyColors.v31HeaderMid,
+                  FamilyColors.v31HeaderDeep,
+                ],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Family',
+                  style: TextStyle(
+                    fontSize: 24.spMin,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                    color: Colors.white,
                   ),
-                  onPressed: createState.isLoading ? null : _showCreateSheet,
-                  child: createState.isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          'Create a group',
-                          style: TextStyle(
-                            fontSize: 16.spMin,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
                 ),
-              ),
-              SizedBox(height: 12.spMin),
-              SizedBox(
-                height: 52.spMin,
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: FamilyColors.indigo,
-                    side: const BorderSide(color: FamilyColors.indigo),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.spMin),
-                    ),
+                SizedBox(height: 5.spMin),
+                Text(
+                  'Know the people you care about are OK, '
+                  'without ever tracking them.',
+                  style: TextStyle(
+                    fontSize: 13.spMin,
+                    height: 1.5,
+                    color: Colors.white.withValues(alpha: 0.85),
                   ),
-                  onPressed: joinState.isLoading ? null : _showJoinSheet,
-                  child: joinState.isLoading
-                      ? const CircularProgressIndicator()
-                      : Text(
-                          'I have an invite code',
-                          style: TextStyle(
-                            fontSize: 16.spMin,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
                 ),
-              ),
-              SizedBox(height: 20.spMin),
-              Text(
-                'Each member controls their own sharing level. '
-                'No one is tracked without saying yes.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 12.spMin, color: AppColors.grey),
-              ),
-              SizedBox(height: 120.spMin),
-            ],
+              ],
+            ),
           ),
-        ),
+          Container(
+            margin: EdgeInsets.fromLTRB(16.spMin, 14.spMin, 16.spMin, 0),
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.spMin,
+              vertical: 15.spMin,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16.spMin),
+              boxShadow: [
+                BoxShadow(
+                  color: FamilyColors.v31CardShadow,
+                  blurRadius: 12.0,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'What a group gives you',
+                  style: TextStyle(
+                    fontSize: 15.spMin,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 9.spMin),
+                _pitchLineBuilder('One tap ', "I'm Safe", ' to everyone at once'),
+                _pitchLineBuilder(
+                  'Ask for a ',
+                  'location snapshot',
+                  ', they choose to send it',
+                ),
+                _pitchLineBuilder(
+                  '',
+                  'SOS',
+                  ' to your people, with live location while it runs',
+                ),
+                _pitchLineBuilder(
+                  'Alerts near your people, ',
+                  'flagged automatically',
+                  '',
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.fromLTRB(16.spMin, 11.spMin, 16.spMin, 0),
+            padding: EdgeInsets.symmetric(
+              horizontal: 14.spMin,
+              vertical: 12.spMin,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF6ECFA),
+              borderRadius: BorderRadius.circular(14.spMin),
+              border: Border.all(color: const Color(0xFFECD9F4)),
+            ),
+            child: Text(
+              'ALRT never live-tracks anyone. Snapshots are one moment, '
+              'sent on purpose, and they expire after an hour.',
+              style: TextStyle(
+                fontSize: 12.spMin,
+                height: 1.7,
+                color: const Color(0xFF8E4AA6),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(16.spMin, 14.spMin, 16.spMin, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  height: 50.spMin,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFFC939DD),
+                          Color(0xFFA22CC6),
+                          Color(0xFF7E1FA8),
+                          Color(0xFF5C1585),
+                        ],
+                        stops: [0.0, 0.4, 0.74, 1.0],
+                      ),
+                      borderRadius: BorderRadius.circular(15.spMin),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF9C27B0).withValues(
+                            alpha: 0.32,
+                          ),
+                          blurRadius: 24.0,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.spMin),
+                        ),
+                      ),
+                      onPressed: createState.isLoading
+                          ? null
+                          : _showCreateSheet,
+                      child: createState.isLoading
+                          ? SizedBox(
+                              width: 20.spMin,
+                              height: 20.spMin,
+                              child: const CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              'Create a group',
+                              style: TextStyle(
+                                fontSize: 15.spMin,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 9.spMin),
+                SizedBox(
+                  height: 48.spMin,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFF1D1D21),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.spMin),
+                        side: const BorderSide(
+                          color: Color(0xFFE8E4EE),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                    onPressed: joinState.isLoading ? null : _showJoinSheet,
+                    child: joinState.isLoading
+                        ? SizedBox(
+                            width: 20.spMin,
+                            height: 20.spMin,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            'I have an invite code',
+                            style: TextStyle(
+                              fontSize: 14.spMin,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 14.spMin),
+            child: Text(
+              'No price to look. Joining is always free.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.spMin,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF6B6875),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _pitchCardBuilder() {
-    return Container(
-      padding: EdgeInsets.all(22.spMin),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [FamilyColors.indigo, Color(0xFF7C7CE0)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24.spMin),
-      ),
-      child: Column(
+  /// One benefit line: plain text with the load-bearing words in ink.
+  Widget _pitchLineBuilder(
+    final String lead,
+    final String strong,
+    final String tail,
+  ) {
+    return Text.rich(
+      TextSpan(
         children: [
-          Container(
-            width: 60.spMin,
-            height: 60.spMin,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(18.spMin),
-            ),
-            child: Icon(LucideIcons.users, color: Colors.white, size: 30.spMin),
-          ),
-          SizedBox(height: 14.spMin),
-          Text(
-            'Family Safety',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 22.spMin,
+          TextSpan(text: lead),
+          TextSpan(
+            text: strong,
+            style: const TextStyle(
               fontWeight: FontWeight.w700,
+              color: Color(0xFF1D1D21),
             ),
           ),
-          SizedBox(height: 6.spMin),
-          Text(
-            'Check in with one tap, see who is near an alert, '
-            'and get a quiet note when family arrive home safe.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.9),
-              fontSize: 13.spMin,
-            ),
-          ),
+          TextSpan(text: tail),
         ],
+      ),
+      style: TextStyle(
+        fontSize: 13.spMin,
+        height: 2.0,
+        color: FamilyColors.v31Ink,
       ),
     );
   }
