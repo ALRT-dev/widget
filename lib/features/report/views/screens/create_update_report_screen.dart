@@ -1483,13 +1483,16 @@ class _CreateUpdateReportScreenState
     required final String label,
     required final VoidCallback onPressed,
   }) {
+    // Two 115px dotted boxes gave an optional step more of the page than
+    // the required ones above it. Same targets, a third of the height, and
+    // the icon takes the tinted square the rest of the page now uses.
     return DottedBorderContainer(
       strokeWidth: 1.2,
       borderRadius: 12.spMin,
       borderColor: AppColors.lightGrey,
       child: Container(
         width: double.infinity,
-        height: 115.spMin,
+        height: 76.spMin,
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(12.spMin),
@@ -1498,17 +1501,21 @@ class _CreateUpdateReportScreenState
           spacing: 6.spMin,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: AppColors.grey.withValues(alpha: 0.6),
-              size: 30.spMin,
+            Container(
+              width: 30.spMin,
+              height: 30.spMin,
+              decoration: BoxDecoration(
+                color: _iconTint,
+                borderRadius: BorderRadius.circular(9.spMin),
+              ),
+              child: Icon(icon, color: _labelColor, size: 16.spMin),
             ),
             Text(
               label,
               style: TextStyle(
-                fontSize: 14.spMin,
-                fontWeight: FontWeight.w600,
-                color: AppColors.grey.withValues(alpha: 0.8),
+                fontSize: 12.spMin,
+                fontWeight: FontWeight.w700,
+                color: AppColors.mediumGrey,
               ),
             ),
           ],
