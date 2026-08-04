@@ -7,7 +7,9 @@ explicit instruction from the product owner in the current session.
 
 - Band colours: Info #8A93A0, Monitor #F5C518, Action #F07E1B, Critical #DA1F2D.
 - Shapes carry the SOURCE system: AWS triangle, official diamond, community
-  circle, ALRT shield. The shield never writes the band word.
+  circle, ALRT shield. The shield never writes the band word. Every shape,
+  the shield included, takes the band hexes above; there is no separate
+  brighter shield palette.
 - Category colours: Weather #4DA8FF, Health #FF8C42, Security #FF4757,
   Traffic #00B383, Utilities #F5A623, Community #9C27B0, Other #8B6F47.
 - Plain-terms summary sits on the dark surface #23252B with white text.
