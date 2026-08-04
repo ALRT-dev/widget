@@ -1409,12 +1409,16 @@ class _RestClient implements RestClient {
   }
 
   @override
-  Future<FamilyInvite> createFamilyInvite({String? circleId}) async {
+  Future<FamilyInvite> createFamilyInvite({
+    String? circleId,
+    Map<String, dynamic> body = const {},
+  }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    const Map<String, dynamic>? _data = null;
+    final _data = <String, dynamic>{};
+    _data.addAll(body);
     final _options = _setStreamType<FamilyInvite>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(

@@ -89,8 +89,10 @@ class FamilyService {
     return _familyRepository.updateOwnFamilyMemberPhoto(photo: photo);
   }
 
-  Future<Either<FamilyInvite, AppError>> createFamilyInvite() {
-    return _familyRepository.createFamilyInvite();
+  Future<Either<FamilyInvite, AppError>> createFamilyInvite({
+    final bool isGuestInvite = false,
+  }) {
+    return _familyRepository.createFamilyInvite(isGuestInvite: isGuestInvite);
   }
 
   Future<Either<List<FamilyInvite>, AppError>> getFamilyInvites() {

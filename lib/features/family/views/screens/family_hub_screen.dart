@@ -803,6 +803,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
     final Set<String> memberIdsNearAlert,
   ) {
     final isOwner = circle.me?.role == FamilyRole.owner;
+    // Guests never request locations, so they never see the affordance.
+    final iAmGuest = circle.me?.role == FamilyRole.guest;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -826,7 +828,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                   onLongPress: isOwner && member.id != circle.myMemberId
                       ? () => _confirmRemoveMember(member)
                       : null,
-                  onRequestLocation: member.id != circle.myMemberId
+                  onRequestLocation:
+                      !iAmGuest && member.id != circle.myMemberId
                       ? () => _requestLocationSnapshot(member)
                       : null,
                 ),

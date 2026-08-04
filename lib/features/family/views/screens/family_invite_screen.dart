@@ -23,6 +23,9 @@ class FamilyInviteScreen extends ConsumerStatefulWidget {
 class _FamilyInviteScreenState extends ConsumerState<FamilyInviteScreen> {
   String? _latestCode;
 
+  /// When on, the next generated code makes whoever redeems it a guest.
+  bool _inviteAsGuest = false;
+
   @override
   void initState() {
     super.initState();
@@ -81,6 +84,8 @@ class _FamilyInviteScreenState extends ConsumerState<FamilyInviteScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 12.spMin, color: AppColors.grey),
             ),
+            SizedBox(height: 14.spMin),
+            _guestToggleBuilder(),
             SizedBox(height: 24.spMin),
             if (invites.isNotEmpty) ...[
               Text(
@@ -97,6 +102,64 @@ class _FamilyInviteScreenState extends ConsumerState<FamilyInviteScreen> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  /// Guest invites cost the owner nothing, so the explainer says exactly
+  /// what a guest can and cannot do before the code is minted.
+  Widget _guestToggleBuilder() {
+    return Container(
+      padding: EdgeInsets.all(14.spMin),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.spMin),
+        border: Border.all(
+          color: _inviteAsGuest
+              ? FamilyColors.indigo
+              : const Color(0xFFE6E6EA),
+          width: _inviteAsGuest ? 1.5 : 1.0,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                LucideIcons.userPlus,
+                size: 18.spMin,
+                color: FamilyColors.indigo,
+              ),
+              SizedBox(width: 10.spMin),
+              Expanded(
+                child: Text(
+                  'Invite as a guest',
+                  style: TextStyle(
+                    fontSize: 15.spMin,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Switch(
+                value: _inviteAsGuest,
+                activeTrackColor: FamilyColors.indigo,
+                onChanged: (value) => setState(() => _inviteAsGuest = value),
+              ),
+            ],
+          ),
+          SizedBox(height: 4.spMin),
+          Text(
+            'A guest receives your circle\'s alerts and can say "I\'m Safe". '
+            'They never request anyone\'s location, and they use none of '
+            'your seats.',
+            style: TextStyle(
+              fontSize: 12.spMin,
+              height: 1.4,
+              color: AppColors.grey,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -185,7 +248,9 @@ class _FamilyInviteScreenState extends ConsumerState<FamilyInviteScreen> {
   }
 
   void _onGenerate() async {
-    final invite = await ref.read(providerOfFamily.notifier).createInvite();
+    final invite = await ref
+        .read(providerOfFamily.notifier)
+        .createInvite(isGuestInvite: _inviteAsGuest);
     if (!mounted || invite == null) return;
     setState(() => _latestCode = invite.code);
   }

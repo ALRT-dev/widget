@@ -61,7 +61,9 @@ abstract class FamilyRepository {
     required final File photo,
   });
 
-  Future<Either<FamilyInvite, AppError>> createFamilyInvite();
+  Future<Either<FamilyInvite, AppError>> createFamilyInvite({
+    final bool isGuestInvite = false,
+  });
 
   Future<Either<List<FamilyInvite>, AppError>> getFamilyInvites();
 
@@ -386,11 +388,16 @@ class FamilyRepositoryImpl implements FamilyRepository {
   }
 
   @override
-  Future<Either<FamilyInvite, AppError>> createFamilyInvite() {
+  Future<Either<FamilyInvite, AppError>> createFamilyInvite({
+    final bool isGuestInvite = false,
+  }) {
     return runAsyncCall(
       name: 'createFamilyInvite',
       future: () async {
-        final result = await _restClient.createFamilyInvite(circleId: _circleId);
+        final result = await _restClient.createFamilyInvite(
+          circleId: _circleId,
+          body: {'isGuestInvite': isGuestInvite},
+        );
         return Success(result);
       },
       onError: Failure.new,

@@ -41,13 +41,25 @@ class FamilyMemberListItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    isMe ? '${member.name} (You)' : member.name,
-                    style: TextStyle(
-                      fontSize: 15.spMin,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.black,
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          isMe ? '${member.name} (You)' : member.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 15.spMin,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.black,
+                          ),
+                        ),
+                      ),
+                      if (member.role == FamilyRole.guest) ...[
+                        SizedBox(width: 6.spMin),
+                        _guestBadgeBuilder(),
+                      ],
+                    ],
                   ),
                   SizedBox(height: 2.spMin),
                   Row(
@@ -130,6 +142,30 @@ class FamilyMemberListItem extends StatelessWidget {
       return 'Checked in ${timeago.format(lastCheckIn)}';
     }
     return 'No snapshot yet';
+  }
+
+  /// Marks a guest so the circle can see at a glance who is along for the
+  /// alerts only. Outlined, never a filled chip: it is not a status.
+  Widget _guestBadgeBuilder() {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 7.spMin,
+        vertical: 1.spMin,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6.spMin),
+        border: Border.all(color: AppColors.grey.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        'GUEST',
+        style: TextStyle(
+          fontSize: 9.spMin,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.5,
+          color: AppColors.grey,
+        ),
+      ),
+    );
   }
 
   Widget _statusChipBuilder() {

@@ -245,10 +245,14 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
   ) {
     final owned = _ownedOf(circles);
     if (owned.isNotEmpty) {
-      return owned.fold(0, (sum, c) => sum + c.memberCount);
+      // Guests join free, so they never appear against a seat.
+      return owned.fold(0, (sum, c) => sum + c.seatCount);
     }
     // Fallback before the circles list has loaded.
-    return circle?.members.length ?? 1;
+    return circle?.members
+            .where((m) => m.role != FamilyRole.guest)
+            .length ??
+        1;
   }
 
   Widget _sectionLabelBuilder(

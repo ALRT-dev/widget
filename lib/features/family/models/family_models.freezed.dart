@@ -672,7 +672,8 @@ as DateTime?,
 /// @nodoc
 mixin _$FamilyInvite {
 
- String get id; String get code; int get useCount; int get maxUses; DateTime? get expiresAt; DateTime? get createdAt;
+ String get id; String get code; int get useCount; int get maxUses;/// Whoever redeems this code joins as a guest.
+ bool get isGuestInvite; DateTime? get expiresAt; DateTime? get createdAt;
 /// Create a copy of FamilyInvite
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -685,16 +686,16 @@ $FamilyInviteCopyWith<FamilyInvite> get copyWith => _$FamilyInviteCopyWithImpl<F
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyInvite&&(identical(other.id, id) || other.id == id)&&(identical(other.code, code) || other.code == code)&&(identical(other.useCount, useCount) || other.useCount == useCount)&&(identical(other.maxUses, maxUses) || other.maxUses == maxUses)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyInvite&&(identical(other.id, id) || other.id == id)&&(identical(other.code, code) || other.code == code)&&(identical(other.useCount, useCount) || other.useCount == useCount)&&(identical(other.maxUses, maxUses) || other.maxUses == maxUses)&&(identical(other.isGuestInvite, isGuestInvite) || other.isGuestInvite == isGuestInvite)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,code,useCount,maxUses,expiresAt,createdAt);
+int get hashCode => Object.hash(runtimeType,id,code,useCount,maxUses,isGuestInvite,expiresAt,createdAt);
 
 @override
 String toString() {
-  return 'FamilyInvite(id: $id, code: $code, useCount: $useCount, maxUses: $maxUses, expiresAt: $expiresAt, createdAt: $createdAt)';
+  return 'FamilyInvite(id: $id, code: $code, useCount: $useCount, maxUses: $maxUses, isGuestInvite: $isGuestInvite, expiresAt: $expiresAt, createdAt: $createdAt)';
 }
 
 
@@ -705,7 +706,7 @@ abstract mixin class $FamilyInviteCopyWith<$Res>  {
   factory $FamilyInviteCopyWith(FamilyInvite value, $Res Function(FamilyInvite) _then) = _$FamilyInviteCopyWithImpl;
 @useResult
 $Res call({
- String id, String code, int useCount, int maxUses, DateTime? expiresAt, DateTime? createdAt
+ String id, String code, int useCount, int maxUses, bool isGuestInvite, DateTime? expiresAt, DateTime? createdAt
 });
 
 
@@ -722,13 +723,14 @@ class _$FamilyInviteCopyWithImpl<$Res>
 
 /// Create a copy of FamilyInvite
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? code = null,Object? useCount = null,Object? maxUses = null,Object? expiresAt = freezed,Object? createdAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? code = null,Object? useCount = null,Object? maxUses = null,Object? isGuestInvite = null,Object? expiresAt = freezed,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
 as String,useCount: null == useCount ? _self.useCount : useCount // ignore: cast_nullable_to_non_nullable
 as int,maxUses: null == maxUses ? _self.maxUses : maxUses // ignore: cast_nullable_to_non_nullable
-as int,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
+as int,isGuestInvite: null == isGuestInvite ? _self.isGuestInvite : isGuestInvite // ignore: cast_nullable_to_non_nullable
+as bool,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
@@ -815,10 +817,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String code,  int useCount,  int maxUses,  DateTime? expiresAt,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String code,  int useCount,  int maxUses,  bool isGuestInvite,  DateTime? expiresAt,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FamilyInvite() when $default != null:
-return $default(_that.id,_that.code,_that.useCount,_that.maxUses,_that.expiresAt,_that.createdAt);case _:
+return $default(_that.id,_that.code,_that.useCount,_that.maxUses,_that.isGuestInvite,_that.expiresAt,_that.createdAt);case _:
   return orElse();
 
 }
@@ -836,10 +838,10 @@ return $default(_that.id,_that.code,_that.useCount,_that.maxUses,_that.expiresAt
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String code,  int useCount,  int maxUses,  DateTime? expiresAt,  DateTime? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String code,  int useCount,  int maxUses,  bool isGuestInvite,  DateTime? expiresAt,  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _FamilyInvite():
-return $default(_that.id,_that.code,_that.useCount,_that.maxUses,_that.expiresAt,_that.createdAt);case _:
+return $default(_that.id,_that.code,_that.useCount,_that.maxUses,_that.isGuestInvite,_that.expiresAt,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -856,10 +858,10 @@ return $default(_that.id,_that.code,_that.useCount,_that.maxUses,_that.expiresAt
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String code,  int useCount,  int maxUses,  DateTime? expiresAt,  DateTime? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String code,  int useCount,  int maxUses,  bool isGuestInvite,  DateTime? expiresAt,  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FamilyInvite() when $default != null:
-return $default(_that.id,_that.code,_that.useCount,_that.maxUses,_that.expiresAt,_that.createdAt);case _:
+return $default(_that.id,_that.code,_that.useCount,_that.maxUses,_that.isGuestInvite,_that.expiresAt,_that.createdAt);case _:
   return null;
 
 }
@@ -871,13 +873,15 @@ return $default(_that.id,_that.code,_that.useCount,_that.maxUses,_that.expiresAt
 @JsonSerializable()
 
 class _FamilyInvite implements FamilyInvite {
-  const _FamilyInvite({required this.id, required this.code, this.useCount = 0, this.maxUses = 10, this.expiresAt, this.createdAt});
+  const _FamilyInvite({required this.id, required this.code, this.useCount = 0, this.maxUses = 10, this.isGuestInvite = false, this.expiresAt, this.createdAt});
   factory _FamilyInvite.fromJson(Map<String, dynamic> json) => _$FamilyInviteFromJson(json);
 
 @override final  String id;
 @override final  String code;
 @override@JsonKey() final  int useCount;
 @override@JsonKey() final  int maxUses;
+/// Whoever redeems this code joins as a guest.
+@override@JsonKey() final  bool isGuestInvite;
 @override final  DateTime? expiresAt;
 @override final  DateTime? createdAt;
 
@@ -894,16 +898,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyInvite&&(identical(other.id, id) || other.id == id)&&(identical(other.code, code) || other.code == code)&&(identical(other.useCount, useCount) || other.useCount == useCount)&&(identical(other.maxUses, maxUses) || other.maxUses == maxUses)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyInvite&&(identical(other.id, id) || other.id == id)&&(identical(other.code, code) || other.code == code)&&(identical(other.useCount, useCount) || other.useCount == useCount)&&(identical(other.maxUses, maxUses) || other.maxUses == maxUses)&&(identical(other.isGuestInvite, isGuestInvite) || other.isGuestInvite == isGuestInvite)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,code,useCount,maxUses,expiresAt,createdAt);
+int get hashCode => Object.hash(runtimeType,id,code,useCount,maxUses,isGuestInvite,expiresAt,createdAt);
 
 @override
 String toString() {
-  return 'FamilyInvite(id: $id, code: $code, useCount: $useCount, maxUses: $maxUses, expiresAt: $expiresAt, createdAt: $createdAt)';
+  return 'FamilyInvite(id: $id, code: $code, useCount: $useCount, maxUses: $maxUses, isGuestInvite: $isGuestInvite, expiresAt: $expiresAt, createdAt: $createdAt)';
 }
 
 
@@ -914,7 +918,7 @@ abstract mixin class _$FamilyInviteCopyWith<$Res> implements $FamilyInviteCopyWi
   factory _$FamilyInviteCopyWith(_FamilyInvite value, $Res Function(_FamilyInvite) _then) = __$FamilyInviteCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String code, int useCount, int maxUses, DateTime? expiresAt, DateTime? createdAt
+ String id, String code, int useCount, int maxUses, bool isGuestInvite, DateTime? expiresAt, DateTime? createdAt
 });
 
 
@@ -931,13 +935,14 @@ class __$FamilyInviteCopyWithImpl<$Res>
 
 /// Create a copy of FamilyInvite
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? code = null,Object? useCount = null,Object? maxUses = null,Object? expiresAt = freezed,Object? createdAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? code = null,Object? useCount = null,Object? maxUses = null,Object? isGuestInvite = null,Object? expiresAt = freezed,Object? createdAt = freezed,}) {
   return _then(_FamilyInvite(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
 as String,useCount: null == useCount ? _self.useCount : useCount // ignore: cast_nullable_to_non_nullable
 as int,maxUses: null == maxUses ? _self.maxUses : maxUses // ignore: cast_nullable_to_non_nullable
-as int,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
+as int,isGuestInvite: null == isGuestInvite ? _self.isGuestInvite : isGuestInvite // ignore: cast_nullable_to_non_nullable
+as bool,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
@@ -3230,7 +3235,8 @@ as List<FamilyTransferCandidate>,
 /// @nodoc
 mixin _$FamilyCircleSummary {
 
- String get circleId; String get name; String? get themeColor;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role; String get myMemberId; int get memberCount;/// True when the caller owns (pays for) this circle — its members
+ String get circleId; String get name; String? get themeColor;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role; String get myMemberId; int get memberCount;/// Members who hold a seat: everyone except guests, who join free.
+ int get seatCount;/// True when the caller owns (pays for) this circle — its members
 /// consume the caller's seats.
  bool get isOwned; DateTime? get joinedAt;
 /// Create a copy of FamilyCircleSummary
@@ -3245,16 +3251,16 @@ $FamilyCircleSummaryCopyWith<FamilyCircleSummary> get copyWith => _$FamilyCircle
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyCircleSummary&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.role, role) || other.role == role)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.isOwned, isOwned) || other.isOwned == isOwned)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyCircleSummary&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.role, role) || other.role == role)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.seatCount, seatCount) || other.seatCount == seatCount)&&(identical(other.isOwned, isOwned) || other.isOwned == isOwned)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,role,myMemberId,memberCount,isOwned,joinedAt);
+int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,role,myMemberId,memberCount,seatCount,isOwned,joinedAt);
 
 @override
 String toString() {
-  return 'FamilyCircleSummary(circleId: $circleId, name: $name, themeColor: $themeColor, role: $role, myMemberId: $myMemberId, memberCount: $memberCount, isOwned: $isOwned, joinedAt: $joinedAt)';
+  return 'FamilyCircleSummary(circleId: $circleId, name: $name, themeColor: $themeColor, role: $role, myMemberId: $myMemberId, memberCount: $memberCount, seatCount: $seatCount, isOwned: $isOwned, joinedAt: $joinedAt)';
 }
 
 
@@ -3265,7 +3271,7 @@ abstract mixin class $FamilyCircleSummaryCopyWith<$Res>  {
   factory $FamilyCircleSummaryCopyWith(FamilyCircleSummary value, $Res Function(FamilyCircleSummary) _then) = _$FamilyCircleSummaryCopyWithImpl;
 @useResult
 $Res call({
- String circleId, String name, String? themeColor,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, String myMemberId, int memberCount, bool isOwned, DateTime? joinedAt
+ String circleId, String name, String? themeColor,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, String myMemberId, int memberCount, int seatCount, bool isOwned, DateTime? joinedAt
 });
 
 
@@ -3282,7 +3288,7 @@ class _$FamilyCircleSummaryCopyWithImpl<$Res>
 
 /// Create a copy of FamilyCircleSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? role = null,Object? myMemberId = null,Object? memberCount = null,Object? isOwned = null,Object? joinedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? role = null,Object? myMemberId = null,Object? memberCount = null,Object? seatCount = null,Object? isOwned = null,Object? joinedAt = freezed,}) {
   return _then(_self.copyWith(
 circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -3290,6 +3296,7 @@ as String,themeColor: freezed == themeColor ? _self.themeColor : themeColor // i
 as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as FamilyRole,myMemberId: null == myMemberId ? _self.myMemberId : myMemberId // ignore: cast_nullable_to_non_nullable
 as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
+as int,seatCount: null == seatCount ? _self.seatCount : seatCount // ignore: cast_nullable_to_non_nullable
 as int,isOwned: null == isOwned ? _self.isOwned : isOwned // ignore: cast_nullable_to_non_nullable
 as bool,joinedAt: freezed == joinedAt ? _self.joinedAt : joinedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -3377,10 +3384,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  bool isOwned,  DateTime? joinedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  int seatCount,  bool isOwned,  DateTime? joinedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FamilyCircleSummary() when $default != null:
-return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.isOwned,_that.joinedAt);case _:
+return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.seatCount,_that.isOwned,_that.joinedAt);case _:
   return orElse();
 
 }
@@ -3398,10 +3405,10 @@ return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMe
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  bool isOwned,  DateTime? joinedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  int seatCount,  bool isOwned,  DateTime? joinedAt)  $default,) {final _that = this;
 switch (_that) {
 case _FamilyCircleSummary():
-return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.isOwned,_that.joinedAt);case _:
+return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.seatCount,_that.isOwned,_that.joinedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -3418,10 +3425,10 @@ return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMe
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  bool isOwned,  DateTime? joinedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  int seatCount,  bool isOwned,  DateTime? joinedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FamilyCircleSummary() when $default != null:
-return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.isOwned,_that.joinedAt);case _:
+return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.seatCount,_that.isOwned,_that.joinedAt);case _:
   return null;
 
 }
@@ -3433,7 +3440,7 @@ return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMe
 @JsonSerializable()
 
 class _FamilyCircleSummary implements FamilyCircleSummary {
-  const _FamilyCircleSummary({required this.circleId, required this.name, this.themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult) this.role = FamilyRole.adult, required this.myMemberId, this.memberCount = 0, this.isOwned = false, this.joinedAt});
+  const _FamilyCircleSummary({required this.circleId, required this.name, this.themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult) this.role = FamilyRole.adult, required this.myMemberId, this.memberCount = 0, this.seatCount = 0, this.isOwned = false, this.joinedAt});
   factory _FamilyCircleSummary.fromJson(Map<String, dynamic> json) => _$FamilyCircleSummaryFromJson(json);
 
 @override final  String circleId;
@@ -3442,6 +3449,8 @@ class _FamilyCircleSummary implements FamilyCircleSummary {
 @override@JsonKey(unknownEnumValue: FamilyRole.adult) final  FamilyRole role;
 @override final  String myMemberId;
 @override@JsonKey() final  int memberCount;
+/// Members who hold a seat: everyone except guests, who join free.
+@override@JsonKey() final  int seatCount;
 /// True when the caller owns (pays for) this circle — its members
 /// consume the caller's seats.
 @override@JsonKey() final  bool isOwned;
@@ -3460,16 +3469,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyCircleSummary&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.role, role) || other.role == role)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.isOwned, isOwned) || other.isOwned == isOwned)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyCircleSummary&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.role, role) || other.role == role)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.seatCount, seatCount) || other.seatCount == seatCount)&&(identical(other.isOwned, isOwned) || other.isOwned == isOwned)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,role,myMemberId,memberCount,isOwned,joinedAt);
+int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,role,myMemberId,memberCount,seatCount,isOwned,joinedAt);
 
 @override
 String toString() {
-  return 'FamilyCircleSummary(circleId: $circleId, name: $name, themeColor: $themeColor, role: $role, myMemberId: $myMemberId, memberCount: $memberCount, isOwned: $isOwned, joinedAt: $joinedAt)';
+  return 'FamilyCircleSummary(circleId: $circleId, name: $name, themeColor: $themeColor, role: $role, myMemberId: $myMemberId, memberCount: $memberCount, seatCount: $seatCount, isOwned: $isOwned, joinedAt: $joinedAt)';
 }
 
 
@@ -3480,7 +3489,7 @@ abstract mixin class _$FamilyCircleSummaryCopyWith<$Res> implements $FamilyCircl
   factory _$FamilyCircleSummaryCopyWith(_FamilyCircleSummary value, $Res Function(_FamilyCircleSummary) _then) = __$FamilyCircleSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- String circleId, String name, String? themeColor,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, String myMemberId, int memberCount, bool isOwned, DateTime? joinedAt
+ String circleId, String name, String? themeColor,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, String myMemberId, int memberCount, int seatCount, bool isOwned, DateTime? joinedAt
 });
 
 
@@ -3497,7 +3506,7 @@ class __$FamilyCircleSummaryCopyWithImpl<$Res>
 
 /// Create a copy of FamilyCircleSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? role = null,Object? myMemberId = null,Object? memberCount = null,Object? isOwned = null,Object? joinedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? role = null,Object? myMemberId = null,Object? memberCount = null,Object? seatCount = null,Object? isOwned = null,Object? joinedAt = freezed,}) {
   return _then(_FamilyCircleSummary(
 circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -3505,6 +3514,7 @@ as String,themeColor: freezed == themeColor ? _self.themeColor : themeColor // i
 as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as FamilyRole,myMemberId: null == myMemberId ? _self.myMemberId : myMemberId // ignore: cast_nullable_to_non_nullable
 as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
+as int,seatCount: null == seatCount ? _self.seatCount : seatCount // ignore: cast_nullable_to_non_nullable
 as int,isOwned: null == isOwned ? _self.isOwned : isOwned // ignore: cast_nullable_to_non_nullable
 as bool,joinedAt: freezed == joinedAt ? _self.joinedAt : joinedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,

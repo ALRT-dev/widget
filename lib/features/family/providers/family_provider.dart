@@ -784,12 +784,16 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     );
   }
 
-  Future<FamilyInvite?> createInvite() async {
+  Future<FamilyInvite?> createInvite({
+    final bool isGuestInvite = false,
+  }) async {
     state = state.copyWith(
       createInviteState: const FamilyActionState.loading(),
     );
 
-    final result = await _familyService.createFamilyInvite();
+    final result = await _familyService.createFamilyInvite(
+      isGuestInvite: isGuestInvite,
+    );
     if (!mounted) return null;
 
     return result.when(

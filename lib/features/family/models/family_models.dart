@@ -7,6 +7,10 @@ enum FamilyRole {
   owner,
   adult,
   child,
+
+  /// Receives the circle's alerts and can say "I'm Safe". Never requests
+  /// anyone's location, and consumes no seat on the owner's plan.
+  guest,
 }
 
 enum FamilySharingLevel {
@@ -152,6 +156,9 @@ abstract class FamilyInvite with _$FamilyInvite {
     required final String code,
     @Default(0) final int useCount,
     @Default(10) final int maxUses,
+
+    /// Whoever redeems this code joins as a guest.
+    @Default(false) final bool isGuestInvite,
     final DateTime? expiresAt,
     final DateTime? createdAt,
   }) = _FamilyInvite;
@@ -310,6 +317,9 @@ abstract class FamilyCircleSummary with _$FamilyCircleSummary {
     final FamilyRole role,
     required final String myMemberId,
     @Default(0) final int memberCount,
+
+    /// Members who hold a seat: everyone except guests, who join free.
+    @Default(0) final int seatCount,
 
     /// True when the caller owns (pays for) this circle — its members
     /// consume the caller's seats.

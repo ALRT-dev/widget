@@ -133,6 +133,7 @@ const _$FamilyRoleEnumMap = {
   FamilyRole.owner: 'owner',
   FamilyRole.adult: 'adult',
   FamilyRole.child: 'child',
+  FamilyRole.guest: 'guest',
 };
 
 const _$FamilySharingLevelEnumMap = {
@@ -155,6 +156,7 @@ _FamilyInvite _$FamilyInviteFromJson(Map<String, dynamic> json) =>
       code: json['code'] as String,
       useCount: (json['useCount'] as num?)?.toInt() ?? 0,
       maxUses: (json['maxUses'] as num?)?.toInt() ?? 10,
+      isGuestInvite: json['isGuestInvite'] as bool? ?? false,
       expiresAt: json['expiresAt'] == null
           ? null
           : DateTime.parse(json['expiresAt'] as String),
@@ -169,6 +171,7 @@ Map<String, dynamic> _$FamilyInviteToJson(_FamilyInvite instance) =>
       'code': instance.code,
       'useCount': instance.useCount,
       'maxUses': instance.maxUses,
+      'isGuestInvite': instance.isGuestInvite,
       'expiresAt': ?instance.expiresAt?.toIso8601String(),
       'createdAt': ?instance.createdAt?.toIso8601String(),
     };
@@ -411,6 +414,7 @@ _FamilyCircleSummary _$FamilyCircleSummaryFromJson(Map<String, dynamic> json) =>
           FamilyRole.adult,
       myMemberId: json['myMemberId'] as String,
       memberCount: (json['memberCount'] as num?)?.toInt() ?? 0,
+      seatCount: (json['seatCount'] as num?)?.toInt() ?? 0,
       isOwned: json['isOwned'] as bool? ?? false,
       joinedAt: json['joinedAt'] == null
           ? null
@@ -426,6 +430,7 @@ Map<String, dynamic> _$FamilyCircleSummaryToJson(
   'role': _$FamilyRoleEnumMap[instance.role]!,
   'myMemberId': instance.myMemberId,
   'memberCount': instance.memberCount,
+  'seatCount': instance.seatCount,
   'isOwned': instance.isOwned,
   'joinedAt': ?instance.joinedAt?.toIso8601String(),
 };

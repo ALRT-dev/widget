@@ -295,6 +295,7 @@ abstract class RestClient {
   @POST(kUrlFamilyInvites)
   Future<FamilyInvite> createFamilyInvite({
     @Query('circleId') final String? circleId,
+    @Body() final Map<String, dynamic> body = const {},
   });
 
   @GET(kUrlFamilyInvites)
