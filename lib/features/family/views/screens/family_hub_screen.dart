@@ -71,9 +71,18 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                       _sosBannerBuilder(sos),
                       SizedBox(height: 12.spMin),
                     ],
-                    _imSafeButtonBuilder(checkInState),
+                    _sectionLabelBuilder('Quick actions'),
                     SizedBox(height: 10.spMin),
-                    _requestCheckInButtonBuilder(),
+                    _cardBuilder(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _imSafeButtonBuilder(checkInState),
+                          SizedBox(height: 10.spMin),
+                          _requestCheckInButtonBuilder(),
+                        ],
+                      ),
+                    ),
                     SizedBox(height: 16.spMin),
                     _privacyBannerBuilder(),
                     SizedBox(height: 20.spMin),
@@ -639,6 +648,45 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
     );
   }
 
+  /// The one section label on this screen: indigo, uppercase, letter-spaced,
+  /// with an optional count so a section says how much is in it.
+  Widget _sectionLabelBuilder(final String title, {final int? count}) {
+    return Text(
+      count == null
+          ? title.toUpperCase()
+          : '${title.toUpperCase()} · $count',
+      style: TextStyle(
+        fontSize: 13.spMin,
+        fontWeight: FontWeight.w700,
+        color: FamilyColors.indigo,
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+
+  /// The one white card on this screen, so every section sits on the same
+  /// surface instead of some floating loose on the grey.
+  Widget _cardBuilder({
+    required final Widget child,
+    final EdgeInsetsGeometry? padding,
+  }) {
+    return Container(
+      padding: padding ?? EdgeInsets.all(14.spMin),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20.spMin),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColorLight,
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
   Widget _imSafeButtonBuilder(final FamilyActionState checkInState) {
     return SizedBox(
       height: 54.spMin,
@@ -758,32 +806,19 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'MEMBERS',
-          style: TextStyle(
-            fontSize: 13.spMin,
-            fontWeight: FontWeight.w700,
-            color: FamilyColors.indigo,
-            letterSpacing: 0.5,
-          ),
-        ),
+        _sectionLabelBuilder('Members', count: circle.members.length),
         SizedBox(height: 10.spMin),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20.spMin),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowColorLight,
-                blurRadius: 2.0,
-              ),
-            ],
-          ),
+        _cardBuilder(
+          padding: EdgeInsets.zero,
           child: Column(
             children: [
               for (final (index, member) in circle.members.indexed) ...[
                 if (index > 0)
-                  Divider(height: 1, indent: 70.spMin, color: const Color(0xFFF0F0F2)),
+                  Divider(
+                    height: 1,
+                    indent: 70.spMin,
+                    color: const Color(0xFFF0F0F2),
+                  ),
                 FamilyMemberListItem(
                   member: member,
                   isMe: member.id == circle.myMemberId,
