@@ -15,8 +15,6 @@ import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
 import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
-import 'package:hazard_app/features/shared/enums/category_image_type.dart';
-import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/features/report/models/report_taxonomy.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -51,6 +49,10 @@ const _cardShadow = Color(0x0D1E142D);
 
 /// The chip treatment the prototype gives secondary actions.
 const _chipFill = Color(0xFFF0F2F5);
+
+/// Text on an unpicked category pill: grey, so seven categories do not read
+/// as seven competing colours before one is chosen.
+const _pillInk = Color(0xFF5F5C66);
 
 class CreateUpdateReportScreenArgs {
   CreateUpdateReportScreenArgs({this.hazardToUpdate});
@@ -573,106 +575,84 @@ class _CreateUpdateReportScreenState
           );
         }
 
-        // One category per line: an even list scans top to bottom, with
-        // nothing dependent on how long a category's name happens to be.
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        // The prototype's wrapped pills: the whole set is visible in three
+        // short rows instead of seven full-width bars, so picking a category
+        // no longer means scrolling past the rest of them.
+        return Wrap(
+          spacing: 6.spMin,
+          runSpacing: 6.spMin,
           children: [
-            for (final category in categories) ...[
-              _categoryRowBuilder(
+            for (final category in categories)
+              _categoryPillBuilder(
                 category: category,
                 isSelected: category.id == selectedCategoryId,
               ),
-              if (category != categories.last) 8.hSizedBox,
-            ],
           ],
         );
       },
     );
   }
 
-  /// A full-width category row: colour disc, name, and a tick when chosen.
-  Widget _categoryRowBuilder({
+  /// One category as a pill: its colour as a dot, its name beside it.
+  ///
+  /// Selecting fills the pill with the category's own tint and pulls the
+  /// border and text to that colour, so the choice is legible from the dot
+  /// alone. Unselected pills stay white with grey text, which keeps seven
+  /// categories from reading as seven competing colours at once.
+  Widget _categoryPillBuilder({
     required final HazardCategory category,
     required final bool isSelected,
   }) {
     final dotColor = category.resolvedColor;
-    final iconImage = category.categoryImageByType(CategoryImageType.user);
+    final fill = Color.alphaBlend(
+      dotColor.withValues(alpha: 0.12),
+      AppColors.white,
+    );
 
     return GestureDetector(
       onTap: () => _handleCategoryTap(category),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 140),
         padding: EdgeInsets.symmetric(
-          horizontal: 12.spMin,
-          vertical: 11.spMin,
+          horizontal: 11.spMin,
+          vertical: 8.spMin,
         ),
         decoration: BoxDecoration(
-          color: isSelected
-              ? dotColor.withValues(alpha: 0.14)
-              : AppColors.white,
-          borderRadius: BorderRadius.circular(14.spMin),
+          color: isSelected ? fill : AppColors.white,
+          borderRadius: BorderRadius.circular(16.spMin),
           border: Border.all(
-            color: isSelected
-                ? dotColor
-                : AppColors.lightGrey.withValues(alpha: 0.8),
-            width: isSelected ? 2.0 : 1.0,
+            color: isSelected ? dotColor : const Color(0xFFE8E4EE),
+            width: 1.5,
           ),
-          // Each row glows in its own category colour, brighter when picked.
-          boxShadow: [
-            BoxShadow(
-              color: dotColor.withValues(alpha: isSelected ? 0.42 : 0.16),
-              blurRadius: isSelected ? 16.0 : 8.0,
-              offset: const Offset(0, 3),
-            ),
-          ],
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: dotColor.withValues(alpha: 0.3),
+                    blurRadius: 12.0,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // The category colour reads as a filled disc, carrying the v4
-            // icon when the server has one for this category.
             Container(
-              width: 34.spMin,
-              height: 34.spMin,
-              alignment: Alignment.center,
+              width: 7.spMin,
+              height: 7.spMin,
               decoration: BoxDecoration(
                 color: dotColor,
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: dotColor.withValues(alpha: 0.5),
-                    blurRadius: 10.0,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: iconImage != null && iconImage.url.isNotEmpty
-                  ? AppCachedNetworkImage(
-                      imageUrl: iconImage.url,
-                      cacheKey: iconImage.s3Key,
-                      width: 17.spMin,
-                      height: 17.spMin,
-                      fit: BoxFit.contain,
-                    )
-                  : const SizedBox.shrink(),
-            ),
-            SizedBox(width: 12.spMin),
-            Expanded(
-              child: Text(
-                category.name ?? 'Category',
-                style: TextStyle(
-                  fontSize: 15.5.spMin,
-                  fontWeight: FontWeight.w700,
-                  color: isSelected ? dotColor : AppColors.black,
-                ),
               ),
             ),
-            Icon(
-              isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
-              size: 22.spMin,
-              color: isSelected
-                  ? dotColor
-                  : AppColors.lightGrey,
+            SizedBox(width: 5.spMin),
+            Text(
+              category.name ?? 'Category',
+              style: TextStyle(
+                fontSize: 11.spMin,
+                fontWeight: FontWeight.w800,
+                color: isSelected ? dotColor : _pillInk,
+              ),
             ),
           ],
         ),
