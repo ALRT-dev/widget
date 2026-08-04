@@ -71,7 +71,21 @@ class _OnboardingCompleteScreenState
                 borderRadius: BorderRadius.circular(30.spMin),
               ),
               child: SafeArea(
-                child: _buildContent(),
+                // Two stacked cards plus 110px of fixed spacers overflow a
+                // short screen, so the page scrolls once it stops fitting
+                // and keeps its spaced-out layout when it still does.
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: IntrinsicHeight(child: _buildContent()),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           );

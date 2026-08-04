@@ -66,6 +66,26 @@ class _MyAppState extends ConsumerState<MyApp> {
           locale: context.locale,
           theme: AppTheme.lightPalette,
           darkTheme: AppTheme.darkPalette,
+
+          // The phone's own font-size setting was passed straight through,
+          // so a user on the largest accessibility size overflowed every
+          // fixed-height row in the app. Honour the setting, but inside a
+          // range the layouts can actually hold: still meaningfully bigger
+          // for anyone who needs it, never big enough to push a button off
+          // the screen. The floor stops a shrunk system font from making
+          // hazard copy unreadable.
+          builder: (context, child) {
+            final media = MediaQuery.of(context);
+            return MediaQuery(
+              data: media.copyWith(
+                textScaler: media.textScaler.clamp(
+                  minScaleFactor: 0.9,
+                  maxScaleFactor: 1.3,
+                ),
+              ),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
         );
       },
     );

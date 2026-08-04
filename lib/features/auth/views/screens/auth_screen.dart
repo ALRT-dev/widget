@@ -118,25 +118,35 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
 
   Widget _buildContent() {
     return SafeArea(
-      child: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 520.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildBrandSection(),
-              28.hSizedBox,
-              // _buildRoleSelector(),
-              // 24.hSizedBox,
-              _buildAuthButtons(),
-              // 18.hSizedBox,
-              // _buildDivider(),
-              // 12.hSizedBox,
-              // _buildGuestOption(),
-              28.hSizedBox,
-              _buildTermsAndPrivacySection(),
-            ],
-          ).pX(24.0),
+      // Centred while it fits, scrollable the moment it doesn't. A bare
+      // Center clips instead of scrolling, which on a short phone hid the
+      // terms line under the bottom edge with no way to reach it.
+      child: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: 520.w),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildBrandSection(),
+                    28.hSizedBox,
+                    // _buildRoleSelector(),
+                    // 24.hSizedBox,
+                    _buildAuthButtons(),
+                    // 18.hSizedBox,
+                    // _buildDivider(),
+                    // 12.hSizedBox,
+                    // _buildGuestOption(),
+                    28.hSizedBox,
+                    _buildTermsAndPrivacySection(),
+                  ],
+                ).pX(24.0),
+              ),
+            ),
+          ),
         ),
       ),
     );

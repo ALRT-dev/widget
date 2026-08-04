@@ -92,18 +92,38 @@ class _OnboardingWelcomeScreenState
           ),
         ),
         child: SafeArea(
-          child: AnimatedBuilder(
-            animation: _mainController,
-            builder: (context, child) {
-              return Transform.translate(
-                offset: _slideAnimation.value,
-                child: Opacity(
-                  opacity: _fadeInAnimation.value,
-                  child: _buildContent(),
+          // The card fills the screen when there is room and scrolls when
+          // there isn't, so a short phone or a large system font pushes the
+          // Get started button down rather than off the bottom edge.
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(20.0),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: (constraints.maxHeight - 40.0).clamp(
+                      0.0,
+                      double.infinity,
+                    ),
+                  ),
+                  child: IntrinsicHeight(
+                    child: AnimatedBuilder(
+                      animation: _mainController,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: _slideAnimation.value,
+                          child: Opacity(
+                            opacity: _fadeInAnimation.value,
+                            child: _buildContent(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               );
             },
-          ).pad(20.0),
+          ),
         ),
       ),
     );
