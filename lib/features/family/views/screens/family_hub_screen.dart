@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
+import 'package:hazard_app/features/family/views/screens/family_group_settings_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_journey_screen.dart';
 import 'package:hazard_app/features/family/providers/states/family_provider_state.dart';
 import 'package:hazard_app/features/family/views/screens/family_circle_profile_screen.dart';
@@ -297,6 +298,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
             context.push(FamilyCircleProfileScreen.route);
           case 'groupSettings':
             _showGroupSettingsSheet(circle);
+          case 'beacon':
+            context.push(FamilyGroupSettingsScreen.route);
           case 'transferHosting':
             _showTransferHostingSheet(circle);
           case 'leave':
@@ -311,7 +314,12 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         if (isOwner)
           const PopupMenuItem(
             value: 'groupSettings',
-            child: Text('Group settings'),
+            child: Text('Group name & rules'),
+          ),
+        if (isOwner)
+          const PopupMenuItem(
+            value: 'beacon',
+            child: Text('Beacon colour'),
           ),
         if (isOwner)
           const PopupMenuItem(

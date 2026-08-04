@@ -12,6 +12,7 @@ _FamilyCircle _$FamilyCircleFromJson(Map<String, dynamic> json) =>
       name: json['name'] as String,
       plan: json['plan'] as String? ?? 'plus',
       maxMembers: (json['maxMembers'] as num?)?.toInt() ?? 10,
+      themeColor: json['themeColor'] as String?,
       anyoneCanRequestSnapshot:
           json['anyoneCanRequestSnapshot'] as bool? ?? true,
       sosToWholeGroup: json['sosToWholeGroup'] as bool? ?? true,
@@ -49,6 +50,7 @@ Map<String, dynamic> _$FamilyCircleToJson(
   'name': instance.name,
   'plan': instance.plan,
   'maxMembers': instance.maxMembers,
+  'themeColor': ?instance.themeColor,
   'anyoneCanRequestSnapshot': instance.anyoneCanRequestSnapshot,
   'sosToWholeGroup': instance.sosToWholeGroup,
   'journeysSnapPointsOnly': instance.journeysSnapPointsOnly,

@@ -77,6 +77,9 @@ abstract class FamilyCircle with _$FamilyCircle {
     @Default(10) final int maxMembers,
 
     // Group rules (owner-set toggles, locked spec).
+    /// The beacon colour: marks the group on member dots, snapshot pins,
+    /// journey points and the widget.
+    final String? themeColor,
     @Default(true) final bool anyoneCanRequestSnapshot,
     @Default(true) final bool sosToWholeGroup,
     @Default(true) final bool journeysSnapPointsOnly,

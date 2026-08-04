@@ -232,12 +232,14 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
   /// Owner-only: updates the circle's name and group rules, then reloads.
   Future<bool> updateGroupSettings({
     final String? name,
+    final String? themeColor,
     final bool? anyoneCanRequestSnapshot,
     final bool? sosToWholeGroup,
     final bool? journeysSnapPointsOnly,
   }) async {
     final result = await _familyService.updateFamilyCircle(
       name: name,
+      themeColor: themeColor,
       anyoneCanRequestSnapshot: anyoneCanRequestSnapshot,
       sosToWholeGroup: sosToWholeGroup,
       journeysSnapPointsOnly: journeysSnapPointsOnly,
