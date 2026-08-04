@@ -194,7 +194,7 @@ class _ManagePushNotificationsListState
               onToggle: (value) {
                 filterProvider.updateUserReported(value);
               },
-              color: const Color(0xFF9C27B0),
+              color: const Color(0xFFC233DB),
               icon: Icons.group_rounded,
             ),
           ],

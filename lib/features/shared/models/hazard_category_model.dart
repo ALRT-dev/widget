@@ -103,7 +103,7 @@ class ColorConverter implements JsonConverter<Color?, String?> {
 
 /// The locked "Other" category colour, and the last resort for any category
 /// the palette does not name.
-const categoryOtherColor = Color(0xFF8B6F47);
+const categoryOtherColor = Color(0xFFA67C52);
 
 /// The locked category colours from the design system, matched on name.
 ///
@@ -113,20 +113,20 @@ Color? lockedCategoryColorFor(final String? categoryName) {
   final name = categoryName?.toLowerCase() ?? '';
   if (name.isEmpty) return null;
   if (name.contains('weather') || name.contains('environment')) {
-    return const Color(0xFF4DA8FF);
+    return const Color(0xFF2FA6FF);
   }
   if (name.contains('health') || name.contains('air')) {
-    return const Color(0xFFFF8C42);
+    return const Color(0xFFFF7E29);
   }
   if (name.contains('security') || name.contains('crime')) {
-    return const Color(0xFFFF4757);
+    return const Color(0xFFFF2E44);
   }
   if (name.contains('traffic') || name.contains('transport')) {
-    return const Color(0xFF00B383);
+    return const Color(0xFF00CC96);
   }
-  if (name.contains('utilit')) return const Color(0xFFF5A623);
+  if (name.contains('utilit')) return const Color(0xFFFFB300);
   if (name.contains('community') || name.contains('info')) {
-    return const Color(0xFF9C27B0);
+    return const Color(0xFFC233DB);
   }
   if (name.contains('other')) return categoryOtherColor;
   return null;
