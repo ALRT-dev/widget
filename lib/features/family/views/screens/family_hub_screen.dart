@@ -72,6 +72,7 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                       _sosBannerBuilder(sos),
                       SizedBox(height: 12.spMin),
                     ],
+                    _checkInRequestBannerBuilder(circle, checkInState),
                     _sectionLabelBuilder('Quick actions'),
                     SizedBox(height: 10.spMin),
                     _cardBuilder(
@@ -83,6 +84,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                           _requestCheckInButtonBuilder(),
                           SizedBox(height: 10.spMin),
                           _shareJourneyButtonBuilder(),
+                          SizedBox(height: 10.spMin),
+                          _dailyCheckInButtonBuilder(),
                         ],
                       ),
                     ),
@@ -641,6 +644,19 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                         fontSize: 12.spMin,
                       ),
                     ),
+                  // Who has answered, on the banner itself. Replying used
+                  // to leave no trace until you opened the SOS.
+                  if (sos.responses.isNotEmpty) ...[
+                    SizedBox(height: 6.spMin),
+                    Text(
+                      _sosResponseSummary(sos),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12.spMin,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -649,6 +665,27 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         ),
       ),
     );
+  }
+
+  /// A one-line read of who has answered an SOS, most committed first.
+  String _sosResponseSummary(final FamilySosEvent sos) {
+    final onTheWay = sos.responses
+        .where(
+          (r) =>
+              r.type == FamilySosResponseType.onMyWay ||
+              r.type == FamilySosResponseType.called,
+        )
+        .map((r) => r.member?.displayName ?? 'Someone')
+        .toList();
+    final seenCount = sos.responses
+        .where((r) => r.type == FamilySosResponseType.seen)
+        .length;
+
+    final parts = <String>[
+      if (onTheWay.isNotEmpty) '${onTheWay.join(', ')} responding',
+      if (seenCount > 0) '$seenCount seen',
+    ];
+    return parts.join(' · ');
   }
 
   /// The one section label on this screen: indigo, uppercase, letter-spaced,
@@ -687,6 +724,108 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         ],
       ),
       child: child,
+    );
+  }
+
+  /// Someone asked the circle to check in. That ask used to arrive with no
+  /// evidence on screen at all — it was held in state and never drawn. It
+  /// now sits above everything with the answer one tap away.
+  Widget _checkInRequestBannerBuilder(
+    final FamilyCircle circle,
+    final FamilyActionState checkInState,
+  ) {
+    final request = circle.latestCheckInRequest;
+    if (request == null) return const SizedBox.shrink();
+
+    // Once you have checked in since the ask, it stops nagging.
+    final askedAt = request.createdAt;
+    final myLastCheckIn = circle.me?.lastCheckInAt;
+    final alreadyAnswered =
+        askedAt != null &&
+        myLastCheckIn != null &&
+        myLastCheckIn.isAfter(askedAt);
+    if (alreadyAnswered) return const SizedBox.shrink();
+
+    final who = request.requestedBy?.displayName ?? 'Someone';
+    final when = askedAt == null ? null : timeago.format(askedAt);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: EdgeInsets.all(14.spMin),
+          decoration: BoxDecoration(
+            color: FamilyColors.amberLight,
+            borderRadius: BorderRadius.circular(16.spMin),
+            border: Border.all(color: FamilyColors.amber, width: 1.5),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    LucideIcons.bellRing,
+                    size: 18.spMin,
+                    color: FamilyColors.amber,
+                  ),
+                  SizedBox(width: 10.spMin),
+                  Expanded(
+                    child: Text(
+                      '$who asked everyone to check in',
+                      style: TextStyle(
+                        fontSize: 15.spMin,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (when != null || (request.message ?? '').isNotEmpty) ...[
+                SizedBox(height: 6.spMin),
+                Text(
+                  [
+                    if (when != null) when,
+                    if ((request.message ?? '').isNotEmpty) request.message!,
+                  ].join(' · '),
+                  style: TextStyle(
+                    fontSize: 12.5.spMin,
+                    color: AppColors.mediumGrey,
+                  ),
+                ),
+              ],
+              SizedBox(height: 12.spMin),
+              SizedBox(
+                height: 46.spMin,
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FamilyColors.safeGreen,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.spMin),
+                    ),
+                  ),
+                  onPressed: checkInState.isLoading
+                      ? null
+                      : () => ref.read(providerOfFamily.notifier).checkIn(),
+                  icon: Icon(Icons.check, size: 20.spMin),
+                  label: Text(
+                    "I'm Safe",
+                    style: TextStyle(
+                      fontSize: 16.spMin,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 16.spMin),
+      ],
     );
   }
 
@@ -792,6 +931,47 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
           style: TextStyle(fontSize: 14.spMin, fontWeight: FontWeight.w600),
         ),
       ),
+    );
+  }
+
+  /// Daily check-in times lived only inside the circle profile, so nobody
+  /// found them. The hub now says how many are set and opens the same
+  /// screen to add one.
+  Widget _dailyCheckInButtonBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final count = ref.watch(
+          providerOfFamily.select((s) => s.scheduledCheckIns.length),
+        );
+
+        return SizedBox(
+          height: 48.spMin,
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: FamilyColors.indigo,
+              backgroundColor: Colors.white,
+              side: BorderSide(
+                color: FamilyColors.indigo.withValues(alpha: 0.3),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18.spMin),
+              ),
+            ),
+            onPressed: () => context.push(FamilyCircleProfileScreen.route),
+            icon: Icon(LucideIcons.clock, size: 18.spMin),
+            label: Text(
+              count == 0
+                  ? 'Set a daily check-in time'
+                  : '$count daily check-in'
+                        '${count == 1 ? '' : 's'} set',
+              style: TextStyle(
+                fontSize: 14.spMin,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
