@@ -784,6 +784,109 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     );
   }
 
+  // ── Journeys ───────────────────────────────────────────────────────────
+
+  /// Loads the caller's running journey, if any.
+  Future<void> loadMyJourney() async {
+    final result = await _familyService.getMyFamilyJourney();
+    if (!mounted) return;
+    result.when(
+      (journey) => state = state.copyWith(activeJourney: journey),
+      (error) => null,
+    );
+  }
+
+  /// Starts a journey shared with [recipientMemberIds] for [durationMinutes].
+  Future<bool> startJourney({
+    required final int durationMinutes,
+    required final List<String> recipientMemberIds,
+    final bool isLive = false,
+  }) async {
+    state = state.copyWith(
+      journeyState: const FamilyActionState.loading(),
+    );
+
+    final result = await _familyService.startFamilyJourney(
+      durationMinutes: durationMinutes,
+      recipientMemberIds: recipientMemberIds,
+      isLive: isLive,
+    );
+    if (!mounted) return false;
+
+    return result.when(
+      (journey) {
+        state = state.copyWith(
+          activeJourney: journey,
+          journeyState: const FamilyActionState.success(),
+        );
+        return true;
+      },
+      (error) {
+        state = state.copyWith(journeyState: FamilyActionState.error(error));
+        return false;
+      },
+    );
+  }
+
+  /// Adds one more block to the running journey.
+  Future<bool> extendJourney({final int? minutes}) async {
+    final journey = state.activeJourney;
+    if (journey == null) return false;
+
+    state = state.copyWith(
+      journeyState: const FamilyActionState.loading(),
+    );
+
+    final result = await _familyService.extendFamilyJourney(
+      journeyId: journey.id,
+      minutes: minutes,
+    );
+    if (!mounted) return false;
+
+    return result.when(
+      (updated) {
+        state = state.copyWith(
+          activeJourney: updated,
+          journeyState: const FamilyActionState.success(),
+        );
+        return true;
+      },
+      (error) {
+        state = state.copyWith(journeyState: FamilyActionState.error(error));
+        return false;
+      },
+    );
+  }
+
+  /// Stops sharing now. Always one tap, never buried.
+  Future<bool> stopJourney() async {
+    final journey = state.activeJourney;
+    if (journey == null) return false;
+
+    state = state.copyWith(
+      journeyState: const FamilyActionState.loading(),
+    );
+
+    final result = await _familyService.stopFamilyJourney(
+      journeyId: journey.id,
+    );
+    if (!mounted) return false;
+
+    return result.when(
+      (_) {
+        state = state.copyWith(
+          activeJourney: null,
+          journeyState: const FamilyActionState.success(),
+        );
+        return true;
+      },
+      (error) {
+        state = state.copyWith(journeyState: FamilyActionState.error(error));
+        return false;
+      },
+    );
+  }
+
   Future<FamilyInvite?> createInvite({
     final bool isGuestInvite = false,
   }) async {

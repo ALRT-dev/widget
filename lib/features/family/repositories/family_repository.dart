@@ -168,6 +168,30 @@ abstract class FamilyRepository {
     final String? sosListId,
   });
 
+  /// Starts a journey shared with the chosen members.
+  Future<Either<FamilyJourney, AppError>> startFamilyJourney({
+    required final int durationMinutes,
+    required final List<String> recipientMemberIds,
+    final bool isLive = false,
+  });
+
+  /// The caller's own running journey, or null.
+  Future<Either<FamilyJourney?, AppError>> getMyFamilyJourney();
+
+  /// Running journeys the caller was picked to see.
+  Future<Either<List<FamilyJourney>, AppError>> getFamilyJourneysSharedWithMe();
+
+  /// Extends a running journey by one more block.
+  Future<Either<FamilyJourney, AppError>> extendFamilyJourney({
+    required final String journeyId,
+    final int? minutes,
+  });
+
+  /// Stops a journey now.
+  Future<Either<FamilyJourney, AppError>> stopFamilyJourney({
+    required final String journeyId,
+  });
+
   Future<Either<List<FamilySosList>, AppError>> getFamilySosLists();
 
   Future<Either<FamilySosList, AppError>> createFamilySosList({
@@ -763,6 +787,90 @@ class FamilyRepositoryImpl implements FamilyRepository {
       name: 'getActiveFamilySosEvents',
       future: () async {
         final result = await _restClient.getActiveFamilySosEvents(circleId: _circleId);
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilyJourney, AppError>> startFamilyJourney({
+    required final int durationMinutes,
+    required final List<String> recipientMemberIds,
+    final bool isLive = false,
+  }) {
+    return runAsyncCall(
+      name: 'startFamilyJourney',
+      future: () async {
+        final result = await _restClient.startFamilyJourney(
+          circleId: _circleId,
+          durationMinutes: durationMinutes,
+          recipientMemberIds: recipientMemberIds,
+          isLive: isLive,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilyJourney?, AppError>> getMyFamilyJourney() {
+    return runAsyncCall(
+      name: 'getMyFamilyJourney',
+      future: () async {
+        final result = await _restClient.getMyFamilyJourney(
+          circleId: _circleId,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<List<FamilyJourney>, AppError>>
+      getFamilyJourneysSharedWithMe() {
+    return runAsyncCall(
+      name: 'getFamilyJourneysSharedWithMe',
+      future: () async {
+        final result = await _restClient.getFamilyJourneysSharedWithMe(
+          circleId: _circleId,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilyJourney, AppError>> extendFamilyJourney({
+    required final String journeyId,
+    final int? minutes,
+  }) {
+    return runAsyncCall(
+      name: 'extendFamilyJourney',
+      future: () async {
+        final result = await _restClient.extendFamilyJourney(
+          journeyId: journeyId,
+          minutes: minutes,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilyJourney, AppError>> stopFamilyJourney({
+    required final String journeyId,
+  }) {
+    return runAsyncCall(
+      name: 'stopFamilyJourney',
+      future: () async {
+        final result = await _restClient.stopFamilyJourney(
+          journeyId: journeyId,
+        );
         return Success(result);
       },
       onError: Failure.new,

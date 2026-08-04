@@ -291,6 +291,38 @@ class FamilyService {
     );
   }
 
+  Future<Either<FamilyJourney, AppError>> startFamilyJourney({
+    required final int durationMinutes,
+    required final List<String> recipientMemberIds,
+    final bool isLive = false,
+  }) {
+    return _familyRepository.startFamilyJourney(
+      durationMinutes: durationMinutes,
+      recipientMemberIds: recipientMemberIds,
+      isLive: isLive,
+    );
+  }
+
+  Future<Either<FamilyJourney?, AppError>> getMyFamilyJourney() {
+    return _familyRepository.getMyFamilyJourney();
+  }
+
+  Future<Either<FamilyJourney, AppError>> extendFamilyJourney({
+    required final String journeyId,
+    final int? minutes,
+  }) {
+    return _familyRepository.extendFamilyJourney(
+      journeyId: journeyId,
+      minutes: minutes,
+    );
+  }
+
+  Future<Either<FamilyJourney, AppError>> stopFamilyJourney({
+    required final String journeyId,
+  }) {
+    return _familyRepository.stopFamilyJourney(journeyId: journeyId);
+  }
+
   Future<Either<List<FamilySosList>, AppError>> getFamilySosLists() {
     return _familyRepository.getFamilySosLists();
   }

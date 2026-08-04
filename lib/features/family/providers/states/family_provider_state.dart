@@ -64,6 +64,8 @@ class FamilyProviderState {
     this.placeSaveState = const FamilyActionState.initial(),
     this.sosTriggerState = const FamilyActionState.initial(),
     this.sosRespondState = const FamilyActionState.initial(),
+    this.activeJourney,
+    this.journeyState = const FamilyActionState.initial(),
   });
 
   /// The user's family circle. `null` when the user has no circle.
@@ -77,6 +79,12 @@ class FamilyProviderState {
 
   /// The currently active SOS events of the circle.
   final List<FamilySosEvent> activeSosEvents;
+
+  /// The caller's own journey while it is running, null otherwise.
+  final FamilyJourney? activeJourney;
+
+  /// Start/extend/stop progress for the journey screen.
+  final FamilyActionState journeyState;
 
   /// The most recent check-ins of the circle (newest first).
   final List<FamilyCheckIn> recentCheckIns;
@@ -136,12 +144,18 @@ class FamilyProviderState {
     final FamilyActionState? placeSaveState,
     final FamilyActionState? sosTriggerState,
     final FamilyActionState? sosRespondState,
+    final Object? activeJourney = _unset,
+    final FamilyActionState? journeyState,
   }) {
     return FamilyProviderState(
       circle: circle == _unset ? this.circle : circle as FamilyCircle?,
       hasLoadedOnce: hasLoadedOnce ?? this.hasLoadedOnce,
       loadState: loadState ?? this.loadState,
       activeSosEvents: activeSosEvents ?? this.activeSosEvents,
+      activeJourney: activeJourney == _unset
+          ? this.activeJourney
+          : activeJourney as FamilyJourney?,
+      journeyState: journeyState ?? this.journeyState,
       recentCheckIns: recentCheckIns ?? this.recentCheckIns,
       scheduledCheckIns: scheduledCheckIns ?? this.scheduledCheckIns,
       circles: circles ?? this.circles,

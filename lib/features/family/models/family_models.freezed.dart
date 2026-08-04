@@ -5087,4 +5087,587 @@ $FamilyMemberSnippetCopyWith<$Res>? get member {
 }
 }
 
+
+/// @nodoc
+mixin _$FamilyJourneyRecipient {
+
+ String get memberId; String get name; String? get profilePictureUrl;
+/// Create a copy of FamilyJourneyRecipient
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilyJourneyRecipientCopyWith<FamilyJourneyRecipient> get copyWith => _$FamilyJourneyRecipientCopyWithImpl<FamilyJourneyRecipient>(this as FamilyJourneyRecipient, _$identity);
+
+  /// Serializes this FamilyJourneyRecipient to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyJourneyRecipient&&(identical(other.memberId, memberId) || other.memberId == memberId)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,memberId,name,profilePictureUrl);
+
+@override
+String toString() {
+  return 'FamilyJourneyRecipient(memberId: $memberId, name: $name, profilePictureUrl: $profilePictureUrl)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilyJourneyRecipientCopyWith<$Res>  {
+  factory $FamilyJourneyRecipientCopyWith(FamilyJourneyRecipient value, $Res Function(FamilyJourneyRecipient) _then) = _$FamilyJourneyRecipientCopyWithImpl;
+@useResult
+$Res call({
+ String memberId, String name, String? profilePictureUrl
+});
+
+
+
+
+}
+/// @nodoc
+class _$FamilyJourneyRecipientCopyWithImpl<$Res>
+    implements $FamilyJourneyRecipientCopyWith<$Res> {
+  _$FamilyJourneyRecipientCopyWithImpl(this._self, this._then);
+
+  final FamilyJourneyRecipient _self;
+  final $Res Function(FamilyJourneyRecipient) _then;
+
+/// Create a copy of FamilyJourneyRecipient
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? memberId = null,Object? name = null,Object? profilePictureUrl = freezed,}) {
+  return _then(_self.copyWith(
+memberId: null == memberId ? _self.memberId : memberId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FamilyJourneyRecipient].
+extension FamilyJourneyRecipientPatterns on FamilyJourneyRecipient {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilyJourneyRecipient value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilyJourneyRecipient() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilyJourneyRecipient value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyJourneyRecipient():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilyJourneyRecipient value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyJourneyRecipient() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String memberId,  String name,  String? profilePictureUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilyJourneyRecipient() when $default != null:
+return $default(_that.memberId,_that.name,_that.profilePictureUrl);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String memberId,  String name,  String? profilePictureUrl)  $default,) {final _that = this;
+switch (_that) {
+case _FamilyJourneyRecipient():
+return $default(_that.memberId,_that.name,_that.profilePictureUrl);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String memberId,  String name,  String? profilePictureUrl)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilyJourneyRecipient() when $default != null:
+return $default(_that.memberId,_that.name,_that.profilePictureUrl);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilyJourneyRecipient implements FamilyJourneyRecipient {
+  const _FamilyJourneyRecipient({required this.memberId, this.name = 'Family member', this.profilePictureUrl});
+  factory _FamilyJourneyRecipient.fromJson(Map<String, dynamic> json) => _$FamilyJourneyRecipientFromJson(json);
+
+@override final  String memberId;
+@override@JsonKey() final  String name;
+@override final  String? profilePictureUrl;
+
+/// Create a copy of FamilyJourneyRecipient
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilyJourneyRecipientCopyWith<_FamilyJourneyRecipient> get copyWith => __$FamilyJourneyRecipientCopyWithImpl<_FamilyJourneyRecipient>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilyJourneyRecipientToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyJourneyRecipient&&(identical(other.memberId, memberId) || other.memberId == memberId)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,memberId,name,profilePictureUrl);
+
+@override
+String toString() {
+  return 'FamilyJourneyRecipient(memberId: $memberId, name: $name, profilePictureUrl: $profilePictureUrl)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilyJourneyRecipientCopyWith<$Res> implements $FamilyJourneyRecipientCopyWith<$Res> {
+  factory _$FamilyJourneyRecipientCopyWith(_FamilyJourneyRecipient value, $Res Function(_FamilyJourneyRecipient) _then) = __$FamilyJourneyRecipientCopyWithImpl;
+@override @useResult
+$Res call({
+ String memberId, String name, String? profilePictureUrl
+});
+
+
+
+
+}
+/// @nodoc
+class __$FamilyJourneyRecipientCopyWithImpl<$Res>
+    implements _$FamilyJourneyRecipientCopyWith<$Res> {
+  __$FamilyJourneyRecipientCopyWithImpl(this._self, this._then);
+
+  final _FamilyJourneyRecipient _self;
+  final $Res Function(_FamilyJourneyRecipient) _then;
+
+/// Create a copy of FamilyJourneyRecipient
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? memberId = null,Object? name = null,Object? profilePictureUrl = freezed,}) {
+  return _then(_FamilyJourneyRecipient(
+memberId: null == memberId ? _self.memberId : memberId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$FamilyJourney {
+
+ String get id; String get circleId; String get memberId; String get memberName; String get status; bool get isLive; DateTime get endsAt; DateTime? get endedAt; int get grantedMinutes; bool get canExtend; int get maxTotalMinutes; double? get latitude; double? get longitude; String? get locationLabel; List<FamilyJourneyRecipient> get recipients; DateTime? get createdAt;
+/// Create a copy of FamilyJourney
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilyJourneyCopyWith<FamilyJourney> get copyWith => _$FamilyJourneyCopyWithImpl<FamilyJourney>(this as FamilyJourney, _$identity);
+
+  /// Serializes this FamilyJourney to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyJourney&&(identical(other.id, id) || other.id == id)&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.memberId, memberId) || other.memberId == memberId)&&(identical(other.memberName, memberName) || other.memberName == memberName)&&(identical(other.status, status) || other.status == status)&&(identical(other.isLive, isLive) || other.isLive == isLive)&&(identical(other.endsAt, endsAt) || other.endsAt == endsAt)&&(identical(other.endedAt, endedAt) || other.endedAt == endedAt)&&(identical(other.grantedMinutes, grantedMinutes) || other.grantedMinutes == grantedMinutes)&&(identical(other.canExtend, canExtend) || other.canExtend == canExtend)&&(identical(other.maxTotalMinutes, maxTotalMinutes) || other.maxTotalMinutes == maxTotalMinutes)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.locationLabel, locationLabel) || other.locationLabel == locationLabel)&&const DeepCollectionEquality().equals(other.recipients, recipients)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,circleId,memberId,memberName,status,isLive,endsAt,endedAt,grantedMinutes,canExtend,maxTotalMinutes,latitude,longitude,locationLabel,const DeepCollectionEquality().hash(recipients),createdAt);
+
+@override
+String toString() {
+  return 'FamilyJourney(id: $id, circleId: $circleId, memberId: $memberId, memberName: $memberName, status: $status, isLive: $isLive, endsAt: $endsAt, endedAt: $endedAt, grantedMinutes: $grantedMinutes, canExtend: $canExtend, maxTotalMinutes: $maxTotalMinutes, latitude: $latitude, longitude: $longitude, locationLabel: $locationLabel, recipients: $recipients, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilyJourneyCopyWith<$Res>  {
+  factory $FamilyJourneyCopyWith(FamilyJourney value, $Res Function(FamilyJourney) _then) = _$FamilyJourneyCopyWithImpl;
+@useResult
+$Res call({
+ String id, String circleId, String memberId, String memberName, String status, bool isLive, DateTime endsAt, DateTime? endedAt, int grantedMinutes, bool canExtend, int maxTotalMinutes, double? latitude, double? longitude, String? locationLabel, List<FamilyJourneyRecipient> recipients, DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$FamilyJourneyCopyWithImpl<$Res>
+    implements $FamilyJourneyCopyWith<$Res> {
+  _$FamilyJourneyCopyWithImpl(this._self, this._then);
+
+  final FamilyJourney _self;
+  final $Res Function(FamilyJourney) _then;
+
+/// Create a copy of FamilyJourney
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? circleId = null,Object? memberId = null,Object? memberName = null,Object? status = null,Object? isLive = null,Object? endsAt = null,Object? endedAt = freezed,Object? grantedMinutes = null,Object? canExtend = null,Object? maxTotalMinutes = null,Object? latitude = freezed,Object? longitude = freezed,Object? locationLabel = freezed,Object? recipients = null,Object? createdAt = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
+as String,memberId: null == memberId ? _self.memberId : memberId // ignore: cast_nullable_to_non_nullable
+as String,memberName: null == memberName ? _self.memberName : memberName // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,isLive: null == isLive ? _self.isLive : isLive // ignore: cast_nullable_to_non_nullable
+as bool,endsAt: null == endsAt ? _self.endsAt : endsAt // ignore: cast_nullable_to_non_nullable
+as DateTime,endedAt: freezed == endedAt ? _self.endedAt : endedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,grantedMinutes: null == grantedMinutes ? _self.grantedMinutes : grantedMinutes // ignore: cast_nullable_to_non_nullable
+as int,canExtend: null == canExtend ? _self.canExtend : canExtend // ignore: cast_nullable_to_non_nullable
+as bool,maxTotalMinutes: null == maxTotalMinutes ? _self.maxTotalMinutes : maxTotalMinutes // ignore: cast_nullable_to_non_nullable
+as int,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
+as double?,locationLabel: freezed == locationLabel ? _self.locationLabel : locationLabel // ignore: cast_nullable_to_non_nullable
+as String?,recipients: null == recipients ? _self.recipients : recipients // ignore: cast_nullable_to_non_nullable
+as List<FamilyJourneyRecipient>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FamilyJourney].
+extension FamilyJourneyPatterns on FamilyJourney {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilyJourney value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilyJourney() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilyJourney value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyJourney():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilyJourney value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilyJourney() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String circleId,  String memberId,  String memberName,  String status,  bool isLive,  DateTime endsAt,  DateTime? endedAt,  int grantedMinutes,  bool canExtend,  int maxTotalMinutes,  double? latitude,  double? longitude,  String? locationLabel,  List<FamilyJourneyRecipient> recipients,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilyJourney() when $default != null:
+return $default(_that.id,_that.circleId,_that.memberId,_that.memberName,_that.status,_that.isLive,_that.endsAt,_that.endedAt,_that.grantedMinutes,_that.canExtend,_that.maxTotalMinutes,_that.latitude,_that.longitude,_that.locationLabel,_that.recipients,_that.createdAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String circleId,  String memberId,  String memberName,  String status,  bool isLive,  DateTime endsAt,  DateTime? endedAt,  int grantedMinutes,  bool canExtend,  int maxTotalMinutes,  double? latitude,  double? longitude,  String? locationLabel,  List<FamilyJourneyRecipient> recipients,  DateTime? createdAt)  $default,) {final _that = this;
+switch (_that) {
+case _FamilyJourney():
+return $default(_that.id,_that.circleId,_that.memberId,_that.memberName,_that.status,_that.isLive,_that.endsAt,_that.endedAt,_that.grantedMinutes,_that.canExtend,_that.maxTotalMinutes,_that.latitude,_that.longitude,_that.locationLabel,_that.recipients,_that.createdAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String circleId,  String memberId,  String memberName,  String status,  bool isLive,  DateTime endsAt,  DateTime? endedAt,  int grantedMinutes,  bool canExtend,  int maxTotalMinutes,  double? latitude,  double? longitude,  String? locationLabel,  List<FamilyJourneyRecipient> recipients,  DateTime? createdAt)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilyJourney() when $default != null:
+return $default(_that.id,_that.circleId,_that.memberId,_that.memberName,_that.status,_that.isLive,_that.endsAt,_that.endedAt,_that.grantedMinutes,_that.canExtend,_that.maxTotalMinutes,_that.latitude,_that.longitude,_that.locationLabel,_that.recipients,_that.createdAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilyJourney extends FamilyJourney {
+  const _FamilyJourney({required this.id, required this.circleId, required this.memberId, this.memberName = 'Family member', this.status = 'active', this.isLive = false, required this.endsAt, this.endedAt, this.grantedMinutes = 0, this.canExtend = true, this.maxTotalMinutes = 240, this.latitude, this.longitude, this.locationLabel, final  List<FamilyJourneyRecipient> recipients = const <FamilyJourneyRecipient>[], this.createdAt}): _recipients = recipients,super._();
+  factory _FamilyJourney.fromJson(Map<String, dynamic> json) => _$FamilyJourneyFromJson(json);
+
+@override final  String id;
+@override final  String circleId;
+@override final  String memberId;
+@override@JsonKey() final  String memberName;
+@override@JsonKey() final  String status;
+@override@JsonKey() final  bool isLive;
+@override final  DateTime endsAt;
+@override final  DateTime? endedAt;
+@override@JsonKey() final  int grantedMinutes;
+@override@JsonKey() final  bool canExtend;
+@override@JsonKey() final  int maxTotalMinutes;
+@override final  double? latitude;
+@override final  double? longitude;
+@override final  String? locationLabel;
+ final  List<FamilyJourneyRecipient> _recipients;
+@override@JsonKey() List<FamilyJourneyRecipient> get recipients {
+  if (_recipients is EqualUnmodifiableListView) return _recipients;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_recipients);
+}
+
+@override final  DateTime? createdAt;
+
+/// Create a copy of FamilyJourney
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilyJourneyCopyWith<_FamilyJourney> get copyWith => __$FamilyJourneyCopyWithImpl<_FamilyJourney>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilyJourneyToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyJourney&&(identical(other.id, id) || other.id == id)&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.memberId, memberId) || other.memberId == memberId)&&(identical(other.memberName, memberName) || other.memberName == memberName)&&(identical(other.status, status) || other.status == status)&&(identical(other.isLive, isLive) || other.isLive == isLive)&&(identical(other.endsAt, endsAt) || other.endsAt == endsAt)&&(identical(other.endedAt, endedAt) || other.endedAt == endedAt)&&(identical(other.grantedMinutes, grantedMinutes) || other.grantedMinutes == grantedMinutes)&&(identical(other.canExtend, canExtend) || other.canExtend == canExtend)&&(identical(other.maxTotalMinutes, maxTotalMinutes) || other.maxTotalMinutes == maxTotalMinutes)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.locationLabel, locationLabel) || other.locationLabel == locationLabel)&&const DeepCollectionEquality().equals(other._recipients, _recipients)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,circleId,memberId,memberName,status,isLive,endsAt,endedAt,grantedMinutes,canExtend,maxTotalMinutes,latitude,longitude,locationLabel,const DeepCollectionEquality().hash(_recipients),createdAt);
+
+@override
+String toString() {
+  return 'FamilyJourney(id: $id, circleId: $circleId, memberId: $memberId, memberName: $memberName, status: $status, isLive: $isLive, endsAt: $endsAt, endedAt: $endedAt, grantedMinutes: $grantedMinutes, canExtend: $canExtend, maxTotalMinutes: $maxTotalMinutes, latitude: $latitude, longitude: $longitude, locationLabel: $locationLabel, recipients: $recipients, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilyJourneyCopyWith<$Res> implements $FamilyJourneyCopyWith<$Res> {
+  factory _$FamilyJourneyCopyWith(_FamilyJourney value, $Res Function(_FamilyJourney) _then) = __$FamilyJourneyCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String circleId, String memberId, String memberName, String status, bool isLive, DateTime endsAt, DateTime? endedAt, int grantedMinutes, bool canExtend, int maxTotalMinutes, double? latitude, double? longitude, String? locationLabel, List<FamilyJourneyRecipient> recipients, DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$FamilyJourneyCopyWithImpl<$Res>
+    implements _$FamilyJourneyCopyWith<$Res> {
+  __$FamilyJourneyCopyWithImpl(this._self, this._then);
+
+  final _FamilyJourney _self;
+  final $Res Function(_FamilyJourney) _then;
+
+/// Create a copy of FamilyJourney
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? circleId = null,Object? memberId = null,Object? memberName = null,Object? status = null,Object? isLive = null,Object? endsAt = null,Object? endedAt = freezed,Object? grantedMinutes = null,Object? canExtend = null,Object? maxTotalMinutes = null,Object? latitude = freezed,Object? longitude = freezed,Object? locationLabel = freezed,Object? recipients = null,Object? createdAt = freezed,}) {
+  return _then(_FamilyJourney(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
+as String,memberId: null == memberId ? _self.memberId : memberId // ignore: cast_nullable_to_non_nullable
+as String,memberName: null == memberName ? _self.memberName : memberName // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,isLive: null == isLive ? _self.isLive : isLive // ignore: cast_nullable_to_non_nullable
+as bool,endsAt: null == endsAt ? _self.endsAt : endsAt // ignore: cast_nullable_to_non_nullable
+as DateTime,endedAt: freezed == endedAt ? _self.endedAt : endedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,grantedMinutes: null == grantedMinutes ? _self.grantedMinutes : grantedMinutes // ignore: cast_nullable_to_non_nullable
+as int,canExtend: null == canExtend ? _self.canExtend : canExtend // ignore: cast_nullable_to_non_nullable
+as bool,maxTotalMinutes: null == maxTotalMinutes ? _self.maxTotalMinutes : maxTotalMinutes // ignore: cast_nullable_to_non_nullable
+as int,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
+as double?,locationLabel: freezed == locationLabel ? _self.locationLabel : locationLabel // ignore: cast_nullable_to_non_nullable
+as String?,recipients: null == recipients ? _self._recipients : recipients // ignore: cast_nullable_to_non_nullable
+as List<FamilyJourneyRecipient>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+
+}
+
 // dart format on

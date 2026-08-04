@@ -453,6 +453,43 @@ abstract class RestClient {
     @Path() required final String sosListId,
   });
 
+  @POST(kUrlFamilyJourneys)
+  Future<FamilyJourney> startFamilyJourney({
+    @Query('circleId') final String? circleId,
+    @Field() required final int durationMinutes,
+    @Field() required final List<String> recipientMemberIds,
+    @Field() final bool? isLive,
+  });
+
+  @GET(kUrlFamilyJourneyMine)
+  Future<FamilyJourney?> getMyFamilyJourney({
+    @Query('circleId') final String? circleId,
+  });
+
+  @GET(kUrlFamilyJourneysShared)
+  Future<List<FamilyJourney>> getFamilyJourneysSharedWithMe({
+    @Query('circleId') final String? circleId,
+  });
+
+  @POST(kUrlFamilyJourneyExtend)
+  Future<FamilyJourney> extendFamilyJourney({
+    @Path() required final String journeyId,
+    @Field() final int? minutes,
+  });
+
+  @POST(kUrlFamilyJourneyStop)
+  Future<FamilyJourney> stopFamilyJourney({
+    @Path() required final String journeyId,
+  });
+
+  @POST(kUrlFamilyJourneyPoint)
+  Future<FamilyJourney> postFamilyJourneyPoint({
+    @Path() required final String journeyId,
+    @Field() required final double latitude,
+    @Field() required final double longitude,
+    @Field() final String? locationLabel,
+  });
+
   @GET(kUrlFamilySosActive)
   Future<List<FamilySosEvent>> getActiveFamilySosEvents({
     @Query('circleId') final String? circleId,

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
+import 'package:hazard_app/features/family/views/screens/family_journey_screen.dart';
 import 'package:hazard_app/features/family/providers/states/family_provider_state.dart';
 import 'package:hazard_app/features/family/views/screens/family_circle_profile_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_invite_screen.dart';
@@ -80,6 +81,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                           _imSafeButtonBuilder(checkInState),
                           SizedBox(height: 10.spMin),
                           _requestCheckInButtonBuilder(),
+                          SizedBox(height: 10.spMin),
+                          _shareJourneyButtonBuilder(),
                         ],
                       ),
                     ),
@@ -717,6 +720,50 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
           style: TextStyle(fontSize: 17.spMin, fontWeight: FontWeight.w700),
         ),
       ),
+    );
+  }
+
+  /// Share a journey: live location while travelling, always self-stopping.
+  Widget _shareJourneyButtonBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final journey = ref.watch(
+          providerOfFamily.select((s) => s.activeJourney),
+        );
+        final isSharing = journey != null && journey.isActive;
+
+        return SizedBox(
+          height: 48.spMin,
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              foregroundColor: FamilyColors.indigo,
+              backgroundColor: isSharing
+                  ? FamilyColors.indigo.withValues(alpha: 0.08)
+                  : Colors.white,
+              side: BorderSide(
+                color: isSharing
+                    ? FamilyColors.indigo
+                    : FamilyColors.indigo.withValues(alpha: 0.3),
+                width: isSharing ? 1.5 : 1.0,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18.spMin),
+              ),
+            ),
+            onPressed: () => context.push(FamilyJourneyScreen.route),
+            icon: Icon(LucideIcons.navigation, size: 18.spMin),
+            label: Text(
+              isSharing
+                  ? 'Sharing your journey · ${journey.remaining.inMinutes} min left'
+                  : 'Share a journey',
+              style: TextStyle(
+                fontSize: 14.spMin,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

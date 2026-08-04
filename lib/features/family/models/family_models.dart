@@ -429,3 +429,58 @@ abstract class FamilySosResponse with _$FamilySosResponse {
   factory FamilySosResponse.fromJson(Map<String, dynamic> json) =>
       _$FamilySosResponseFromJson(json);
 }
+
+/// Who a journey is being shared with.
+@freezed
+abstract class FamilyJourneyRecipient with _$FamilyJourneyRecipient {
+  const factory FamilyJourneyRecipient({
+    required final String memberId,
+    @Default('Family member') final String name,
+    final String? profilePictureUrl,
+  }) = _FamilyJourneyRecipient;
+
+  factory FamilyJourneyRecipient.fromJson(Map<String, dynamic> json) =>
+      _$FamilyJourneyRecipientFromJson(json);
+}
+
+/// A trip someone chose to share, always with a stop time they picked.
+///
+/// Snap points are the default; [isLive] is a per-journey opt-in. A journey
+/// that has ended carries no coordinates at all: the times survive, the
+/// places do not.
+@freezed
+abstract class FamilyJourney with _$FamilyJourney {
+  const FamilyJourney._();
+
+  const factory FamilyJourney({
+    required final String id,
+    required final String circleId,
+    required final String memberId,
+    @Default('Family member') final String memberName,
+    @Default('active') final String status,
+    @Default(false) final bool isLive,
+    required final DateTime endsAt,
+    final DateTime? endedAt,
+    @Default(0) final int grantedMinutes,
+    @Default(true) final bool canExtend,
+    @Default(240) final int maxTotalMinutes,
+    final double? latitude,
+    final double? longitude,
+    final String? locationLabel,
+    @Default(<FamilyJourneyRecipient>[])
+    final List<FamilyJourneyRecipient> recipients,
+    final DateTime? createdAt,
+  }) = _FamilyJourney;
+
+  /// Still sharing: not stopped, and the chosen stop time has not passed.
+  bool get isActive => status == 'active' && endsAt.isAfter(DateTime.now());
+
+  /// How long is left before it stops itself.
+  Duration get remaining {
+    final left = endsAt.difference(DateTime.now());
+    return left.isNegative ? Duration.zero : left;
+  }
+
+  factory FamilyJourney.fromJson(Map<String, dynamic> json) =>
+      _$FamilyJourneyFromJson(json);
+}

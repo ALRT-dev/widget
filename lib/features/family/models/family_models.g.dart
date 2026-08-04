@@ -655,3 +655,70 @@ const _$FamilySosResponseTypeEnumMap = {
   FamilySosResponseType.onMyWay: 'onMyWay',
   FamilySosResponseType.called: 'called',
 };
+
+_FamilyJourneyRecipient _$FamilyJourneyRecipientFromJson(
+  Map<String, dynamic> json,
+) => _FamilyJourneyRecipient(
+  memberId: json['memberId'] as String,
+  name: json['name'] as String? ?? 'Family member',
+  profilePictureUrl: json['profilePictureUrl'] as String?,
+);
+
+Map<String, dynamic> _$FamilyJourneyRecipientToJson(
+  _FamilyJourneyRecipient instance,
+) => <String, dynamic>{
+  'memberId': instance.memberId,
+  'name': instance.name,
+  'profilePictureUrl': ?instance.profilePictureUrl,
+};
+
+_FamilyJourney _$FamilyJourneyFromJson(Map<String, dynamic> json) =>
+    _FamilyJourney(
+      id: json['id'] as String,
+      circleId: json['circleId'] as String,
+      memberId: json['memberId'] as String,
+      memberName: json['memberName'] as String? ?? 'Family member',
+      status: json['status'] as String? ?? 'active',
+      isLive: json['isLive'] as bool? ?? false,
+      endsAt: DateTime.parse(json['endsAt'] as String),
+      endedAt: json['endedAt'] == null
+          ? null
+          : DateTime.parse(json['endedAt'] as String),
+      grantedMinutes: (json['grantedMinutes'] as num?)?.toInt() ?? 0,
+      canExtend: json['canExtend'] as bool? ?? true,
+      maxTotalMinutes: (json['maxTotalMinutes'] as num?)?.toInt() ?? 240,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      locationLabel: json['locationLabel'] as String?,
+      recipients:
+          (json['recipients'] as List<dynamic>?)
+              ?.map(
+                (e) =>
+                    FamilyJourneyRecipient.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const <FamilyJourneyRecipient>[],
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+    );
+
+Map<String, dynamic> _$FamilyJourneyToJson(_FamilyJourney instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'circleId': instance.circleId,
+      'memberId': instance.memberId,
+      'memberName': instance.memberName,
+      'status': instance.status,
+      'isLive': instance.isLive,
+      'endsAt': instance.endsAt.toIso8601String(),
+      'endedAt': ?instance.endedAt?.toIso8601String(),
+      'grantedMinutes': instance.grantedMinutes,
+      'canExtend': instance.canExtend,
+      'maxTotalMinutes': instance.maxTotalMinutes,
+      'latitude': ?instance.latitude,
+      'longitude': ?instance.longitude,
+      'locationLabel': ?instance.locationLabel,
+      'recipients': instance.recipients.map((e) => e.toJson()).toList(),
+      'createdAt': ?instance.createdAt?.toIso8601String(),
+    };
