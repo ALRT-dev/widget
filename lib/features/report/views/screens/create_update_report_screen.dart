@@ -39,6 +39,19 @@ const _sectionLabelColor = Color(0xFFB84500);
 /// The soft grey the report page sits on, from the V3.1 prototype.
 const _pageColor = Color(0xFFF0EEF2);
 
+/// Section labels on this page take the prototype's bright orange rather
+/// than the darker V3 rust. The rust is legible but reads as brown at 10px,
+/// which is most of why the page looked washed out.
+const _labelColor = Color(0xFFFF6B01);
+
+/// The tint behind a card's leading icon, and the soft lift under the card
+/// itself. Flat hairline borders were the other half of the cheap look.
+const _iconTint = Color(0xFFFFF3E8);
+const _cardShadow = Color(0x0D1E142D);
+
+/// The chip treatment the prototype gives secondary actions.
+const _chipFill = Color(0xFFF0F2F5);
+
 class CreateUpdateReportScreenArgs {
   CreateUpdateReportScreenArgs({this.hazardToUpdate});
 
@@ -271,7 +284,7 @@ class _CreateUpdateReportScreenState
                 fontSize: 10.5.spMin,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.7,
-                color: _sectionLabelColor,
+                color: _labelColor,
               ),
             ),
           ),
@@ -398,10 +411,10 @@ class _CreateUpdateReportScreenState
           color: isSelected
               ? _sectionLabelColor.withValues(alpha: 0.16)
               : AppColors.white,
-          borderRadius: BorderRadius.circular(18.spMin),
+          borderRadius: BorderRadius.circular(11.spMin),
           border: Border.all(
-            color: isSelected ? _sectionLabelColor : AppColors.lightGrey,
-            width: isSelected ? 2.0 : 1.0,
+            color: isSelected ? _sectionLabelColor : const Color(0xFFE8E4EE),
+            width: 1.5,
           ),
           boxShadow: isSelected
               ? [
@@ -484,10 +497,10 @@ class _CreateUpdateReportScreenState
           color: isSelected
               ? _sectionLabelColor.withValues(alpha: 0.16)
               : AppColors.white,
-          borderRadius: BorderRadius.circular(14.spMin),
+          borderRadius: BorderRadius.circular(12.spMin),
           border: Border.all(
-            color: isSelected ? _sectionLabelColor : AppColors.lightGrey,
-            width: isSelected ? 2.0 : 1.0,
+            color: isSelected ? _sectionLabelColor : const Color(0xFFE8E4EE),
+            width: 1.5,
           ),
           boxShadow: isSelected
               ? [
@@ -1227,19 +1240,33 @@ class _CreateUpdateReportScreenState
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.white,
-                  borderRadius: BorderRadius.circular(16.spMin),
-                  border: Border.all(color: AppColors.lightGrey),
+                  borderRadius: BorderRadius.circular(14.spMin),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: _cardShadow,
+                      blurRadius: 10.0,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
                 padding: EdgeInsets.symmetric(
-                  horizontal: 15.spMin,
-                  vertical: 12.spMin,
+                  horizontal: 13.spMin,
+                  vertical: 11.spMin,
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      LucideIcons.mapPin,
-                      size: 18.spMin,
-                      color: _sectionLabelColor,
+                    Container(
+                      width: 32.spMin,
+                      height: 32.spMin,
+                      decoration: BoxDecoration(
+                        color: _iconTint,
+                        borderRadius: BorderRadius.circular(10.spMin),
+                      ),
+                      child: Icon(
+                        LucideIcons.mapPin,
+                        size: 16.spMin,
+                        color: _labelColor,
+                      ),
                     ),
                     SizedBox(width: 10.spMin),
                     Expanded(
@@ -1249,8 +1276,8 @@ class _CreateUpdateReportScreenState
                           Text(
                             locationName ?? 'Finding your location…',
                             style: TextStyle(
-                              fontSize: 15.5.spMin,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 13.5.spMin,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                           2.hSizedBox,
@@ -1259,19 +1286,30 @@ class _CreateUpdateReportScreenState
                                 ? 'Tap to set it manually'
                                 : 'Your current location · auto-filled',
                             style: TextStyle(
-                              fontSize: 11.5.spMin,
+                              fontSize: 10.5.spMin,
                               color: AppColors.mediumGrey,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Text(
-                      'Adjust',
-                      style: TextStyle(
-                        fontSize: 14.spMin,
-                        fontWeight: FontWeight.w700,
-                        color: _sectionLabelColor,
+                    SizedBox(width: 8.spMin),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.spMin,
+                        vertical: 7.spMin,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _chipFill,
+                        borderRadius: BorderRadius.circular(10.spMin),
+                      ),
+                      child: Text(
+                        'Adjust',
+                        style: TextStyle(
+                          fontSize: 11.spMin,
+                          fontWeight: FontWeight.w800,
+                          color: _labelColor,
+                        ),
                       ),
                     ),
                   ],
