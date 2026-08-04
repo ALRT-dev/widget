@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 
 /// Bundled quick-report taxonomy (locked spec: chips are observations, not
