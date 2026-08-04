@@ -39,20 +39,12 @@ class SafetyProfileScreen extends ConsumerWidget {
                 onPressed: () => context.pop(),
                 icon: const Icon(LucideIcons.arrowLeft, color: _ink),
               ),
-              title: Text(
-                'Safety profile',
-                style: TextStyle(
-                  color: _ink,
-                  fontSize: 18.spMin,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
             ),
       bottomNavigationBar: isOnboarding ? _onboardingFooter(context) : null,
       body: ListView(
         padding: EdgeInsets.fromLTRB(18.spMin, 6.spMin, 18.spMin, 28.spMin),
         children: [
-          if (isOnboarding) _onboardingHeroBuilder(),
+          _heroBuilder(),
           Container(
             padding: EdgeInsets.all(13.spMin),
             decoration: BoxDecoration(
@@ -169,22 +161,42 @@ class SafetyProfileScreen extends ConsumerWidget {
   }
 
   /// The onboarding lead-in: what this is, and that it is optional.
-  Widget _onboardingHeroBuilder() {
+  /// The big banner: this screen decides what every alert says first,
+  /// so it leads with what it is and why it is safe to answer.
+  Widget _heroBuilder() {
     return Container(
       width: double.infinity,
       margin: EdgeInsets.only(bottom: 14.spMin),
-      padding: EdgeInsets.all(18.spMin),
+      padding: EdgeInsets.all(20.spMin),
       decoration: BoxDecoration(
-        color: const Color(0xFF17171A),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF23252B), Color(0xFF121216)],
+        ),
         borderRadius: BorderRadius.circular(18.spMin),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            width: 44.spMin,
+            height: 44.spMin,
+            margin: EdgeInsets.only(bottom: 12.spMin),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(13.spMin),
+            ),
+            child: Icon(
+              LucideIcons.shieldCheck,
+              size: 22.spMin,
+              color: Colors.white,
+            ),
+          ),
           Text(
             'Your safety profile',
             style: TextStyle(
-              fontSize: 24.spMin,
+              fontSize: 26.spMin,
               fontWeight: FontWeight.w800,
               color: Colors.white,
               height: 1.15,
