@@ -98,7 +98,7 @@ class _CreateUpdateReportScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.extraLightGrey,
+      backgroundColor: AppColors.white,
       bottomNavigationBar: _submitBarBuilder(),
       appBar: AppBar(
         backgroundColor: AppColors.transparent,
@@ -183,19 +183,17 @@ class _CreateUpdateReportScreenState
   /// after a category is picked, so the whole job is visible up front.
   Widget _formBuilder() {
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 16.spMin, 28.spMin),
+      padding: EdgeInsets.fromLTRB(20.spMin, 16.spMin, 20.spMin, 28.spMin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _disclosureBandBuilder(),
-          14.hSizedBox,
           _cardBuilder(
             step: 1,
             title: 'Where',
             isRequired: true,
             child: _locationBuilder(),
           ),
-          12.hSizedBox,
           _cardBuilder(
             step: 2,
             title: 'Category',
@@ -203,34 +201,29 @@ class _CreateUpdateReportScreenState
             helper: 'one tap, pick the closest fit',
             child: _categoriesBuilder(),
           ),
-          12.hSizedBox,
           _cardBuilder(
             step: 3,
             title: 'What can you see?',
             helper: 'tap any, this is an observation not a diagnosis',
             child: _chipsBuilder(),
           ),
-          12.hSizedBox,
           _cardBuilder(
             step: 4,
             title: 'How would you describe it?',
             helper: 'auto-set from what you picked, tap to change',
             child: _severityWordingBuilder(),
           ),
-          12.hSizedBox,
           _cardBuilder(
             step: 5,
             title: 'Add details',
             helper: 'tapping what you can see helps neighbours act faster',
             child: _descriptionBuilder(),
           ),
-          12.hSizedBox,
           _cardBuilder(
             step: 6,
             title: 'Photos',
             child: _mediaBuilder(),
           ),
-          12.hSizedBox,
           _headlinePreviewBuilder(),
         ],
       ),
@@ -293,18 +286,14 @@ class _CreateUpdateReportScreenState
   }) {
     return Container(
       width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 18.spMin),
       decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(18.spMin),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowColorLight,
-            blurRadius: 10.0,
-            offset: const Offset(0, 2),
+        border: Border(
+          bottom: BorderSide(
+            color: AppColors.lightGrey.withValues(alpha: 0.55),
           ),
-        ],
+        ),
       ),
-      padding: EdgeInsets.all(16.spMin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -339,7 +328,7 @@ class _CreateUpdateReportScreenState
         color: AppColors.extraLightGrey,
         borderRadius: BorderRadius.circular(12.spMin),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 14.spMin),
+      padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 16.spMin),
       child: Text(
         message,
         style: TextStyle(

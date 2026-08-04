@@ -44,7 +44,20 @@ class GuideDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _GuideDetailScreenState extends ConsumerState<GuideDetailScreen> {
-  GuidePhase _selectedPhase = GuidePhase.before;
+  /// The phase the reader explicitly picked. Null means "not chosen yet",
+  /// so the guide opens on whichever phase actually has steps.
+  GuidePhase? _pickedPhase;
+
+  /// Opening on a fixed phase meant a guide whose content lives in During
+  /// or After rendered as "no steps" — the lesson was there, just never
+  /// shown. Fall back to the first phase that has something to read.
+  GuidePhase _phaseFor(final GuideDetail detail) {
+    if (_pickedPhase != null) return _pickedPhase!;
+    for (final phase in GuidePhase.values) {
+      if (phase.stepsOf(detail.sections).isNotEmpty) return phase;
+    }
+    return GuidePhase.before;
+  }
 
   String get _slugOrId => widget.args.slugOrId;
 
@@ -204,21 +217,27 @@ class _GuideDetailScreenState extends ConsumerState<GuideDetailScreen> {
   // -------------------------------- BODY --------------------------------
 
   Widget _bodyBuilder(final GuideDetail detail) {
-    final steps = _selectedPhase.stepsOf(detail.sections);
+    final selectedPhase = _phaseFor(detail);
+    final steps = selectedPhase.stepsOf(detail.sections);
+    final hasAnySteps = GuidePhase.values.any(
+      (phase) => phase.stepsOf(detail.sections).isNotEmpty,
+    );
 
     return ListView(
       padding: EdgeInsets.all(16.spMin),
       children: [
         GuidePhaseSelector(
-          selectedPhase: _selectedPhase,
-          onPhaseSelected: (phase) => setState(() => _selectedPhase = phase),
+          selectedPhase: selectedPhase,
+          onPhaseSelected: (phase) => setState(() => _pickedPhase = phase),
         ),
         16.hSizedBox,
         if (steps.isEmpty)
           Padding(
             padding: EdgeInsets.symmetric(vertical: 20.spMin),
             child: Text(
-              'No steps for this phase yet.',
+              hasAnySteps
+                  ? 'Nothing for this phase. Try the other tabs above.'
+                  : 'This guide has no steps yet.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.spMin,

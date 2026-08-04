@@ -31,10 +31,18 @@ class _MapRailState extends ConsumerState<MapRail> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: _railColor,
+        // Translucent so the map still reads behind the rail, with the same
+        // purply-blue halo the footer carries.
+        color: _railColor.withValues(alpha: 0.82),
         borderRadius: BorderRadius.circular(999),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
+            color: AppColors.footerGlow.withValues(alpha: 0.34),
+            blurRadius: 22.0,
+            spreadRadius: 1.0,
+            offset: const Offset(0, 4),
+          ),
+          const BoxShadow(
             color: AppColors.shadowColorDark,
             blurRadius: 14.0,
             offset: Offset(0, 4.0),
@@ -149,8 +157,15 @@ class _MapRailState extends ConsumerState<MapRail> {
       width: 40.spMin,
       height: 40.spMin,
       decoration: BoxDecoration(
-        color: color,
+        color: color.withValues(alpha: 0.9),
         shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.45),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Icon(
         icon,
