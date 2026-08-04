@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
+import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/notification/providers/notifications_feed_provider.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -28,6 +29,9 @@ class HomeTabbar extends ConsumerStatefulWidget {
 
   /// Indigo accent for the Family destination.
   static const familyIndigo = Color(0xFF7C7CE0);
+
+  /// The ring the avatar wears while an SOS is running.
+  static const _sosRing = Color(0xFFE4002B);
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _HomeTabbarState();
@@ -194,13 +198,36 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
                 ),
               );
 
+        // Locked rule: the avatar wears a ring while any live share or SOS
+        // is running, so something of yours being shared is never silent.
+        final isSosRunning = ref.watch(
+          providerOfFamily.select((s) => s.activeSosEvents.isNotEmpty),
+        );
+        final isSharingLive = ref.watch(
+          providerOfFamily.select((s) {
+            final expiresAt = s.circle?.me?.locationExpiresAt;
+            return expiresAt != null && expiresAt.isAfter(DateTime.now());
+          }),
+        );
+
+        final ringColor = isSosRunning
+            ? HomeTabbar._sosRing
+            : isSharingLive
+            ? HomeTabbar.familyIndigo
+            : isActive
+            ? AppColors.white
+            : null;
+
         return Container(
-          decoration: isActive
-              ? BoxDecoration(
+          decoration: ringColor == null
+              ? null
+              : BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.white, width: 2),
-                )
-              : null,
+                  border: Border.all(
+                    color: ringColor,
+                    width: isSosRunning || isSharingLive ? 2.5 : 2,
+                  ),
+                ),
           child: avatar,
         );
       },
