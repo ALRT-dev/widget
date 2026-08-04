@@ -109,9 +109,16 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
   Widget _tabIconBuilder(final HomeTab tab, {required final bool isActive}) {
     switch (tab) {
       case HomeTab.list:
-        return Image.asset(
-          'assets/logos/alrt_logo.png',
-          height: 22.spMin,
+        // The mark sits in its locked 32x26 box, never redrawn and never
+        // substituted for a glyph. Contain rather than a bare height, so
+        // the box is the spec and the artwork fits itself to it.
+        return SizedBox(
+          width: 32.spMin,
+          height: 26.spMin,
+          child: Image.asset(
+            'assets/logos/alrt_logo.png',
+            fit: BoxFit.contain,
+          ),
         );
       case HomeTab.notifications:
         return _alertsIconBuilder(isActive: isActive);
