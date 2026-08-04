@@ -81,6 +81,7 @@
     <!-- ALRT Nearby Alerts home-screen widget -->
     <receiver
       android:name=".AlrtAlertsWidgetProvider"
+      android:label="@string/widget_alerts_label"
       android:exported="false">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -93,6 +94,7 @@
     <!-- ALRT Family status home-screen widget -->
     <receiver
       android:name=".AlrtFamilyWidgetProvider"
+      android:label="@string/widget_family_label"
       android:exported="false">
       <intent-filter>
         <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

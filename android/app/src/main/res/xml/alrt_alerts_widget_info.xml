@@ -9,4 +9,5 @@
     android:initialLayout="@layout/alrt_widget"
     android:previewLayout="@layout/alrt_widget"
     android:resizeMode="horizontal|vertical"
+    android:description="@string/widget_alerts_description"
     android:widgetCategory="home_screen" />

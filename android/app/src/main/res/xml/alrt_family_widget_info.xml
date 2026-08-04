@@ -8,4 +8,5 @@
     android:initialLayout="@layout/alrt_family_widget"
     android:previewLayout="@layout/alrt_family_widget"
     android:resizeMode="horizontal|vertical"
+    android:description="@string/widget_family_description"
     android:widgetCategory="home_screen" />

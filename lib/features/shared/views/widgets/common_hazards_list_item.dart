@@ -236,11 +236,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
   Widget _normalHeaderBuilder() {
     return Consumer(
       builder: (context, ref, child) {
-        final isUserReported = ref.watch(
-          provider.select(
-            (value) => value.hazard!.isUserReported,
-          ),
-        );
         final isAwsCompliant = ref.watch(
           provider.select(
             (value) => value.hazard!.isAwsCompliant ?? false,
@@ -259,11 +254,12 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
 
         final isVerified = source != null;
 
-        final categoryLabel = isUserReported
-            ? 'USER'
-            : isAwsCompliant
+        // Same rule as the coloured header: the badge names the SOURCE.
+        final categoryLabel = isAwsCompliant
             ? 'AWS'
-            : 'OFFICIAL';
+            : isVerified
+            ? 'OFFICIAL'
+            : 'COMMUNITY';
 
         return Row(
           spacing: 8.spMin,
@@ -291,7 +287,8 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                 ),
               ),
             ),
-            // Severity/Category Text
+            const Spacer(),
+            // Only the Australian Warning System writes a severity word.
             if (isAwsCompliant)
               Container(
                 padding: EdgeInsets.symmetric(
@@ -441,39 +438,36 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                                     AppColors.grey)
                         : AppColors.white,
               ),
+              // Left: the SOURCE system, one badge and only one.
+              _headerPillBuilder(
+                label: isAwsCompliant
+                    ? 'AWS'
+                    : isVerified
+                    ? 'OFFICIAL'
+                    : 'COMMUNITY',
+                foregroundColor: pillForegroundColor,
+                backgroundColor: pillBackgroundColor,
+                backgroundColorAlpha: pillBackgroundColorAlpha,
+                borderColor: pillBorderColor,
+              ),
+              const Spacer(),
+              // Right: the severity word, and only the Australian Warning
+              // System ever writes one. No other source states a level.
               if (isAwsCompliant &&
                   severityTitle.isNotEmpty &&
                   severityTitle != 'Unknown')
-                _headerPillBuilder(
-                  label: severityTitle.toUpperCase(),
-                  foregroundColor: pillForegroundColor,
-                  backgroundColor: pillBackgroundColor,
-                  backgroundColorAlpha: pillBackgroundColorAlpha,
-                  borderColor: pillBorderColor,
-                ),
-              if (isUserReported)
-                _headerPillBuilder(
-                  label: 'UNVERIFIED',
-                  foregroundColor: pillForegroundColor,
-                  backgroundColor: pillBackgroundColor,
-                  backgroundColorAlpha: pillBackgroundColorAlpha,
-                  borderColor: pillBorderColor,
-                ),
-              if (isAwsCompliant)
-                _headerPillBuilder(
-                  label: 'AWS',
-                  foregroundColor: pillForegroundColor,
-                  backgroundColor: pillBackgroundColor,
-                  backgroundColorAlpha: pillBackgroundColorAlpha,
-                  borderColor: pillBorderColor,
-                ),
-              if (isVerified)
-                _headerPillBuilder(
-                  label: 'OFFICIAL',
-                  foregroundColor: pillForegroundColor,
-                  backgroundColor: pillBackgroundColor,
-                  backgroundColorAlpha: pillBackgroundColorAlpha,
-                  borderColor: pillBorderColor,
+                Text(
+                  severityTitle,
+                  style: TextStyle(
+                    fontSize: 13.spMin,
+                    fontWeight: FontWeight.w800,
+                    color: isOfficialCritical
+                        ? AppColors.white
+                        : hazardColor == AppColors.transparent ||
+                              hazardColor.isLight
+                        ? AppColors.black
+                        : AppColors.white,
+                  ),
                 ),
             ],
           ),
