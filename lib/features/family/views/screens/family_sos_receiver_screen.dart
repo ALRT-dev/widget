@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
+import 'package:hazard_app/features/family/views/screens/family_sos_resolved_screen.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -63,7 +64,7 @@ class FamilySosReceiverScreen extends ConsumerWidget {
                 SizedBox(height: 16.spMin),
                 if (!isResolved && !isMine) _actionsBuilder(context, ref, sos, name),
                 if (!isResolved && isMine) ...[
-                  _resolveButtonBuilder(ref, sos),
+                  _resolveButtonBuilder(context, ref, sos),
                   SizedBox(height: 10.spMin),
                   _shareUpdatedLocationButtonBuilder(context, ref),
                 ],
@@ -267,7 +268,11 @@ class FamilySosReceiverScreen extends ConsumerWidget {
     );
   }
 
-  Widget _resolveButtonBuilder(final WidgetRef ref, final FamilySosEvent sos) {
+  Widget _resolveButtonBuilder(
+    final BuildContext context,
+    final WidgetRef ref,
+    final FamilySosEvent sos,
+  ) {
     return SizedBox(
       height: 50.spMin,
       width: double.infinity,
@@ -279,11 +284,40 @@ class FamilySosReceiverScreen extends ConsumerWidget {
             borderRadius: BorderRadius.circular(16.spMin),
           ),
         ),
-        onPressed: () =>
-            ref.read(providerOfFamily.notifier).resolveSos(sosEventId: sos.id),
+        onPressed: () => _resolveAndShowSummary(context, ref, sos),
         child: Text(
           "I'm safe now — resolve SOS",
           style: TextStyle(fontSize: 15.spMin, fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
+
+  /// Stands the SOS down and then shows the after-event record, so the
+  /// promise that the location data is gone is stated, not assumed.
+  Future<void> _resolveAndShowSummary(
+    final BuildContext context,
+    final WidgetRef ref,
+    final FamilySosEvent sos,
+  ) async {
+    final circleName = ref.read(providerOfFamily).circle?.name;
+    final memberCount = ref.read(providerOfFamily).circle?.members.length;
+
+    await ref.read(providerOfFamily.notifier).resolveSos(sosEventId: sos.id);
+    if (!context.mounted) return;
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => FamilySosResolvedScreen(
+          args: FamilySosResolvedScreenArgs(
+            event: sos.copyWith(
+              status: FamilySosStatus.resolved,
+              resolvedAt: DateTime.now(),
+            ),
+            circleName: circleName,
+            // Everyone but the person in SOS could see it.
+            recipientCount: memberCount == null ? null : memberCount - 1,
+          ),
         ),
       ),
     );

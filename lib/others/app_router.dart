@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/views/screens/auth_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_sos_resolved_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_journey_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_invite_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_place_edit_screen.dart';
@@ -162,6 +163,12 @@ class AppRouter {
         GoRoute(
           path: FamilyInviteScreen.route,
           builder: (context, state) => const FamilyInviteScreen(),
+        ),
+        GoRoute(
+          path: FamilySosResolvedScreen.route,
+          builder: (context, state) => FamilySosResolvedScreen(
+            args: state.extra as FamilySosResolvedScreenArgs,
+          ),
         ),
         GoRoute(
           path: FamilyJourneyScreen.route,
