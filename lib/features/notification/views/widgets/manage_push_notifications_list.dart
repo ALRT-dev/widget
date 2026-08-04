@@ -8,6 +8,7 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/main_categories_provider_state.dart';
+import 'package:hazard_app/features/shared/views/widgets/category_filter_chip.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class ManagePushNotificationsList extends ConsumerStatefulWidget {
@@ -382,7 +383,15 @@ class _ManagePushNotificationsListState
                   },
                 ),
                 16.hSizedBox,
-                ...cats.map((category) => _categoryToggleCard(category)),
+                // Same pill as the ALRT feed filter, so a category reads
+                // identically wherever it is offered.
+                Wrap(
+                  spacing: 10.spMin,
+                  runSpacing: 10.spMin,
+                  children: cats
+                      .map((category) => _categoryChipBuilder(category))
+                      .toList(),
+                ),
               ],
             );
           },
@@ -392,7 +401,7 @@ class _ManagePushNotificationsListState
     );
   }
 
-  Widget _categoryToggleCard(final HazardCategory category) {
+  Widget _categoryChipBuilder(final HazardCategory category) {
     return Consumer(
       builder: (context, ref, child) {
         final isSelected = ref.watch(
@@ -402,21 +411,13 @@ class _ManagePushNotificationsListState
             ),
           ),
         );
-        final categoryColor = category.resolvedColor;
 
-        return Padding(
-          padding: EdgeInsets.only(bottom: 12.spMin),
-          child: _filterToggleCard(
-            title: category.name ?? 'Unknown Category',
-            description: category.description ?? 'Hazard category',
-            isEnabled: isSelected,
-            onToggle: (value) {
-              ref
-                  .read(providerOfManageNotifications.notifier)
-                  .toggleCategory(category.id);
-            },
-            color: categoryColor,
-          ),
+        return CategoryFilterChip(
+          category: category,
+          isSelected: isSelected,
+          onToggle: (value) => ref
+              .read(providerOfManageNotifications.notifier)
+              .toggleCategory(category.id),
         );
       },
     );

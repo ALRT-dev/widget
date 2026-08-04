@@ -2,12 +2,13 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hazard_app/features/shared/extensions/color_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/base_bottomsheet_v2.dart';
+import 'package:hazard_app/features/shared/views/widgets/category_filter_chip.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class AlrtKeysBottomsheetContent extends ConsumerStatefulWidget {
@@ -42,6 +43,8 @@ class _AlrtKeysBottomsheetContentState
                 child: Column(
                   children: [
                     20.hSizedBox,
+                    _shapeKeySection(),
+                    16.hSizedBox,
                     _awsWarningsSection(),
                     16.hSizedBox,
                     _officialWarningsSection(),
@@ -106,6 +109,134 @@ class _AlrtKeysBottomsheetContentState
           ).onPressed(() => Navigator.pop(context)),
         ],
       ),
+    );
+  }
+
+  /// The shape system: a pin's SHAPE says where the alert came from, the
+  /// colour says how serious it is. Drawn in neutral ink here so the legend
+  /// reads as shape-means-source, never as a band.
+  Widget _shapeKeySection() {
+    final divider = Divider(
+      color: AppColors.extraLightGrey,
+      height: 28.spMin,
+    );
+    const ink = AppColors.mediumGrey;
+    final size = 26.spMin;
+
+    return _sectionContainerBuilder(
+      title: 'What the shapes mean'.toUpperCase(),
+      subtitle:
+          'The shape tells you who the alert came from. The colour tells '
+          'you how serious it is.',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _shapeKeyRowBuilder(
+            shape: TriangleOutline(
+              color: ink,
+              size: Size(size, size),
+              borderRadius: 1.0,
+            ),
+            name: 'Triangle',
+            meaning: 'Australian Warning System',
+          ),
+          divider,
+          _shapeKeyRowBuilder(
+            shape: SizedBox(
+              width: size,
+              height: size,
+              child: Center(
+                child: Transform.rotate(
+                  angle: math.pi / 4,
+                  child: Container(
+                    width: size * 0.72,
+                    height: size * 0.72,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(1.spMin),
+                      border: Border.all(color: ink, width: 2.0),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            name: 'Diamond',
+            meaning: 'Official alert from a public agency',
+          ),
+          divider,
+          _shapeKeyRowBuilder(
+            shape: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: ink, width: 2.0),
+              ),
+            ),
+            name: 'Circle',
+            meaning: 'Community report from someone nearby',
+          ),
+          divider,
+          _shapeKeyRowBuilder(
+            shape: SvgPicture.asset(
+              'assets/icons/shield.svg',
+              width: size,
+              height: size,
+              colorFilter: const ColorFilter.mode(ink, BlendMode.srcIn),
+            ),
+            name: 'Shield',
+            meaning: 'ALRT intel',
+          ),
+          divider,
+          _shapeKeyRowBuilder(
+            shape: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5.spMin),
+                border: Border.all(color: ink, width: 2.0),
+              ),
+            ),
+            name: 'Rounded square',
+            meaning: 'Global event',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _shapeKeyRowBuilder({
+    required final Widget shape,
+    required final String name,
+    required final String meaning,
+  }) {
+    return Row(
+      children: [
+        SizedBox(width: 30.spMin, child: Center(child: shape)),
+        16.wSizedBox,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  fontSize: 15.spMin,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.black,
+                ),
+              ),
+              Text(
+                meaning,
+                style: TextStyle(
+                  fontSize: 13.5.spMin,
+                  color: AppColors.grey.withValues(alpha: 0.9),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -310,13 +441,9 @@ class _AlrtKeysBottomsheetContentState
             runSpacing: 10.spMin,
             children: categories
                 .map(
-                  (category) => _chipBuilder(
-                    title: category.name ?? 'Unknown Category',
-                    color: category.id == 'utilitiesAndInfrastructure'
-                        ? category.resolvedColor.darken(0.3)
-                        : category.resolvedColor.darken(0.2),
+                  (category) => CategoryFilterChip(
+                    category: category,
                     isSelected: true,
-                    onToggle: (value) {},
                   ),
                 )
                 .toList(),
@@ -439,50 +566,6 @@ class _AlrtKeysBottomsheetContentState
         ),
       ],
     );
-  }
-
-  Widget _chipBuilder({
-    required final String title,
-    required final Color color,
-    required final bool isSelected,
-    required final ValueChanged<bool> onToggle,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 16.spMin,
-        vertical: 7.spMin,
-      ),
-      decoration: BoxDecoration(
-        color: isSelected ? color.withValues(alpha: 0.05) : Colors.transparent,
-        borderRadius: BorderRadius.circular(20.spMin),
-        border: Border.all(
-          color: isSelected ? color : AppColors.lightGrey,
-          width: 1.2.spMin,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 10.spMin,
-            height: 10.spMin,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
-          ),
-          7.wSizedBox,
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14.spMin,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              color: isSelected ? color : AppColors.black,
-            ),
-          ),
-        ],
-      ),
-    ).onPressed(() => onToggle(!isSelected));
   }
 }
 

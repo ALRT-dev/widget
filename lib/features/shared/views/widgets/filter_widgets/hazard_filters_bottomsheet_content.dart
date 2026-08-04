@@ -7,6 +7,7 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
 import 'package:hazard_app/features/shared/views/widgets/base_bottomsheet_v2.dart';
+import 'package:hazard_app/features/shared/views/widgets/category_filter_chip.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class HazardFiltersBottomsheetContent extends ConsumerStatefulWidget {
@@ -255,11 +256,8 @@ class _HazardFiltersBottomsheetContentState
             runSpacing: 10.spMin,
             children: categories
                 .map(
-                  (category) => _chipBuilder(
-                    title: category.name ?? 'Unknown Category',
-                    color: category.id == 'utilitiesAndInfrastructure'
-                        ? category.resolvedColor.darken(0.3)
-                        : category.resolvedColor.darken(0.2),
+                  (category) => CategoryFilterChip(
+                    category: category,
                     isSelected: selectedCategories.contains(category.id),
                     onToggle: (value) {
                       ref
@@ -472,36 +470,6 @@ class _HazardFiltersBottomsheetContentState
         ),
       ),
     );
-  }
-
-  Widget _chipBuilder({
-    required final String title,
-    required final Color color,
-    required final bool isSelected,
-    required final ValueChanged<bool> onToggle,
-  }) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: 16.spMin,
-        vertical: 8.spMin,
-      ),
-      decoration: BoxDecoration(
-        color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
-        borderRadius: BorderRadius.circular(20.spMin),
-        border: Border.all(
-          color: isSelected ? color : AppColors.lightGrey,
-          width: 1.2.spMin,
-        ),
-      ),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 14.spMin,
-          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          color: isSelected ? color : AppColors.black,
-        ),
-      ),
-    ).onPressed(() => onToggle(!isSelected));
   }
 
   void _handleResetAll() {

@@ -273,8 +273,18 @@ class _AskAlrtSheetState extends ConsumerState<AskAlrtSheet> {
   }
 
   Widget _buildInputRow(final bool isSending) {
+    // The home indicator sits under the sheet when the keyboard is closed
+    // (padding.bottom drops to zero once the keyboard covers it), so the
+    // send button needs that clearance or it reads as cut off.
+    final bottomSafeArea = MediaQuery.paddingOf(context).bottom;
+
     return Padding(
-      padding: EdgeInsets.fromLTRB(16.spMin, 10.spMin, 16.spMin, 16.spMin),
+      padding: EdgeInsets.fromLTRB(
+        16.spMin,
+        10.spMin,
+        16.spMin,
+        16.spMin + bottomSafeArea,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
