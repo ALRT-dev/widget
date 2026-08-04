@@ -1,3 +1,4 @@
+import 'package:hazard_app/features/profile/views/screens/safety_profile_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_complete_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_disclaimer_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_legal_screen.dart';
@@ -7,6 +8,7 @@ enum OnboardingStep {
   welcome,
   disclaimer,
   legal,
+  safetyProfile,
   // location,
   // radius,
   // pushNotification,
@@ -21,6 +23,8 @@ enum OnboardingStep {
         return OnboardingDisclaimerScreen.route;
       case OnboardingStep.legal:
         return OnboardingLegalScreen.route;
+      case OnboardingStep.safetyProfile:
+        return SafetyProfileScreen.onboardingRoute;
       // case OnboardingStep.location:
       //   return OnboardingLocationScreen.route;
       // case OnboardingStep.radius:

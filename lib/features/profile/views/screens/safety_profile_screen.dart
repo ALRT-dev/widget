@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart';
 import 'package:hazard_app/features/profile/models/safety_cohort.dart';
 import 'package:hazard_app/features/profile/providers/safety_profile_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -11,9 +12,14 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// Everything ticked here stays on the phone — nothing is sent to a server.
 /// Cohorts speak to a situation, never an assumed limitation.
 class SafetyProfileScreen extends ConsumerWidget {
-  const SafetyProfileScreen({super.key});
+  const SafetyProfileScreen({super.key, this.isOnboarding = false});
+
+  /// During onboarding the screen leads with what it is for and offers a
+  /// way past it, because a profile nobody understands is worse than none.
+  final bool isOnboarding;
 
   static const route = '/safety-profile';
+  static const onboardingRoute = '/onboarding/safety-profile';
 
   static const _ink = Color(0xFF232326);
   static const _inkSoft = Color(0xFF75757E);
@@ -24,25 +30,29 @@ class SafetyProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F4F6),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => context.pop(),
-          icon: const Icon(LucideIcons.arrowLeft, color: _ink),
-        ),
-        title: Text(
-          'Safety profile',
-          style: TextStyle(
-            color: _ink,
-            fontSize: 18.spMin,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
+      appBar: isOnboarding
+          ? null
+          : AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                onPressed: () => context.pop(),
+                icon: const Icon(LucideIcons.arrowLeft, color: _ink),
+              ),
+              title: Text(
+                'Safety profile',
+                style: TextStyle(
+                  color: _ink,
+                  fontSize: 18.spMin,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+      bottomNavigationBar: isOnboarding ? _onboardingFooter(context) : null,
       body: ListView(
         padding: EdgeInsets.fromLTRB(18.spMin, 6.spMin, 18.spMin, 28.spMin),
         children: [
+          if (isOnboarding) _onboardingHeroBuilder(),
           Container(
             padding: EdgeInsets.all(13.spMin),
             decoration: BoxDecoration(
@@ -156,5 +166,97 @@ class SafetyProfileScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// The onboarding lead-in: what this is, and that it is optional.
+  Widget _onboardingHeroBuilder() {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: 14.spMin),
+      padding: EdgeInsets.all(18.spMin),
+      decoration: BoxDecoration(
+        color: const Color(0xFF17171A),
+        borderRadius: BorderRadius.circular(18.spMin),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Your safety profile',
+            style: TextStyle(
+              fontSize: 24.spMin,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              height: 1.15,
+            ),
+          ),
+          SizedBox(height: 8.spMin),
+          Text(
+            'Pick anything that applies to you or the people you care for. '
+            'Alerts will show the guidance that matters to you first. '
+            'Optional, and you can change it anytime.',
+            style: TextStyle(
+              fontSize: 13.spMin,
+              height: 1.5,
+              color: Colors.white.withValues(alpha: 0.8),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _onboardingFooter(final BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(18.spMin, 8.spMin, 18.spMin, 10.spMin),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: 54.spMin,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF6B01),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.spMin),
+                  ),
+                ),
+                onPressed: () => _finishOnboardingStep(context),
+                child: Text(
+                  'Save my profile',
+                  style: TextStyle(
+                    fontSize: 16.spMin,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 6.spMin),
+            TextButton(
+              onPressed: () => _finishOnboardingStep(context),
+              child: Text(
+                'Skip — show all guidance equally',
+                style: TextStyle(
+                  fontSize: 13.spMin,
+                  color: _inkSoft,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The profile is already saved on every tap, so both buttons simply
+  /// move on. Skipping is a real choice, not a penalty.
+  void _finishOnboardingStep(final BuildContext context) {
+    context.go(OnboardingStep.safetyProfile.nextStep.route);
   }
 }

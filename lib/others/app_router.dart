@@ -231,6 +231,11 @@ class AppRouter {
           builder: (context, state) => const AlrtPlusManageScreen(),
         ),
         GoRoute(
+          path: SafetyProfileScreen.onboardingRoute,
+          builder: (context, state) =>
+              const SafetyProfileScreen(isOnboarding: true),
+        ),
+        GoRoute(
           path: SafetyProfileScreen.route,
           builder: (context, state) => const SafetyProfileScreen(),
         ),
