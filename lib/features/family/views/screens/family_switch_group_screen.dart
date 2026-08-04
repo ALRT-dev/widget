@@ -5,6 +5,8 @@ import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/providers/selected_circle_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_group_actions.dart';
+import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Every group you belong to, on one dark page, each wearing its own beacon.
@@ -60,6 +62,109 @@ class FamilySwitchGroupScreen extends ConsumerWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.spMin),
             child: _seatCardBuilder(circles),
+          ),
+          _actionsBuilder(context, ref),
+        ],
+      ),
+    );
+  }
+
+  /// Being in a group never closes the door on the next one: joining with a
+  /// code is free and unlimited, and a host can split their seats across up
+  /// to 4 groups they own. Both paths live here, on the switcher, where the
+  /// question "can I be in another group?" actually gets asked.
+  Widget _actionsBuilder(final BuildContext context, final WidgetRef ref) {
+    ref.listen(providerOfFamily.select((s) => s.joinCircleState), (
+      prev,
+      next,
+    ) {
+      if (prev != next && next.isError && next.error != null) {
+        context.showErrorToast(message: next.error!.message);
+      }
+    });
+    ref.listen(providerOfFamily.select((s) => s.createCircleState), (
+      prev,
+      next,
+    ) {
+      if (prev != next && next.isError && next.error != null) {
+        context.showErrorToast(message: next.error!.message);
+      }
+    });
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16.spMin, 14.spMin, 16.spMin, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            height: 48.spMin,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.white.withValues(alpha: 0.08),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.spMin),
+                  side: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.16),
+                  ),
+                ),
+              ),
+              onPressed: () => showJoinGroupSheet(context, ref),
+              child: Text(
+                'Join another group with a code',
+                style: TextStyle(
+                  fontSize: 14.spMin,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 9.spMin),
+          SizedBox(
+            height: 48.spMin,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFFC939DD),
+                    Color(0xFFA22CC6),
+                    Color(0xFF7E1FA8),
+                    Color(0xFF5C1585),
+                  ],
+                  stops: [0.0, 0.4, 0.74, 1.0],
+                ),
+                borderRadius: BorderRadius.circular(15.spMin),
+              ),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.spMin),
+                  ),
+                ),
+                onPressed: () => showCreateGroupSheet(context, ref),
+                child: Text(
+                  'Create another group',
+                  style: TextStyle(
+                    fontSize: 14.spMin,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 10.spMin),
+            child: Text(
+              'Joining with a code is always free, in as many groups as '
+              'you like. Your ALRT+ seats can host up to 4 groups.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11.spMin,
+                height: 1.5,
+                color: Colors.white.withValues(alpha: 0.55),
+              ),
+            ),
           ),
         ],
       ),
