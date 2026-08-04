@@ -53,7 +53,7 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
         .toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F1F5),
+      backgroundColor: FamilyColors.v31Page,
       body: Column(
         children: [
           _headerBuilder(circle.name),
@@ -72,25 +72,58 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF4B4BE0), Color(0xFF2E2EA8)],
+          // 165 degrees in the prototype: near-vertical, tilted right.
+          begin: Alignment(-0.35, -1),
+          end: Alignment(0.35, 1),
+          colors: [
+            FamilyColors.v31HeaderTop,
+            FamilyColors.v31HeaderMid,
+            FamilyColors.v31HeaderDeep,
+          ],
+          stops: [0.0, 0.55, 1.0],
         ),
       ),
-      padding: EdgeInsets.fromLTRB(20.spMin, 8.spMin, 20.spMin, 22.spMin),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
+      child: Stack(
+        children: [
+          // The soft blob of light in the top-right corner.
+          Positioned(
+            top: -40.spMin,
+            right: -30.spMin,
+            child: Container(
+              width: 180.spMin,
+              height: 180.spMin,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    FamilyColors.v31HeaderGlow.withValues(alpha: 0.4),
+                    FamilyColors.v31HeaderGlow.withValues(alpha: 0.0),
+                  ],
+                  stops: const [0.0, 0.68],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              16.spMin,
+              8.spMin,
+              16.spMin,
+              22.spMin,
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () => Navigator.of(context).maybePop(),
               child: Container(
-                width: 34.spMin,
-                height: 34.spMin,
+                width: 30.spMin,
+                height: 30.spMin,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
+                  color: Colors.white.withValues(alpha: 0.16),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -106,30 +139,34 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
               style: TextStyle(
                 fontSize: 11.spMin,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 1.0,
-                color: Colors.white.withValues(alpha: 0.75),
+                letterSpacing: 0.6,
+                color: Colors.white.withValues(alpha: 0.7),
               ),
             ),
             4.hSizedBox,
             Text(
               'Share my journey',
               style: TextStyle(
-                fontSize: 26.spMin,
+                fontSize: 22.spMin,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
-                height: 1.1,
+                letterSpacing: -0.5,
+                height: 1.15,
               ),
             ),
             5.hSizedBox,
-            Text(
-              'Live location while you travel, on your terms',
-              style: TextStyle(
-                fontSize: 13.spMin,
-                color: Colors.white.withValues(alpha: 0.85),
+                  Text(
+                    'Live location while you travel, on your terms',
+                    style: TextStyle(
+                      fontSize: 12.5.spMin,
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -162,15 +199,15 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
                   '1 hour at most per extension. ALRT asks before it ends '
                   'and only you can extend.',
                   style: TextStyle(
-                    fontSize: 12.5.spMin,
-                    height: 1.45,
-                    color: AppColors.mediumGrey,
+                    fontSize: 11.spMin,
+                    height: 1.6,
+                    color: FamilyColors.v31Ink,
                   ),
                 ),
               ],
             ),
           ),
-          12.hSizedBox,
+          11.hSizedBox,
           _cardBuilder(
             label: 'Who sees it',
             padding: EdgeInsets.zero,
@@ -217,24 +254,24 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
       onTap: () => setState(() => _durationMinutes = minutes),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 140),
-        height: 52.spMin,
+        height: 44.spMin,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: isSelected ? FamilyColors.indigo : Colors.white,
-          borderRadius: BorderRadius.circular(14.spMin),
+          color: isSelected ? FamilyColors.v31Indigo : Colors.white,
+          borderRadius: BorderRadius.circular(12.spMin),
           border: Border.all(
             color: isSelected
-                ? FamilyColors.indigo
-                : AppColors.lightGrey.withValues(alpha: 0.9),
-            width: isSelected ? 2 : 1,
+                ? FamilyColors.v31Indigo
+                : FamilyColors.v31Border,
+            width: 1.5,
           ),
         ),
         child: Text(
           minutes < 60 ? '$minutes min' : '${minutes ~/ 60} hour',
           style: TextStyle(
-            fontSize: 16.spMin,
-            fontWeight: FontWeight.w700,
-            color: isSelected ? Colors.white : FamilyColors.indigo,
+            fontSize: 14.spMin,
+            fontWeight: FontWeight.w800,
+            color: isSelected ? Colors.white : FamilyColors.v31Indigo,
           ),
         ),
       ),
@@ -255,15 +292,17 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 16.spMin,
+                fontSize: 14.spMin,
                 fontWeight: FontWeight.w700,
-                color: isOn ? AppColors.black : AppColors.grey,
+                color: isOn ? AppColors.black : FamilyColors.v31Ink,
               ),
             ),
           ),
           Switch(
             value: isOn,
-            activeTrackColor: FamilyColors.safeGreen,
+            activeTrackColor: FamilyColors.v31ToggleOn,
+            inactiveTrackColor: FamilyColors.v31ToggleOff,
+            inactiveThumbColor: Colors.white,
             onChanged: (value) => setState(() {
               if (value) {
                 _recipientIds.add(member.id);
@@ -287,15 +326,16 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
     );
 
     return SizedBox(
-      height: 56.spMin,
+      height: 50.spMin,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: FamilyColors.indigo,
-          disabledBackgroundColor: FamilyColors.indigo.withValues(alpha: 0.4),
+          backgroundColor: FamilyColors.v31Indigo,
+          disabledBackgroundColor:
+              FamilyColors.v31Indigo.withValues(alpha: 0.4),
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.spMin),
+            borderRadius: BorderRadius.circular(15.spMin),
           ),
         ),
         onPressed: canStart ? _handleStart : null,
@@ -303,7 +343,7 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
           _recipientIds.isEmpty
               ? 'Pick who sees it'
               : 'Start sharing until ${endsAt.format(context)}',
-          style: TextStyle(fontSize: 16.spMin, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 15.spMin, fontWeight: FontWeight.w800),
         ),
       ),
     );
@@ -423,16 +463,16 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18.spMin),
-        boxShadow: [
+        borderRadius: BorderRadius.circular(16.spMin),
+        boxShadow: const [
           BoxShadow(
-            color: AppColors.shadowColorLight,
+            color: FamilyColors.v31CardShadow,
             blurRadius: 10.0,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
-      padding: padding ?? EdgeInsets.all(16.spMin),
+      padding: padding ?? EdgeInsets.fromLTRB(15.spMin, 14.spMin, 15.spMin, 14.spMin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -443,10 +483,10 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
             child: Text(
               label.toUpperCase(),
               style: TextStyle(
-                fontSize: 11.5.spMin,
+                fontSize: 10.spMin,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 1.0,
-                color: const Color(0xFFB84500),
+                letterSpacing: 0.6,
+                color: FamilyColors.v31Label,
               ),
             ),
           ),
@@ -459,20 +499,20 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
   Widget _noteBuilder(final String text) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFFFF8E8),
+        color: FamilyColors.v31NoteBackground,
         borderRadius: BorderRadius.circular(14.spMin),
-        border: Border.all(color: const Color(0xFFF0DFB8)),
+        border: Border.all(color: FamilyColors.v31NoteBorder, width: 1.5),
       ),
       padding: EdgeInsets.symmetric(
         horizontal: 14.spMin,
-        vertical: 12.spMin,
+        vertical: 11.spMin,
       ),
       child: Text(
         text,
         style: TextStyle(
-          fontSize: 12.5.spMin,
-          height: 1.45,
-          color: const Color(0xFF6B5424),
+          fontSize: 12.spMin,
+          height: 1.6,
+          color: FamilyColors.v31NoteInk,
         ),
       ),
     );

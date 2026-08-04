@@ -34,6 +34,49 @@ class FamilyColors {
   /// A light red background for SOS banners.
   static const sosRedLight = Color(0xFFFDECEC);
 
+  // ── V3.1 prototype tokens ──────────────────────────────────────────────
+  // Read straight off the standalone prototype. The older indigo above is
+  // a different, lighter blue, which is why family screens built against it
+  // never matched the mocks.
+
+  /// The V3.1 family indigo: buttons, selected chips, accents.
+  static const v31Indigo = Color(0xFF3D3DDF);
+
+  /// The lavender page behind the cards.
+  static const v31Page = Color(0xFFF0EEF5);
+
+  /// Section labels on family screens (orange, not the V3 rust).
+  static const v31Label = Color(0xFFFF6B01);
+
+  /// Body and secondary copy.
+  static const v31Ink = Color(0xFF5F5C66);
+
+  /// Hairline between rows inside a card.
+  static const v31Divider = Color(0xFFF4F1F6);
+
+  /// Unselected control borders.
+  static const v31Border = Color(0xFFD8D4E8);
+
+  /// Toggle track when on, and when off.
+  static const v31ToggleOn = Color(0xFF16C784);
+  static const v31ToggleOff = Color(0xFFD8D4DE);
+
+  /// The amber promise note: background, border, ink.
+  static const v31NoteBackground = Color(0xFFFFF9EC);
+  static const v31NoteBorder = Color(0xFFF5D98A);
+  static const v31NoteInk = Color(0xFF8A6D1E);
+
+  /// The three stops of the family header gradient (165 degrees).
+  static const v31HeaderTop = Color(0xFF4B4BF0);
+  static const v31HeaderMid = Color(0xFF3229C4);
+  static const v31HeaderDeep = Color(0xFF1E1780);
+
+  /// The soft blob of light in the top-right of the header.
+  static const v31HeaderGlow = Color(0xFF7882FF);
+
+  /// Card shadow on the lavender page.
+  static const v31CardShadow = Color(0x0D1E142D);
+
   /// The palette used to derive a stable per-member avatar color.
   static const memberPalette = <Color>[
     Color(0xFFF26522), // orange
