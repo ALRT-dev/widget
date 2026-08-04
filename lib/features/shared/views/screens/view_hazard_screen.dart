@@ -36,6 +36,7 @@ import 'package:hazard_app/others/app_colors.dart';
 import 'dart:math' as math;
 
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:hazard_app/features/shared/services/alert_speech_service.dart';
 
 class ViewHazardScreenArgs {
   ViewHazardScreenArgs({required this.hazard});
@@ -827,6 +828,32 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
+  /// Speaks the alert: source, title, plain terms, then the description.
+  /// Tapping Listen again while speaking stops it.
+  Future<void> _speakAlert(final WidgetRef ref, final Hazard hazard) async {
+    final speech = ref.read(providerOfAlertSpeech);
+    if (speech.isSpeaking) {
+      await speech.stop();
+      return;
+    }
+    final plainTerms = AlertCardStyle.plainTermsOf(
+      isOfficial: !hazard.isUserReported,
+      isAws: hazard.isAwsCompliant ?? false,
+      severity: hazard.severity,
+      band: hazard.severityBand,
+      categoryName: hazard.category?.name,
+    );
+    final text = [
+      hazard.isUserReported
+          ? 'Community report, unverified.'
+          : 'Official alert from ${hazard.source?.name ?? 'an official source'}.',
+      hazard.title ?? '',
+      if (plainTerms != null) 'In plain terms: $plainTerms.',
+      hazard.description ?? '',
+    ].where((line) => line.trim().isNotEmpty).join(' ');
+    await speech.speak(text);
+  }
+
   Widget _buildShareFollowRow() {
     return Consumer(
       builder: (context, ref, child) {
@@ -891,6 +918,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               highlighted: isFollowing,
               onTap: () =>
                   ref.read(providerOfFollowedAlerts.notifier).toggle(id),
+            ),
+            8.wSizedBox,
+            // Accessible delivery: the whole alert, spoken on demand.
+            action(
+              label: 'Listen',
+              onTap: () => _speakAlert(ref, hazard),
             ),
           ],
         ).pX(16.0);

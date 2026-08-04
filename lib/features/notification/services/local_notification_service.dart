@@ -33,6 +33,15 @@ class LocalNotificationService {
   static const _channelDescription =
       'Hazard alerts and family safety notifications';
 
+  // Accessible delivery: ACTION/CRITICAL alerts land here when the user has
+  // strong vibration on (deaf or hard of hearing). The pattern is long and
+  // unmistakable; channel settings are fixed at creation, which is why this
+  // is a second channel rather than a per-notification tweak.
+  static const _urgentChannelId = 'alrt_alerts_urgent';
+  static const _urgentChannelName = 'Urgent alerts (strong vibration)';
+  static const _urgentChannelDescription =
+      'Take-action and critical alerts with long strong vibration';
+
   // Action button ids, shared by Android actions and iOS category actions.
   static const actionViewDetails = 'alrt_view_details';
   static const actionFollow = 'alrt_follow_updates';
@@ -57,6 +66,7 @@ class LocalNotificationService {
   void Function()? _onOpenMapAction;
   void Function()? _onImSafeAction;
   bool Function(String alertId)? _isFollowing;
+  bool Function()? _useStrongVibration;
 
   /// Initializes the plugin and wires the callbacks. Safe to call once at
   /// startup; subsequent calls only replace the callbacks.
@@ -69,12 +79,14 @@ class LocalNotificationService {
     void Function()? onOpenMapAction,
     void Function()? onImSafeAction,
     bool Function(String alertId)? isFollowing,
+    bool Function()? useStrongVibration,
   }) async {
     _onNotificationTap = onNotificationTap;
     _onFollowAction = onFollowAction;
     _onOpenMapAction = onOpenMapAction;
     _onImSafeAction = onImSafeAction;
     _isFollowing = isFollowing;
+    _useStrongVibration = useStrongVibration;
     if (_initialized || kIsWeb) return;
 
     // Let iOS present foreground notifications natively.
@@ -113,6 +125,19 @@ class LocalNotificationService {
         importance: Importance.max,
       ),
     );
+    await androidPlugin?.createNotificationChannel(
+      AndroidNotificationChannel(
+        _urgentChannelId,
+        _urgentChannelName,
+        description: _urgentChannelDescription,
+        importance: Importance.max,
+        enableLights: true,
+        enableVibration: true,
+        vibrationPattern: Int64List.fromList(
+          [0, 700, 300, 700, 300, 1200, 400, 700, 300, 700, 300, 1200],
+        ),
+      ),
+    );
 
     _initialized = true;
   }
@@ -129,6 +154,8 @@ class LocalNotificationService {
     if (title == null && body == null) return;
 
     final actions = _actionsFor(message.data);
+    final urgent = _isUrgent(message.data) &&
+        (_useStrongVibration?.call() ?? false);
 
     await _plugin.show(
       message.hashCode,
@@ -136,9 +163,10 @@ class LocalNotificationService {
       body,
       NotificationDetails(
         android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          channelDescription: _channelDescription,
+          urgent ? _urgentChannelId : _channelId,
+          urgent ? _urgentChannelName : _channelName,
+          channelDescription:
+              urgent ? _urgentChannelDescription : _channelDescription,
           importance: Importance.max,
           priority: Priority.high,
           actions: actions,
@@ -146,6 +174,13 @@ class LocalNotificationService {
       ),
       payload: jsonEncode(message.data),
     );
+  }
+
+  /// ACTION and CRITICAL hazard pushes qualify for accessible delivery.
+  bool _isUrgent(Map<String, dynamic> data) {
+    final band =
+        (_hazardPayloadOf(data)?['severityBand'] as String?)?.toLowerCase();
+    return band == 'action' || band == 'critical';
   }
 
   /// Band-matched action buttons. Only hazard pushes (payloads carrying a

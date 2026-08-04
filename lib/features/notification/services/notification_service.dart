@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
@@ -8,6 +9,7 @@ import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/home/views/screens/home_screen.dart';
+import 'package:hazard_app/features/notification/providers/accessible_alerts_provider.dart';
 import 'package:hazard_app/features/notification/providers/repository_providers.dart';
 import 'package:hazard_app/features/notification/repositories/notification_repository.dart';
 import 'package:hazard_app/features/notification/services/local_notification_service.dart';
@@ -17,6 +19,7 @@ import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/providers/followed_alerts_provider.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/providers/service_providers.dart';
+import 'package:hazard_app/features/shared/services/alert_speech_service.dart';
 import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/utils/either.dart';
 
@@ -116,10 +119,50 @@ class NotificationService {
           _ref.read(providerOfFollowedAlerts.notifier).follow(alertId),
       onOpenMapAction: () => _goToHomeTab(HomeTab.map),
       onImSafeAction: _handleImSafeAction,
+      useStrongVibration: () =>
+          _ref.read(providerOfAccessibleAlerts).strongVibration,
     );
     _foregroundMessageStreamSub = _notificationRepository
         .onForegroundPushNotificationMessage()
-        .listen(LocalNotificationService.instance.showFromRemoteMessage);
+        .listen((message) {
+          LocalNotificationService.instance.showFromRemoteMessage(message);
+          _maybeSpeak(message);
+        });
+  }
+
+  /// Accessible delivery for vision impairment: with read-aloud on, an
+  /// ACTION/CRITICAL alert arriving while the app is open is spoken once,
+  /// on-device. Lower bands stay quiet; the Listen button on every alert
+  /// detail covers them on demand.
+  void _maybeSpeak(final RemoteMessage message) {
+    if (!_ref.read(providerOfAccessibleAlerts).readAloud) return;
+
+    final data = message.data;
+    final band = _severityBandOf(data);
+    if (band != 'action' && band != 'critical') return;
+
+    final title = message.notification?.title ?? data['title'] as String?;
+    final body = message.notification?.body ?? data['body'] as String?;
+    final text = [
+      band == 'critical' ? 'Critical alert.' : 'Take action alert.',
+      if (title != null && title.isNotEmpty) title,
+      if (body != null && body.isNotEmpty) body,
+    ].join(' ');
+    _ref.read(providerOfAlertSpeech).speak(text);
+  }
+
+  /// Same envelope as LocalNotificationService: the hazard rides in
+  /// data['payload'] as a JSON string.
+  String? _severityBandOf(final Map<String, dynamic> data) {
+    final raw = data['payload'];
+    if (raw is! String || raw.isEmpty) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) return null;
+      return (decoded['severityBand'] as String?)?.toLowerCase();
+    } catch (_) {
+      return null;
+    }
   }
 
   /// "I'm safe" on an ACTION/CRITICAL notification fires the same family
