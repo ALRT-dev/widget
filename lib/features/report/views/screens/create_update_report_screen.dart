@@ -271,7 +271,7 @@ class _CreateUpdateReportScreenState
                 ],
               ),
               style: TextStyle(
-                fontSize: 12.5.spMin,
+                fontSize: 13.spMin,
                 height: 1.45,
                 color: _bandInk,
                 fontFamily: AppTheme.defaultFontFamily,
@@ -318,7 +318,7 @@ class _CreateUpdateReportScreenState
             Text(
               helper,
               style: TextStyle(
-                fontSize: 11.5.spMin,
+                fontSize: 12.5.spMin,
                 color: AppColors.mediumGrey,
               ),
             ),
@@ -343,7 +343,7 @@ class _CreateUpdateReportScreenState
       child: Text(
         message,
         style: TextStyle(
-          fontSize: 12.spMin,
+          fontSize: 13.spMin,
           color: AppColors.mediumGrey,
         ),
       ),
@@ -393,18 +393,27 @@ class _CreateUpdateReportScreenState
         padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 8.spMin),
         decoration: BoxDecoration(
           color: isSelected
-              ? _sectionLabelColor.withValues(alpha: 0.12)
+              ? _sectionLabelColor.withValues(alpha: 0.16)
               : AppColors.white,
           borderRadius: BorderRadius.circular(18.spMin),
           border: Border.all(
             color: isSelected ? _sectionLabelColor : AppColors.lightGrey,
-            width: isSelected ? 1.5 : 1.0,
+            width: isSelected ? 2.0 : 1.0,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: _sectionLabelColor.withValues(alpha: 0.28),
+                    blurRadius: 12.0,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Text(
           chip.label,
           style: TextStyle(
-            fontSize: 13.spMin,
+            fontSize: 14.spMin,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             color: isSelected ? _sectionLabelColor : AppColors.black,
           ),
@@ -470,20 +479,29 @@ class _CreateUpdateReportScreenState
         padding: EdgeInsets.symmetric(horizontal: 10.spMin, vertical: 10.spMin),
         decoration: BoxDecoration(
           color: isSelected
-              ? _sectionLabelColor.withValues(alpha: 0.12)
+              ? _sectionLabelColor.withValues(alpha: 0.16)
               : AppColors.white,
           borderRadius: BorderRadius.circular(14.spMin),
           border: Border.all(
             color: isSelected ? _sectionLabelColor : AppColors.lightGrey,
-            width: isSelected ? 1.5 : 1.0,
+            width: isSelected ? 2.0 : 1.0,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: _sectionLabelColor.withValues(alpha: 0.28),
+                    blurRadius: 12.0,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           children: [
             Text(
               wording.label,
               style: TextStyle(
-                fontSize: 13.spMin,
+                fontSize: 14.5.spMin,
                 fontWeight: FontWeight.w700,
                 color: isSelected ? _sectionLabelColor : AppColors.black,
               ),
@@ -493,7 +511,7 @@ class _CreateUpdateReportScreenState
               wording.sub,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 10.5.spMin,
+                fontSize: 11.5.spMin,
                 color: AppColors.mediumGrey,
               ),
             ),
@@ -575,27 +593,42 @@ class _CreateUpdateReportScreenState
         ),
         decoration: BoxDecoration(
           color: isSelected
-              ? dotColor.withValues(alpha: 0.08)
+              ? dotColor.withValues(alpha: 0.14)
               : AppColors.white,
           borderRadius: BorderRadius.circular(14.spMin),
           border: Border.all(
             color: isSelected
                 ? dotColor
                 : AppColors.lightGrey.withValues(alpha: 0.8),
-            width: isSelected ? 1.5 : 1.0,
+            width: isSelected ? 2.0 : 1.0,
           ),
+          // Each row glows in its own category colour, brighter when picked.
+          boxShadow: [
+            BoxShadow(
+              color: dotColor.withValues(alpha: isSelected ? 0.42 : 0.16),
+              blurRadius: isSelected ? 16.0 : 8.0,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: Row(
           children: [
             // The category colour reads as a filled disc, carrying the v4
             // icon when the server has one for this category.
             Container(
-              width: 30.spMin,
-              height: 30.spMin,
+              width: 34.spMin,
+              height: 34.spMin,
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: dotColor,
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: dotColor.withValues(alpha: 0.5),
+                    blurRadius: 10.0,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: iconImage != null && iconImage.url.isNotEmpty
                   ? AppCachedNetworkImage(
@@ -612,7 +645,7 @@ class _CreateUpdateReportScreenState
               child: Text(
                 category.name ?? 'Category',
                 style: TextStyle(
-                  fontSize: 14.spMin,
+                  fontSize: 15.5.spMin,
                   fontWeight: FontWeight.w700,
                   color: isSelected ? dotColor : AppColors.black,
                 ),
@@ -620,7 +653,7 @@ class _CreateUpdateReportScreenState
             ),
             Icon(
               isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
-              size: 20.spMin,
+              size: 22.spMin,
               color: isSelected
                   ? dotColor
                   : AppColors.lightGrey,
@@ -920,7 +953,7 @@ class _CreateUpdateReportScreenState
           child: Text(
             title.toUpperCase(),
             style: TextStyle(
-              fontSize: 10.5.spMin,
+              fontSize: 12.spMin,
               color: _sectionLabelColor,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.0,
@@ -1084,7 +1117,7 @@ class _CreateUpdateReportScreenState
                           Text(
                             locationName ?? 'Finding your location…',
                             style: TextStyle(
-                              fontSize: 14.spMin,
+                              fontSize: 15.5.spMin,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -1104,7 +1137,7 @@ class _CreateUpdateReportScreenState
                     Text(
                       'Adjust',
                       style: TextStyle(
-                        fontSize: 13.spMin,
+                        fontSize: 14.spMin,
                         fontWeight: FontWeight.w700,
                         color: _sectionLabelColor,
                       ),
@@ -1153,7 +1186,7 @@ class _CreateUpdateReportScreenState
             child: Text(
               headline,
               style: TextStyle(
-                fontSize: 14.spMin,
+                fontSize: 15.spMin,
                 fontWeight: FontWeight.w700,
                 color: AppColors.black,
                 fontFamily: AppTheme.defaultFontFamily,

@@ -54,6 +54,24 @@ abstract final class AlertCardStyle {
   static const bandAction = Color(0xFFF07E1B);
   static const bandCritical = Color(0xFFDA1F2D);
 
+  // ── ALRT shield palette (icon sheet, renders at 20px) ─────────────────
+  // The shield glyph has its own brighter hexes, separate from the band
+  // hexes above. The shield still never writes the band word next to it.
+  static const shieldOutline = Color(0xFF1A1D21);
+  static const shieldYellow = Color(0xFFFFC400);
+  static const shieldOrange = Color(0xFFFF6B00);
+  static const shieldRed = Color(0xFFE4002B);
+
+  /// The shield colour for a severity band, per the icon sheet.
+  static Color shieldColor(final HazardSeverityBand? band) {
+    return switch (band) {
+      HazardSeverityBand.monitor => shieldYellow,
+      HazardSeverityBand.action => shieldOrange,
+      HazardSeverityBand.critical => shieldRed,
+      _ => shieldOutline,
+    };
+  }
+
   /// The locked hex for an official severity shape.
   static Color bandShapeColor(final HazardSeverityBand? band) {
     return switch (band) {

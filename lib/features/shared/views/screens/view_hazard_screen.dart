@@ -31,6 +31,7 @@ import 'package:hazard_app/features/shared/utils/share_alert.dart';
 import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
 import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
+import 'package:hazard_app/features/shared/views/widgets/category_filter_chip.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'dart:math' as math;
 
@@ -556,6 +557,15 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 'Other',
           ),
         );
+        // The category keeps its own colour here, so Traffic & Transport
+        // reads the same green opened as it does on the map pin.
+        final category = ref.watch(
+          provider.select((value) => value.hazard?.category),
+        );
+        final categoryInk = category == null
+            ? null
+            : categoryChipColor(category);
+
         final updatedAt = ref.watch(
           provider.select((value) => value.hazard?.updatedAt),
         );
@@ -597,16 +607,26 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             else if (isUserReported)
               _v3PillBuilder(
                 label: categoryName,
-                backgroundColor: AlertCardStyle.communityCategoryPillBackground,
-                foregroundColor: AlertCardStyle.communityCategoryPillForeground,
-                borderColor: AlertCardStyle.communityCategoryPillForeground,
+                backgroundColor:
+                    categoryInk?.withValues(alpha: 0.14) ??
+                    AlertCardStyle.communityCategoryPillBackground,
+                foregroundColor:
+                    categoryInk ??
+                    AlertCardStyle.communityCategoryPillForeground,
+                borderColor:
+                    categoryInk ??
+                    AlertCardStyle.communityCategoryPillForeground,
               )
             else
               _v3PillBuilder(
                 label: categoryName,
-                backgroundColor: AlertCardStyle.officialCategoryPillBackground,
-                foregroundColor: AlertCardStyle.officialCategoryPillForeground,
-                borderColor: AlertCardStyle.officialCategoryPillBorder,
+                backgroundColor:
+                    categoryInk?.withValues(alpha: 0.14) ??
+                    AlertCardStyle.officialCategoryPillBackground,
+                foregroundColor:
+                    categoryInk ?? AlertCardStyle.officialCategoryPillForeground,
+                borderColor:
+                    categoryInk ?? AlertCardStyle.officialCategoryPillBorder,
               ),
             if (isLive)
               _v3PillBuilder(
