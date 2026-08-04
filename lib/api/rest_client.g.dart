@@ -1973,13 +1973,18 @@ class _RestClient implements RestClient {
   Future<FamilySosEvent> triggerFamilySos({
     double? latitude,
     double? longitude,
+    String? sosListId,
     String? circleId,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'circleId': circleId};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
-    final _data = {'latitude': latitude, 'longitude': longitude};
+    final _data = {
+      'latitude': latitude,
+      'longitude': longitude,
+      'sosListId': sosListId,
+    };
     _data.removeWhere((k, v) => v == null);
     final _options = _setStreamType<FamilySosEvent>(
       Options(method: 'POST', headers: _headers, extra: _extra)
@@ -2000,6 +2005,129 @@ class _RestClient implements RestClient {
       rethrow;
     }
     return _value;
+  }
+
+  @override
+  Future<List<FamilySosList>> getFamilySosLists() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<FamilySosList>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/family/sos-lists',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<FamilySosList> _value;
+    try {
+      _value = _result.data!
+          .map((dynamic i) => FamilySosList.fromJson(i as Map<String, dynamic>))
+          .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<FamilySosList> createFamilySosList({
+    required String name,
+    required List<String> memberIds,
+    bool? isDefault,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'name': name,
+      'memberIds': memberIds,
+      'isDefault': isDefault,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _options = _setStreamType<FamilySosList>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/family/sos-lists',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late FamilySosList _value;
+    try {
+      _value = FamilySosList.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<FamilySosList> updateFamilySosList({
+    required String sosListId,
+    String? name,
+    List<String>? memberIds,
+    bool? isDefault,
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'name': name,
+      'memberIds': memberIds,
+      'isDefault': isDefault,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _options = _setStreamType<FamilySosList>(
+      Options(method: 'PUT', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/family/sos-lists/${sosListId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late FamilySosList _value;
+    try {
+      _value = FamilySosList.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<void> deleteFamilySosList({required String sosListId}) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<void>(
+      Options(method: 'DELETE', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/family/sos-lists/${sosListId}',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    await _dio.fetch<void>(_options);
   }
 
   @override

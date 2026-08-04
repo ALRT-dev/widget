@@ -2378,6 +2378,290 @@ $FamilyMemberSnippetCopyWith<$Res>? get member {
 
 
 /// @nodoc
+mixin _$FamilySosList {
+
+ String get id; String get ownerUserId; String get name; bool get isDefault; List<String> get memberIds; DateTime? get createdAt;
+/// Create a copy of FamilySosList
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilySosListCopyWith<FamilySosList> get copyWith => _$FamilySosListCopyWithImpl<FamilySosList>(this as FamilySosList, _$identity);
+
+  /// Serializes this FamilySosList to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilySosList&&(identical(other.id, id) || other.id == id)&&(identical(other.ownerUserId, ownerUserId) || other.ownerUserId == ownerUserId)&&(identical(other.name, name) || other.name == name)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&const DeepCollectionEquality().equals(other.memberIds, memberIds)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,ownerUserId,name,isDefault,const DeepCollectionEquality().hash(memberIds),createdAt);
+
+@override
+String toString() {
+  return 'FamilySosList(id: $id, ownerUserId: $ownerUserId, name: $name, isDefault: $isDefault, memberIds: $memberIds, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilySosListCopyWith<$Res>  {
+  factory $FamilySosListCopyWith(FamilySosList value, $Res Function(FamilySosList) _then) = _$FamilySosListCopyWithImpl;
+@useResult
+$Res call({
+ String id, String ownerUserId, String name, bool isDefault, List<String> memberIds, DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$FamilySosListCopyWithImpl<$Res>
+    implements $FamilySosListCopyWith<$Res> {
+  _$FamilySosListCopyWithImpl(this._self, this._then);
+
+  final FamilySosList _self;
+  final $Res Function(FamilySosList) _then;
+
+/// Create a copy of FamilySosList
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? ownerUserId = null,Object? name = null,Object? isDefault = null,Object? memberIds = null,Object? createdAt = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,ownerUserId: null == ownerUserId ? _self.ownerUserId : ownerUserId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
+as bool,memberIds: null == memberIds ? _self.memberIds : memberIds // ignore: cast_nullable_to_non_nullable
+as List<String>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FamilySosList].
+extension FamilySosListPatterns on FamilySosList {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilySosList value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilySosList() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilySosList value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilySosList():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilySosList value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilySosList() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String ownerUserId,  String name,  bool isDefault,  List<String> memberIds,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilySosList() when $default != null:
+return $default(_that.id,_that.ownerUserId,_that.name,_that.isDefault,_that.memberIds,_that.createdAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String ownerUserId,  String name,  bool isDefault,  List<String> memberIds,  DateTime? createdAt)  $default,) {final _that = this;
+switch (_that) {
+case _FamilySosList():
+return $default(_that.id,_that.ownerUserId,_that.name,_that.isDefault,_that.memberIds,_that.createdAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String ownerUserId,  String name,  bool isDefault,  List<String> memberIds,  DateTime? createdAt)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilySosList() when $default != null:
+return $default(_that.id,_that.ownerUserId,_that.name,_that.isDefault,_that.memberIds,_that.createdAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilySosList implements FamilySosList {
+  const _FamilySosList({required this.id, required this.ownerUserId, required this.name, this.isDefault = false, final  List<String> memberIds = const <String>[], this.createdAt}): _memberIds = memberIds;
+  factory _FamilySosList.fromJson(Map<String, dynamic> json) => _$FamilySosListFromJson(json);
+
+@override final  String id;
+@override final  String ownerUserId;
+@override final  String name;
+@override@JsonKey() final  bool isDefault;
+ final  List<String> _memberIds;
+@override@JsonKey() List<String> get memberIds {
+  if (_memberIds is EqualUnmodifiableListView) return _memberIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_memberIds);
+}
+
+@override final  DateTime? createdAt;
+
+/// Create a copy of FamilySosList
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilySosListCopyWith<_FamilySosList> get copyWith => __$FamilySosListCopyWithImpl<_FamilySosList>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilySosListToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilySosList&&(identical(other.id, id) || other.id == id)&&(identical(other.ownerUserId, ownerUserId) || other.ownerUserId == ownerUserId)&&(identical(other.name, name) || other.name == name)&&(identical(other.isDefault, isDefault) || other.isDefault == isDefault)&&const DeepCollectionEquality().equals(other._memberIds, _memberIds)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,ownerUserId,name,isDefault,const DeepCollectionEquality().hash(_memberIds),createdAt);
+
+@override
+String toString() {
+  return 'FamilySosList(id: $id, ownerUserId: $ownerUserId, name: $name, isDefault: $isDefault, memberIds: $memberIds, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilySosListCopyWith<$Res> implements $FamilySosListCopyWith<$Res> {
+  factory _$FamilySosListCopyWith(_FamilySosList value, $Res Function(_FamilySosList) _then) = __$FamilySosListCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String ownerUserId, String name, bool isDefault, List<String> memberIds, DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$FamilySosListCopyWithImpl<$Res>
+    implements _$FamilySosListCopyWith<$Res> {
+  __$FamilySosListCopyWithImpl(this._self, this._then);
+
+  final _FamilySosList _self;
+  final $Res Function(_FamilySosList) _then;
+
+/// Create a copy of FamilySosList
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? ownerUserId = null,Object? name = null,Object? isDefault = null,Object? memberIds = null,Object? createdAt = freezed,}) {
+  return _then(_FamilySosList(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,ownerUserId: null == ownerUserId ? _self.ownerUserId : ownerUserId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,isDefault: null == isDefault ? _self.isDefault : isDefault // ignore: cast_nullable_to_non_nullable
+as bool,memberIds: null == memberIds ? _self._memberIds : memberIds // ignore: cast_nullable_to_non_nullable
+as List<String>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$FamilyCircleSummary {
 
  String get circleId; String get name; String? get themeColor;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role; String get myMemberId; int get memberCount;/// True when the caller owns (pays for) this circle — its members

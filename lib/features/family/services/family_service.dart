@@ -261,11 +261,49 @@ class FamilyService {
   Future<Either<FamilySosEvent, AppError>> triggerFamilySos({
     final double? latitude,
     final double? longitude,
+    final String? sosListId,
   }) {
     return _familyRepository.triggerFamilySos(
       latitude: latitude,
       longitude: longitude,
+      sosListId: sosListId,
     );
+  }
+
+  Future<Either<List<FamilySosList>, AppError>> getFamilySosLists() {
+    return _familyRepository.getFamilySosLists();
+  }
+
+  Future<Either<FamilySosList, AppError>> createFamilySosList({
+    required final String name,
+    required final List<String> memberIds,
+    final bool? isDefault,
+  }) {
+    return _familyRepository.createFamilySosList(
+      name: name,
+      memberIds: memberIds,
+      isDefault: isDefault,
+    );
+  }
+
+  Future<Either<FamilySosList, AppError>> updateFamilySosList({
+    required final String sosListId,
+    final String? name,
+    final List<String>? memberIds,
+    final bool? isDefault,
+  }) {
+    return _familyRepository.updateFamilySosList(
+      sosListId: sosListId,
+      name: name,
+      memberIds: memberIds,
+      isDefault: isDefault,
+    );
+  }
+
+  Future<Either<void, AppError>> deleteFamilySosList({
+    required final String sosListId,
+  }) {
+    return _familyRepository.deleteFamilySosList(sosListId: sosListId);
   }
 
   Future<Either<List<FamilySosEvent>, AppError>> getActiveFamilySosEvents() {

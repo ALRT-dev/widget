@@ -239,6 +239,23 @@ abstract class FamilyCheckIn with _$FamilyCheckIn {
       _$FamilyCheckInFromJson(json);
 }
 
+/// An SOS recipient preset (locked spec §28): a named list owned by the
+/// sender, configured in advance — never during an emergency.
+@freezed
+abstract class FamilySosList with _$FamilySosList {
+  const factory FamilySosList({
+    required final String id,
+    required final String ownerUserId,
+    required final String name,
+    @Default(false) final bool isDefault,
+    @Default(<String>[]) final List<String> memberIds,
+    final DateTime? createdAt,
+  }) = _FamilySosList;
+
+  factory FamilySosList.fromJson(Map<String, dynamic> json) =>
+      _$FamilySosListFromJson(json);
+}
+
 /// One row of GET /api/family/circles — a circle the user belongs to,
 /// with just enough for the group switcher and the ALRT+ seat ledger.
 @freezed

@@ -314,6 +314,32 @@ const _$FamilyCheckInStatusEnumMap = {
   FamilyCheckInStatus.needsHelp: 'needsHelp',
 };
 
+_FamilySosList _$FamilySosListFromJson(Map<String, dynamic> json) =>
+    _FamilySosList(
+      id: json['id'] as String,
+      ownerUserId: json['ownerUserId'] as String,
+      name: json['name'] as String,
+      isDefault: json['isDefault'] as bool? ?? false,
+      memberIds:
+          (json['memberIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const <String>[],
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+    );
+
+Map<String, dynamic> _$FamilySosListToJson(_FamilySosList instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'ownerUserId': instance.ownerUserId,
+      'name': instance.name,
+      'isDefault': instance.isDefault,
+      'memberIds': instance.memberIds,
+      'createdAt': ?instance.createdAt?.toIso8601String(),
+    };
+
 _FamilyCircleSummary _$FamilyCircleSummaryFromJson(Map<String, dynamic> json) =>
     _FamilyCircleSummary(
       circleId: json['circleId'] as String,

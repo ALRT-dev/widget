@@ -229,6 +229,66 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     await load();
   }
 
+  // ------------------------ SOS RECIPIENT PRESETS ------------------------
+
+  Future<void> loadSosLists() async {
+    final result = await _familyService.getFamilySosLists();
+    if (!mounted) return;
+    result.whenSuccess((lists) {
+      state = state.copyWith(sosLists: lists);
+      return null;
+    });
+  }
+
+  /// Creates or updates a preset; pass [sosListId] to edit an existing one.
+  Future<bool> saveSosList({
+    final String? sosListId,
+    required final String name,
+    required final List<String> memberIds,
+    final bool? isDefault,
+  }) async {
+    final result = sosListId == null
+        ? await _familyService.createFamilySosList(
+            name: name,
+            memberIds: memberIds,
+            isDefault: isDefault,
+          )
+        : await _familyService.updateFamilySosList(
+            sosListId: sosListId,
+            name: name,
+            memberIds: memberIds,
+            isDefault: isDefault,
+          );
+    if (!mounted) return false;
+
+    return result.when(
+      (_) {
+        loadSosLists();
+        return true;
+      },
+      (_) => false,
+    );
+  }
+
+  Future<bool> removeSosList({required final String sosListId}) async {
+    final result = await _familyService.deleteFamilySosList(
+      sosListId: sosListId,
+    );
+    if (!mounted) return false;
+
+    return result.when(
+      (_) {
+        state = state.copyWith(
+          sosLists: state.sosLists
+              .where((list) => list.id != sosListId)
+              .toList(),
+        );
+        return true;
+      },
+      (_) => false,
+    );
+  }
+
   Future<void> createCircle({required final String name}) async {
     state = state.copyWith(
       createCircleState: const FamilyActionState.loading(),
@@ -876,7 +936,7 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
   // ---------------------------- SOS ----------------------------
 
   /// Triggers an SOS with the user's current location attached.
-  Future<FamilySosEvent?> triggerSos() async {
+  Future<FamilySosEvent?> triggerSos({final String? sosListId}) async {
     state = state.copyWith(sosTriggerState: const FamilyActionState.loading());
 
     final position = await _familyLocationService
@@ -886,6 +946,7 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     final result = await _familyService.triggerFamilySos(
       latitude: position?.latitude,
       longitude: position?.longitude,
+      sosListId: sosListId,
     );
     if (!mounted) return null;
 

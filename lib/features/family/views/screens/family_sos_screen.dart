@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -32,12 +33,21 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
 
   bool _sent = false;
 
+  /// §28: the selected preset. Null = the implicit "Everyone" (whole
+  /// circle). Pre-selects the default list once lists load, until the
+  /// user explicitly picks a row.
+  String? _selectedListId;
+  bool _listTouched = false;
+
   @override
   void initState() {
     super.initState();
     _holdController.addStatusListener((status) {
       if (status == AnimationStatus.completed) _fireSos();
     });
+    Future.microtask(
+      () => ref.read(providerOfFamily.notifier).loadSosLists(),
+    );
   }
 
   @override
@@ -54,6 +64,19 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
     final circleName = ref.watch(
       providerOfFamily.select((s) => s.circle?.name ?? 'your family circle'),
     );
+    final sosLists = ref.watch(providerOfFamily.select((s) => s.sosLists));
+
+    // Default list preselected until the user picks one themselves.
+    if (!_listTouched && _selectedListId == null) {
+      final defaultList = sosLists.where((l) => l.isDefault).firstOrNull;
+      if (defaultList != null) _selectedListId = defaultList.id;
+    }
+    final selectedList =
+        sosLists.where((l) => l.id == _selectedListId).firstOrNull;
+    final targetLabel = selectedList == null
+        ? 'all $memberCount members of $circleName'
+        : 'the ${selectedList.memberIds.length} people on '
+              '${selectedList.name}';
 
     return Scaffold(
       backgroundColor: FamilyColors.sosDarkRed,
@@ -98,15 +121,29 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
               Text(
                 _sent
                     ? 'A snapshot of your location was shared with '
-                          '$circleName.'
+                          '${selectedList?.name ?? circleName}.'
                     : 'Sends an SOS and a one-time snapshot of your location '
-                          'to all $memberCount members of $circleName.',
+                          'to $targetLabel.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.8),
                   fontSize: 14.spMin,
                 ),
               ),
+              if (!_sent && sosLists.isNotEmpty) ...[
+                SizedBox(height: 16.spMin),
+                _presetRowBuilder(
+                  id: null,
+                  name: 'Everyone in $circleName',
+                  count: memberCount,
+                ),
+                for (final list in sosLists)
+                  _presetRowBuilder(
+                    id: list.id,
+                    name: list.name,
+                    count: list.memberIds.length,
+                  ),
+              ],
               const Spacer(),
               _sent ? _sentIndicatorBuilder() : _holdButtonBuilder(),
               SizedBox(height: 14.spMin),
@@ -135,6 +172,73 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  /// §28: large single-select rows — radio, name, count. No checkboxes,
+  /// no expansion, no counting on this screen.
+  Widget _presetRowBuilder({
+    required final String? id,
+    required final String name,
+    required final int count,
+  }) {
+    final isSelected = _selectedListId == id;
+
+    return GestureDetector(
+      onTap: () => setState(() {
+        _listTouched = true;
+        _selectedListId = id;
+      }),
+      child: Container(
+        width: double.infinity,
+        margin: EdgeInsets.only(top: 8.spMin),
+        padding: EdgeInsets.symmetric(
+          horizontal: 14.spMin,
+          vertical: 12.spMin,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: isSelected ? 0.16 : 0.07),
+          borderRadius: BorderRadius.circular(14.spMin),
+          border: Border.all(
+            color: isSelected
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.2),
+            width: isSelected ? 1.6 : 1.0,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isSelected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_off_rounded,
+              size: 20.spMin,
+              color: Colors.white,
+            ),
+            SizedBox(width: 10.spMin),
+            Expanded(
+              child: Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15.spMin,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            Text(
+              '$count ${count == 1 ? 'person' : 'people'}',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.75),
+                fontSize: 12.5.spMin,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -296,7 +400,9 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
 
   void _fireSos() async {
     HapticFeedback.heavyImpact();
-    final sos = await ref.read(providerOfFamily.notifier).triggerSos();
+    final sos = await ref
+        .read(providerOfFamily.notifier)
+        .triggerSos(sosListId: _selectedListId);
     if (!mounted) return;
     if (sos != null) {
       setState(() => _sent = true);

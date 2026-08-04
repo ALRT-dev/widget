@@ -153,6 +153,26 @@ abstract class FamilyRepository {
   Future<Either<FamilySosEvent, AppError>> triggerFamilySos({
     final double? latitude,
     final double? longitude,
+    final String? sosListId,
+  });
+
+  Future<Either<List<FamilySosList>, AppError>> getFamilySosLists();
+
+  Future<Either<FamilySosList, AppError>> createFamilySosList({
+    required final String name,
+    required final List<String> memberIds,
+    final bool? isDefault,
+  });
+
+  Future<Either<FamilySosList, AppError>> updateFamilySosList({
+    required final String sosListId,
+    final String? name,
+    final List<String>? memberIds,
+    final bool? isDefault,
+  });
+
+  Future<Either<void, AppError>> deleteFamilySosList({
+    required final String sosListId,
   });
 
   Future<Either<List<FamilySosEvent>, AppError>> getActiveFamilySosEvents();
@@ -665,6 +685,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
   Future<Either<FamilySosEvent, AppError>> triggerFamilySos({
     double? latitude,
     double? longitude,
+    String? sosListId,
   }) {
     return runAsyncCall(
       name: 'triggerFamilySos',
@@ -672,6 +693,7 @@ class FamilyRepositoryImpl implements FamilyRepository {
         final result = await _restClient.triggerFamilySos(
           latitude: latitude,
           longitude: longitude,
+          sosListId: sosListId,
           circleId: _circleId,
         );
         return Success(result);
@@ -687,6 +709,74 @@ class FamilyRepositoryImpl implements FamilyRepository {
       future: () async {
         final result = await _restClient.getActiveFamilySosEvents(circleId: _circleId);
         return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<List<FamilySosList>, AppError>> getFamilySosLists() {
+    return runAsyncCall(
+      name: 'getFamilySosLists',
+      future: () async {
+        final result = await _restClient.getFamilySosLists();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilySosList, AppError>> createFamilySosList({
+    required String name,
+    required List<String> memberIds,
+    bool? isDefault,
+  }) {
+    return runAsyncCall(
+      name: 'createFamilySosList',
+      future: () async {
+        final result = await _restClient.createFamilySosList(
+          name: name,
+          memberIds: memberIds,
+          isDefault: isDefault,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilySosList, AppError>> updateFamilySosList({
+    required String sosListId,
+    String? name,
+    List<String>? memberIds,
+    bool? isDefault,
+  }) {
+    return runAsyncCall(
+      name: 'updateFamilySosList',
+      future: () async {
+        final result = await _restClient.updateFamilySosList(
+          sosListId: sosListId,
+          name: name,
+          memberIds: memberIds,
+          isDefault: isDefault,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> deleteFamilySosList({
+    required String sosListId,
+  }) {
+    return runAsyncCall(
+      name: 'deleteFamilySosList',
+      future: () async {
+        await _restClient.deleteFamilySosList(sosListId: sosListId);
+        return const Success(null);
       },
       onError: Failure.new,
     );

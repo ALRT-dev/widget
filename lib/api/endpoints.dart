@@ -95,6 +95,8 @@ const kUrlFamilyScheduledCheckIn =
     '$kUrlFamilyScheduledCheckIns/{scheduledCheckInId}';
 const kUrlFamilyPlaces = '$kUrlFamily/places';
 const kUrlFamilyPlacePrefs = '$kUrlFamilyPlaces/{placeId}/prefs';
+const kUrlFamilySosLists = '$kUrlFamily/sos-lists';
+const kUrlFamilySosList = '$kUrlFamilySosLists/{sosListId}';
 const kUrlFamilySos = '$kUrlFamily/sos';
 const kUrlFamilySosActive = '$kUrlFamilySos/active';
 const kUrlFamilySosRespond = '$kUrlFamilySos/{sosEventId}/respond';

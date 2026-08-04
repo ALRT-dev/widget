@@ -41,9 +41,11 @@ class _FamilyCircleProfileScreenState
     final me = ref.read(providerOfFamily).circle?.me;
     _nicknameController = TextEditingController(text: me?.name ?? '');
     _selectedColorHex = me?.colorHex;
-    Future.microtask(
-      () => ref.read(providerOfFamily.notifier).loadScheduledCheckIns(),
-    );
+    Future.microtask(() {
+      ref.read(providerOfFamily.notifier)
+        ..loadScheduledCheckIns()
+        ..loadSosLists();
+    });
   }
 
   @override
@@ -169,6 +171,24 @@ class _FamilyCircleProfileScreenState
           ),
           SizedBox(height: 8.spMin),
           _scheduledCheckInsBuilder(),
+          SizedBox(height: 20.spMin),
+          Text(
+            'SOS LISTS',
+            style: TextStyle(
+              fontSize: 12.spMin,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+              color: AppColors.grey,
+            ),
+          ),
+          SizedBox(height: 4.spMin),
+          Text(
+            'Who your SOS reaches. Set up in advance — never during an '
+            'emergency.',
+            style: TextStyle(fontSize: 12.spMin, color: AppColors.grey),
+          ),
+          SizedBox(height: 8.spMin),
+          _sosListsBuilder(),
           SizedBox(height: 28.spMin),
           SizedBox(
             height: 52.spMin,
@@ -319,6 +339,211 @@ class _FamilyCircleProfileScreenState
         ? context.showSuccessToast(message: 'Daily check-in set for $timeOfDay.')
         : context.showErrorToast(
             message: 'Could not save the check-in time. Please try again.',
+          );
+  }
+
+  Widget _sosListsBuilder() {
+    final sosLists = ref.watch(providerOfFamily.select((s) => s.sosLists));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final list in sosLists)
+          Container(
+            margin: EdgeInsets.only(bottom: 8.spMin),
+            padding: EdgeInsets.symmetric(horizontal: 14.spMin),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14.spMin),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  list.isDefault
+                      ? LucideIcons.star
+                      : LucideIcons.users,
+                  size: 18.spMin,
+                  color: FamilyColors.indigo,
+                ),
+                SizedBox(width: 10.spMin),
+                Expanded(
+                  child: Text(
+                    '${list.name} — ${list.memberIds.length} '
+                    '${list.memberIds.length == 1 ? 'person' : 'people'}'
+                    '${list.isDefault ? ' · default' : ''}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14.spMin,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    LucideIcons.pencil,
+                    size: 17.spMin,
+                    color: AppColors.grey,
+                  ),
+                  onPressed: () => _editSosList(existing: list),
+                ),
+                IconButton(
+                  icon: Icon(
+                    LucideIcons.trash2,
+                    size: 17.spMin,
+                    color: AppColors.grey,
+                  ),
+                  onPressed: () => ref
+                      .read(providerOfFamily.notifier)
+                      .removeSosList(sosListId: list.id),
+                ),
+              ],
+            ),
+          ),
+        if (sosLists.length < 4)
+          TextButton.icon(
+            onPressed: () => _editSosList(),
+            icon: Icon(LucideIcons.plus, size: 16.spMin),
+            label: Text(
+              'Add SOS list',
+              style:
+                  TextStyle(fontSize: 14.spMin, fontWeight: FontWeight.w700),
+            ),
+            style: TextButton.styleFrom(foregroundColor: FamilyColors.indigo),
+          ),
+      ],
+    );
+  }
+
+  /// Multi-select checkbox editor (§28: the ONLY place checkboxes exist).
+  Future<void> _editSosList({final FamilySosList? existing}) async {
+    final members = ref.read(providerOfFamily).circle?.others ?? [];
+    if (members.isEmpty) {
+      context.showWarningToast(
+        message: 'Invite family members first — an SOS list needs people.',
+      );
+      return;
+    }
+
+    final nameController = TextEditingController(text: existing?.name ?? '');
+    final selected = {...?existing?.memberIds};
+    var isDefault = existing?.isDefault ?? false;
+
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.spMin)),
+      ),
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+            20.spMin,
+            20.spMin,
+            20.spMin,
+            MediaQuery.of(sheetContext).viewInsets.bottom + 20.spMin,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                existing == null ? 'New SOS list' : 'Edit ${existing.name}',
+                style: TextStyle(
+                  fontSize: 17.spMin,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: 12.spMin),
+              TextField(
+                controller: nameController,
+                maxLength: 40,
+                textCapitalization: TextCapitalization.words,
+                decoration: const InputDecoration(
+                  hintText: 'List name, e.g. Family only',
+                  counterText: '',
+                ),
+              ),
+              SizedBox(height: 8.spMin),
+              for (final member in members)
+                CheckboxListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  activeColor: FamilyColors.indigo,
+                  value: selected.contains(member.id),
+                  onChanged: (checked) => setSheetState(() {
+                    checked == true
+                        ? selected.add(member.id)
+                        : selected.remove(member.id);
+                  }),
+                  title: Text(
+                    member.name,
+                    style: TextStyle(fontSize: 14.spMin),
+                  ),
+                ),
+              SwitchListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                activeThumbColor: FamilyColors.indigo,
+                value: isDefault,
+                onChanged: (value) =>
+                    setSheetState(() => isDefault = value),
+                title: Text(
+                  'Preselect this list on the SOS screen',
+                  style: TextStyle(fontSize: 14.spMin),
+                ),
+              ),
+              SizedBox(height: 10.spMin),
+              SizedBox(
+                height: 48.spMin,
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: FamilyColors.indigo,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.spMin),
+                    ),
+                  ),
+                  onPressed: () => Navigator.of(sheetContext).pop(true),
+                  child: Text(
+                    'Save list',
+                    style: TextStyle(
+                      fontSize: 15.spMin,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final name = nameController.text.trim();
+    if (saved != true || !mounted) return;
+    if (name.isEmpty || selected.isEmpty) {
+      context.showErrorToast(
+        message: 'Give the list a name and at least one person.',
+      );
+      return;
+    }
+
+    final ok = await ref.read(providerOfFamily.notifier).saveSosList(
+          sosListId: existing?.id,
+          name: name,
+          memberIds: selected.toList(),
+          isDefault: isDefault,
+        );
+    if (!mounted) return;
+    ok
+        ? context.showSuccessToast(message: 'SOS list saved.')
+        : context.showErrorToast(
+            message: 'Could not save the list. Please try again.',
           );
   }
 

@@ -411,7 +411,31 @@ abstract class RestClient {
   Future<FamilySosEvent> triggerFamilySos({
     @Field() final double? latitude,
     @Field() final double? longitude,
+    @Field() final String? sosListId,
     @Query('circleId') final String? circleId,
+  });
+
+  @GET(kUrlFamilySosLists)
+  Future<List<FamilySosList>> getFamilySosLists();
+
+  @POST(kUrlFamilySosLists)
+  Future<FamilySosList> createFamilySosList({
+    @Field() required final String name,
+    @Field() required final List<String> memberIds,
+    @Field() final bool? isDefault,
+  });
+
+  @PUT(kUrlFamilySosList)
+  Future<FamilySosList> updateFamilySosList({
+    @Path() required final String sosListId,
+    @Field() final String? name,
+    @Field() final List<String>? memberIds,
+    @Field() final bool? isDefault,
+  });
+
+  @DELETE(kUrlFamilySosList)
+  Future<void> deleteFamilySosList({
+    @Path() required final String sosListId,
   });
 
   @GET(kUrlFamilySosActive)
