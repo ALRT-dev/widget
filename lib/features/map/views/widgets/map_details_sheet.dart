@@ -6,6 +6,7 @@ import 'package:hazard_app/features/map/providers/map_display_settings_provider.
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
+import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -63,28 +64,46 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
                 color: AppColors.white,
               ),
             ),
-            _sectionLabelBuilder('MAP TYPE').pT(16.0),
-            _mapTypesBuilder().pT(10.0),
-            _sectionLabelBuilder('SHOW ALERTS FROM').pT(18.0),
-            _systemToggleRowBuilder(
-              system: AlertSourceSystem.aws,
-              title: 'AWS Warnings',
-              subtitle: 'Australian Warning System · severity levels',
-              tint: const Color(0xFFFFB020),
-            ).pT(10.0),
-            _systemToggleRowBuilder(
-              system: AlertSourceSystem.official,
-              title: 'Official',
-              subtitle: 'State agencies and services',
-              tint: const Color(0xFF90A4AE),
-            ).pT(8.0),
-            _systemToggleRowBuilder(
-              system: AlertSourceSystem.community,
-              title: 'Community',
-              subtitle: 'Reports from people nearby',
-              tint: const Color(0xFF5AB0FF),
-            ).pT(8.0),
-            _doneButtonBuilder().pT(18.0),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionLabelBuilder('MAP TYPE').pT(16.0),
+                    _mapTypesBuilder().pT(10.0),
+                    _sectionLabelBuilder('SHOW ALERTS FROM').pT(18.0),
+                    _systemToggleRowBuilder(
+                      system: AlertSourceSystem.aws,
+                      title: 'AWS Warnings',
+                      subtitle: 'Australian Warning System · severity levels',
+                      tint: const Color(0xFFFFB020),
+                    ).pT(10.0),
+                    _systemToggleRowBuilder(
+                      system: AlertSourceSystem.official,
+                      title: 'Official',
+                      subtitle: 'State agencies and services',
+                      tint: const Color(0xFF90A4AE),
+                    ).pT(8.0),
+                    _systemToggleRowBuilder(
+                      system: AlertSourceSystem.community,
+                      title: 'Community',
+                      subtitle: 'Reports from people nearby',
+                      tint: const Color(0xFF5AB0FF),
+                    ).pT(8.0),
+                    _sectionLabelBuilder('KEY · SHAPE SAYS WHO').pT(18.0),
+                    _shapeKeyBuilder().pT(10.0),
+                    _sectionLabelBuilder('COLOUR SAYS HOW URGENT').pT(16.0),
+                    _bandKeyBuilder().pT(10.0),
+                    _sectionLabelBuilder('COMMUNITY REPORTS WEAR THEIR '
+                            'CATEGORY')
+                        .pT(16.0),
+                    _categoryKeyBuilder().pT(10.0),
+                  ],
+                ),
+              ),
+            ),
+            _doneButtonBuilder().pT(16.0),
           ],
         ),
       ),
@@ -269,6 +288,175 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
           ),
         );
       },
+    );
+  }
+
+  /// The map's key, straight from the locked design system: the shape
+  /// names the source system, the colour carries the urgency band, and a
+  /// community circle wears its category colour, never a band hex.
+  Widget _shapeKeyBuilder() {
+    return Column(
+      children: [
+        _keyRowBuilder(
+          icon: LucideIcons.triangleAlert,
+          iconColor: AlertCardStyle.bandMonitor,
+          title: 'Triangle · AWS warning',
+          subtitle: 'The only source that states a severity level',
+        ),
+        _keyRowBuilder(
+          icon: LucideIcons.diamond,
+          iconColor: AlertCardStyle.bandAction,
+          title: 'Diamond · official source',
+          subtitle: 'State agencies and services',
+        ),
+        _keyRowBuilder(
+          icon: LucideIcons.circle,
+          iconColor: const Color(0xFF5AB0FF),
+          title: 'Circle · community report',
+          subtitle: 'Unverified, from someone nearby',
+        ),
+        _keyRowBuilder(
+          icon: LucideIcons.shield,
+          iconColor: AlertCardStyle.bandInfo,
+          title: 'Shield · ALRT',
+          subtitle: 'From ALRT itself, colour only, never a level word',
+        ),
+      ],
+    );
+  }
+
+  Widget _keyRowBuilder({
+    required final IconData icon,
+    required final Color iconColor,
+    required final String title,
+    required final String subtitle,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.spMin),
+      child: Row(
+        children: [
+          Container(
+            width: 34.spMin,
+            height: 34.spMin,
+            decoration: BoxDecoration(
+              color: _tileColor,
+              borderRadius: BorderRadius.circular(10.spMin),
+            ),
+            child: Icon(icon, size: 17.spMin, color: iconColor),
+          ),
+          10.wSizedBox,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13.spMin,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.white,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 11.spMin,
+                    color: AppColors.white.withValues(alpha: 0.55),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bandKeyBuilder() {
+    const bands = [
+      (AlertCardStyle.bandInfo, 'Info'),
+      (AlertCardStyle.bandMonitor, 'Monitor'),
+      (AlertCardStyle.bandAction, 'Action'),
+      (AlertCardStyle.bandCritical, 'Critical'),
+    ];
+    return Row(
+      children: [
+        for (final (color, label) in bands)
+          Expanded(
+            child: Column(
+              children: [
+                Container(
+                  height: 8.spMin,
+                  margin: EdgeInsets.symmetric(horizontal: 3.spMin),
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+                4.hSizedBox,
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10.5.spMin,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.white.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _categoryKeyBuilder() {
+    const names = [
+      'Weather',
+      'Health',
+      'Security',
+      'Traffic',
+      'Utilities',
+      'Community',
+      'Other',
+    ];
+    return Wrap(
+      spacing: 7.spMin,
+      runSpacing: 7.spMin,
+      children: [
+        for (final name in names)
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 10.spMin,
+              vertical: 5.spMin,
+            ),
+            decoration: BoxDecoration(
+              color: _tileColor,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 9.spMin,
+                  height: 9.spMin,
+                  decoration: BoxDecoration(
+                    color: lockedCategoryColorFor(name) ?? categoryOtherColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                6.wSizedBox,
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 11.spMin,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.white.withValues(alpha: 0.85),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 
