@@ -76,22 +76,9 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                       SizedBox(height: 12.spMin),
                     ],
                     _checkInRequestBannerBuilder(circle, checkInState),
-                    _sectionLabelBuilder('Quick actions'),
+                    _imSafeButtonBuilder(checkInState),
                     SizedBox(height: 10.spMin),
-                    _cardBuilder(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _imSafeButtonBuilder(checkInState),
-                          SizedBox(height: 10.spMin),
-                          _requestCheckInButtonBuilder(),
-                          SizedBox(height: 10.spMin),
-                          _shareJourneyButtonBuilder(),
-                          SizedBox(height: 10.spMin),
-                          _dailyCheckInButtonBuilder(),
-                        ],
-                      ),
-                    ),
+                    _quickTilesRowBuilder(),
                     SizedBox(height: 16.spMin),
                     _privacyBannerBuilder(),
                     SizedBox(height: 20.spMin),
@@ -883,151 +870,234 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
     );
   }
 
+  /// The one action that matters most, and the only one that looks like it.
+  ///
+  /// Four identical outlined pills stacked down the page gave every action
+  /// the same weight, so nothing led. "I'm Safe" now carries the green
+  /// gradient and its own glow, and everything else drops to a compact tile.
   Widget _imSafeButtonBuilder(final FamilyActionState checkInState) {
-    return SizedBox(
-      height: 54.spMin,
-      child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: FamilyColors.safeGreen,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.spMin),
-          ),
-          elevation: 0,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF078551), Color(0xFF0FBE70)],
         ),
-        onPressed: checkInState.isLoading
-            ? null
-            : () => ref.read(providerOfFamily.notifier).checkIn(),
-        icon: checkInState.isLoading
-            ? SizedBox(
-                width: 18.spMin,
-                height: 18.spMin,
-                child: const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-            : Icon(Icons.check, size: 22.spMin),
-        label: Text(
-          "I'm Safe",
-          style: TextStyle(fontSize: 17.spMin, fontWeight: FontWeight.w700),
+        borderRadius: BorderRadius.circular(16.spMin),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF12B476).withValues(alpha: 0.3),
+            blurRadius: 20.0,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: SizedBox(
+        height: 50.spMin,
+        width: double.infinity,
+        child: TextButton.icon(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.spMin),
+            ),
+          ),
+          onPressed: checkInState.isLoading
+              ? null
+              : () => ref.read(providerOfFamily.notifier).checkIn(),
+          icon: checkInState.isLoading
+              ? SizedBox(
+                  width: 18.spMin,
+                  height: 18.spMin,
+                  child: const CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+              : Icon(Icons.check_rounded, size: 20.spMin),
+          label: Text(
+            "I'm Safe",
+            style: TextStyle(fontSize: 15.spMin, fontWeight: FontWeight.w800),
+          ),
         ),
       ),
     );
   }
 
-  /// Share a journey: live location while travelling, always self-stopping.
-  Widget _shareJourneyButtonBuilder() {
+  /// The supporting actions, as a row of compact tiles.
+  ///
+  /// SOS used to sit at the very bottom of the page as an outlined button,
+  /// below the whole member list. It is the most urgent thing here, so it
+  /// takes the red gradient and comes up to the top with the others.
+  Widget _quickTilesRowBuilder() {
     return Consumer(
       builder: (context, ref, child) {
         final journey = ref.watch(
           providerOfFamily.select((s) => s.activeJourney),
         );
+        final scheduledCount = ref.watch(
+          providerOfFamily.select((s) => s.scheduledCheckIns.length),
+        );
         final isSharing = journey != null && journey.isActive;
 
-        return SizedBox(
-          height: 48.spMin,
-          child: OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: FamilyColors.indigo,
-              backgroundColor: isSharing
-                  ? FamilyColors.indigo.withValues(alpha: 0.08)
-                  : Colors.white,
-              side: BorderSide(
-                color: isSharing
-                    ? FamilyColors.indigo
-                    : FamilyColors.indigo.withValues(alpha: 0.3),
-                width: isSharing ? 1.5 : 1.0,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18.spMin),
-              ),
-            ),
-            onPressed: () => context.push(FamilyJourneyScreen.route),
-            icon: Icon(LucideIcons.navigation, size: 18.spMin),
-            label: Text(
-              isSharing
-                  ? 'Sharing your journey · ${journey.remaining.inMinutes} min left'
-                  : 'Share a journey',
-              style: TextStyle(
-                fontSize: 14.spMin,
-                fontWeight: FontWeight.w600,
+        return Row(
+          spacing: 8.spMin,
+          children: [
+            Expanded(
+              child: _quickTileBuilder(
+                icon: LucideIcons.bellRing,
+                label: 'Check-in',
+                tint: const Color(0xFFE8F4FF),
+                ink: const Color(0xFF4DA8FF),
+                onTap: () async {
+                  await ref.read(providerOfFamily.notifier).requestCheckIn();
+                  if (!context.mounted) return;
+                  context.showSuccessToast(
+                    message: 'Check-in requested from everyone',
+                  );
+                },
               ),
             ),
-          ),
+            Expanded(
+              child: _quickTileBuilder(
+                icon: LucideIcons.navigation,
+                label: isSharing
+                    ? '${journey.remaining.inMinutes} min'
+                    : 'Journey',
+                tint: const Color(0xFFF5E9FA),
+                ink: const Color(0xFF9C27B0),
+                isLit: isSharing,
+                onTap: () => context.push(FamilyJourneyScreen.route),
+              ),
+            ),
+            Expanded(
+              child: _quickTileBuilder(
+                icon: LucideIcons.clock,
+                label: scheduledCount == 0 ? 'Daily' : '$scheduledCount daily',
+                tint: const Color(0xFFFFF3E8),
+                ink: const Color(0xFFE05A00),
+                isLit: scheduledCount > 0,
+                onTap: () => context.push(FamilyCircleProfileScreen.route),
+              ),
+            ),
+            Expanded(child: _sosTileBuilder()),
+          ],
         );
       },
     );
   }
 
-  Widget _requestCheckInButtonBuilder() {
-    return SizedBox(
-      height: 48.spMin,
-      child: OutlinedButton.icon(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: FamilyColors.indigo,
-          backgroundColor: Colors.white,
-          side: BorderSide(color: FamilyColors.indigo.withValues(alpha: 0.3)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.spMin),
-          ),
+  Widget _quickTileBuilder({
+    required final IconData icon,
+    required final String label,
+    required final Color tint,
+    required final Color ink,
+    required final VoidCallback onTap,
+    final bool isLit = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12.spMin, horizontal: 4.spMin),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14.spMin),
+          border: isLit ? Border.all(color: ink, width: 1.5) : null,
+          boxShadow: [
+            BoxShadow(
+              color: FamilyColors.v31CardShadow,
+              blurRadius: 10.0,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        onPressed: () async {
-          await ref.read(providerOfFamily.notifier).requestCheckIn();
-          if (!mounted) return;
-          context.showSuccessToast(
-            message: 'Check-in requested from everyone',
-          );
-        },
-        icon: Icon(LucideIcons.bellRing, size: 18.spMin),
-        label: Text(
-          'Request a check-in from everyone',
-          style: TextStyle(fontSize: 14.spMin, fontWeight: FontWeight.w600),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 30.spMin,
+              height: 30.spMin,
+              decoration: BoxDecoration(
+                color: tint,
+                borderRadius: BorderRadius.circular(9.spMin),
+              ),
+              child: Icon(icon, size: 16.spMin, color: ink),
+            ),
+            SizedBox(height: 5.spMin),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10.spMin,
+                fontWeight: FontWeight.w800,
+                color: FamilyColors.v31Ink,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  /// Daily check-in times lived only inside the circle profile, so nobody
-  /// found them. The hub now says how many are set and opens the same
-  /// screen to add one.
-  Widget _dailyCheckInButtonBuilder() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final count = ref.watch(
-          providerOfFamily.select((s) => s.scheduledCheckIns.length),
-        );
-
-        return SizedBox(
-          height: 48.spMin,
-          child: OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: FamilyColors.indigo,
-              backgroundColor: Colors.white,
-              side: BorderSide(
-                color: FamilyColors.indigo.withValues(alpha: 0.3),
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18.spMin),
-              ),
-            ),
-            onPressed: () => context.push(FamilyCircleProfileScreen.route),
-            icon: Icon(LucideIcons.clock, size: 18.spMin),
-            label: Text(
-              count == 0
-                  ? 'Set a daily check-in time'
-                  : '$count daily check-in'
-                        '${count == 1 ? '' : 's'} set',
-              style: TextStyle(
-                fontSize: 14.spMin,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+  Widget _sosTileBuilder() {
+    return GestureDetector(
+      onTap: () => context.push(FamilySosScreen.route),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12.spMin, horizontal: 4.spMin),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFFFF4B3E), Color(0xFFE01B0F), Color(0xFFB80000)],
+            stops: [0.0, 0.55, 1.0],
           ),
-        );
-      },
+          borderRadius: BorderRadius.circular(14.spMin),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFE01B0F).withValues(alpha: 0.45),
+              blurRadius: 18.0,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 30.spMin,
+              height: 30.spMin,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.24),
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.5),
+                ),
+              ),
+              child: Icon(
+                LucideIcons.siren,
+                size: 15.spMin,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(height: 5.spMin),
+            Text(
+              'SOS',
+              style: TextStyle(
+                fontSize: 10.spMin,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.6,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
+
+
+
 
   Widget _privacyBannerBuilder() {
     return Container(
@@ -1118,32 +1188,10 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
             ],
           ),
         ),
-        SizedBox(height: 20.spMin),
-        _sosEntryButtonBuilder(),
       ],
     );
   }
 
-  Widget _sosEntryButtonBuilder() {
-    return SizedBox(
-      height: 48.spMin,
-      child: OutlinedButton.icon(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: FamilyColors.sosRed,
-          side: const BorderSide(color: FamilyColors.sosRed),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.spMin),
-          ),
-        ),
-        onPressed: () => context.push(FamilySosScreen.route),
-        icon: Icon(LucideIcons.siren, size: 18.spMin),
-        label: Text(
-          'Family SOS',
-          style: TextStyle(fontSize: 14.spMin, fontWeight: FontWeight.w700),
-        ),
-      ),
-    );
-  }
 
   Future<void> _requestLocationSnapshot(final FamilyMember member) async {
     final sent = await ref
