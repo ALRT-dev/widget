@@ -14,6 +14,7 @@ import 'package:hazard_app/features/report/providers/create_update_report_provid
 import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/enums/category_image_type.dart';
+import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
 import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
 import 'package:hazard_app/features/report/models/report_taxonomy.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
@@ -33,6 +34,9 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// The V3 section label / helper text colour from the design screenshots.
 const _sectionLabelColor = Color(0xFFB84500);
+
+/// Readable ink for text sitting on the Info-band grey disclosure band.
+const _bandInk = Color(0xFF4A525C);
 
 class CreateUpdateReportScreenArgs {
   CreateUpdateReportScreenArgs({this.hazardToUpdate});
@@ -94,6 +98,8 @@ class _CreateUpdateReportScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.extraLightGrey,
+      bottomNavigationBar: _submitBarBuilder(),
       appBar: AppBar(
         backgroundColor: AppColors.transparent,
         surfaceTintColor: AppColors.transparent,
@@ -108,6 +114,7 @@ class _CreateUpdateReportScreenState
           ),
         ),
         centerTitle: false,
+        toolbarHeight: 64.spMin,
         title: Consumer(
           builder: (context, ref, child) {
             final isUpdating = ref.watch(
@@ -124,12 +131,32 @@ class _CreateUpdateReportScreenState
               return _submittedAppbarTitleBuilder();
             }
 
-            return Text(
-              isUpdating ? 'Update an ALRT' : 'Report an ALRT',
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: 24.spMin,
-              ),
+            // Title plus one plain line of what this screen is for, so the
+            // header carries the purpose instead of a warning box.
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  isUpdating ? 'Update an ALRT' : 'Report an ALRT',
+                  style: TextStyle(
+                    color: AppColors.white,
+                    fontSize: 21.spMin,
+                    fontWeight: FontWeight.w700,
+                    height: 1.1,
+                  ),
+                ),
+                3.hSizedBox,
+                Text(
+                  'Tell your neighbours what you can see',
+                  style: TextStyle(
+                    color: AppColors.white.withValues(alpha: 0.9),
+                    fontSize: 11.5.spMin,
+                    fontWeight: FontWeight.w400,
+                    height: 1.1,
+                  ),
+                ),
+              ],
             );
           },
         ),
@@ -152,82 +179,172 @@ class _CreateUpdateReportScreenState
     ).keyboardDismisser(context);
   }
 
+  /// Every step is on the page from the first frame — nothing unfolds only
+  /// after a category is picked, so the whole job is visible up front.
   Widget _formBuilder() {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(20.spMin),
+      padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 16.spMin, 28.spMin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _emergencyBannerBuilder(),
-          16.hSizedBox,
-          _locationBuilder(),
-          20.hSizedBox,
-          _sectionTitleBuilder(
+          _disclosureBandBuilder(),
+          14.hSizedBox,
+          _cardBuilder(
+            step: 1,
+            title: 'Where',
+            isRequired: true,
+            child: _locationBuilder(),
+          ),
+          12.hSizedBox,
+          _cardBuilder(
+            step: 2,
             title: 'Category',
             isRequired: true,
-            requiredWidget: const SizedBox(),
+            helper: 'one tap, pick the closest fit',
+            child: _categoriesBuilder(),
           ),
-          10.hSizedBox,
-          _categoriesBuilder(),
-          Consumer(
-            builder: (context, ref, child) {
-              final hasSelectedCategory = ref.watch(
-                providerOfCreateReport.select(
-                  (value) => value.hazardToCreateOrUpdate.category != null,
-                ),
-              );
-              if (!hasSelectedCategory) return const SizedBox.shrink();
+          12.hSizedBox,
+          _cardBuilder(
+            step: 3,
+            title: 'What can you see?',
+            helper: 'tap any, this is an observation not a diagnosis',
+            child: _chipsBuilder(),
+          ),
+          12.hSizedBox,
+          _cardBuilder(
+            step: 4,
+            title: 'How would you describe it?',
+            helper: 'auto-set from what you picked, tap to change',
+            child: _severityWordingBuilder(),
+          ),
+          12.hSizedBox,
+          _cardBuilder(
+            step: 5,
+            title: 'Add details',
+            helper: 'tapping what you can see helps neighbours act faster',
+            child: _descriptionBuilder(),
+          ),
+          12.hSizedBox,
+          _cardBuilder(
+            step: 6,
+            title: 'Photos',
+            child: _mediaBuilder(),
+          ),
+          12.hSizedBox,
+          _headlinePreviewBuilder(),
+        ],
+      ),
+    );
+  }
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 24.spMin,
+  /// The standing disclosure: ALRT carries a report between neighbours, it is
+  /// not an emergency service. Info-band grey, stated once, never alarming.
+  Widget _disclosureBandBuilder() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AlertCardStyle.bandInfo.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(14.spMin),
+        border: Border.all(
+          color: AlertCardStyle.bandInfo.withValues(alpha: 0.35),
+        ),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 12.spMin),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(LucideIcons.info, size: 17.spMin, color: _bandInk),
+          SizedBox(width: 10.spMin),
+          Expanded(
+            child: Text.rich(
+              TextSpan(
                 children: [
-                  _chipsBuilder(),
-                  _severityWordingBuilder(),
-                  _descriptionBuilder(),
-                  Text(
-                    'Tapping what you can see helps neighbours act faster.',
-                    style: TextStyle(
-                      fontSize: 12.spMin,
-                      color: _sectionLabelColor,
-                    ),
+                  TextSpan(
+                    text: 'ALRT is a community report, '
+                        'not an emergency service.\n',
+                    style: TextStyle(fontWeight: FontWeight.w700),
                   ),
-                  _mediaBuilder(),
-                  _headlinePreviewBuilder(),
-                  _submitButtonBuilder(),
+                  TextSpan(
+                    text: 'Report only what you can see safely.',
+                    style: TextStyle(color: AppColors.mediumGrey),
+                  ),
                 ],
-              ).pT(24.0);
-            },
+              ),
+              style: TextStyle(
+                fontSize: 12.5.spMin,
+                height: 1.45,
+                color: _bandInk,
+                fontFamily: AppTheme.defaultFontFamily,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  /// The locked V3 emergency line — always the first thing on the form.
-  Widget _emergencyBannerBuilder() {
+  /// One white card per step: numbered label, optional helper line, content.
+  Widget _cardBuilder({
+    required final String title,
+    required final Widget child,
+    final int? step,
+    final String? helper,
+    final bool? isRequired = false,
+  }) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.red.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12.spMin),
-        border: Border.all(color: AppColors.red.withValues(alpha: 0.25)),
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(18.spMin),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowColorLight,
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 10.spMin),
-      child: Text.rich(
-        TextSpan(
-          children: [
-            TextSpan(
-              text: 'Emergency? Call Triple Zero (000) first. ',
-              style: TextStyle(fontWeight: FontWeight.w700),
+      padding: EdgeInsets.all(16.spMin),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _sectionTitleBuilder(
+            title: title,
+            step: step,
+            isRequired: isRequired,
+          ),
+          if (helper != null) ...[
+            5.hSizedBox,
+            Text(
+              helper,
+              style: TextStyle(
+                fontSize: 11.5.spMin,
+                color: AppColors.mediumGrey,
+              ),
             ),
-            TextSpan(text: 'Report only what you can see safely.'),
           ],
-        ),
+          12.hSizedBox,
+          child,
+        ],
+      ),
+    );
+  }
+
+  /// Shown in place of per-category content before a category is picked, so
+  /// the step is still visible and says what will land in it.
+  Widget _awaitingCategoryBuilder(final String message) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.extraLightGrey,
+        borderRadius: BorderRadius.circular(12.spMin),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 14.spMin),
+      child: Text(
+        message,
         style: TextStyle(
-          fontSize: 12.5.spMin,
-          color: AppColors.red,
-          fontFamily: AppTheme.defaultFontFamily,
+          fontSize: 12.spMin,
+          color: AppColors.mediumGrey,
         ),
       ),
     );
@@ -243,25 +360,24 @@ class _CreateUpdateReportScreenState
             (value) => value.hazardToCreateOrUpdate.category?.name,
           ),
         );
-        final chips = chipsForCategoryName(categoryName);
+        if (categoryName == null) {
+          return _awaitingCategoryBuilder(
+            'Pick a category above and the things you might see appear here.',
+          );
+        }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        final chips = chipsForCategoryName(categoryName);
+        if (chips.isEmpty) {
+          return _awaitingCategoryBuilder(
+            'No quick options for this category. Add details below instead.',
+          );
+        }
+
+        return Wrap(
+          spacing: 8.spMin,
+          runSpacing: 8.spMin,
           children: [
-            _sectionTitleBuilder(title: 'What can you see?'),
-            4.hSizedBox,
-            Text(
-              'tap any, this is an observation not a diagnosis',
-              style: TextStyle(fontSize: 12.spMin, color: _sectionLabelColor),
-            ),
-            10.hSizedBox,
-            Wrap(
-              spacing: 8.spMin,
-              runSpacing: 8.spMin,
-              children: [
-                for (final chip in chips) _chipItemBuilder(chip),
-              ],
-            ),
+            for (final chip in chips) _chipItemBuilder(chip),
           ],
         );
       },
@@ -333,23 +449,11 @@ class _CreateUpdateReportScreenState
   /// "How would you describe it?" — severity is declared by the reporter,
   /// pre-selected from the chips, never imposed.
   Widget _severityWordingBuilder() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      spacing: 8.spMin,
       children: [
-        _sectionTitleBuilder(title: 'How would you describe it?'),
-        4.hSizedBox,
-        Text(
-          'auto-set from what you picked, tap to change',
-          style: TextStyle(fontSize: 12.spMin, color: _sectionLabelColor),
-        ),
-        10.hSizedBox,
-        Row(
-          spacing: 8.spMin,
-          children: [
-            for (final wording in ReportSeverityWording.values)
-              Expanded(child: _wordingItemBuilder(wording)),
-          ],
-        ),
+        for (final wording in ReportSeverityWording.values)
+          Expanded(child: _wordingItemBuilder(wording)),
       ],
     );
   }
@@ -435,98 +539,91 @@ class _CreateUpdateReportScreenState
           );
         }
 
-        return Wrap(
-          spacing: 8.spMin,
-          runSpacing: 8.spMin,
+        // One category per line: an even list scans top to bottom, with
+        // nothing dependent on how long a category's name happens to be.
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            for (final category in categories)
-              _categoryPillBuilder(
+            for (final category in categories) ...[
+              _categoryRowBuilder(
                 category: category,
                 isSelected: category.id == selectedCategoryId,
               ),
+              if (category != categories.last) 8.hSizedBox,
+            ],
           ],
         );
       },
     );
   }
 
-  Widget _categoryPillBuilder({
+  /// A full-width category row: colour disc, name, and a tick when chosen.
+  Widget _categoryRowBuilder({
     required final HazardCategory category,
     required final bool isSelected,
   }) {
-    final dotColor =
-        category.color ?? fallbackCategoryColorFor(category.name);
+    final dotColor = category.resolvedColor;
     final iconImage = category.categoryImageByType(CategoryImageType.user);
 
     return GestureDetector(
       onTap: () => _handleCategoryTap(category),
-      child: Container(
-        padding: EdgeInsets.fromLTRB(14.spMin, 8.spMin, 14.spMin, 6.spMin),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 140),
+        padding: EdgeInsets.symmetric(
+          horizontal: 12.spMin,
+          vertical: 11.spMin,
+        ),
         decoration: BoxDecoration(
           color: isSelected
-              ? dotColor.withValues(alpha: 0.1)
+              ? dotColor.withValues(alpha: 0.08)
               : AppColors.white,
-          borderRadius: BorderRadius.circular(18.spMin),
+          borderRadius: BorderRadius.circular(14.spMin),
           border: Border.all(
-            color: isSelected ? dotColor : AppColors.white,
-            width: 1.5,
+            color: isSelected
+                ? dotColor
+                : AppColors.lightGrey.withValues(alpha: 0.8),
+            width: isSelected ? 1.5 : 1.0,
           ),
-          // Each pill glows softly in its own category colour.
-          boxShadow: [
-            BoxShadow(
-              color: dotColor.withValues(alpha: isSelected ? 0.45 : 0.25),
-              blurRadius: isSelected ? 12.0 : 8.0,
-              offset: const Offset(0, 2),
-            ),
-          ],
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Row(
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Small category icon (v4 set from the server); the colour
-                // dot stands in when a category has no icon yet.
-                if (iconImage != null && iconImage.url.isNotEmpty)
-                  AppCachedNetworkImage(
-                    imageUrl: iconImage.url,
-                    cacheKey: iconImage.s3Key,
-                    width: 16.spMin,
-                    height: 16.spMin,
-                    fit: BoxFit.contain,
-                  )
-                else
-                  Container(
-                    width: 8.spMin,
-                    height: 8.spMin,
-                    decoration: BoxDecoration(
-                      color: dotColor,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                SizedBox(width: 7.spMin),
-                Text(
-                  category.name ?? 'Category',
-                  style: TextStyle(
-                    fontSize: 13.spMin,
-                    fontWeight: FontWeight.w700,
-                    color: isSelected ? dotColor : AppColors.black,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 5.spMin),
-            // The category's accent line.
+            // The category colour reads as a filled disc, carrying the v4
+            // icon when the server has one for this category.
             Container(
-              height: 2.5,
               width: 30.spMin,
+              height: 30.spMin,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: isSelected
-                    ? dotColor
-                    : dotColor.withValues(alpha: 0.45),
-                borderRadius: BorderRadius.circular(2),
+                color: dotColor,
+                shape: BoxShape.circle,
               ),
+              child: iconImage != null && iconImage.url.isNotEmpty
+                  ? AppCachedNetworkImage(
+                      imageUrl: iconImage.url,
+                      cacheKey: iconImage.s3Key,
+                      width: 17.spMin,
+                      height: 17.spMin,
+                      fit: BoxFit.contain,
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            SizedBox(width: 12.spMin),
+            Expanded(
+              child: Text(
+                category.name ?? 'Category',
+                style: TextStyle(
+                  fontSize: 14.spMin,
+                  fontWeight: FontWeight.w700,
+                  color: isSelected ? dotColor : AppColors.black,
+                ),
+              ),
+            ),
+            Icon(
+              isSelected ? Icons.check_circle_rounded : Icons.circle_outlined,
+              size: 20.spMin,
+              color: isSelected
+                  ? dotColor
+                  : AppColors.lightGrey,
             ),
           ],
         ),
@@ -794,53 +891,75 @@ class _CreateUpdateReportScreenState
 
   Widget _sectionTitleBuilder({
     required final String title,
-    final bool isRequired = false,
-    final Widget? requiredWidget,
+    final int? step,
+    final bool? isRequired = false,
   }) {
     return Row(
       children: [
-        Text(
-          title.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10.5.spMin,
-            color: _sectionLabelColor,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.0,
+        if (step != null) ...[
+          Container(
+            width: 19.spMin,
+            height: 19.spMin,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: _sectionLabelColor.withValues(alpha: 0.10),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '$step',
+              style: TextStyle(
+                fontSize: 10.5.spMin,
+                fontWeight: FontWeight.w800,
+                color: _sectionLabelColor,
+              ),
+            ),
+          ),
+          SizedBox(width: 8.spMin),
+        ],
+        Expanded(
+          child: Text(
+            title.toUpperCase(),
+            style: TextStyle(
+              fontSize: 10.5.spMin,
+              color: _sectionLabelColor,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.0,
+            ),
           ),
         ),
-        isRequired
-            ? requiredWidget ??
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.orange300,
-                          AppColors.red200,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(20.spMin),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10.spMin,
-                      vertical: 2.spMin,
-                    ),
-                    child: Text(
-                      'Required',
-                      style: TextStyle(
-                        fontSize: 10.spMin,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.white,
-                      ),
-                    ),
-                  ).pL(5.0)
-            : Text(
-                '  optional',
-                style: TextStyle(
-                  fontSize: 10.5.spMin,
-                  fontWeight: FontWeight.w400,
-                  color: AppColors.grey.withValues(alpha: 0.6),
-                ),
+        if (isRequired == true)
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.orange300,
+                  AppColors.red200,
+                ],
               ),
+              borderRadius: BorderRadius.circular(20.spMin),
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: 10.spMin,
+              vertical: 2.spMin,
+            ),
+            child: Text(
+              'Required',
+              style: TextStyle(
+                fontSize: 10.spMin,
+                fontWeight: FontWeight.w600,
+                color: AppColors.white,
+              ),
+            ),
+          )
+        else if (isRequired == false)
+          Text(
+            'optional',
+            style: TextStyle(
+              fontSize: 10.5.spMin,
+              fontWeight: FontWeight.w400,
+              color: AppColors.grey.withValues(alpha: 0.6),
+            ),
+          ),
       ],
     );
   }
@@ -1013,45 +1132,32 @@ class _CreateUpdateReportScreenState
             (value) => value.hazardToCreateOrUpdate.locationName,
           ),
         );
-        if (categoryName == null) return const SizedBox.shrink();
-
         final headline = _assembleHeadline(
           categoryName: categoryName,
           locationName: locationName,
         );
 
-        return Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: AppColors.lightGrey.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(12.spMin),
-          ),
-          padding: EdgeInsets.symmetric(
-            horizontal: 14.spMin,
-            vertical: 10.spMin,
-          ),
-          child: Text.rich(
-            TextSpan(
+        return _cardBuilder(
+          title: 'How it will read',
+          isRequired: null,
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.extraLightGrey,
+              borderRadius: BorderRadius.circular(12.spMin),
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: 14.spMin,
+              vertical: 12.spMin,
+            ),
+            child: Text(
+              headline,
               style: TextStyle(
+                fontSize: 14.spMin,
+                fontWeight: FontWeight.w700,
+                color: AppColors.black,
                 fontFamily: AppTheme.defaultFontFamily,
               ),
-              children: [
-                TextSpan(
-                  text: 'Headline preview: ',
-                ),
-                TextSpan(
-                  text: headline,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.black,
-                  ),
-                ),
-              ],
-            ),
-            style: TextStyle(
-              fontSize: 12.spMin,
-              fontWeight: FontWeight.w400,
-              color: AppColors.mediumGrey,
             ),
           ),
         );
@@ -1063,7 +1169,7 @@ class _CreateUpdateReportScreenState
   /// chips → chip fragment; details → first sentence to 60 chars;
   /// otherwise "{category} report — {suburb}".
   String _assembleHeadline({
-    required final String categoryName,
+    required final String? categoryName,
     required final String? locationName,
   }) {
     final suffix = locationName == null ? '' : ' — $locationName';
@@ -1085,57 +1191,46 @@ class _CreateUpdateReportScreenState
       if (sentence.isNotEmpty) return '$sentence$suffix';
     }
 
-    return '$categoryName report$suffix';
+    if (categoryName != null) return '$categoryName report$suffix';
+    return locationName == null
+        ? 'Your report will appear here'
+        : 'Community report$suffix';
   }
 
   Widget _descriptionBuilder() {
     final hasOtherChip = _selectedChipIds.any((id) => id.endsWith('_other'));
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 10.spMin,
-      children: [
-        _sectionTitleBuilder(title: 'Add details'),
-        _inputBuilder(
-          hintText: hasOtherChip
-              ? 'Tell us what you can see…'
-              : 'Water over both lanes near the bridge...',
-          controller: _descriptionController,
-          focusNode: _descriptionFocusNode,
-          minLines: 5,
-          maxLines: 10,
-          textCapitalization: TextCapitalization.sentences,
-          keyboardType: TextInputType.multiline,
-          contentPadding: EdgeInsets.all(15.spMin),
-          borderRadius: 16.0,
-          onChanged: (value) {
-            _updateDescription(value.trim());
-            // The headline ladder can depend on the details text.
-            setState(() {});
-          },
-        ),
-      ],
+    return _inputBuilder(
+      hintText: hasOtherChip
+          ? 'Tell us what you can see…'
+          : 'Water over both lanes near the bridge...',
+      controller: _descriptionController,
+      focusNode: _descriptionFocusNode,
+      minLines: 5,
+      maxLines: 10,
+      textCapitalization: TextCapitalization.sentences,
+      keyboardType: TextInputType.multiline,
+      contentPadding: EdgeInsets.all(15.spMin),
+      borderRadius: 16.0,
+      onChanged: (value) {
+        _updateDescription(value.trim());
+        // The headline ladder can depend on the details text.
+        setState(() {});
+      },
     );
   }
 
   Widget _mediaBuilder() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 10.spMin,
-      children: [
-        _sectionTitleBuilder(title: 'Upload Media'),
-        Consumer(
-          builder: (context, ref, child) {
-            final hasMedias = ref.watch(
-              providerOfCreateReport.select(
-                (value) => value.medias.isNotEmpty,
-              ),
-            );
-            if (!hasMedias) return _mediaPickerBuilder();
-            return CreateReportMediasList();
-          },
-        ),
-      ],
+    return Consumer(
+      builder: (context, ref, child) {
+        final hasMedias = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.medias.isNotEmpty,
+          ),
+        );
+        if (!hasMedias) return _mediaPickerBuilder();
+        return CreateReportMediasList();
+      },
     );
   }
 
@@ -1202,7 +1297,9 @@ class _CreateUpdateReportScreenState
     );
   }
 
-  Widget _submitButtonBuilder() {
+  /// Pinned to the bottom so the action, and what is still missing before it
+  /// can be tapped, are visible without scrolling the form.
+  Widget _submitBarBuilder() {
     return Consumer(
       builder: (context, ref, child) {
         final reportSubmitted = ref.watch(
@@ -1212,37 +1309,67 @@ class _CreateUpdateReportScreenState
         );
         if (reportSubmitted) return const SizedBox.shrink();
 
-        final hasSelectedCategory = ref.watch(
+        final hasCategory = ref.watch(
           providerOfCreateReport.select(
             (value) => value.hazardToCreateOrUpdate.category != null,
           ),
         );
-        if (!hasSelectedCategory) return const SizedBox.shrink();
+        final hasLocation = ref.watch(
+          providerOfCreateReport.select(
+            (value) => value.hazardToCreateOrUpdate.locationName != null,
+          ),
+        );
+        final isReady = hasCategory && hasLocation;
 
-        final hasAllRequiredDataEntered = _hasAllRequiredDataEntered(ref);
+        final missing = <String>[
+          if (!hasLocation) 'a location',
+          if (!hasCategory) 'a category',
+        ];
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Button.gradient(
-              value: 'Submit report',
-              icon: Icon(Icons.check_rounded),
-              borderRadius: 16.0,
-              onPressed: !hasAllRequiredDataEntered
-                  ? null
-                  : _handleSubmitReport,
-            ),
-            8.hSizedBox,
-            Text(
-              'This shows as unverified until confirmed by others nearby. '
-              'No points for posting, points for being right.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 10.5.spMin,
-                color: AppColors.grey.withValues(alpha: 0.8),
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorMedium,
+                blurRadius: 16.0,
+                offset: const Offset(0, -2),
               ),
+            ],
+          ),
+          padding: EdgeInsets.fromLTRB(
+            16.spMin,
+            12.spMin,
+            16.spMin,
+            10.spMin,
+          ),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Button.gradient(
+                  value: 'Submit report',
+                  icon: Icon(Icons.check_rounded),
+                  borderRadius: 16.0,
+                  onPressed: isReady ? _handleSubmitReport : null,
+                ),
+                8.hSizedBox,
+                Text(
+                  isReady
+                      ? 'Shows as unverified until others nearby confirm it. '
+                            'No points for posting, points for being right.'
+                      : 'Add ${missing.join(' and ')} to submit.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 10.5.spMin,
+                    color: AppColors.grey.withValues(alpha: 0.8),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -1388,17 +1515,6 @@ class _CreateUpdateReportScreenState
             value.hazardToCreateOrUpdate.locationName != null ||
             (value.hazardToCreateOrUpdate.description?.isNotEmpty ?? false) ||
             value.medias.isNotEmpty,
-      ),
-    );
-  }
-
-  /// Checks if all required data has been entered in the form.
-  bool _hasAllRequiredDataEntered(final WidgetRef ref) {
-    return ref.watch(
-      providerOfCreateReport.select(
-        (value) =>
-            value.hazardToCreateOrUpdate.category != null &&
-            value.hazardToCreateOrUpdate.locationName != null,
       ),
     );
   }

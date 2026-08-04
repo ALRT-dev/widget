@@ -402,7 +402,7 @@ class _ManagePushNotificationsListState
             ),
           ),
         );
-        final categoryColor = category.color ?? Colors.blue;
+        final categoryColor = category.resolvedColor;
 
         return Padding(
           padding: EdgeInsets.only(bottom: 12.spMin),

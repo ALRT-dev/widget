@@ -258,8 +258,8 @@ class _HazardFiltersBottomsheetContentState
                   (category) => _chipBuilder(
                     title: category.name ?? 'Unknown Category',
                     color: category.id == 'utilitiesAndInfrastructure'
-                        ? category.color?.darken(0.3) ?? AppColors.primary
-                        : category.color?.darken(0.2) ?? AppColors.primary,
+                        ? category.resolvedColor.darken(0.3)
+                        : category.resolvedColor.darken(0.2),
                     isSelected: selectedCategories.contains(category.id),
                     onToggle: (value) {
                       ref

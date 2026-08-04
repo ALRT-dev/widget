@@ -47,6 +47,18 @@ abstract class HazardCategory with _$HazardCategory {
   /// Gets the effective color of the hazard category, falling back to the parent's color if not set.
   Color? get effectiveColor => color ?? parent?.color;
 
+  /// The single colour this category shows everywhere in the app.
+  ///
+  /// The locked design-system hex wins for the seven known categories, so a
+  /// category looks identical on the map, the feed, the filters and the
+  /// report form. Anything the palette does not name keeps whatever colour
+  /// the server gave it, and falls back to Other last.
+  Color get resolvedColor =>
+      lockedCategoryColorFor(name) ??
+      lockedCategoryColorFor(parent?.name) ??
+      effectiveColor ??
+      categoryOtherColor;
+
   /// Gets the category image by type from the category or its parent.
   CategoryImage? categoryImageByType(CategoryImageType type) {
     final img = images?.firstWhereOrNull((image) => image.imageType == type);
@@ -87,4 +99,35 @@ class ColorConverter implements JsonConverter<Color?, String?> {
     // ignore: deprecated_member_use
     return '#${object.value.toRadixString(16).substring(2).toUpperCase()}';
   }
+}
+
+/// The locked "Other" category colour, and the last resort for any category
+/// the palette does not name.
+const categoryOtherColor = Color(0xFF8B6F47);
+
+/// The locked category colours from the design system, matched on name.
+///
+/// Returns null when the name is not one of the seven locked categories, so
+/// callers can fall back to a server-supplied colour for anything new.
+Color? lockedCategoryColorFor(final String? categoryName) {
+  final name = categoryName?.toLowerCase() ?? '';
+  if (name.isEmpty) return null;
+  if (name.contains('weather') || name.contains('environment')) {
+    return const Color(0xFF4DA8FF);
+  }
+  if (name.contains('health') || name.contains('air')) {
+    return const Color(0xFFFF8C42);
+  }
+  if (name.contains('security') || name.contains('crime')) {
+    return const Color(0xFFFF4757);
+  }
+  if (name.contains('traffic') || name.contains('transport')) {
+    return const Color(0xFF00B383);
+  }
+  if (name.contains('utilit')) return const Color(0xFFF5A623);
+  if (name.contains('community') || name.contains('info')) {
+    return const Color(0xFF9C27B0);
+  }
+  if (name.contains('other')) return categoryOtherColor;
+  return null;
 }

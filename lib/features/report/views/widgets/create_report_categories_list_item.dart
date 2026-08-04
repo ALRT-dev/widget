@@ -38,7 +38,7 @@ class _CreateReportCategoriesListItemState
       ),
     );
 
-    final categoryColor = widget.category.color ?? AppColors.orange;
+    final categoryColor = widget.category.resolvedColor;
     final categoryImage = widget.category.categoryImageByType(
       CategoryImageType.user,
     );

@@ -437,7 +437,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                             hazardColor.isLight
                         ? (isVerified
                               ? AlertCardStyle.bandShapeColor(severityBand)
-                              : widget.hazard.category?.color ??
+                              : widget.hazard.category?.resolvedColor ??
                                     AppColors.grey)
                         : AppColors.white,
               ),
@@ -877,7 +877,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         final categoryColor = ref.watch(
           provider.select(
             (value) =>
-                value.hazard!.category?.effectiveColor ?? AppColors.black,
+                value.hazard!.category?.resolvedColor ?? AppColors.black,
           ),
         );
         final darkenCategoryColor = categoryId == 'utilitiesAndInfrastructure'
@@ -921,11 +921,11 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                       ),
                     ),
                   ),
-                  if (!widget.isInfoWindow) ...[
-                    const Spacer(),
-                    _shareButtonBuilder(),
-                    12.wSizedBox,
-                  ],
+                  // Share sits on the map callout too, so an alert can be
+                  // passed on without opening it first.
+                  const Spacer(),
+                  _shareButtonBuilder(),
+                  12.wSizedBox,
                   GestureDetector(
                     onTap: _gotoViewHazard,
                     child: Row(
@@ -980,9 +980,13 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         }
 
         return GestureDetector(
-          onTap: () => shareAlert(hazard: hazard, from: 'card'),
+          behavior: HitTestBehavior.opaque,
+          onTap: () => shareAlert(
+            hazard: hazard,
+            from: widget.isInfoWindow ? 'map_callout' : 'card',
+          ),
           child: Padding(
-            padding: EdgeInsets.all(4.spMin),
+            padding: EdgeInsets.all(7.spMin),
             child: Icon(
               LucideIcons.share,
               size: 17.spMin,
