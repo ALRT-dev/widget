@@ -8,7 +8,6 @@ import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/map/utils/dialogs.dart';
 import 'package:hazard_app/features/map/utils/hazard_avoidance_helper.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
-import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/round_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -291,14 +290,142 @@ class _RoutePlanningState extends ConsumerState<RoutePlanning> {
                           duration: '--',
                           isSelected: false,
                           isUnavailable: true,
-                          onTap: () => context.showErrorToast(
-                            message: unavailableModes[mode]!,
+                          onTap: () => _showModeUnavailableSheet(
+                            mode: mode,
+                            reason: unavailableModes[mode]!,
                           ),
                         ),
                 ),
           ],
         );
       },
+    );
+  }
+
+  /// Why a mode has no route, in a sheet rather than a toast.
+  ///
+  /// A toast takes the answer away after three seconds, which is no use for
+  /// the one question this screen actually gets asked: why is public
+  /// transport greyed out? The reason stays on screen until dismissed, and
+  /// the exact text Google returned is kept underneath — a trip with no
+  /// service and a misconfigured API key look identical up top, and only
+  /// that line tells them apart.
+  void _showModeUnavailableSheet({
+    required final TravelMode mode,
+    required final String reason,
+  }) {
+    final isTransit = mode == TravelMode.transit;
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22.spMin)),
+        ),
+        padding: EdgeInsets.fromLTRB(
+          20.spMin,
+          18.spMin,
+          20.spMin,
+          16.spMin,
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(mode.iconData, size: 20.spMin, color: AppColors.grey),
+                  SizedBox(width: 10.spMin),
+                  Expanded(
+                    child: Text(
+                      '${mode.displayText} is not available for this trip',
+                      style: TextStyle(
+                        fontSize: 16.spMin,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 12.spMin),
+              Text(
+                isTransit
+                    ? 'ALRT asks Google for a public transport route every '
+                          'time you plan a trip. Google returns one only '
+                          'where it has timetable data and a service that '
+                          'runs at the time you are travelling.'
+                    : 'ALRT asked Google for this mode and it returned no '
+                          'route between these two points.',
+                style: TextStyle(
+                  fontSize: 13.spMin,
+                  height: 1.5,
+                  color: AppColors.mediumGrey,
+                ),
+              ),
+              SizedBox(height: 14.spMin),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(12.spMin),
+                decoration: BoxDecoration(
+                  color: AppColors.lightGrey.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(12.spMin),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'WHAT GOOGLE SAID',
+                      style: TextStyle(
+                        fontSize: 10.spMin,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                    SizedBox(height: 6.spMin),
+                    SelectableText(
+                      reason,
+                      style: TextStyle(
+                        fontSize: 12.spMin,
+                        height: 1.45,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 14.spMin),
+              SizedBox(
+                height: 44.spMin,
+                width: double.infinity,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: AppColors.lightGrey.withValues(
+                      alpha: 0.5,
+                    ),
+                    foregroundColor: AppColors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.spMin),
+                    ),
+                  ),
+                  onPressed: () => Navigator.of(sheetContext).pop(),
+                  child: Text(
+                    'Close',
+                    style: TextStyle(
+                      fontSize: 14.spMin,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
