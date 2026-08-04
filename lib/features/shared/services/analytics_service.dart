@@ -18,6 +18,11 @@ class AnalyticsService {
     _logEvent('alert_shared', {'hazard_id': hazardId, 'from': from});
   }
 
+  /// The app itself was shared (QR sheet: copy or the OS share sheet).
+  static void appShared({required String from}) {
+    _logEvent('app_shared', {'from': from});
+  }
+
   /// The user enabled notifications from the priming screen.
   static void notificationsEnabled({required String from}) {
     _logEvent('notifications_enabled', {'from': from});

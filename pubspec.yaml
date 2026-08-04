@@ -67,6 +67,7 @@ dependencies:
   speech_to_text: ^7.0.0
   purchases_flutter: ^10.4.3
   home_widget: ^0.7.0
+  qr_flutter: ^4.1.0
 
 dev_dependencies:
   flutter_test:

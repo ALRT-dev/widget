@@ -31,6 +31,7 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
+import 'package:hazard_app/features/profile/views/widgets/share_alrt_sheet.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_wrapper.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -479,6 +480,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 icon: LucideIcons.layoutGrid,
                 color: AppColors.orange,
                 onTap: () => showAddWidgetSheet(context),
+              ),
+              _buildAccountSettingsItem(
+                title: 'Share ALRT',
+                subtitle: 'QR code or link · help a neighbour get alerts',
+                icon: LucideIcons.share,
+                color: AppColors.purple,
+                onTap: () => showShareAlrtSheet(context),
               ),
               _buildAccountSettingsItem(
                 title: 'Support Request',
