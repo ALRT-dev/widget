@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/screens/family_group_settings_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_switch_group_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_journey_screen.dart';
 import 'package:hazard_app/features/family/providers/states/family_provider_state.dart';
 import 'package:hazard_app/features/family/views/screens/family_circle_profile_screen.dart';
@@ -123,9 +124,12 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
           child: ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 20.spMin),
             scrollDirection: Axis.horizontal,
-            itemCount: circles.length,
+            // One extra slot: the chips switch, the last one manages.
+            itemCount: circles.length + 1,
             separatorBuilder: (_, _) => SizedBox(width: 8.spMin),
             itemBuilder: (context, index) {
+              if (index == circles.length) return _manageGroupsChipBuilder();
+
               final summary = circles[index];
               final isSelected = summary.circleId == circle.id;
 
@@ -166,6 +170,41 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+
+  /// The way out of the chip row: every group on one page, with its beacon
+  /// and what it costs in seats.
+  Widget _manageGroupsChipBuilder() {
+    return GestureDetector(
+      onTap: () => context.push(FamilySwitchGroupScreen.route),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 14.spMin),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: FamilyColors.v31Page,
+          borderRadius: BorderRadius.circular(18.spMin),
+          border: Border.all(color: FamilyColors.v31Border),
+        ),
+        child: Row(
+          children: [
+            Text(
+              'Manage groups',
+              style: TextStyle(
+                fontSize: 13.spMin,
+                fontWeight: FontWeight.w700,
+                color: FamilyColors.v31Ink,
+              ),
+            ),
+            SizedBox(width: 4.spMin),
+            Icon(
+              LucideIcons.chevronRight,
+              size: 14.spMin,
+              color: FamilyColors.v31Ink,
+            ),
+          ],
         ),
       ),
     );
@@ -300,6 +339,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
             _showGroupSettingsSheet(circle);
           case 'beacon':
             context.push(FamilyGroupSettingsScreen.route);
+          case 'switchGroups':
+            context.push(FamilySwitchGroupScreen.route);
           case 'transferHosting':
             _showTransferHostingSheet(circle);
           case 'leave':
@@ -307,6 +348,10 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         }
       },
       itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'switchGroups',
+          child: Text('Switch between groups'),
+        ),
         const PopupMenuItem(value: 'places', child: Text('Places')),
         const PopupMenuItem(value: 'invite', child: Text('Invite members')),
         const PopupMenuItem(value: 'sharing', child: Text('My sharing level')),
