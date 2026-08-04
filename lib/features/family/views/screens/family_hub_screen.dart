@@ -52,7 +52,7 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F6),
+      backgroundColor: FamilyColors.v31Page,
       body: RefreshIndicator(
         onRefresh: () => ref.read(providerOfFamily.notifier).load(silent: true),
         color: FamilyColors.indigo,
@@ -137,7 +137,7 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? FamilyColors.indigo
-                        : const Color(0xFFF4F4F6),
+                        : FamilyColors.v31Page,
                     borderRadius: BorderRadius.circular(18.spMin),
                   ),
                   child: Row(

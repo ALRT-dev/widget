@@ -49,7 +49,7 @@ class FamilySosReceiverScreen extends ConsumerWidget {
     final isResolved = sos.status != FamilySosStatus.active;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F6),
+      backgroundColor: FamilyColors.v31Page,
       body: Column(
         children: [
           _headerBuilder(context, sos, name, isResolved),

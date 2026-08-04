@@ -42,7 +42,7 @@ class _FamilyInviteScreenState extends ConsumerState<FamilyInviteScreen> {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F6),
+      backgroundColor: FamilyColors.v31Page,
       appBar: AppBar(
         title: const Text('Invite members'),
         backgroundColor: FamilyColors.indigo,

@@ -4,14 +4,18 @@ import 'package:flutter/material.dart';
 ///
 /// Kept separate from [AppColors] so the family feature stays self-contained.
 class FamilyColors {
-  /// The family brand color.
-  static const indigo = Color(0xFF5B5BD6);
+  /// The family brand colour, taken from the V3.1 prototype.
+  ///
+  /// The whole family palette is built around this: the header gradient
+  /// runs #4B4BF0 to #3229C4 to #1E1780, and the softer indigo this used
+  /// to be read as faded next to it.
+  static const indigo = v31Indigo;
 
-  /// A darker shade of the family brand color.
-  static const indigoDark = Color(0xFF4646B0);
+  /// The deep end of the family gradient (the prototype's mid stop).
+  static const indigoDark = v31HeaderMid;
 
-  /// A very light indigo used for backgrounds.
-  static const indigoLight = Color(0xFFEEEEFB);
+  /// A very light indigo used for chip and pill backgrounds.
+  static const indigoLight = Color(0xFFECECFB);
 
   /// The green used for "Safe" chips and the "I'm Safe" button.
   static const safeGreen = Color(0xFF27AE60);

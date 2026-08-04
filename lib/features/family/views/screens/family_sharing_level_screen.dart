@@ -21,7 +21,7 @@ class FamilySharingLevelScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F6),
+      backgroundColor: FamilyColors.v31Page,
       appBar: AppBar(
         title: const Text('Your sharing level'),
         backgroundColor: FamilyColors.indigo,

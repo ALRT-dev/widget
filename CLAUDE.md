@@ -12,7 +12,11 @@ explicit instruction from the product owner in the current session.
   Traffic #00B383, Utilities #F5A623, Community #9C27B0, Other #8B6F47.
 - Plain-terms summary sits on the dark surface #23252B with white text.
 - V3 section labels: #B84500, uppercase, letter-spaced.
-- Family indigo is #5B5BD6 (FamilyColors.indigo).
+- Family indigo is #3D3DDF (FamilyColors.indigo), from the V3.1
+  prototype. The family header gradient is #4B4BF0 -> #3229C4 (55%)
+  -> #1E1780 at 165 degrees with a soft radial highlight top-right;
+  the page behind family cards is #F0EEF5 and family section labels
+  are #FF6B01, not the V3 rust.
 - Footer (when rebuilt as the floating capsule): active slot gets a lit grey
   pill, the ALRT slot uses the full six-path ALRT logo SVG (32x26, never
   redrawn or substituted) and opens Report, the Alerts bell always carries

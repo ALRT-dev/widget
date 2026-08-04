@@ -62,7 +62,7 @@ class _FamilyPlaceEditScreenState
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F6),
+      backgroundColor: FamilyColors.v31Page,
       appBar: AppBar(
         title: Text(_editingPlace == null ? 'Add a place' : 'Edit place'),
         backgroundColor: FamilyColors.indigo,

@@ -67,7 +67,7 @@ class _FamilyCircleProfileScreenState
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F4F6),
+      backgroundColor: FamilyColors.v31Page,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
