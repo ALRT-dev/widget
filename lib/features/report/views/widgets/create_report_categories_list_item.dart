@@ -101,7 +101,7 @@ class _CreateReportCategoriesListItemState
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                         style: TextStyle(
-                          fontSize: 12.spMin,
+                          fontSize: 13.5.spMin,
                           color: Colors.grey[700],
                         ),
                       ),

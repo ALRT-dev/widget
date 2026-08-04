@@ -170,7 +170,7 @@ class _CreateUpdateReportScreenState
                   'Tell your neighbours what you can see',
                   style: TextStyle(
                     color: AppColors.white.withValues(alpha: 0.9),
-                    fontSize: 11.5.spMin,
+                    fontSize: 13.spMin,
                     fontWeight: FontWeight.w400,
                     height: 1.1,
                   ),
@@ -293,7 +293,7 @@ class _CreateUpdateReportScreenState
                       TextSpan(
                         text: '  $helper',
                         style: TextStyle(
-                          fontSize: 10.5.spMin,
+                          fontSize: 12.spMin,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0,
                           color: AppColors.mediumGrey,
@@ -302,7 +302,7 @@ class _CreateUpdateReportScreenState
                   ],
                 ),
                 style: TextStyle(
-                  fontSize: 10.5.spMin,
+                  fontSize: 12.spMin,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.7,
                   color: _labelColor,
@@ -353,7 +353,7 @@ class _CreateUpdateReportScreenState
                 'ALRT is a community report, not an emergency service. '
                 'Report only what you can see safely.',
                 style: TextStyle(
-                  fontSize: 11.spMin,
+                  fontSize: 12.5.spMin,
                   height: 1.4,
                   fontWeight: FontWeight.w700,
                   color: AppColors.white,
@@ -381,7 +381,7 @@ class _CreateUpdateReportScreenState
       child: Text(
         message,
         style: TextStyle(
-          fontSize: 13.spMin,
+          fontSize: 14.spMin,
           color: AppColors.mediumGrey,
         ),
       ),
@@ -451,7 +451,7 @@ class _CreateUpdateReportScreenState
         child: Text(
           chip.label,
           style: TextStyle(
-            fontSize: 14.spMin,
+            fontSize: 15.spMin,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             color: isSelected ? _sectionLabelColor : AppColors.black,
           ),
@@ -539,7 +539,7 @@ class _CreateUpdateReportScreenState
             Text(
               wording.label,
               style: TextStyle(
-                fontSize: 14.5.spMin,
+                fontSize: 15.5.spMin,
                 fontWeight: FontWeight.w700,
                 color: isSelected ? _sectionLabelColor : AppColors.black,
               ),
@@ -549,7 +549,7 @@ class _CreateUpdateReportScreenState
               wording.sub,
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 11.5.spMin,
+                fontSize: 13.spMin,
                 color: AppColors.mediumGrey,
               ),
             ),
@@ -585,11 +585,11 @@ class _CreateUpdateReportScreenState
           return getCategoriesState.maybeWhen(
             loading: () => Text(
               'Loading categories…',
-              style: TextStyle(fontSize: 12.spMin, color: AppColors.grey),
+              style: TextStyle(fontSize: 13.5.spMin, color: AppColors.grey),
             ),
             error: (error) => Text(
               'Could not load categories. Please try again.',
-              style: TextStyle(fontSize: 12.spMin, color: AppColors.grey),
+              style: TextStyle(fontSize: 13.5.spMin, color: AppColors.grey),
             ),
             orElse: () => const SizedBox.shrink(),
           );
@@ -669,7 +669,7 @@ class _CreateUpdateReportScreenState
             Text(
               category.name ?? 'Category',
               style: TextStyle(
-                fontSize: 11.spMin,
+                fontSize: 12.5.spMin,
                 fontWeight: FontWeight.w800,
                 color: isSelected ? dotColor : _pillInk,
               ),
@@ -714,7 +714,7 @@ class _CreateUpdateReportScreenState
               Text(
                 'Your ALRT has been submitted!',
                 style: TextStyle(
-                  fontSize: 14.spMin,
+                  fontSize: 15.spMin,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                   height: 1.4,
@@ -745,7 +745,7 @@ class _CreateUpdateReportScreenState
                   ],
                 ),
                 style: TextStyle(
-                  fontSize: 12.spMin,
+                  fontSize: 13.5.spMin,
                   fontWeight: FontWeight.w500,
                   color: Colors.white.withValues(
                     alpha: 0.7,
@@ -923,7 +923,7 @@ class _CreateUpdateReportScreenState
           Text(
             'Thank you for keeping your community safe.\nYour ALRT has been submitted for review.',
             style: TextStyle(
-              fontSize: 14.spMin,
+              fontSize: 15.spMin,
               fontWeight: FontWeight.normal,
               color: AppColors.mediumGrey,
             ),
@@ -966,7 +966,7 @@ class _CreateUpdateReportScreenState
           Text(
             'WHAT THIS CAN EARN',
             style: TextStyle(
-              fontSize: 10.spMin,
+              fontSize: 12.spMin,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.6,
               color: _sectionLabelColor,
@@ -1003,7 +1003,7 @@ class _CreateUpdateReportScreenState
                         : '$streakDays-day streak. Reach 3 days and '
                               'approvals count 1.2x.',
                     style: TextStyle(
-                      fontSize: 11.5.spMin,
+                      fontSize: 13.spMin,
                       height: 1.45,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF8A5A2B),
@@ -1019,7 +1019,7 @@ class _CreateUpdateReportScreenState
             child: Text(
               'How points work',
               style: TextStyle(
-                fontSize: 12.spMin,
+                fontSize: 13.5.spMin,
                 fontWeight: FontWeight.w700,
                 color: _sectionLabelColor,
                 decoration: TextDecoration.underline,
@@ -1046,7 +1046,7 @@ class _CreateUpdateReportScreenState
             child: Text(
               points,
               style: TextStyle(
-                fontSize: 13.spMin,
+                fontSize: 14.spMin,
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF0A8A58),
               ),
@@ -1056,7 +1056,7 @@ class _CreateUpdateReportScreenState
             child: Text(
               text,
               style: TextStyle(
-                fontSize: 12.5.spMin,
+                fontSize: 14.spMin,
                 height: 1.4,
                 color: AppColors.mediumGrey,
               ),
@@ -1086,7 +1086,7 @@ class _CreateUpdateReportScreenState
             child: Text(
               '$step',
               style: TextStyle(
-                fontSize: 10.5.spMin,
+                fontSize: 12.spMin,
                 fontWeight: FontWeight.w800,
                 color: _sectionLabelColor,
               ),
@@ -1098,7 +1098,7 @@ class _CreateUpdateReportScreenState
           child: Text(
             title.toUpperCase(),
             style: TextStyle(
-              fontSize: 12.spMin,
+              fontSize: 13.5.spMin,
               color: _sectionLabelColor,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.0,
@@ -1123,7 +1123,7 @@ class _CreateUpdateReportScreenState
             child: Text(
               'Required',
               style: TextStyle(
-                fontSize: 10.spMin,
+                fontSize: 12.spMin,
                 fontWeight: FontWeight.w600,
                 color: AppColors.white,
               ),
@@ -1133,7 +1133,7 @@ class _CreateUpdateReportScreenState
           Text(
             'optional',
             style: TextStyle(
-              fontSize: 10.5.spMin,
+              fontSize: 12.spMin,
               fontWeight: FontWeight.w400,
               color: AppColors.grey.withValues(alpha: 0.6),
             ),
@@ -1276,7 +1276,7 @@ class _CreateUpdateReportScreenState
                           Text(
                             locationName ?? 'Finding your location…',
                             style: TextStyle(
-                              fontSize: 13.5.spMin,
+                              fontSize: 14.5.spMin,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -1286,7 +1286,7 @@ class _CreateUpdateReportScreenState
                                 ? 'Tap to set it manually'
                                 : 'Your current location · auto-filled',
                             style: TextStyle(
-                              fontSize: 10.5.spMin,
+                              fontSize: 12.spMin,
                               color: AppColors.mediumGrey,
                             ),
                           ),
@@ -1306,7 +1306,7 @@ class _CreateUpdateReportScreenState
                       child: Text(
                         'Adjust',
                         style: TextStyle(
-                          fontSize: 11.spMin,
+                          fontSize: 12.5.spMin,
                           fontWeight: FontWeight.w800,
                           color: _labelColor,
                         ),
@@ -1375,7 +1375,7 @@ class _CreateUpdateReportScreenState
               ],
             ),
             style: TextStyle(
-              fontSize: 12.5.spMin,
+              fontSize: 14.spMin,
               height: 1.5,
               fontFamily: AppTheme.defaultFontFamily,
             ),
@@ -1513,7 +1513,7 @@ class _CreateUpdateReportScreenState
             Text(
               label,
               style: TextStyle(
-                fontSize: 12.spMin,
+                fontSize: 13.5.spMin,
                 fontWeight: FontWeight.w700,
                 color: AppColors.mediumGrey,
               ),
@@ -1590,7 +1590,7 @@ class _CreateUpdateReportScreenState
                       : 'Add ${missing.join(' and ')} to submit.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 10.5.spMin,
+                    fontSize: 12.spMin,
                     color: AppColors.grey.withValues(alpha: 0.8),
                   ),
                 ),
@@ -1640,7 +1640,7 @@ class _CreateUpdateReportScreenState
                 Text(
                   'Submit Another Report',
                   style: TextStyle(
-                    fontSize: 14.spMin,
+                    fontSize: 15.spMin,
                     fontWeight: FontWeight.w600,
                     color: AppColors.black,
                   ),
@@ -1688,7 +1688,7 @@ class _CreateUpdateReportScreenState
                 Text(
                   'See My Active Reports',
                   style: TextStyle(
-                    fontSize: 14.spMin,
+                    fontSize: 15.spMin,
                     fontWeight: FontWeight.w600,
                     color: AppColors.black,
                   ),
