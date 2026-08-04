@@ -260,38 +260,58 @@ class _CreateUpdateReportScreenState
     final String? helper,
   }) {
     return Padding(
-      padding: EdgeInsets.only(top: 16.spMin),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(left: 2.spMin, bottom: 8.spMin),
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(text: label.toUpperCase()),
-                  if (helper != null)
-                    TextSpan(
-                      text: '  $helper',
-                      style: TextStyle(
-                        fontSize: 10.5.spMin,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 0,
-                        color: AppColors.mediumGrey,
+      padding: EdgeInsets.only(top: 12.spMin),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.fromLTRB(
+          14.spMin,
+          13.spMin,
+          14.spMin,
+          14.spMin,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16.spMin),
+          boxShadow: const [
+            BoxShadow(
+              color: _cardShadow,
+              blurRadius: 10.0,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: 10.spMin),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: label.toUpperCase()),
+                    if (helper != null)
+                      TextSpan(
+                        text: '  $helper',
+                        style: TextStyle(
+                          fontSize: 10.5.spMin,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0,
+                          color: AppColors.mediumGrey,
+                        ),
                       ),
-                    ),
-                ],
-              ),
-              style: TextStyle(
-                fontSize: 10.5.spMin,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.7,
-                color: _labelColor,
+                  ],
+                ),
+                style: TextStyle(
+                  fontSize: 10.5.spMin,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.7,
+                  color: _labelColor,
+                ),
               ),
             ),
-          ),
-          child,
-        ],
+            child,
+          ],
+        ),
       ),
     );
   }
