@@ -64,8 +64,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const ProfileTrustCard(),
                   24.spMin.hSizedBox,
                   _buildFamilySafetyCard(),
-                  14.spMin.hSizedBox,
-                  _buildLearnAndPrepareCard(),
                   24.spMin.hSizedBox,
                   _buildSubmittedHazardsSection(),
                   _buildFailedReviewsSection(),
@@ -591,85 +589,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  /// Learn & Prepare card — opens the safety guides hub.
-  Widget _buildLearnAndPrepareCard() {
-    return GestureDetector(
-      onTap: () => context.push('/learn'),
-      child: Container(
-        padding: EdgeInsets.all(18.spMin),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(20.spMin),
-          border: Border.all(
-            color: AppColors.orange.withValues(alpha: 0.4),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowColorLight,
-              blurRadius: 2.0,
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 46.spMin,
-              height: 46.spMin,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.orange, Color(0xFFE8492E)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(14.spMin),
-              ),
-              child: Icon(
-                LucideIcons.bookOpen,
-                color: AppColors.white,
-                size: 24.spMin,
-              ),
-            ),
-            14.spMin.wSizedBox,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Learn & Prepare',
-                    style: TextStyle(
-                      fontSize: 17.spMin,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.black,
-                    ),
-                  ),
-                  Text(
-                    'Safety guides for before, during and after',
-                    style: TextStyle(
-                      color: AppColors.grey,
-                      fontSize: 12.spMin,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              LucideIcons.chevronRight,
-              color: AppColors.grey,
-              size: 20.spMin,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _currentLanguageLabel() {
-    return switch (context.locale.languageCode) {
-      'es' => 'Español',
-      _ => 'English',
-    };
-  }
-
   /// Bottom sheet to switch between the supported languages.
   void _showLanguagePicker() {
     showModalBottomSheet<void>(
@@ -1030,4 +949,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   void _gotoDeleteAccountScreen() {
     context.push(DeleteAccountScreen.route);
   }
+
+  String _currentLanguageLabel() {
+    return switch (context.locale.languageCode) {
+      'es' => 'Español',
+      _ => 'English',
+    };
+  }
+
 }
