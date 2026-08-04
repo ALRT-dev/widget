@@ -13,6 +13,9 @@ _FamilyCircle _$FamilyCircleFromJson(Map<String, dynamic> json) =>
       plan: json['plan'] as String? ?? 'plus',
       maxMembers: (json['maxMembers'] as num?)?.toInt() ?? 10,
       themeColor: json['themeColor'] as String?,
+      isPaused: json['isPaused'] as bool? ?? false,
+      pausedHostName: json['pausedHostName'] as String?,
+      graceDaysLeft: (json['graceDaysLeft'] as num?)?.toInt(),
       anyoneCanRequestSnapshot:
           json['anyoneCanRequestSnapshot'] as bool? ?? true,
       sosToWholeGroup: json['sosToWholeGroup'] as bool? ?? true,
@@ -51,6 +54,9 @@ Map<String, dynamic> _$FamilyCircleToJson(
   'plan': instance.plan,
   'maxMembers': instance.maxMembers,
   'themeColor': ?instance.themeColor,
+  'isPaused': instance.isPaused,
+  'pausedHostName': ?instance.pausedHostName,
+  'graceDaysLeft': ?instance.graceDaysLeft,
   'anyoneCanRequestSnapshot': instance.anyoneCanRequestSnapshot,
   'sosToWholeGroup': instance.sosToWholeGroup,
   'journeysSnapPointsOnly': instance.journeysSnapPointsOnly,
@@ -379,6 +385,50 @@ Map<String, dynamic> _$FamilyTransferCandidateToJson(
   'eligible': instance.eligible,
   'reason': ?instance.reason,
 };
+
+_FamilySosRecipientGroup _$FamilySosRecipientGroupFromJson(
+  Map<String, dynamic> json,
+) => _FamilySosRecipientGroup(
+  circleId: json['circleId'] as String,
+  name: json['name'] as String,
+  themeColor: json['themeColor'] as String?,
+  members:
+      (json['members'] as List<dynamic>?)
+          ?.map((e) => FamilySosRecipient.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <FamilySosRecipient>[],
+);
+
+Map<String, dynamic> _$FamilySosRecipientGroupToJson(
+  _FamilySosRecipientGroup instance,
+) => <String, dynamic>{
+  'circleId': instance.circleId,
+  'name': instance.name,
+  'themeColor': ?instance.themeColor,
+  'members': instance.members.map((e) => e.toJson()).toList(),
+};
+
+_FamilySosRecipient _$FamilySosRecipientFromJson(Map<String, dynamic> json) =>
+    _FamilySosRecipient(
+      memberId: json['memberId'] as String,
+      name: json['name'] as String,
+      profilePictureUrl: json['profilePictureUrl'] as String?,
+      role:
+          $enumDecodeNullable(
+            _$FamilyRoleEnumMap,
+            json['role'],
+            unknownValue: FamilyRole.adult,
+          ) ??
+          FamilyRole.adult,
+    );
+
+Map<String, dynamic> _$FamilySosRecipientToJson(_FamilySosRecipient instance) =>
+    <String, dynamic>{
+      'memberId': instance.memberId,
+      'name': instance.name,
+      'profilePictureUrl': ?instance.profilePictureUrl,
+      'role': _$FamilyRoleEnumMap[instance.role]!,
+    };
 
 _FamilyTransferCandidates _$FamilyTransferCandidatesFromJson(
   Map<String, dynamic> json,

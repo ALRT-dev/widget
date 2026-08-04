@@ -294,6 +294,30 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     });
   }
 
+  /// Everyone the user could put on a list, grouped by circle. Returns null
+  /// on failure so the editor can show a retry instead of an empty page.
+  Future<List<FamilySosRecipientGroup>?> loadSosRecipients() async {
+    final result = await _familyService.getFamilySosRecipients();
+    if (!mounted) return null;
+    return result.when((groups) => groups, (_) => null);
+  }
+
+  /// Takeover: revive the paused circle by becoming its host. Returns null
+  /// on success, otherwise the backend's refusal in plain words — the
+  /// backend is the only judge of eligibility, so its reason is shown
+  /// verbatim rather than pre-computed client-side.
+  Future<String?> takeOverCircle() async {
+    final result = await _familyService.takeOverFamilyCircle();
+    if (!mounted) return 'Something went wrong';
+    return result.when(
+      (_) {
+        load(silent: true);
+        return null;
+      },
+      (error) => error.message,
+    );
+  }
+
   /// Creates or updates a preset; pass [sosListId] to edit an existing one.
   Future<bool> saveSosList({
     final String? sosListId,

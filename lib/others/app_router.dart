@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/views/screens/auth_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_group_settings_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_switch_group_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_sos_lists_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_sos_list_edit_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_group_paused_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_share_ending_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_sos_resolved_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_journey_screen.dart';
@@ -174,6 +177,20 @@ class AppRouter {
         GoRoute(
           path: FamilySwitchGroupScreen.route,
           builder: (context, state) => const FamilySwitchGroupScreen(),
+        ),
+        GoRoute(
+          path: FamilySosListsScreen.route,
+          builder: (context, state) => const FamilySosListsScreen(),
+        ),
+        GoRoute(
+          path: FamilySosListEditScreen.route,
+          builder: (context, state) => FamilySosListEditScreen(
+            args: state.extra as FamilySosListEditScreenArgs?,
+          ),
+        ),
+        GoRoute(
+          path: FamilyGroupPausedScreen.route,
+          builder: (context, state) => const FamilyGroupPausedScreen(),
         ),
         GoRoute(
           path: FamilyShareEndingScreen.route,

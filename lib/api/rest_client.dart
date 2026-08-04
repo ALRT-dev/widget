@@ -433,6 +433,14 @@ abstract class RestClient {
   @GET(kUrlFamilySosLists)
   Future<List<FamilySosList>> getFamilySosLists();
 
+  @GET(kUrlFamilySosRecipients)
+  Future<List<FamilySosRecipientGroup>> getFamilySosRecipients();
+
+  @POST(kUrlFamilyTakeOver)
+  Future<void> takeOverFamilyCircle({
+    @Query('circleId') final String? circleId,
+  });
+
   @POST(kUrlFamilySosLists)
   Future<FamilySosList> createFamilySosList({
     @Field() required final String name,

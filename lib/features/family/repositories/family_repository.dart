@@ -194,6 +194,11 @@ abstract class FamilyRepository {
 
   Future<Either<List<FamilySosList>, AppError>> getFamilySosLists();
 
+  Future<Either<List<FamilySosRecipientGroup>, AppError>>
+  getFamilySosRecipients();
+
+  Future<Either<void, AppError>> takeOverFamilyCircle();
+
   Future<Either<FamilySosList, AppError>> createFamilySosList({
     required final String name,
     required final List<String> memberIds,
@@ -884,6 +889,31 @@ class FamilyRepositoryImpl implements FamilyRepository {
       future: () async {
         final result = await _restClient.getFamilySosLists();
         return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<List<FamilySosRecipientGroup>, AppError>>
+  getFamilySosRecipients() {
+    return runAsyncCall(
+      name: 'getFamilySosRecipients',
+      future: () async {
+        final result = await _restClient.getFamilySosRecipients();
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> takeOverFamilyCircle() {
+    return runAsyncCall(
+      name: 'takeOverFamilyCircle',
+      future: () async {
+        await _restClient.takeOverFamilyCircle(circleId: _circleId);
+        return const Success(null);
       },
       onError: Failure.new,
     );

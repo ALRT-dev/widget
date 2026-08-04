@@ -80,6 +80,16 @@ abstract class FamilyCircle with _$FamilyCircle {
     /// The beacon colour: marks the group on member dots, snapshot pins,
     /// journey points and the widget.
     final String? themeColor,
+
+    /// True when the host's ALRT+ lapsed: check-ins, snapshots and SOS are
+    /// paused for this circle, nothing deleted. Only ever true once
+    /// billing is switched on.
+    @Default(false) final bool isPaused,
+
+    /// Who lapsed, and how many of the 30 grace days remain. Only set
+    /// while [isPaused].
+    final String? pausedHostName,
+    final int? graceDaysLeft,
     @Default(true) final bool anyoneCanRequestSnapshot,
     @Default(true) final bool sosToWholeGroup,
     @Default(true) final bool journeysSnapPointsOnly,
@@ -291,6 +301,36 @@ abstract class FamilyTransferCandidate with _$FamilyTransferCandidate {
 
   factory FamilyTransferCandidate.fromJson(Map<String, dynamic> json) =>
       _$FamilyTransferCandidateFromJson(json);
+}
+
+/// One group in GET /api/family/sos-recipients: a circle the user belongs
+/// to, with the members an SOS list could reach.
+@freezed
+abstract class FamilySosRecipientGroup with _$FamilySosRecipientGroup {
+  const factory FamilySosRecipientGroup({
+    required final String circleId,
+    required final String name,
+    final String? themeColor,
+    @Default(<FamilySosRecipient>[]) final List<FamilySosRecipient> members,
+  }) = _FamilySosRecipientGroup;
+
+  factory FamilySosRecipientGroup.fromJson(Map<String, dynamic> json) =>
+      _$FamilySosRecipientGroupFromJson(json);
+}
+
+@freezed
+abstract class FamilySosRecipient with _$FamilySosRecipient {
+  const factory FamilySosRecipient({
+    required final String memberId,
+    required final String name,
+    final String? profilePictureUrl,
+    @JsonKey(unknownEnumValue: FamilyRole.adult)
+    @Default(FamilyRole.adult)
+    final FamilyRole role,
+  }) = _FamilySosRecipient;
+
+  factory FamilySosRecipient.fromJson(Map<String, dynamic> json) =>
+      _$FamilySosRecipientFromJson(json);
 }
 
 /// GET /api/family/circle/transfer-candidates response.

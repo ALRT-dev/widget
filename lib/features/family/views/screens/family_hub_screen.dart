@@ -6,6 +6,8 @@ import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/screens/family_group_settings_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_switch_group_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_sos_lists_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_group_paused_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_journey_screen.dart';
 import 'package:hazard_app/features/family/providers/states/family_provider_state.dart';
 import 'package:hazard_app/features/family/views/screens/family_circle_profile_screen.dart';
@@ -73,6 +75,10 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                   children: [
                     for (final sos in activeSosEvents) ...[
                       _sosBannerBuilder(sos),
+                      SizedBox(height: 12.spMin),
+                    ],
+                    if (circle.isPaused) ...[
+                      _pausedBannerBuilder(circle),
                       SizedBox(height: 12.spMin),
                     ],
                     _checkInRequestBannerBuilder(circle, checkInState),
@@ -160,6 +166,93 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         ),
       ),
     );
+  }
+
+  /// The amber strip that says the group is paused and opens the ways
+  /// forward. Renders only when the backend says so, which can only happen
+  /// once billing is switched on.
+  Widget _pausedBannerBuilder(final FamilyCircle circle) {
+    return GestureDetector(
+      onTap: _openPausedScreen,
+      child: Container(
+        padding: EdgeInsets.all(13.spMin),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFF0A030), Color(0xFFE08812)],
+          ),
+          borderRadius: BorderRadius.circular(16.spMin),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFE08812).withValues(alpha: 0.3),
+              blurRadius: 14.0,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 30.spMin,
+              height: 30.spMin,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.spMin),
+              ),
+              child: Icon(
+                LucideIcons.pause,
+                size: 16.spMin,
+                color: const Color(0xFFE08812),
+              ),
+            ),
+            SizedBox(width: 11.spMin),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${circle.name} is paused',
+                    style: TextStyle(
+                      fontSize: 12.5.spMin,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    "${circle.pausedHostName ?? 'The host'}'s ALRT+ ended — "
+                    'see what that means and the ways forward',
+                    style: TextStyle(
+                      fontSize: 10.5.spMin,
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              LucideIcons.chevronRight,
+              size: 16.spMin,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The paused screen hands its host-side choices back as a pop result so
+  /// the existing transfer sheet and delete flow stay the single owners of
+  /// those actions.
+  void _openPausedScreen() async {
+    final action = await context.push(FamilyGroupPausedScreen.route);
+    if (!mounted) return;
+    final circle = ref.read(providerOfFamily).circle;
+    if (circle == null) return;
+    switch (action) {
+      case 'transfer':
+        _showTransferHostingSheet(circle);
+      case 'close':
+        _confirmLeaveOrDelete(isOwner: true);
+    }
   }
 
   /// The way out of the chip row: every group on one page, with its beacon
@@ -328,6 +421,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
             context.push(FamilyGroupSettingsScreen.route);
           case 'switchGroups':
             context.push(FamilySwitchGroupScreen.route);
+          case 'sosLists':
+            context.push(FamilySosListsScreen.route);
           case 'transferHosting':
             _showTransferHostingSheet(circle);
           case 'leave':
@@ -338,6 +433,10 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         const PopupMenuItem(
           value: 'switchGroups',
           child: Text('Switch between groups'),
+        ),
+        const PopupMenuItem(
+          value: 'sosLists',
+          child: Text('Who your SOS reaches'),
         ),
         const PopupMenuItem(value: 'places', child: Text('Places')),
         const PopupMenuItem(value: 'invite', child: Text('Invite members')),

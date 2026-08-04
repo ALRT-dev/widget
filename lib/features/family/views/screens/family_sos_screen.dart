@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
+import 'package:hazard_app/features/family/views/screens/family_sos_lists_screen.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -143,6 +144,24 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
                     name: list.name,
                     count: list.memberIds.length,
                   ),
+              ],
+              if (!_sent) ...[
+                SizedBox(height: 6.spMin),
+                TextButton(
+                  onPressed: () => context.push(FamilySosListsScreen.route),
+                  child: Text(
+                    sosLists.isEmpty
+                        ? 'Set up who your SOS reaches'
+                        : 'Manage lists',
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white.withValues(alpha: 0.85),
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white54,
+                    ),
+                  ),
+                ),
               ],
               const Spacer(),
               _sent ? _sentIndicatorBuilder() : _holdButtonBuilder(),

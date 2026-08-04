@@ -18,7 +18,12 @@ mixin _$FamilyCircle {
  String get id; String get name; String get plan; int get maxMembers;// Group rules (owner-set toggles, locked spec).
 /// The beacon colour: marks the group on member dots, snapshot pins,
 /// journey points and the widget.
- String? get themeColor; bool get anyoneCanRequestSnapshot; bool get sosToWholeGroup; bool get journeysSnapPointsOnly; String get myMemberId; List<FamilyMember> get members; List<FamilySavedPlace> get places; List<FamilySosEvent> get activeSosEvents; FamilyCheckInRequest? get latestCheckInRequest; DateTime? get createdAt;
+ String? get themeColor;/// True when the host's ALRT+ lapsed: check-ins, snapshots and SOS are
+/// paused for this circle, nothing deleted. Only ever true once
+/// billing is switched on.
+ bool get isPaused;/// Who lapsed, and how many of the 30 grace days remain. Only set
+/// while [isPaused].
+ String? get pausedHostName; int? get graceDaysLeft; bool get anyoneCanRequestSnapshot; bool get sosToWholeGroup; bool get journeysSnapPointsOnly; String get myMemberId; List<FamilyMember> get members; List<FamilySavedPlace> get places; List<FamilySosEvent> get activeSosEvents; FamilyCheckInRequest? get latestCheckInRequest; DateTime? get createdAt;
 /// Create a copy of FamilyCircle
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -31,16 +36,16 @@ $FamilyCircleCopyWith<FamilyCircle> get copyWith => _$FamilyCircleCopyWithImpl<F
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyCircle&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.plan, plan) || other.plan == plan)&&(identical(other.maxMembers, maxMembers) || other.maxMembers == maxMembers)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.anyoneCanRequestSnapshot, anyoneCanRequestSnapshot) || other.anyoneCanRequestSnapshot == anyoneCanRequestSnapshot)&&(identical(other.sosToWholeGroup, sosToWholeGroup) || other.sosToWholeGroup == sosToWholeGroup)&&(identical(other.journeysSnapPointsOnly, journeysSnapPointsOnly) || other.journeysSnapPointsOnly == journeysSnapPointsOnly)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&const DeepCollectionEquality().equals(other.members, members)&&const DeepCollectionEquality().equals(other.places, places)&&const DeepCollectionEquality().equals(other.activeSosEvents, activeSosEvents)&&(identical(other.latestCheckInRequest, latestCheckInRequest) || other.latestCheckInRequest == latestCheckInRequest)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyCircle&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.plan, plan) || other.plan == plan)&&(identical(other.maxMembers, maxMembers) || other.maxMembers == maxMembers)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.isPaused, isPaused) || other.isPaused == isPaused)&&(identical(other.pausedHostName, pausedHostName) || other.pausedHostName == pausedHostName)&&(identical(other.graceDaysLeft, graceDaysLeft) || other.graceDaysLeft == graceDaysLeft)&&(identical(other.anyoneCanRequestSnapshot, anyoneCanRequestSnapshot) || other.anyoneCanRequestSnapshot == anyoneCanRequestSnapshot)&&(identical(other.sosToWholeGroup, sosToWholeGroup) || other.sosToWholeGroup == sosToWholeGroup)&&(identical(other.journeysSnapPointsOnly, journeysSnapPointsOnly) || other.journeysSnapPointsOnly == journeysSnapPointsOnly)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&const DeepCollectionEquality().equals(other.members, members)&&const DeepCollectionEquality().equals(other.places, places)&&const DeepCollectionEquality().equals(other.activeSosEvents, activeSosEvents)&&(identical(other.latestCheckInRequest, latestCheckInRequest) || other.latestCheckInRequest == latestCheckInRequest)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,plan,maxMembers,themeColor,anyoneCanRequestSnapshot,sosToWholeGroup,journeysSnapPointsOnly,myMemberId,const DeepCollectionEquality().hash(members),const DeepCollectionEquality().hash(places),const DeepCollectionEquality().hash(activeSosEvents),latestCheckInRequest,createdAt);
+int get hashCode => Object.hash(runtimeType,id,name,plan,maxMembers,themeColor,isPaused,pausedHostName,graceDaysLeft,anyoneCanRequestSnapshot,sosToWholeGroup,journeysSnapPointsOnly,myMemberId,const DeepCollectionEquality().hash(members),const DeepCollectionEquality().hash(places),const DeepCollectionEquality().hash(activeSosEvents),latestCheckInRequest,createdAt);
 
 @override
 String toString() {
-  return 'FamilyCircle(id: $id, name: $name, plan: $plan, maxMembers: $maxMembers, themeColor: $themeColor, anyoneCanRequestSnapshot: $anyoneCanRequestSnapshot, sosToWholeGroup: $sosToWholeGroup, journeysSnapPointsOnly: $journeysSnapPointsOnly, myMemberId: $myMemberId, members: $members, places: $places, activeSosEvents: $activeSosEvents, latestCheckInRequest: $latestCheckInRequest, createdAt: $createdAt)';
+  return 'FamilyCircle(id: $id, name: $name, plan: $plan, maxMembers: $maxMembers, themeColor: $themeColor, isPaused: $isPaused, pausedHostName: $pausedHostName, graceDaysLeft: $graceDaysLeft, anyoneCanRequestSnapshot: $anyoneCanRequestSnapshot, sosToWholeGroup: $sosToWholeGroup, journeysSnapPointsOnly: $journeysSnapPointsOnly, myMemberId: $myMemberId, members: $members, places: $places, activeSosEvents: $activeSosEvents, latestCheckInRequest: $latestCheckInRequest, createdAt: $createdAt)';
 }
 
 
@@ -51,7 +56,7 @@ abstract mixin class $FamilyCircleCopyWith<$Res>  {
   factory $FamilyCircleCopyWith(FamilyCircle value, $Res Function(FamilyCircle) _then) = _$FamilyCircleCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String plan, int maxMembers, String? themeColor, bool anyoneCanRequestSnapshot, bool sosToWholeGroup, bool journeysSnapPointsOnly, String myMemberId, List<FamilyMember> members, List<FamilySavedPlace> places, List<FamilySosEvent> activeSosEvents, FamilyCheckInRequest? latestCheckInRequest, DateTime? createdAt
+ String id, String name, String plan, int maxMembers, String? themeColor, bool isPaused, String? pausedHostName, int? graceDaysLeft, bool anyoneCanRequestSnapshot, bool sosToWholeGroup, bool journeysSnapPointsOnly, String myMemberId, List<FamilyMember> members, List<FamilySavedPlace> places, List<FamilySosEvent> activeSosEvents, FamilyCheckInRequest? latestCheckInRequest, DateTime? createdAt
 });
 
 
@@ -68,14 +73,17 @@ class _$FamilyCircleCopyWithImpl<$Res>
 
 /// Create a copy of FamilyCircle
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? plan = null,Object? maxMembers = null,Object? themeColor = freezed,Object? anyoneCanRequestSnapshot = null,Object? sosToWholeGroup = null,Object? journeysSnapPointsOnly = null,Object? myMemberId = null,Object? members = null,Object? places = null,Object? activeSosEvents = null,Object? latestCheckInRequest = freezed,Object? createdAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? plan = null,Object? maxMembers = null,Object? themeColor = freezed,Object? isPaused = null,Object? pausedHostName = freezed,Object? graceDaysLeft = freezed,Object? anyoneCanRequestSnapshot = null,Object? sosToWholeGroup = null,Object? journeysSnapPointsOnly = null,Object? myMemberId = null,Object? members = null,Object? places = null,Object? activeSosEvents = null,Object? latestCheckInRequest = freezed,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,plan: null == plan ? _self.plan : plan // ignore: cast_nullable_to_non_nullable
 as String,maxMembers: null == maxMembers ? _self.maxMembers : maxMembers // ignore: cast_nullable_to_non_nullable
 as int,themeColor: freezed == themeColor ? _self.themeColor : themeColor // ignore: cast_nullable_to_non_nullable
-as String?,anyoneCanRequestSnapshot: null == anyoneCanRequestSnapshot ? _self.anyoneCanRequestSnapshot : anyoneCanRequestSnapshot // ignore: cast_nullable_to_non_nullable
+as String?,isPaused: null == isPaused ? _self.isPaused : isPaused // ignore: cast_nullable_to_non_nullable
+as bool,pausedHostName: freezed == pausedHostName ? _self.pausedHostName : pausedHostName // ignore: cast_nullable_to_non_nullable
+as String?,graceDaysLeft: freezed == graceDaysLeft ? _self.graceDaysLeft : graceDaysLeft // ignore: cast_nullable_to_non_nullable
+as int?,anyoneCanRequestSnapshot: null == anyoneCanRequestSnapshot ? _self.anyoneCanRequestSnapshot : anyoneCanRequestSnapshot // ignore: cast_nullable_to_non_nullable
 as bool,sosToWholeGroup: null == sosToWholeGroup ? _self.sosToWholeGroup : sosToWholeGroup // ignore: cast_nullable_to_non_nullable
 as bool,journeysSnapPointsOnly: null == journeysSnapPointsOnly ? _self.journeysSnapPointsOnly : journeysSnapPointsOnly // ignore: cast_nullable_to_non_nullable
 as bool,myMemberId: null == myMemberId ? _self.myMemberId : myMemberId // ignore: cast_nullable_to_non_nullable
@@ -181,10 +189,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  bool isPaused,  String? pausedHostName,  int? graceDaysLeft,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FamilyCircle() when $default != null:
-return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.isPaused,_that.pausedHostName,_that.graceDaysLeft,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
   return orElse();
 
 }
@@ -202,10 +210,10 @@ return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  bool isPaused,  String? pausedHostName,  int? graceDaysLeft,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _FamilyCircle():
-return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.isPaused,_that.pausedHostName,_that.graceDaysLeft,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -222,10 +230,10 @@ return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  bool isPaused,  String? pausedHostName,  int? graceDaysLeft,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FamilyCircle() when $default != null:
-return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.isPaused,_that.pausedHostName,_that.graceDaysLeft,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
   return null;
 
 }
@@ -237,7 +245,7 @@ return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor
 @JsonSerializable()
 
 class _FamilyCircle extends FamilyCircle {
-  const _FamilyCircle({required this.id, required this.name, this.plan = 'plus', this.maxMembers = 10, this.themeColor, this.anyoneCanRequestSnapshot = true, this.sosToWholeGroup = true, this.journeysSnapPointsOnly = true, required this.myMemberId, final  List<FamilyMember> members = const <FamilyMember>[], final  List<FamilySavedPlace> places = const <FamilySavedPlace>[], final  List<FamilySosEvent> activeSosEvents = const <FamilySosEvent>[], this.latestCheckInRequest, this.createdAt}): _members = members,_places = places,_activeSosEvents = activeSosEvents,super._();
+  const _FamilyCircle({required this.id, required this.name, this.plan = 'plus', this.maxMembers = 10, this.themeColor, this.isPaused = false, this.pausedHostName, this.graceDaysLeft, this.anyoneCanRequestSnapshot = true, this.sosToWholeGroup = true, this.journeysSnapPointsOnly = true, required this.myMemberId, final  List<FamilyMember> members = const <FamilyMember>[], final  List<FamilySavedPlace> places = const <FamilySavedPlace>[], final  List<FamilySosEvent> activeSosEvents = const <FamilySosEvent>[], this.latestCheckInRequest, this.createdAt}): _members = members,_places = places,_activeSosEvents = activeSosEvents,super._();
   factory _FamilyCircle.fromJson(Map<String, dynamic> json) => _$FamilyCircleFromJson(json);
 
 @override final  String id;
@@ -248,6 +256,14 @@ class _FamilyCircle extends FamilyCircle {
 /// The beacon colour: marks the group on member dots, snapshot pins,
 /// journey points and the widget.
 @override final  String? themeColor;
+/// True when the host's ALRT+ lapsed: check-ins, snapshots and SOS are
+/// paused for this circle, nothing deleted. Only ever true once
+/// billing is switched on.
+@override@JsonKey() final  bool isPaused;
+/// Who lapsed, and how many of the 30 grace days remain. Only set
+/// while [isPaused].
+@override final  String? pausedHostName;
+@override final  int? graceDaysLeft;
 @override@JsonKey() final  bool anyoneCanRequestSnapshot;
 @override@JsonKey() final  bool sosToWholeGroup;
 @override@JsonKey() final  bool journeysSnapPointsOnly;
@@ -289,16 +305,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyCircle&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.plan, plan) || other.plan == plan)&&(identical(other.maxMembers, maxMembers) || other.maxMembers == maxMembers)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.anyoneCanRequestSnapshot, anyoneCanRequestSnapshot) || other.anyoneCanRequestSnapshot == anyoneCanRequestSnapshot)&&(identical(other.sosToWholeGroup, sosToWholeGroup) || other.sosToWholeGroup == sosToWholeGroup)&&(identical(other.journeysSnapPointsOnly, journeysSnapPointsOnly) || other.journeysSnapPointsOnly == journeysSnapPointsOnly)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&const DeepCollectionEquality().equals(other._members, _members)&&const DeepCollectionEquality().equals(other._places, _places)&&const DeepCollectionEquality().equals(other._activeSosEvents, _activeSosEvents)&&(identical(other.latestCheckInRequest, latestCheckInRequest) || other.latestCheckInRequest == latestCheckInRequest)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyCircle&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.plan, plan) || other.plan == plan)&&(identical(other.maxMembers, maxMembers) || other.maxMembers == maxMembers)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.isPaused, isPaused) || other.isPaused == isPaused)&&(identical(other.pausedHostName, pausedHostName) || other.pausedHostName == pausedHostName)&&(identical(other.graceDaysLeft, graceDaysLeft) || other.graceDaysLeft == graceDaysLeft)&&(identical(other.anyoneCanRequestSnapshot, anyoneCanRequestSnapshot) || other.anyoneCanRequestSnapshot == anyoneCanRequestSnapshot)&&(identical(other.sosToWholeGroup, sosToWholeGroup) || other.sosToWholeGroup == sosToWholeGroup)&&(identical(other.journeysSnapPointsOnly, journeysSnapPointsOnly) || other.journeysSnapPointsOnly == journeysSnapPointsOnly)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&const DeepCollectionEquality().equals(other._members, _members)&&const DeepCollectionEquality().equals(other._places, _places)&&const DeepCollectionEquality().equals(other._activeSosEvents, _activeSosEvents)&&(identical(other.latestCheckInRequest, latestCheckInRequest) || other.latestCheckInRequest == latestCheckInRequest)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,plan,maxMembers,themeColor,anyoneCanRequestSnapshot,sosToWholeGroup,journeysSnapPointsOnly,myMemberId,const DeepCollectionEquality().hash(_members),const DeepCollectionEquality().hash(_places),const DeepCollectionEquality().hash(_activeSosEvents),latestCheckInRequest,createdAt);
+int get hashCode => Object.hash(runtimeType,id,name,plan,maxMembers,themeColor,isPaused,pausedHostName,graceDaysLeft,anyoneCanRequestSnapshot,sosToWholeGroup,journeysSnapPointsOnly,myMemberId,const DeepCollectionEquality().hash(_members),const DeepCollectionEquality().hash(_places),const DeepCollectionEquality().hash(_activeSosEvents),latestCheckInRequest,createdAt);
 
 @override
 String toString() {
-  return 'FamilyCircle(id: $id, name: $name, plan: $plan, maxMembers: $maxMembers, themeColor: $themeColor, anyoneCanRequestSnapshot: $anyoneCanRequestSnapshot, sosToWholeGroup: $sosToWholeGroup, journeysSnapPointsOnly: $journeysSnapPointsOnly, myMemberId: $myMemberId, members: $members, places: $places, activeSosEvents: $activeSosEvents, latestCheckInRequest: $latestCheckInRequest, createdAt: $createdAt)';
+  return 'FamilyCircle(id: $id, name: $name, plan: $plan, maxMembers: $maxMembers, themeColor: $themeColor, isPaused: $isPaused, pausedHostName: $pausedHostName, graceDaysLeft: $graceDaysLeft, anyoneCanRequestSnapshot: $anyoneCanRequestSnapshot, sosToWholeGroup: $sosToWholeGroup, journeysSnapPointsOnly: $journeysSnapPointsOnly, myMemberId: $myMemberId, members: $members, places: $places, activeSosEvents: $activeSosEvents, latestCheckInRequest: $latestCheckInRequest, createdAt: $createdAt)';
 }
 
 
@@ -309,7 +325,7 @@ abstract mixin class _$FamilyCircleCopyWith<$Res> implements $FamilyCircleCopyWi
   factory _$FamilyCircleCopyWith(_FamilyCircle value, $Res Function(_FamilyCircle) _then) = __$FamilyCircleCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String plan, int maxMembers, String? themeColor, bool anyoneCanRequestSnapshot, bool sosToWholeGroup, bool journeysSnapPointsOnly, String myMemberId, List<FamilyMember> members, List<FamilySavedPlace> places, List<FamilySosEvent> activeSosEvents, FamilyCheckInRequest? latestCheckInRequest, DateTime? createdAt
+ String id, String name, String plan, int maxMembers, String? themeColor, bool isPaused, String? pausedHostName, int? graceDaysLeft, bool anyoneCanRequestSnapshot, bool sosToWholeGroup, bool journeysSnapPointsOnly, String myMemberId, List<FamilyMember> members, List<FamilySavedPlace> places, List<FamilySosEvent> activeSosEvents, FamilyCheckInRequest? latestCheckInRequest, DateTime? createdAt
 });
 
 
@@ -326,14 +342,17 @@ class __$FamilyCircleCopyWithImpl<$Res>
 
 /// Create a copy of FamilyCircle
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? plan = null,Object? maxMembers = null,Object? themeColor = freezed,Object? anyoneCanRequestSnapshot = null,Object? sosToWholeGroup = null,Object? journeysSnapPointsOnly = null,Object? myMemberId = null,Object? members = null,Object? places = null,Object? activeSosEvents = null,Object? latestCheckInRequest = freezed,Object? createdAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? plan = null,Object? maxMembers = null,Object? themeColor = freezed,Object? isPaused = null,Object? pausedHostName = freezed,Object? graceDaysLeft = freezed,Object? anyoneCanRequestSnapshot = null,Object? sosToWholeGroup = null,Object? journeysSnapPointsOnly = null,Object? myMemberId = null,Object? members = null,Object? places = null,Object? activeSosEvents = null,Object? latestCheckInRequest = freezed,Object? createdAt = freezed,}) {
   return _then(_FamilyCircle(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,plan: null == plan ? _self.plan : plan // ignore: cast_nullable_to_non_nullable
 as String,maxMembers: null == maxMembers ? _self.maxMembers : maxMembers // ignore: cast_nullable_to_non_nullable
 as int,themeColor: freezed == themeColor ? _self.themeColor : themeColor // ignore: cast_nullable_to_non_nullable
-as String?,anyoneCanRequestSnapshot: null == anyoneCanRequestSnapshot ? _self.anyoneCanRequestSnapshot : anyoneCanRequestSnapshot // ignore: cast_nullable_to_non_nullable
+as String?,isPaused: null == isPaused ? _self.isPaused : isPaused // ignore: cast_nullable_to_non_nullable
+as bool,pausedHostName: freezed == pausedHostName ? _self.pausedHostName : pausedHostName // ignore: cast_nullable_to_non_nullable
+as String?,graceDaysLeft: freezed == graceDaysLeft ? _self.graceDaysLeft : graceDaysLeft // ignore: cast_nullable_to_non_nullable
+as int?,anyoneCanRequestSnapshot: null == anyoneCanRequestSnapshot ? _self.anyoneCanRequestSnapshot : anyoneCanRequestSnapshot // ignore: cast_nullable_to_non_nullable
 as bool,sosToWholeGroup: null == sosToWholeGroup ? _self.sosToWholeGroup : sosToWholeGroup // ignore: cast_nullable_to_non_nullable
 as bool,journeysSnapPointsOnly: null == journeysSnapPointsOnly ? _self.journeysSnapPointsOnly : journeysSnapPointsOnly // ignore: cast_nullable_to_non_nullable
 as bool,myMemberId: null == myMemberId ? _self.myMemberId : myMemberId // ignore: cast_nullable_to_non_nullable
@@ -2957,6 +2976,556 @@ as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_no
 as FamilyRole,eligible: null == eligible ? _self.eligible : eligible // ignore: cast_nullable_to_non_nullable
 as bool,reason: freezed == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
 as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$FamilySosRecipientGroup {
+
+ String get circleId; String get name; String? get themeColor; List<FamilySosRecipient> get members;
+/// Create a copy of FamilySosRecipientGroup
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilySosRecipientGroupCopyWith<FamilySosRecipientGroup> get copyWith => _$FamilySosRecipientGroupCopyWithImpl<FamilySosRecipientGroup>(this as FamilySosRecipientGroup, _$identity);
+
+  /// Serializes this FamilySosRecipientGroup to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilySosRecipientGroup&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&const DeepCollectionEquality().equals(other.members, members));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,const DeepCollectionEquality().hash(members));
+
+@override
+String toString() {
+  return 'FamilySosRecipientGroup(circleId: $circleId, name: $name, themeColor: $themeColor, members: $members)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilySosRecipientGroupCopyWith<$Res>  {
+  factory $FamilySosRecipientGroupCopyWith(FamilySosRecipientGroup value, $Res Function(FamilySosRecipientGroup) _then) = _$FamilySosRecipientGroupCopyWithImpl;
+@useResult
+$Res call({
+ String circleId, String name, String? themeColor, List<FamilySosRecipient> members
+});
+
+
+
+
+}
+/// @nodoc
+class _$FamilySosRecipientGroupCopyWithImpl<$Res>
+    implements $FamilySosRecipientGroupCopyWith<$Res> {
+  _$FamilySosRecipientGroupCopyWithImpl(this._self, this._then);
+
+  final FamilySosRecipientGroup _self;
+  final $Res Function(FamilySosRecipientGroup) _then;
+
+/// Create a copy of FamilySosRecipientGroup
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? members = null,}) {
+  return _then(_self.copyWith(
+circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,themeColor: freezed == themeColor ? _self.themeColor : themeColor // ignore: cast_nullable_to_non_nullable
+as String?,members: null == members ? _self.members : members // ignore: cast_nullable_to_non_nullable
+as List<FamilySosRecipient>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FamilySosRecipientGroup].
+extension FamilySosRecipientGroupPatterns on FamilySosRecipientGroup {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilySosRecipientGroup value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilySosRecipientGroup() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilySosRecipientGroup value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilySosRecipientGroup():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilySosRecipientGroup value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilySosRecipientGroup() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor,  List<FamilySosRecipient> members)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilySosRecipientGroup() when $default != null:
+return $default(_that.circleId,_that.name,_that.themeColor,_that.members);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor,  List<FamilySosRecipient> members)  $default,) {final _that = this;
+switch (_that) {
+case _FamilySosRecipientGroup():
+return $default(_that.circleId,_that.name,_that.themeColor,_that.members);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String circleId,  String name,  String? themeColor,  List<FamilySosRecipient> members)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilySosRecipientGroup() when $default != null:
+return $default(_that.circleId,_that.name,_that.themeColor,_that.members);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilySosRecipientGroup implements FamilySosRecipientGroup {
+  const _FamilySosRecipientGroup({required this.circleId, required this.name, this.themeColor, final  List<FamilySosRecipient> members = const <FamilySosRecipient>[]}): _members = members;
+  factory _FamilySosRecipientGroup.fromJson(Map<String, dynamic> json) => _$FamilySosRecipientGroupFromJson(json);
+
+@override final  String circleId;
+@override final  String name;
+@override final  String? themeColor;
+ final  List<FamilySosRecipient> _members;
+@override@JsonKey() List<FamilySosRecipient> get members {
+  if (_members is EqualUnmodifiableListView) return _members;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_members);
+}
+
+
+/// Create a copy of FamilySosRecipientGroup
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilySosRecipientGroupCopyWith<_FamilySosRecipientGroup> get copyWith => __$FamilySosRecipientGroupCopyWithImpl<_FamilySosRecipientGroup>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilySosRecipientGroupToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilySosRecipientGroup&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&const DeepCollectionEquality().equals(other._members, _members));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,const DeepCollectionEquality().hash(_members));
+
+@override
+String toString() {
+  return 'FamilySosRecipientGroup(circleId: $circleId, name: $name, themeColor: $themeColor, members: $members)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilySosRecipientGroupCopyWith<$Res> implements $FamilySosRecipientGroupCopyWith<$Res> {
+  factory _$FamilySosRecipientGroupCopyWith(_FamilySosRecipientGroup value, $Res Function(_FamilySosRecipientGroup) _then) = __$FamilySosRecipientGroupCopyWithImpl;
+@override @useResult
+$Res call({
+ String circleId, String name, String? themeColor, List<FamilySosRecipient> members
+});
+
+
+
+
+}
+/// @nodoc
+class __$FamilySosRecipientGroupCopyWithImpl<$Res>
+    implements _$FamilySosRecipientGroupCopyWith<$Res> {
+  __$FamilySosRecipientGroupCopyWithImpl(this._self, this._then);
+
+  final _FamilySosRecipientGroup _self;
+  final $Res Function(_FamilySosRecipientGroup) _then;
+
+/// Create a copy of FamilySosRecipientGroup
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? members = null,}) {
+  return _then(_FamilySosRecipientGroup(
+circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,themeColor: freezed == themeColor ? _self.themeColor : themeColor // ignore: cast_nullable_to_non_nullable
+as String?,members: null == members ? _self._members : members // ignore: cast_nullable_to_non_nullable
+as List<FamilySosRecipient>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$FamilySosRecipient {
+
+ String get memberId; String get name; String? get profilePictureUrl;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role;
+/// Create a copy of FamilySosRecipient
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilySosRecipientCopyWith<FamilySosRecipient> get copyWith => _$FamilySosRecipientCopyWithImpl<FamilySosRecipient>(this as FamilySosRecipient, _$identity);
+
+  /// Serializes this FamilySosRecipient to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilySosRecipient&&(identical(other.memberId, memberId) || other.memberId == memberId)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.role, role) || other.role == role));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,memberId,name,profilePictureUrl,role);
+
+@override
+String toString() {
+  return 'FamilySosRecipient(memberId: $memberId, name: $name, profilePictureUrl: $profilePictureUrl, role: $role)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilySosRecipientCopyWith<$Res>  {
+  factory $FamilySosRecipientCopyWith(FamilySosRecipient value, $Res Function(FamilySosRecipient) _then) = _$FamilySosRecipientCopyWithImpl;
+@useResult
+$Res call({
+ String memberId, String name, String? profilePictureUrl,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role
+});
+
+
+
+
+}
+/// @nodoc
+class _$FamilySosRecipientCopyWithImpl<$Res>
+    implements $FamilySosRecipientCopyWith<$Res> {
+  _$FamilySosRecipientCopyWithImpl(this._self, this._then);
+
+  final FamilySosRecipient _self;
+  final $Res Function(FamilySosRecipient) _then;
+
+/// Create a copy of FamilySosRecipient
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? memberId = null,Object? name = null,Object? profilePictureUrl = freezed,Object? role = null,}) {
+  return _then(_self.copyWith(
+memberId: null == memberId ? _self.memberId : memberId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as FamilyRole,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FamilySosRecipient].
+extension FamilySosRecipientPatterns on FamilySosRecipient {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilySosRecipient value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilySosRecipient() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilySosRecipient value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilySosRecipient():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilySosRecipient value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilySosRecipient() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String memberId,  String name,  String? profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilySosRecipient() when $default != null:
+return $default(_that.memberId,_that.name,_that.profilePictureUrl,_that.role);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String memberId,  String name,  String? profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role)  $default,) {final _that = this;
+switch (_that) {
+case _FamilySosRecipient():
+return $default(_that.memberId,_that.name,_that.profilePictureUrl,_that.role);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String memberId,  String name,  String? profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilySosRecipient() when $default != null:
+return $default(_that.memberId,_that.name,_that.profilePictureUrl,_that.role);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilySosRecipient implements FamilySosRecipient {
+  const _FamilySosRecipient({required this.memberId, required this.name, this.profilePictureUrl, @JsonKey(unknownEnumValue: FamilyRole.adult) this.role = FamilyRole.adult});
+  factory _FamilySosRecipient.fromJson(Map<String, dynamic> json) => _$FamilySosRecipientFromJson(json);
+
+@override final  String memberId;
+@override final  String name;
+@override final  String? profilePictureUrl;
+@override@JsonKey(unknownEnumValue: FamilyRole.adult) final  FamilyRole role;
+
+/// Create a copy of FamilySosRecipient
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilySosRecipientCopyWith<_FamilySosRecipient> get copyWith => __$FamilySosRecipientCopyWithImpl<_FamilySosRecipient>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilySosRecipientToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilySosRecipient&&(identical(other.memberId, memberId) || other.memberId == memberId)&&(identical(other.name, name) || other.name == name)&&(identical(other.profilePictureUrl, profilePictureUrl) || other.profilePictureUrl == profilePictureUrl)&&(identical(other.role, role) || other.role == role));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,memberId,name,profilePictureUrl,role);
+
+@override
+String toString() {
+  return 'FamilySosRecipient(memberId: $memberId, name: $name, profilePictureUrl: $profilePictureUrl, role: $role)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilySosRecipientCopyWith<$Res> implements $FamilySosRecipientCopyWith<$Res> {
+  factory _$FamilySosRecipientCopyWith(_FamilySosRecipient value, $Res Function(_FamilySosRecipient) _then) = __$FamilySosRecipientCopyWithImpl;
+@override @useResult
+$Res call({
+ String memberId, String name, String? profilePictureUrl,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role
+});
+
+
+
+
+}
+/// @nodoc
+class __$FamilySosRecipientCopyWithImpl<$Res>
+    implements _$FamilySosRecipientCopyWith<$Res> {
+  __$FamilySosRecipientCopyWithImpl(this._self, this._then);
+
+  final _FamilySosRecipient _self;
+  final $Res Function(_FamilySosRecipient) _then;
+
+/// Create a copy of FamilySosRecipient
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? memberId = null,Object? name = null,Object? profilePictureUrl = freezed,Object? role = null,}) {
+  return _then(_FamilySosRecipient(
+memberId: null == memberId ? _self.memberId : memberId // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,profilePictureUrl: freezed == profilePictureUrl ? _self.profilePictureUrl : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as FamilyRole,
   ));
 }
 

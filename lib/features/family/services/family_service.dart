@@ -327,6 +327,15 @@ class FamilyService {
     return _familyRepository.getFamilySosLists();
   }
 
+  Future<Either<List<FamilySosRecipientGroup>, AppError>>
+  getFamilySosRecipients() {
+    return _familyRepository.getFamilySosRecipients();
+  }
+
+  Future<Either<void, AppError>> takeOverFamilyCircle() {
+    return _familyRepository.takeOverFamilyCircle();
+  }
+
   Future<Either<FamilySosList, AppError>> createFamilySosList({
     required final String name,
     required final List<String> memberIds,
