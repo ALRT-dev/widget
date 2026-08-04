@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/learn/views/screens/learn_topics_screen.dart';
 import 'package:hazard_app/features/search/providers/main_search_provider.dart';
 import 'package:hazard_app/features/search/providers/states/main_search_provider_state.dart';
 import 'package:hazard_app/features/search/views/widgets/hazard_search_results_list.dart';
@@ -34,6 +35,11 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
     super.dispose();
   }
 
+  /// Live results or the Learn hub — the prototype's ALRT Feed carries both
+  /// behind one toggle, so Learn lives where the searching happens, not
+  /// only on the Alerts bell.
+  bool _showLearn = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,14 +47,79 @@ class _HazardSearchScreenState extends ConsumerState<HazardSearchScreen> {
         controller: _scrollController,
         slivers: [
           HazardSearchAppBar(),
-          15.hSizedBox.sliverBox,
-          _showingResultsBuilder().sliverBox,
-          20.hSizedBox.sliverBox,
-          HazardSearchResultsList(),
-          30.hSizedBox.sliverBox,
+          10.hSizedBox.sliverBox,
+          _modeToggleBuilder().sliverBox,
+          10.hSizedBox.sliverBox,
+          if (_showLearn)
+            SliverToBoxAdapter(
+              child: LearnTopicsView(
+                padding: EdgeInsets.fromLTRB(
+                  16.spMin,
+                  4.spMin,
+                  16.spMin,
+                  120.spMin,
+                ),
+              ),
+            )
+          else ...[
+            _showingResultsBuilder().sliverBox,
+            20.hSizedBox.sliverBox,
+            HazardSearchResultsList(),
+            30.hSizedBox.sliverBox,
+          ],
         ],
       ),
     ).keyboardDismisser(context);
+  }
+
+  /// The prototype's Live / Learn segmented toggle, same treatment as the
+  /// Alerts screen so the two surfaces stay recognisably one control.
+  Widget _modeToggleBuilder() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.spMin),
+      child: Container(
+        height: 44.spMin,
+        padding: EdgeInsets.all(4.spMin),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEDEDEF),
+          borderRadius: BorderRadius.circular(16.spMin),
+        ),
+        child: Row(
+          children: [
+            _modeButtonBuilder(label: 'Live', showLearn: false),
+            _modeButtonBuilder(label: 'Learn', showLearn: true),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _modeButtonBuilder({
+    required final String label,
+    required final bool showLearn,
+  }) {
+    final isSelected = _showLearn == showLearn;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _showLearn = showLearn),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFF23252B) : Colors.transparent,
+            borderRadius: BorderRadius.circular(13.spMin),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 13.spMin,
+              fontWeight: FontWeight.w700,
+              color: isSelected ? Colors.white : const Color(0xFF5F5C66),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _showingResultsBuilder() {
