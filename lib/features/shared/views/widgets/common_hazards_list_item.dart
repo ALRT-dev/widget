@@ -194,159 +194,16 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     ).pX(widget.horizontalPadding);
   }
 
-  /// The live-freshness chip, and on the map's list a share button beside
-  /// it: from the map you can pass an alert on without opening it first.
+  /// The live-freshness chip. Share lives in the card's own action row,
+  /// so it is not repeated here.
   Widget _freshnessRowBuilder() {
     return Consumer(
       builder: (context, ref, child) {
         final hazard = ref.watch(provider.select((value) => value.hazard));
         if (hazard == null) return const SizedBox.shrink();
-
-        final chip = FreshnessChip(
+        return FreshnessChip(
           updatedAt: hazard.updatedAt,
           createdAt: hazard.createdAt,
-        );
-        if (!isAlertShareable(hazard)) return chip;
-
-        return Row(
-          children: [
-            chip,
-            const Spacer(),
-            InkWell(
-              onTap: () => shareAlert(hazard: hazard, from: 'list'),
-              borderRadius: BorderRadius.circular(999),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 8.spMin,
-                  vertical: 4.spMin,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      LucideIcons.share2,
-                      size: 13.spMin,
-                      color: AppColors.grey,
-                    ),
-                    4.wSizedBox,
-                    Text(
-                      'Share',
-                      style: TextStyle(
-                        fontSize: 11.spMin,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // ignore: unused_element
-  Widget _normalHeaderBuilder() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final isAwsCompliant = ref.watch(
-          provider.select(
-            (value) => value.hazard!.isAwsCompliant ?? false,
-          ),
-        );
-        final severityTitle = ref.watch(
-          provider.select(
-            (value) => value.hazard!.severityTitle,
-          ),
-        );
-        final source = ref.watch(
-          provider.select(
-            (value) => value.hazard!.source,
-          ),
-        );
-
-        final isVerified = source != null;
-
-        // Same rule as the coloured header: the badge names the SOURCE.
-        final categoryLabel = isAwsCompliant
-            ? 'AWS'
-            : isVerified
-            ? 'OFFICIAL'
-            : 'COMMUNITY';
-
-        return Row(
-          spacing: 8.spMin,
-          children: [
-            // Category Pill
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 12.spMin,
-                vertical: 4.spMin,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(20.spMin),
-                border: Border.all(
-                  color: AppColors.lightGrey,
-                  width: 1.0,
-                ),
-              ),
-              child: Text(
-                categoryLabel,
-                style: TextStyle(
-                  fontSize: 10.spMin,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black,
-                ),
-              ),
-            ),
-            const Spacer(),
-            // Only the Australian Warning System writes a severity word.
-            if (isAwsCompliant)
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 12.spMin,
-                  vertical: 4.spMin,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(20.spMin),
-                  border: Border.all(
-                    color: AppColors.lightGrey,
-                    width: 1.0,
-                  ),
-                ),
-                child: Text(
-                  severityTitle,
-                  style: TextStyle(
-                    fontSize: 10.spMin,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.black,
-                  ),
-                ),
-              ),
-            // Verification Badge
-            if (isVerified)
-              Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.white,
-                    ),
-                    child: Icon(
-                      Icons.verified_rounded,
-                      size: 18.spMin,
-                      color: AppColors.blue,
-                    ),
-                  ),
-                  if (widget.showCloseButton && widget.onClosePressed != null)
-                    33.wSizedBox,
-                ],
-              ),
-          ],
         );
       },
     );

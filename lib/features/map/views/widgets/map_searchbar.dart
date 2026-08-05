@@ -99,7 +99,9 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
                 ),
               ],
             ),
-            height: 50.spMin,
+            // Same capsule as the search screen, to the pixel.
+            padding: EdgeInsets.symmetric(vertical: 1.spMin),
+            height: 48.spMin,
             alignment: Alignment.center,
             child: TextFormField(
               focusNode: _searchFocusNode,

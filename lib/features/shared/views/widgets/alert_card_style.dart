@@ -104,6 +104,7 @@ abstract final class AlertCardStyle {
     final HazardSeverityBand? band,
     final String? categoryName,
     final String? sourceName,
+    final String? locationName,
   }) {
     if (!isOfficial) return null;
 
@@ -112,7 +113,18 @@ abstract final class AlertCardStyle {
         ? trimmed
         : 'The issuing agency';
 
-    // The source's own level word, verbatim, never reworded.
+    // What the alert is ABOUT, in the alert's own facts: the hazard and
+    // where it is. Never our words for what is happening or what to do.
+    final what = (categoryName ?? '').trim().toLowerCase();
+    final where = (locationName ?? '').trim();
+    final subject = what.isEmpty
+        ? 'this'
+        : where.isEmpty
+            ? 'a $what'
+            : 'a $what near $where';
+
+    // The source's own level word, verbatim, never reworded. Only AWS
+    // publishes one.
     final level = isAws
         ? switch (severity) {
             HazardSeverity.emergency => 'Emergency Warning',
@@ -123,10 +135,10 @@ abstract final class AlertCardStyle {
         : null;
 
     if (level != null) {
-      return '$who has issued a $level for this area. '
+      return '$who has issued a $level for $subject. '
           'Their advice is in this alert.';
     }
-    return '$who has reported this. Their advice is in this alert.';
+    return '$who has reported $subject. Their advice is in this alert.';
   }
 
   // ── V3 expanded-card treatments (alert detail screen) ──────────────────

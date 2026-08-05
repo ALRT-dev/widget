@@ -69,10 +69,23 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   /// licence and copyright detail.
   bool _attributionExpanded = false;
 
+  /// Whether this alert is being read aloud right now. Drives the lit
+  /// Listen button, and is cleared when the speech ends on its own.
+  bool _isSpeaking = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) => _onInit());
+  }
+
+  @override
+  void dispose() {
+    // Leaving the alert stops it being read. Speech that follows you out
+    // of the screen it belongs to is the kind of thing people turn the
+    // whole feature off over.
+    if (_isSpeaking) ref.read(providerOfAlertSpeech).stop();
+    super.dispose();
   }
 
   @override
@@ -673,6 +686,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           band: hazard.severityBand,
           categoryName: hazard.category?.name,
           sourceName: hazard.source?.name,
+          locationName: hazard.locationName,
         );
         if (plainTerms == null) return const SizedBox.shrink();
 
@@ -793,8 +807,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         _buildMapPreviewCard(),
         16.hSizedBox,
 
-        // "What we know" (the AI summary) now renders in the V3 header's
-        // "In plain terms:" box, so it is not repeated here.
+        // What we know: the SOURCE's own description, verbatim. Not our
+        // words and not an AI summary, which is the whole point of it
+        // being called what we know.
+        _buildOfficialDescriptionSection(),
 
         // What To Do Section
         _buildWhatToDoSection(),
@@ -827,9 +843,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           },
         ),
 
-        // Official Description Section
-        // _buildOfficialDescriptionSection(),
-
         // Medias Section
         _buildMediasSection(),
 
@@ -848,8 +861,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   /// Tapping Listen again while speaking stops it.
   Future<void> _speakAlert(final WidgetRef ref, final Hazard hazard) async {
     final speech = ref.read(providerOfAlertSpeech);
-    if (speech.isSpeaking) {
+    // Pressing it again stops it.
+    if (_isSpeaking || speech.isSpeaking) {
       await speech.stop();
+      if (mounted) setState(() => _isSpeaking = false);
       return;
     }
     final plainTerms = AlertCardStyle.plainTermsOf(
@@ -859,6 +874,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       band: hazard.severityBand,
       categoryName: hazard.category?.name,
       sourceName: hazard.source?.name,
+      locationName: hazard.locationName,
     );
     final text = [
       hazard.isUserReported
@@ -868,7 +884,12 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       if (plainTerms != null) 'In plain terms: $plainTerms.',
       hazard.description ?? '',
     ].where((line) => line.trim().isNotEmpty).join(' ');
+
+    setState(() => _isSpeaking = true);
     await speech.speak(text);
+    // speak() completes when the voice finishes, so the button drops back
+    // to Listen on its own rather than staying lit forever.
+    if (mounted) setState(() => _isSpeaking = false);
   }
 
   Widget _buildShareFollowRow() {
@@ -881,6 +902,10 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         final isFollowing =
             ref.watch(providerOfFollowedAlerts).contains(id);
 
+        // An active button lights orange and carries a glow behind it, so
+        // "following" and "speaking" are states you can see rather than
+        // things you have to remember doing.
+        const litInk = Color(0xFFFF6B01);
         Widget action({
           required final String label,
           required final VoidCallback onTap,
@@ -890,7 +915,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             child: InkWell(
               onTap: onTap,
               borderRadius: BorderRadius.circular(11.spMin),
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
                 height: 40.spMin,
                 decoration: BoxDecoration(
                   color: highlighted
@@ -898,11 +924,18 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                       : AppColors.white,
                   borderRadius: BorderRadius.circular(11.spMin),
                   border: Border.all(
-                    color: highlighted
-                        ? const Color(0xFFB84500)
-                        : const Color(0xFFD8D4DE),
-                    width: 1.5,
+                    color: highlighted ? litInk : const Color(0xFFD8D4DE),
+                    width: highlighted ? 2.0 : 1.5,
                   ),
+                  boxShadow: highlighted
+                      ? [
+                          BoxShadow(
+                            color: litInk.withValues(alpha: 0.35),
+                            blurRadius: 16.0,
+                            spreadRadius: 1.0,
+                          ),
+                        ]
+                      : null,
                 ),
                 child: Center(
                   child: Text(
@@ -910,9 +943,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                     style: TextStyle(
                       fontSize: 12.5.spMin,
                       fontWeight: FontWeight.w800,
-                      color: highlighted
-                          ? const Color(0xFFB84500)
-                          : const Color(0xFF5F5C66),
+                      color: highlighted ? litInk : const Color(0xFF5F5C66),
                     ),
                   ),
                 ),
@@ -939,7 +970,8 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             8.wSizedBox,
             // Accessible delivery: the whole alert, spoken on demand.
             action(
-              label: 'Listen',
+              label: _isSpeaking ? 'Stop' : 'Listen',
+              highlighted: _isSpeaking,
               onTap: () => _speakAlert(ref, hazard),
             ),
             // Community reports can be sent for review or the account
