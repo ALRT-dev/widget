@@ -72,7 +72,7 @@ class LearnTopicsView extends ConsumerWidget {
           ),
           10.hSizedBox,
           if (learnState.topics.isEmpty)
-            _emptyBuilder()
+            _emptyBuilder(ref: ref)
           else
             ...learnState.topics.map(
               (topic) => Padding(
@@ -167,7 +167,11 @@ class LearnTopicsView extends ConsumerWidget {
     );
   }
 
-  Widget _emptyBuilder() {
+  /// The library comes from the server, so "empty" can mean two different
+  /// things: nothing is published yet, or this device did not get it. The
+  /// old copy asserted the first and hid the second. Say which we actually
+  /// know, and give a way to try again.
+  Widget _emptyBuilder({final WidgetRef? ref}) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 30.spMin),
       child: Column(
@@ -187,13 +191,32 @@ class LearnTopicsView extends ConsumerWidget {
           ),
           4.hSizedBox,
           Text(
-            'Preparedness guides will appear here soon.',
+            'The library loaded, but came back empty. If guides are showing '
+            'on your alerts, this is a connection problem rather than an '
+            'empty library, so it is worth another try.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13.spMin,
+              height: 1.45,
               color: AppColors.grey,
             ),
           ),
+          if (ref != null) ...[
+            14.hSizedBox,
+            TextButton(
+              onPressed: () => ref.read(providerOfLearn.notifier).load(),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.orange,
+              ),
+              child: Text(
+                'Try again',
+                style: TextStyle(
+                  fontSize: 13.spMin,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
