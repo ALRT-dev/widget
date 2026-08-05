@@ -19,9 +19,16 @@ class AskAlrtProvider extends Notifier<AskAlrtProviderState> {
   /// deployed, network, malformed response). Never show a raw error.
   /// Used only when nothing local matches and the backend is unreachable.
   /// The emergency number is resolved per user, never hard-coded.
+  /// The offline fallback carries the app basics rather than a shrug, so
+  /// even with the assistant unreachable the answer is useful.
   static String fallbackAnswerFor(final String emergencyNumber) =>
-      "I can't answer that one right now. If you're in danger call "
-      '$emergencyNumber; for alert details, tap the alert itself.';
+      "I can't reach the assistant right now, but here are the basics: "
+      'ALRT shows official warnings and community reports near you on the '
+      'map and feed. Shapes tell you the source (triangle = Australian '
+      'Warning System, diamond = official agency, circle = community '
+      'report) and colour tells you urgency. The Family tab does check-ins '
+      'and SOS. ALRT never contacts emergency services for you — if you '
+      'are in danger, call $emergencyNumber now.';
 
   /// Shown when the backend reports a quota-style error mentioning 'limit'.
   static const limitAnswer =

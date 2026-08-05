@@ -83,8 +83,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   void dispose() {
     // Leaving the alert stops it being read. Speech that follows you out
     // of the screen it belongs to is the kind of thing people turn the
-    // whole feature off over.
-    if (_isSpeaking) ref.read(providerOfAlertSpeech).stop();
+    // whole feature off over. Unconditional: _isSpeaking can be stale if
+    // the flag reset raced the engine, and stop() on silence is a no-op.
+    ref.read(providerOfAlertSpeech).stop();
     super.dispose();
   }
 
