@@ -2,7 +2,9 @@ package com.safetyalrt.alrt
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
@@ -20,6 +22,14 @@ class AlrtFamilyWidgetProvider : HomeWidgetProvider() {
 
     companion object {
         private const val PAYLOAD_KEY = "alrt_family_widget_payload"
+
+        /** The group-icon slots in the layout, in draw order. */
+        private val ICON_SLOTS = intArrayOf(
+            R.id.family_group_icon_0,
+            R.id.family_group_icon_1,
+            R.id.family_group_icon_2,
+            R.id.family_group_icon_3
+        )
     }
 
     override fun onUpdate(
@@ -37,8 +47,10 @@ class AlrtFamilyWidgetProvider : HomeWidgetProvider() {
                 views.setTextViewText(R.id.family_kicker, "FAMILY")
                 views.setTextViewText(R.id.family_headline, "No family circle")
                 views.setTextViewText(R.id.family_sub, "Set up in the app")
+                views.setViewVisibility(R.id.family_groups_row, View.GONE)
             } else {
                 bind(views, payload)
+                bindGroups(views, payload.optJSONArray("groups"))
             }
 
             val deeplink = payload?.optString("deeplink")
@@ -53,6 +65,47 @@ class AlrtFamilyWidgetProvider : HomeWidgetProvider() {
 
             appWidgetManager.updateAppWidget(widgetId, views)
         }
+    }
+
+    /**
+     * Draws one icon per group the user belongs to.
+     *
+     * The widget process cannot fetch a URL, so the app renders each icon to
+     * a PNG in its own files directory and passes the path. A missing or
+     * unreadable file hides that slot rather than drawing a blank square.
+     */
+    private fun bindGroups(views: RemoteViews, groups: org.json.JSONArray?) {
+        var shown = 0
+
+        for (slot in ICON_SLOTS.indices) {
+            val group = groups?.optJSONObject(slot)
+            val path = group?.optString("iconPath")?.takeIf { it.isNotBlank() }
+            val bitmap = path
+                ?.let { runCatching { BitmapFactory.decodeFile(it) }.getOrNull() }
+
+            if (bitmap == null) {
+                views.setViewVisibility(ICON_SLOTS[slot], View.GONE)
+                continue
+            }
+
+            views.setImageViewBitmap(ICON_SLOTS[slot], bitmap)
+            views.setViewVisibility(ICON_SLOTS[slot], View.VISIBLE)
+            // The group the headline is about is drawn at full strength; the
+            // others sit back so the card still says which one it reports on.
+            views.setInt(
+                ICON_SLOTS[slot],
+                "setImageAlpha",
+                if (group.optBoolean("isCurrent", false)) 255 else 130
+            )
+            shown++
+        }
+
+        // One group is already named in the kicker, so a single icon adds
+        // nothing. The row earns its space from two groups up.
+        views.setViewVisibility(
+            R.id.family_groups_row,
+            if (shown > 1) View.VISIBLE else View.GONE
+        )
     }
 
     private fun bind(views: RemoteViews, payload: JSONObject) {

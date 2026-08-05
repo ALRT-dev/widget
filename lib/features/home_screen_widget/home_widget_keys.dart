@@ -19,6 +19,11 @@ class HomeWidgetKeys {
   /// The JSON payload for the Family status widget.
   static const familyPayloadKey = 'alrt_family_widget_payload';
 
+  /// Prefix for the per-group icon files the Family widget draws. The
+  /// index is appended, so the same slots are reused rather than the
+  /// shared container filling up with one file per group ever seen.
+  static const familyGroupIconKeyPrefix = 'alrt_family_group_icon_';
+
   /// Android provider class name (as registered in AndroidManifest.xml).
   static const androidProviderName = 'AlrtAlertsWidgetProvider';
 

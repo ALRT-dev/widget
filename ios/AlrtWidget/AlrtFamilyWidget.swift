@@ -7,6 +7,16 @@ private enum FamilyWidgetConfig {
     static let kind = "AlrtFamilyWidget"
 }
 
+/// One family group as the widget draws it. The extension cannot fetch a
+/// URL, so the app renders each icon to a PNG in the App Group container
+/// and passes the path.
+private struct FamilyGroup: Codable {
+    let circleId: String
+    let name: String
+    let isCurrent: Bool
+    let iconPath: String?
+}
+
 private struct FamilyPayload: Codable {
     let state: String
     let headline: String
@@ -14,6 +24,7 @@ private struct FamilyPayload: Codable {
     let deeplink: String
     let circleName: String?
     let isCritical: Bool
+    let groups: [FamilyGroup]?
 
     static func load() -> FamilyPayload? {
         guard
@@ -76,11 +87,37 @@ private struct FamilyWidgetView: View {
                     .font(.system(size: 12))
                     .foregroundColor(isCritical ? Color(white: 1, opacity: 0.9) : Color(white: 0.8))
                     .lineLimit(2)
+                groupRow
                 Spacer(minLength: 0)
             }
             .padding(14)
         }
         .widgetURL(URL(string: entry.payload?.deeplink ?? "alrtwidget://open?screen=family"))
+    }
+
+    /// One icon per group the user is in, so every group is visible from
+    /// the home screen and not only the one the headline reports on. A
+    /// single group adds nothing the kicker does not already say, so the
+    /// row starts at two.
+    @ViewBuilder private var groupRow: some View {
+        let groups = entry.payload?.groups ?? []
+        if groups.count > 1 {
+            HStack(spacing: 6) {
+                ForEach(groups.prefix(4), id: \.circleId) { group in
+                    if let path = group.iconPath,
+                       let image = UIImage(contentsOfFile: path) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .clipShape(Circle())
+                            // The group the headline is about is drawn at
+                            // full strength; the others sit back.
+                            .opacity(group.isCurrent ? 1 : 0.55)
+                    }
+                }
+            }
+            .padding(.top, 8)
+        }
     }
 
     private var headlineColor: Color {

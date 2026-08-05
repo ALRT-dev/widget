@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/states/family_provider_state.dart';
+import 'package:hazard_app/features/home_screen_widget/family_group_icon_renderer.dart';
 import 'package:hazard_app/features/home_screen_widget/home_widget_keys.dart';
 import 'package:hazard_app/features/home_screen_widget/home_widget_service.dart';
 import 'package:hazard_app/features/home_screen_widget/models/family_widget_payload.dart';
@@ -20,15 +24,82 @@ class FamilyWidgetSync {
 
   static String? _lastSignature;
 
+  /// Renders are serialized: the listener fires often, and two overlapping
+  /// renders would race on the same icon files.
+  static Future<void> _pending = Future<void>.value();
+
   static void push(final FamilyProviderState state) {
     final payload = _build(state);
     // Signature covers only what the widget renders — skip disk writes for
-    // unrelated state churn (loading flags, etc.).
+    // unrelated state churn (loading flags, etc.). The group row is part of
+    // it, so a new group or a changed picture repaints.
     final signature = '${payload.state}|${payload.circleName}|'
-        '${payload.headline}|${payload.sub}';
+        '${payload.headline}|${payload.sub}|${_groupSignature(state)}';
     if (signature == _lastSignature) return;
     _lastSignature = signature;
-    HomeWidgetService.updateFamily(payload);
+
+    _pending = _pending.then((_) => _pushWithIcons(state, payload));
+  }
+
+  /// Renders each group's icon to a file the widget process can read, then
+  /// writes the payload. The text is never held hostage by an image: a
+  /// failed render just leaves that slot without an icon.
+  static Future<void> _pushWithIcons(
+    final FamilyProviderState state,
+    final FamilyWidgetPayload payload,
+  ) async {
+    final summaries = _orderedGroups(state);
+    final groups = <FamilyWidgetGroup>[];
+
+    for (var index = 0; index < summaries.length; index++) {
+      final summary = summaries[index];
+      final path = await FamilyGroupIconRenderer.render(
+        key: '${HomeWidgetKeys.familyGroupIconKeyPrefix}$index',
+        name: summary.name,
+        photoUrl: summary.photoUrl,
+        themeColorHex: summary.themeColor,
+      );
+      groups.add(
+        FamilyWidgetGroup(
+          circleId: summary.circleId,
+          name: summary.name,
+          isCurrent: summary.circleId == state.circle?.id,
+          iconPath: path,
+        ),
+      );
+    }
+
+    await HomeWidgetService.updateFamily(
+      FamilyWidgetPayload(
+        state: payload.state,
+        headline: payload.headline,
+        sub: payload.sub,
+        deeplink: payload.deeplink,
+        circleName: payload.circleName,
+        groups: groups,
+      ),
+    );
+  }
+
+  /// The groups the widget draws: the one in scope first, so the icon that
+  /// matches the headline is the one nearest it.
+  static List<FamilyCircleSummary> _orderedGroups(
+    final FamilyProviderState state,
+  ) {
+    final currentId = state.circle?.id;
+    final ordered = [...state.circles]..sort((a, b) {
+        if (a.circleId == currentId) return -1;
+        if (b.circleId == currentId) return 1;
+        return 0;
+      });
+    return ordered.take(FamilyWidgetPayload.maxGroups).toList();
+  }
+
+  /// Everything about the group row that changes what is drawn.
+  static String _groupSignature(final FamilyProviderState state) {
+    return _orderedGroups(state)
+        .map((s) => '${s.circleId}:${s.name}:${s.photoUrl}:${s.themeColor}')
+        .join(',');
   }
 
   static FamilyWidgetPayload _build(final FamilyProviderState state) {
