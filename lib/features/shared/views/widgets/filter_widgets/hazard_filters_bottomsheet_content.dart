@@ -300,18 +300,25 @@ class _HazardFiltersBottomsheetContentState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // The V3 section label: rust, uppercase, letter-spaced, the
+          // same one every other section header in the app wears. These
+          // two sheets were drawing plain black body type instead, which
+          // is what made them read as a different app.
           Text(
-            title,
+            title.toUpperCase(),
             style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: AppColors.black,
+              fontSize: 10.5.spMin,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.1,
+              color: const Color(0xFFB84500),
             ),
           ),
-          3.hSizedBox,
+          5.hSizedBox,
           Text(
             subtitle,
             style: TextStyle(
-              fontSize: 14.spMin,
+              fontSize: 13.spMin,
+              height: 1.45,
               color: AppColors.grey,
             ),
           ),
@@ -345,9 +352,9 @@ class _HazardFiltersBottomsheetContentState
             boxShadow: [
               if (isEnabled)
                 BoxShadow(
-                  color: activeColor.withValues(alpha: 0.5),
-                  blurRadius: 8,
-                  offset: const Offset(0.0, 0.0),
+                  color: activeColor.withValues(alpha: 0.22),
+                  blurRadius: 6,
+                  offset: const Offset(0.0, 2.0),
                 ),
             ],
           ),
