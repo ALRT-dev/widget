@@ -4,6 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/profile/models/for_you_library.dart';
 import 'package:hazard_app/features/profile/models/safety_cohort.dart';
 import 'package:hazard_app/features/profile/providers/safety_profile_provider.dart';
+import 'package:hazard_app/features/profile/views/screens/safety_profile_screen.dart';
+import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// The FOR YOU card on an alert: pre-written, human-reviewed guidance pinned
@@ -38,7 +41,6 @@ class _ForYouCardState extends ConsumerState<ForYouCard> {
   @override
   Widget build(BuildContext context) {
     final ticked = ref.watch(providerOfSafetyProfile);
-    if (ticked.isEmpty) return const SizedBox.shrink();
 
     final bucket = ForYouLibrary.bucketFor(
       categoryName: widget.categoryName,
@@ -47,6 +49,12 @@ class _ForYouCardState extends ConsumerState<ForYouCard> {
     if (bucket == null) return const SizedBox.shrink();
     final rows = ForYouLibrary.rows[bucket];
     if (rows == null) return const SizedBox.shrink();
+
+    // Guidance exists for this hazard but nothing is ticked yet. Silence
+    // here is why the feature looks missing: the card simply never appears
+    // and nothing tells you it could. Offer it instead, on the alert where
+    // it would have helped.
+    if (ticked.isEmpty) return _setupPromptBuilder(context);
 
     // Ticked cohorts that have a line for this hazard, in enum order.
     final matched = [
@@ -174,6 +182,64 @@ class _ForYouCardState extends ConsumerState<ForYouCard> {
         ],
       ),
     );
+  }
+
+  /// Shown on an alert that HAS guidance when the reader has ticked nothing
+  /// yet. One tap to the safety profile, and it says what it stays: on the
+  /// phone.
+  Widget _setupPromptBuilder(final BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(top: 12.spMin),
+      padding: EdgeInsets.all(13.spMin),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3F4F8),
+        borderRadius: BorderRadius.circular(14.spMin),
+        border: Border.all(color: const Color(0xFFE2E0E6)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            LucideIcons.shieldCheck,
+            size: 20.spMin,
+            color: const Color(0xFF5F5C66),
+          ),
+          SizedBox(width: 11.spMin),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Guidance for your household',
+                  style: TextStyle(
+                    fontSize: 13.5.spMin,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF232326),
+                  ),
+                ),
+                SizedBox(height: 2.spMin),
+                Text(
+                  'This alert has advice for older adults, children, '
+                  'mobility and more. Tick what applies and it shows here. '
+                  'Stays on your phone.',
+                  style: TextStyle(
+                    fontSize: 11.5.spMin,
+                    height: 1.4,
+                    color: const Color(0xFF5F5C66),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 8.spMin),
+          Icon(
+            LucideIcons.chevronRight,
+            size: 18.spMin,
+            color: const Color(0xFF8A8792),
+          ),
+        ],
+      ),
+    ).onPressed(() => context.push(SafetyProfileScreen.route));
   }
 
   Widget _visitorExplainerBuilder() {

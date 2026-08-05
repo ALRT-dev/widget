@@ -7,6 +7,7 @@ import 'package:hazard_app/features/learn/providers/learn_provider.dart';
 import 'package:hazard_app/features/learn/views/screens/guide_detail_screen.dart';
 import 'package:hazard_app/features/learn/views/widgets/learn_progress_hero_card.dart';
 import 'package:hazard_app/features/learn/views/widgets/learn_topic_card.dart';
+import 'package:hazard_app/features/learn/views/widgets/learn_weekly_challenge_card.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -55,6 +56,10 @@ class LearnTopicsView extends ConsumerWidget {
             totalCount: learnState.totalCount,
             totalXpEarned: learnState.totalXpEarned,
           ),
+          12.hSizedBox,
+          // The weekly challenge is a LEARNING challenge, so it belongs
+          // here rather than only on the profile card where it was hiding.
+          const LearnWeeklyChallengeCard(),
           20.hSizedBox,
           Text(
             'BE READY FOR',

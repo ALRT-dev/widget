@@ -31,7 +31,18 @@ class _FamilyTabViewState extends ConsumerState<FamilyTabView> {
       providerOfFamily.select((s) => s.hasLoadedOnce),
     );
     final loadState = ref.watch(providerOfFamily.select((s) => s.loadState));
-    final hasCircle = ref.watch(
+    // Belonging to a group is decided by MEMBERSHIP, not by whether the
+    // selected circle's detail happens to be loaded. `circle` is only the
+    // circle currently in scope: when it is briefly null (a switch, a slow
+    // detail fetch, a failed refresh) a member used to be shown the
+    // "Create a group" pitch, complete with a paywall button, as though
+    // they had no family at all. If you are in a group, you always see it.
+    final isInAGroup = ref.watch(
+      providerOfFamily.select(
+        (s) => s.circle != null || s.circles.isNotEmpty,
+      ),
+    );
+    final hasScopedCircle = ref.watch(
       providerOfFamily.select((s) => s.circle != null),
     );
 
@@ -44,7 +55,14 @@ class _FamilyTabViewState extends ConsumerState<FamilyTabView> {
       );
     }
 
-    return hasCircle ? const FamilyHubScreen() : const FamilyOnboardingScreen();
+    if (!isInAGroup) return const FamilyOnboardingScreen();
+    // In a group, detail still arriving: wait, never fall back to the pitch.
+    if (!hasScopedCircle) {
+      return const Center(
+        child: CircularProgressIndicator(color: FamilyColors.indigo),
+      );
+    }
+    return const FamilyHubScreen();
   }
 
   Widget _errorBuilder() {
