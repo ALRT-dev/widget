@@ -24,6 +24,9 @@ class SafetyProfileScreen extends ConsumerWidget {
   static const _ink = Color(0xFF232326);
   static const _inkSoft = Color(0xFF75757E);
 
+  /// The V3 section-label rust used across the app.
+  static const _sectionLabel = Color(0xFFB84500);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(providerOfSafetyProfile);
@@ -72,14 +75,41 @@ class SafetyProfileScreen extends ConsumerWidget {
             ),
           ),
           SizedBox(height: 16.spMin),
-          Text(
-            'THIS ALERT SEASON, MY HOUSEHOLD INCLUDES',
-            style: TextStyle(
-              fontSize: 10.5.spMin,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.1,
-              color: _inkSoft,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'THIS ALERT SEASON, MY HOUSEHOLD INCLUDES',
+                  style: TextStyle(
+                    fontSize: 10.5.spMin,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.1,
+                    color: _sectionLabel,
+                  ),
+                ),
+              ),
+              // Ticking something should visibly land, so the count is
+              // right beside the label rather than left to be guessed.
+              if (selected.isNotEmpty)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 9.spMin,
+                    vertical: 3.spMin,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _sectionLabel.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    '${selected.length} selected',
+                    style: TextStyle(
+                      fontSize: 10.5.spMin,
+                      fontWeight: FontWeight.w800,
+                      color: _sectionLabel,
+                    ),
+                  ),
+                ),
+            ],
           ),
           SizedBox(height: 10.spMin),
           Wrap(
@@ -130,7 +160,7 @@ class SafetyProfileScreen extends ConsumerWidget {
       onTap: () => ref.read(providerOfSafetyProfile.notifier).toggle(cohort),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: EdgeInsets.symmetric(horizontal: 13.spMin, vertical: 9.spMin),
+        padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 11.spMin),
         decoration: BoxDecoration(
           color: isSelected ? cohort.tintBg : Colors.white,
           borderRadius: BorderRadius.circular(999),
@@ -142,15 +172,30 @@ class SafetyProfileScreen extends ConsumerWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (isSelected) ...[
-              Icon(LucideIcons.check, size: 13.spMin, color: cohort.tintInk),
-              SizedBox(width: 6.spMin),
-            ],
+            // The cohort's colour is its permanent identity, so it shows
+            // before it is picked too: the row reads as a palette you can
+            // scan, not a wall of identical grey pills.
+            if (isSelected)
+              Icon(LucideIcons.check, size: 14.spMin, color: cohort.tintInk)
+            else
+              Container(
+                width: 10.spMin,
+                height: 10.spMin,
+                decoration: BoxDecoration(
+                  color: cohort.tintBg,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: cohort.tintInk.withValues(alpha: 0.55),
+                    width: 1.4,
+                  ),
+                ),
+              ),
+            SizedBox(width: 7.spMin),
             Text(
               cohort.label,
               style: TextStyle(
-                fontSize: 12.5.spMin,
-                fontWeight: FontWeight.w600,
+                fontSize: 13.spMin,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                 color: isSelected ? cohort.tintInk : _ink,
               ),
             ),
