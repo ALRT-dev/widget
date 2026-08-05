@@ -93,7 +93,9 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
 
     return Scaffold(
       backgroundColor: AlrtPlusStyle.body,
-      body: Column(
+      body: SafeArea(
+        bottom: false,
+        child: Column(
         children: [
           _bandBuilder(context),
           Expanded(
@@ -127,7 +129,8 @@ class _AlrtPlusManageScreenState extends ConsumerState<AlrtPlusManageScreen> {
               ],
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

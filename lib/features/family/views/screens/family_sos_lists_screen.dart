@@ -52,7 +52,9 @@ class _FamilySosListsScreenState extends ConsumerState<FamilySosListsScreen> {
 
     return Scaffold(
       backgroundColor: _page,
-      body: ListView(
+      body: SafeArea(
+        bottom: false,
+        child: ListView(
         padding: EdgeInsets.only(bottom: 40.spMin),
         children: [
           _headerBuilder(),
@@ -132,7 +134,8 @@ class _FamilySosListsScreenState extends ConsumerState<FamilySosListsScreen> {
               ),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }

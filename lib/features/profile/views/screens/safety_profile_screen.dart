@@ -44,7 +44,14 @@ class SafetyProfileScreen extends ConsumerWidget {
               ),
             ),
       bottomNavigationBar: isOnboarding ? _onboardingFooter(context) : null,
-      body: ListView(
+      // During onboarding there is no app bar to push content clear of the
+      // status bar and notch, so the top of the banner was sitting under
+      // them. The app bar does that job on the settings route, so the top
+      // inset is only needed on the onboarding one.
+      body: SafeArea(
+        top: isOnboarding,
+        bottom: false,
+        child: ListView(
         padding: EdgeInsets.fromLTRB(18.spMin, 6.spMin, 18.spMin, 28.spMin),
         children: [
           _heroBuilder(),
@@ -146,7 +153,8 @@ class SafetyProfileScreen extends ConsumerWidget {
               color: _inkSoft,
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
