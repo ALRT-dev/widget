@@ -79,6 +79,7 @@ const kUrlFamily = '$kUrlApi/family';
 const kUrlFamilyCircle = '$kUrlFamily/circle';
 const kUrlFamilyCircles = '$kUrlFamily/circles';
 const kUrlFamilyCircleLeave = '$kUrlFamilyCircle/leave';
+const kUrlFamilyCirclePhoto = '$kUrlFamilyCircle/photo';
 const kUrlFamilyTransferCandidates = '$kUrlFamilyCircle/transfer-candidates';
 const kUrlFamilyTransferOwnership = '$kUrlFamilyCircle/transfer-ownership';
 const kUrlFamilyTakeOver = '$kUrlFamilyCircle/take-over';

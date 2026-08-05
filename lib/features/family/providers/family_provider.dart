@@ -576,6 +576,35 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     );
   }
 
+  /// Sets the group picture for the whole circle. Owner-only server-side,
+  /// and the settings screen only offers it to owners.
+  Future<bool> updateGroupPhoto(final File photo) async {
+    final result = await _familyService.updateFamilyCirclePhoto(photo: photo);
+    if (!mounted) return false;
+
+    return result.when(
+      (_) {
+        load(silent: true);
+        return true;
+      },
+      (_) => false,
+    );
+  }
+
+  /// Clears the group picture, dropping back to the initial + theme colour.
+  Future<bool> removeGroupPhoto() async {
+    final result = await _familyService.removeFamilyCirclePhoto();
+    if (!mounted) return false;
+
+    return result.when(
+      (_) {
+        load(silent: true);
+        return true;
+      },
+      (_) => false,
+    );
+  }
+
   Future<void> updateNickname(final String nickname) async {
     state = state.copyWith(
       memberUpdateState: const FamilyActionState.loading(),

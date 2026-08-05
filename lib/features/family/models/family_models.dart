@@ -81,6 +81,10 @@ abstract class FamilyCircle with _$FamilyCircle {
     /// journey points and the widget.
     final String? themeColor,
 
+    /// The group picture, set by the owner. Null means the circle is drawn
+    /// as its initial on [themeColor], which is the default look.
+    final String? photoUrl,
+
     /// True when the host's ALRT+ lapsed: check-ins, snapshots and SOS are
     /// paused for this circle, nothing deleted. Only ever true once
     /// billing is switched on.
@@ -355,6 +359,7 @@ abstract class FamilyCircleSummary with _$FamilyCircleSummary {
     required final String circleId,
     required final String name,
     final String? themeColor,
+    final String? photoUrl,
     @JsonKey(unknownEnumValue: FamilyRole.adult)
     @Default(FamilyRole.adult)
     final FamilyRole role,

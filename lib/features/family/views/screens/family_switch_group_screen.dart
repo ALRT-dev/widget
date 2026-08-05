@@ -5,6 +5,7 @@ import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/providers/selected_circle_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_group_avatar.dart';
 import 'package:hazard_app/features/family/views/widgets/family_group_actions.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -279,6 +280,17 @@ class FamilySwitchGroupScreen extends ConsumerWidget {
           children: [
             Row(
               children: [
+                // The group's own picture, so a switcher of same-coloured
+                // cards is still told apart at a glance.
+                FamilyGroupAvatar(
+                  name: summary.name,
+                  photoUrl: summary.photoUrl,
+                  themeColorHex: summary.themeColor,
+                  size: 38.spMin,
+                  borderColor: Colors.white.withValues(alpha: 0.55),
+                  borderWidth: 1.6,
+                ),
+                SizedBox(width: 10.spMin),
                 Expanded(
                   child: Text(
                     summary.name,

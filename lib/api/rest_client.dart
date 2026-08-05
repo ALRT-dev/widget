@@ -276,6 +276,21 @@ abstract class RestClient {
     @Query('circleId') final String? circleId,
   });
 
+  /// The group picture (owner only). Multipart, same field name as every
+  /// other upload in the app.
+  @PUT(kUrlFamilyCirclePhoto)
+  @MultiPart()
+  Future<HttpResponse> updateFamilyCirclePhoto({
+    @Part(name: 'profilePictureFile') required final File photo,
+    @Query('circleId') final String? circleId,
+  });
+
+  /// Clears it, dropping the circle back to its initial on its theme colour.
+  @DELETE(kUrlFamilyCirclePhoto)
+  Future<HttpResponse> removeFamilyCirclePhoto({
+    @Query('circleId') final String? circleId,
+  });
+
   @POST(kUrlFamilyCircleLeave)
   Future<HttpResponse> leaveFamilyCircle({
     @Query('circleId') final String? circleId,

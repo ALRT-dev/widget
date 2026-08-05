@@ -17,6 +17,7 @@ import 'package:hazard_app/features/family/views/screens/family_sharing_level_sc
 import 'package:hazard_app/features/family/views/screens/family_sos_receiver_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_sos_screen.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_group_avatar.dart';
 import 'package:hazard_app/features/family/views/widgets/family_leave_confirm_sheet.dart';
 import 'package:hazard_app/features/family/views/widgets/family_member_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -320,9 +321,20 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
               SizedBox(height: 10.spMin),
               Row(
                 children: [
+                  FamilyGroupAvatar(
+                    name: circle.name,
+                    photoUrl: circle.photoUrl,
+                    themeColorHex: circle.themeColor,
+                    size: 46.spMin,
+                    borderColor: Colors.white.withValues(alpha: 0.45),
+                    borderWidth: 1.8,
+                  ),
+                  SizedBox(width: 12.spMin),
                   Expanded(
                     child: Text(
                       circle.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 28.spMin,

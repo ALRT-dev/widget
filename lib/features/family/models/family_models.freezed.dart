@@ -18,7 +18,9 @@ mixin _$FamilyCircle {
  String get id; String get name; String get plan; int get maxMembers;// Group rules (owner-set toggles, locked spec).
 /// The beacon colour: marks the group on member dots, snapshot pins,
 /// journey points and the widget.
- String? get themeColor;/// True when the host's ALRT+ lapsed: check-ins, snapshots and SOS are
+ String? get themeColor;/// The group picture, set by the owner. Null means the circle is drawn
+/// as its initial on [themeColor], which is the default look.
+ String? get photoUrl;/// True when the host's ALRT+ lapsed: check-ins, snapshots and SOS are
 /// paused for this circle, nothing deleted. Only ever true once
 /// billing is switched on.
  bool get isPaused;/// Who lapsed, and how many of the 30 grace days remain. Only set
@@ -36,16 +38,16 @@ $FamilyCircleCopyWith<FamilyCircle> get copyWith => _$FamilyCircleCopyWithImpl<F
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyCircle&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.plan, plan) || other.plan == plan)&&(identical(other.maxMembers, maxMembers) || other.maxMembers == maxMembers)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.isPaused, isPaused) || other.isPaused == isPaused)&&(identical(other.pausedHostName, pausedHostName) || other.pausedHostName == pausedHostName)&&(identical(other.graceDaysLeft, graceDaysLeft) || other.graceDaysLeft == graceDaysLeft)&&(identical(other.anyoneCanRequestSnapshot, anyoneCanRequestSnapshot) || other.anyoneCanRequestSnapshot == anyoneCanRequestSnapshot)&&(identical(other.sosToWholeGroup, sosToWholeGroup) || other.sosToWholeGroup == sosToWholeGroup)&&(identical(other.journeysSnapPointsOnly, journeysSnapPointsOnly) || other.journeysSnapPointsOnly == journeysSnapPointsOnly)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&const DeepCollectionEquality().equals(other.members, members)&&const DeepCollectionEquality().equals(other.places, places)&&const DeepCollectionEquality().equals(other.activeSosEvents, activeSosEvents)&&(identical(other.latestCheckInRequest, latestCheckInRequest) || other.latestCheckInRequest == latestCheckInRequest)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyCircle&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.plan, plan) || other.plan == plan)&&(identical(other.maxMembers, maxMembers) || other.maxMembers == maxMembers)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&(identical(other.isPaused, isPaused) || other.isPaused == isPaused)&&(identical(other.pausedHostName, pausedHostName) || other.pausedHostName == pausedHostName)&&(identical(other.graceDaysLeft, graceDaysLeft) || other.graceDaysLeft == graceDaysLeft)&&(identical(other.anyoneCanRequestSnapshot, anyoneCanRequestSnapshot) || other.anyoneCanRequestSnapshot == anyoneCanRequestSnapshot)&&(identical(other.sosToWholeGroup, sosToWholeGroup) || other.sosToWholeGroup == sosToWholeGroup)&&(identical(other.journeysSnapPointsOnly, journeysSnapPointsOnly) || other.journeysSnapPointsOnly == journeysSnapPointsOnly)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&const DeepCollectionEquality().equals(other.members, members)&&const DeepCollectionEquality().equals(other.places, places)&&const DeepCollectionEquality().equals(other.activeSosEvents, activeSosEvents)&&(identical(other.latestCheckInRequest, latestCheckInRequest) || other.latestCheckInRequest == latestCheckInRequest)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,plan,maxMembers,themeColor,isPaused,pausedHostName,graceDaysLeft,anyoneCanRequestSnapshot,sosToWholeGroup,journeysSnapPointsOnly,myMemberId,const DeepCollectionEquality().hash(members),const DeepCollectionEquality().hash(places),const DeepCollectionEquality().hash(activeSosEvents),latestCheckInRequest,createdAt);
+int get hashCode => Object.hash(runtimeType,id,name,plan,maxMembers,themeColor,photoUrl,isPaused,pausedHostName,graceDaysLeft,anyoneCanRequestSnapshot,sosToWholeGroup,journeysSnapPointsOnly,myMemberId,const DeepCollectionEquality().hash(members),const DeepCollectionEquality().hash(places),const DeepCollectionEquality().hash(activeSosEvents),latestCheckInRequest,createdAt);
 
 @override
 String toString() {
-  return 'FamilyCircle(id: $id, name: $name, plan: $plan, maxMembers: $maxMembers, themeColor: $themeColor, isPaused: $isPaused, pausedHostName: $pausedHostName, graceDaysLeft: $graceDaysLeft, anyoneCanRequestSnapshot: $anyoneCanRequestSnapshot, sosToWholeGroup: $sosToWholeGroup, journeysSnapPointsOnly: $journeysSnapPointsOnly, myMemberId: $myMemberId, members: $members, places: $places, activeSosEvents: $activeSosEvents, latestCheckInRequest: $latestCheckInRequest, createdAt: $createdAt)';
+  return 'FamilyCircle(id: $id, name: $name, plan: $plan, maxMembers: $maxMembers, themeColor: $themeColor, photoUrl: $photoUrl, isPaused: $isPaused, pausedHostName: $pausedHostName, graceDaysLeft: $graceDaysLeft, anyoneCanRequestSnapshot: $anyoneCanRequestSnapshot, sosToWholeGroup: $sosToWholeGroup, journeysSnapPointsOnly: $journeysSnapPointsOnly, myMemberId: $myMemberId, members: $members, places: $places, activeSosEvents: $activeSosEvents, latestCheckInRequest: $latestCheckInRequest, createdAt: $createdAt)';
 }
 
 
@@ -56,7 +58,7 @@ abstract mixin class $FamilyCircleCopyWith<$Res>  {
   factory $FamilyCircleCopyWith(FamilyCircle value, $Res Function(FamilyCircle) _then) = _$FamilyCircleCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, String plan, int maxMembers, String? themeColor, bool isPaused, String? pausedHostName, int? graceDaysLeft, bool anyoneCanRequestSnapshot, bool sosToWholeGroup, bool journeysSnapPointsOnly, String myMemberId, List<FamilyMember> members, List<FamilySavedPlace> places, List<FamilySosEvent> activeSosEvents, FamilyCheckInRequest? latestCheckInRequest, DateTime? createdAt
+ String id, String name, String plan, int maxMembers, String? themeColor, String? photoUrl, bool isPaused, String? pausedHostName, int? graceDaysLeft, bool anyoneCanRequestSnapshot, bool sosToWholeGroup, bool journeysSnapPointsOnly, String myMemberId, List<FamilyMember> members, List<FamilySavedPlace> places, List<FamilySosEvent> activeSosEvents, FamilyCheckInRequest? latestCheckInRequest, DateTime? createdAt
 });
 
 
@@ -73,13 +75,14 @@ class _$FamilyCircleCopyWithImpl<$Res>
 
 /// Create a copy of FamilyCircle
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? plan = null,Object? maxMembers = null,Object? themeColor = freezed,Object? isPaused = null,Object? pausedHostName = freezed,Object? graceDaysLeft = freezed,Object? anyoneCanRequestSnapshot = null,Object? sosToWholeGroup = null,Object? journeysSnapPointsOnly = null,Object? myMemberId = null,Object? members = null,Object? places = null,Object? activeSosEvents = null,Object? latestCheckInRequest = freezed,Object? createdAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? plan = null,Object? maxMembers = null,Object? themeColor = freezed,Object? photoUrl = freezed,Object? isPaused = null,Object? pausedHostName = freezed,Object? graceDaysLeft = freezed,Object? anyoneCanRequestSnapshot = null,Object? sosToWholeGroup = null,Object? journeysSnapPointsOnly = null,Object? myMemberId = null,Object? members = null,Object? places = null,Object? activeSosEvents = null,Object? latestCheckInRequest = freezed,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,plan: null == plan ? _self.plan : plan // ignore: cast_nullable_to_non_nullable
 as String,maxMembers: null == maxMembers ? _self.maxMembers : maxMembers // ignore: cast_nullable_to_non_nullable
 as int,themeColor: freezed == themeColor ? _self.themeColor : themeColor // ignore: cast_nullable_to_non_nullable
+as String?,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
 as String?,isPaused: null == isPaused ? _self.isPaused : isPaused // ignore: cast_nullable_to_non_nullable
 as bool,pausedHostName: freezed == pausedHostName ? _self.pausedHostName : pausedHostName // ignore: cast_nullable_to_non_nullable
 as String?,graceDaysLeft: freezed == graceDaysLeft ? _self.graceDaysLeft : graceDaysLeft // ignore: cast_nullable_to_non_nullable
@@ -189,10 +192,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  bool isPaused,  String? pausedHostName,  int? graceDaysLeft,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  String? photoUrl,  bool isPaused,  String? pausedHostName,  int? graceDaysLeft,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FamilyCircle() when $default != null:
-return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.isPaused,_that.pausedHostName,_that.graceDaysLeft,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.photoUrl,_that.isPaused,_that.pausedHostName,_that.graceDaysLeft,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
   return orElse();
 
 }
@@ -210,10 +213,10 @@ return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  bool isPaused,  String? pausedHostName,  int? graceDaysLeft,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  String? photoUrl,  bool isPaused,  String? pausedHostName,  int? graceDaysLeft,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _FamilyCircle():
-return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.isPaused,_that.pausedHostName,_that.graceDaysLeft,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.photoUrl,_that.isPaused,_that.pausedHostName,_that.graceDaysLeft,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -230,10 +233,10 @@ return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  bool isPaused,  String? pausedHostName,  int? graceDaysLeft,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String plan,  int maxMembers,  String? themeColor,  String? photoUrl,  bool isPaused,  String? pausedHostName,  int? graceDaysLeft,  bool anyoneCanRequestSnapshot,  bool sosToWholeGroup,  bool journeysSnapPointsOnly,  String myMemberId,  List<FamilyMember> members,  List<FamilySavedPlace> places,  List<FamilySosEvent> activeSosEvents,  FamilyCheckInRequest? latestCheckInRequest,  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FamilyCircle() when $default != null:
-return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.isPaused,_that.pausedHostName,_that.graceDaysLeft,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
+return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor,_that.photoUrl,_that.isPaused,_that.pausedHostName,_that.graceDaysLeft,_that.anyoneCanRequestSnapshot,_that.sosToWholeGroup,_that.journeysSnapPointsOnly,_that.myMemberId,_that.members,_that.places,_that.activeSosEvents,_that.latestCheckInRequest,_that.createdAt);case _:
   return null;
 
 }
@@ -245,7 +248,7 @@ return $default(_that.id,_that.name,_that.plan,_that.maxMembers,_that.themeColor
 @JsonSerializable()
 
 class _FamilyCircle extends FamilyCircle {
-  const _FamilyCircle({required this.id, required this.name, this.plan = 'plus', this.maxMembers = 10, this.themeColor, this.isPaused = false, this.pausedHostName, this.graceDaysLeft, this.anyoneCanRequestSnapshot = true, this.sosToWholeGroup = true, this.journeysSnapPointsOnly = true, required this.myMemberId, final  List<FamilyMember> members = const <FamilyMember>[], final  List<FamilySavedPlace> places = const <FamilySavedPlace>[], final  List<FamilySosEvent> activeSosEvents = const <FamilySosEvent>[], this.latestCheckInRequest, this.createdAt}): _members = members,_places = places,_activeSosEvents = activeSosEvents,super._();
+  const _FamilyCircle({required this.id, required this.name, this.plan = 'plus', this.maxMembers = 10, this.themeColor, this.photoUrl, this.isPaused = false, this.pausedHostName, this.graceDaysLeft, this.anyoneCanRequestSnapshot = true, this.sosToWholeGroup = true, this.journeysSnapPointsOnly = true, required this.myMemberId, final  List<FamilyMember> members = const <FamilyMember>[], final  List<FamilySavedPlace> places = const <FamilySavedPlace>[], final  List<FamilySosEvent> activeSosEvents = const <FamilySosEvent>[], this.latestCheckInRequest, this.createdAt}): _members = members,_places = places,_activeSosEvents = activeSosEvents,super._();
   factory _FamilyCircle.fromJson(Map<String, dynamic> json) => _$FamilyCircleFromJson(json);
 
 @override final  String id;
@@ -256,6 +259,9 @@ class _FamilyCircle extends FamilyCircle {
 /// The beacon colour: marks the group on member dots, snapshot pins,
 /// journey points and the widget.
 @override final  String? themeColor;
+/// The group picture, set by the owner. Null means the circle is drawn
+/// as its initial on [themeColor], which is the default look.
+@override final  String? photoUrl;
 /// True when the host's ALRT+ lapsed: check-ins, snapshots and SOS are
 /// paused for this circle, nothing deleted. Only ever true once
 /// billing is switched on.
@@ -305,16 +311,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyCircle&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.plan, plan) || other.plan == plan)&&(identical(other.maxMembers, maxMembers) || other.maxMembers == maxMembers)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.isPaused, isPaused) || other.isPaused == isPaused)&&(identical(other.pausedHostName, pausedHostName) || other.pausedHostName == pausedHostName)&&(identical(other.graceDaysLeft, graceDaysLeft) || other.graceDaysLeft == graceDaysLeft)&&(identical(other.anyoneCanRequestSnapshot, anyoneCanRequestSnapshot) || other.anyoneCanRequestSnapshot == anyoneCanRequestSnapshot)&&(identical(other.sosToWholeGroup, sosToWholeGroup) || other.sosToWholeGroup == sosToWholeGroup)&&(identical(other.journeysSnapPointsOnly, journeysSnapPointsOnly) || other.journeysSnapPointsOnly == journeysSnapPointsOnly)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&const DeepCollectionEquality().equals(other._members, _members)&&const DeepCollectionEquality().equals(other._places, _places)&&const DeepCollectionEquality().equals(other._activeSosEvents, _activeSosEvents)&&(identical(other.latestCheckInRequest, latestCheckInRequest) || other.latestCheckInRequest == latestCheckInRequest)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyCircle&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.plan, plan) || other.plan == plan)&&(identical(other.maxMembers, maxMembers) || other.maxMembers == maxMembers)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&(identical(other.isPaused, isPaused) || other.isPaused == isPaused)&&(identical(other.pausedHostName, pausedHostName) || other.pausedHostName == pausedHostName)&&(identical(other.graceDaysLeft, graceDaysLeft) || other.graceDaysLeft == graceDaysLeft)&&(identical(other.anyoneCanRequestSnapshot, anyoneCanRequestSnapshot) || other.anyoneCanRequestSnapshot == anyoneCanRequestSnapshot)&&(identical(other.sosToWholeGroup, sosToWholeGroup) || other.sosToWholeGroup == sosToWholeGroup)&&(identical(other.journeysSnapPointsOnly, journeysSnapPointsOnly) || other.journeysSnapPointsOnly == journeysSnapPointsOnly)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&const DeepCollectionEquality().equals(other._members, _members)&&const DeepCollectionEquality().equals(other._places, _places)&&const DeepCollectionEquality().equals(other._activeSosEvents, _activeSosEvents)&&(identical(other.latestCheckInRequest, latestCheckInRequest) || other.latestCheckInRequest == latestCheckInRequest)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,plan,maxMembers,themeColor,isPaused,pausedHostName,graceDaysLeft,anyoneCanRequestSnapshot,sosToWholeGroup,journeysSnapPointsOnly,myMemberId,const DeepCollectionEquality().hash(_members),const DeepCollectionEquality().hash(_places),const DeepCollectionEquality().hash(_activeSosEvents),latestCheckInRequest,createdAt);
+int get hashCode => Object.hash(runtimeType,id,name,plan,maxMembers,themeColor,photoUrl,isPaused,pausedHostName,graceDaysLeft,anyoneCanRequestSnapshot,sosToWholeGroup,journeysSnapPointsOnly,myMemberId,const DeepCollectionEquality().hash(_members),const DeepCollectionEquality().hash(_places),const DeepCollectionEquality().hash(_activeSosEvents),latestCheckInRequest,createdAt);
 
 @override
 String toString() {
-  return 'FamilyCircle(id: $id, name: $name, plan: $plan, maxMembers: $maxMembers, themeColor: $themeColor, isPaused: $isPaused, pausedHostName: $pausedHostName, graceDaysLeft: $graceDaysLeft, anyoneCanRequestSnapshot: $anyoneCanRequestSnapshot, sosToWholeGroup: $sosToWholeGroup, journeysSnapPointsOnly: $journeysSnapPointsOnly, myMemberId: $myMemberId, members: $members, places: $places, activeSosEvents: $activeSosEvents, latestCheckInRequest: $latestCheckInRequest, createdAt: $createdAt)';
+  return 'FamilyCircle(id: $id, name: $name, plan: $plan, maxMembers: $maxMembers, themeColor: $themeColor, photoUrl: $photoUrl, isPaused: $isPaused, pausedHostName: $pausedHostName, graceDaysLeft: $graceDaysLeft, anyoneCanRequestSnapshot: $anyoneCanRequestSnapshot, sosToWholeGroup: $sosToWholeGroup, journeysSnapPointsOnly: $journeysSnapPointsOnly, myMemberId: $myMemberId, members: $members, places: $places, activeSosEvents: $activeSosEvents, latestCheckInRequest: $latestCheckInRequest, createdAt: $createdAt)';
 }
 
 
@@ -325,7 +331,7 @@ abstract mixin class _$FamilyCircleCopyWith<$Res> implements $FamilyCircleCopyWi
   factory _$FamilyCircleCopyWith(_FamilyCircle value, $Res Function(_FamilyCircle) _then) = __$FamilyCircleCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, String plan, int maxMembers, String? themeColor, bool isPaused, String? pausedHostName, int? graceDaysLeft, bool anyoneCanRequestSnapshot, bool sosToWholeGroup, bool journeysSnapPointsOnly, String myMemberId, List<FamilyMember> members, List<FamilySavedPlace> places, List<FamilySosEvent> activeSosEvents, FamilyCheckInRequest? latestCheckInRequest, DateTime? createdAt
+ String id, String name, String plan, int maxMembers, String? themeColor, String? photoUrl, bool isPaused, String? pausedHostName, int? graceDaysLeft, bool anyoneCanRequestSnapshot, bool sosToWholeGroup, bool journeysSnapPointsOnly, String myMemberId, List<FamilyMember> members, List<FamilySavedPlace> places, List<FamilySosEvent> activeSosEvents, FamilyCheckInRequest? latestCheckInRequest, DateTime? createdAt
 });
 
 
@@ -342,13 +348,14 @@ class __$FamilyCircleCopyWithImpl<$Res>
 
 /// Create a copy of FamilyCircle
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? plan = null,Object? maxMembers = null,Object? themeColor = freezed,Object? isPaused = null,Object? pausedHostName = freezed,Object? graceDaysLeft = freezed,Object? anyoneCanRequestSnapshot = null,Object? sosToWholeGroup = null,Object? journeysSnapPointsOnly = null,Object? myMemberId = null,Object? members = null,Object? places = null,Object? activeSosEvents = null,Object? latestCheckInRequest = freezed,Object? createdAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? plan = null,Object? maxMembers = null,Object? themeColor = freezed,Object? photoUrl = freezed,Object? isPaused = null,Object? pausedHostName = freezed,Object? graceDaysLeft = freezed,Object? anyoneCanRequestSnapshot = null,Object? sosToWholeGroup = null,Object? journeysSnapPointsOnly = null,Object? myMemberId = null,Object? members = null,Object? places = null,Object? activeSosEvents = null,Object? latestCheckInRequest = freezed,Object? createdAt = freezed,}) {
   return _then(_FamilyCircle(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,plan: null == plan ? _self.plan : plan // ignore: cast_nullable_to_non_nullable
 as String,maxMembers: null == maxMembers ? _self.maxMembers : maxMembers // ignore: cast_nullable_to_non_nullable
 as int,themeColor: freezed == themeColor ? _self.themeColor : themeColor // ignore: cast_nullable_to_non_nullable
+as String?,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
 as String?,isPaused: null == isPaused ? _self.isPaused : isPaused // ignore: cast_nullable_to_non_nullable
 as bool,pausedHostName: freezed == pausedHostName ? _self.pausedHostName : pausedHostName // ignore: cast_nullable_to_non_nullable
 as String?,graceDaysLeft: freezed == graceDaysLeft ? _self.graceDaysLeft : graceDaysLeft // ignore: cast_nullable_to_non_nullable
@@ -3811,7 +3818,7 @@ as List<FamilyTransferCandidate>,
 /// @nodoc
 mixin _$FamilyCircleSummary {
 
- String get circleId; String get name; String? get themeColor;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role; String get myMemberId; int get memberCount;/// Members who hold a seat: everyone except guests, who join free.
+ String get circleId; String get name; String? get themeColor; String? get photoUrl;@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole get role; String get myMemberId; int get memberCount;/// Members who hold a seat: everyone except guests, who join free.
  int get seatCount;/// True when the caller owns (pays for) this circle — its members
 /// consume the caller's seats.
  bool get isOwned; DateTime? get joinedAt;
@@ -3827,16 +3834,16 @@ $FamilyCircleSummaryCopyWith<FamilyCircleSummary> get copyWith => _$FamilyCircle
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyCircleSummary&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.role, role) || other.role == role)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.seatCount, seatCount) || other.seatCount == seatCount)&&(identical(other.isOwned, isOwned) || other.isOwned == isOwned)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilyCircleSummary&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&(identical(other.role, role) || other.role == role)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.seatCount, seatCount) || other.seatCount == seatCount)&&(identical(other.isOwned, isOwned) || other.isOwned == isOwned)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,role,myMemberId,memberCount,seatCount,isOwned,joinedAt);
+int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,photoUrl,role,myMemberId,memberCount,seatCount,isOwned,joinedAt);
 
 @override
 String toString() {
-  return 'FamilyCircleSummary(circleId: $circleId, name: $name, themeColor: $themeColor, role: $role, myMemberId: $myMemberId, memberCount: $memberCount, seatCount: $seatCount, isOwned: $isOwned, joinedAt: $joinedAt)';
+  return 'FamilyCircleSummary(circleId: $circleId, name: $name, themeColor: $themeColor, photoUrl: $photoUrl, role: $role, myMemberId: $myMemberId, memberCount: $memberCount, seatCount: $seatCount, isOwned: $isOwned, joinedAt: $joinedAt)';
 }
 
 
@@ -3847,7 +3854,7 @@ abstract mixin class $FamilyCircleSummaryCopyWith<$Res>  {
   factory $FamilyCircleSummaryCopyWith(FamilyCircleSummary value, $Res Function(FamilyCircleSummary) _then) = _$FamilyCircleSummaryCopyWithImpl;
 @useResult
 $Res call({
- String circleId, String name, String? themeColor,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, String myMemberId, int memberCount, int seatCount, bool isOwned, DateTime? joinedAt
+ String circleId, String name, String? themeColor, String? photoUrl,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, String myMemberId, int memberCount, int seatCount, bool isOwned, DateTime? joinedAt
 });
 
 
@@ -3864,11 +3871,12 @@ class _$FamilyCircleSummaryCopyWithImpl<$Res>
 
 /// Create a copy of FamilyCircleSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? role = null,Object? myMemberId = null,Object? memberCount = null,Object? seatCount = null,Object? isOwned = null,Object? joinedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? photoUrl = freezed,Object? role = null,Object? myMemberId = null,Object? memberCount = null,Object? seatCount = null,Object? isOwned = null,Object? joinedAt = freezed,}) {
   return _then(_self.copyWith(
 circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,themeColor: freezed == themeColor ? _self.themeColor : themeColor // ignore: cast_nullable_to_non_nullable
+as String?,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
 as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as FamilyRole,myMemberId: null == myMemberId ? _self.myMemberId : myMemberId // ignore: cast_nullable_to_non_nullable
 as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable
@@ -3960,10 +3968,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  int seatCount,  bool isOwned,  DateTime? joinedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor,  String? photoUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  int seatCount,  bool isOwned,  DateTime? joinedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FamilyCircleSummary() when $default != null:
-return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.seatCount,_that.isOwned,_that.joinedAt);case _:
+return $default(_that.circleId,_that.name,_that.themeColor,_that.photoUrl,_that.role,_that.myMemberId,_that.memberCount,_that.seatCount,_that.isOwned,_that.joinedAt);case _:
   return orElse();
 
 }
@@ -3981,10 +3989,10 @@ return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMe
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  int seatCount,  bool isOwned,  DateTime? joinedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String circleId,  String name,  String? themeColor,  String? photoUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  int seatCount,  bool isOwned,  DateTime? joinedAt)  $default,) {final _that = this;
 switch (_that) {
 case _FamilyCircleSummary():
-return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.seatCount,_that.isOwned,_that.joinedAt);case _:
+return $default(_that.circleId,_that.name,_that.themeColor,_that.photoUrl,_that.role,_that.myMemberId,_that.memberCount,_that.seatCount,_that.isOwned,_that.joinedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -4001,10 +4009,10 @@ return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMe
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String circleId,  String name,  String? themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  int seatCount,  bool isOwned,  DateTime? joinedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String circleId,  String name,  String? themeColor,  String? photoUrl, @JsonKey(unknownEnumValue: FamilyRole.adult)  FamilyRole role,  String myMemberId,  int memberCount,  int seatCount,  bool isOwned,  DateTime? joinedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FamilyCircleSummary() when $default != null:
-return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMemberId,_that.memberCount,_that.seatCount,_that.isOwned,_that.joinedAt);case _:
+return $default(_that.circleId,_that.name,_that.themeColor,_that.photoUrl,_that.role,_that.myMemberId,_that.memberCount,_that.seatCount,_that.isOwned,_that.joinedAt);case _:
   return null;
 
 }
@@ -4016,12 +4024,13 @@ return $default(_that.circleId,_that.name,_that.themeColor,_that.role,_that.myMe
 @JsonSerializable()
 
 class _FamilyCircleSummary implements FamilyCircleSummary {
-  const _FamilyCircleSummary({required this.circleId, required this.name, this.themeColor, @JsonKey(unknownEnumValue: FamilyRole.adult) this.role = FamilyRole.adult, required this.myMemberId, this.memberCount = 0, this.seatCount = 0, this.isOwned = false, this.joinedAt});
+  const _FamilyCircleSummary({required this.circleId, required this.name, this.themeColor, this.photoUrl, @JsonKey(unknownEnumValue: FamilyRole.adult) this.role = FamilyRole.adult, required this.myMemberId, this.memberCount = 0, this.seatCount = 0, this.isOwned = false, this.joinedAt});
   factory _FamilyCircleSummary.fromJson(Map<String, dynamic> json) => _$FamilyCircleSummaryFromJson(json);
 
 @override final  String circleId;
 @override final  String name;
 @override final  String? themeColor;
+@override final  String? photoUrl;
 @override@JsonKey(unknownEnumValue: FamilyRole.adult) final  FamilyRole role;
 @override final  String myMemberId;
 @override@JsonKey() final  int memberCount;
@@ -4045,16 +4054,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyCircleSummary&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.role, role) || other.role == role)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.seatCount, seatCount) || other.seatCount == seatCount)&&(identical(other.isOwned, isOwned) || other.isOwned == isOwned)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilyCircleSummary&&(identical(other.circleId, circleId) || other.circleId == circleId)&&(identical(other.name, name) || other.name == name)&&(identical(other.themeColor, themeColor) || other.themeColor == themeColor)&&(identical(other.photoUrl, photoUrl) || other.photoUrl == photoUrl)&&(identical(other.role, role) || other.role == role)&&(identical(other.myMemberId, myMemberId) || other.myMemberId == myMemberId)&&(identical(other.memberCount, memberCount) || other.memberCount == memberCount)&&(identical(other.seatCount, seatCount) || other.seatCount == seatCount)&&(identical(other.isOwned, isOwned) || other.isOwned == isOwned)&&(identical(other.joinedAt, joinedAt) || other.joinedAt == joinedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,role,myMemberId,memberCount,seatCount,isOwned,joinedAt);
+int get hashCode => Object.hash(runtimeType,circleId,name,themeColor,photoUrl,role,myMemberId,memberCount,seatCount,isOwned,joinedAt);
 
 @override
 String toString() {
-  return 'FamilyCircleSummary(circleId: $circleId, name: $name, themeColor: $themeColor, role: $role, myMemberId: $myMemberId, memberCount: $memberCount, seatCount: $seatCount, isOwned: $isOwned, joinedAt: $joinedAt)';
+  return 'FamilyCircleSummary(circleId: $circleId, name: $name, themeColor: $themeColor, photoUrl: $photoUrl, role: $role, myMemberId: $myMemberId, memberCount: $memberCount, seatCount: $seatCount, isOwned: $isOwned, joinedAt: $joinedAt)';
 }
 
 
@@ -4065,7 +4074,7 @@ abstract mixin class _$FamilyCircleSummaryCopyWith<$Res> implements $FamilyCircl
   factory _$FamilyCircleSummaryCopyWith(_FamilyCircleSummary value, $Res Function(_FamilyCircleSummary) _then) = __$FamilyCircleSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- String circleId, String name, String? themeColor,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, String myMemberId, int memberCount, int seatCount, bool isOwned, DateTime? joinedAt
+ String circleId, String name, String? themeColor, String? photoUrl,@JsonKey(unknownEnumValue: FamilyRole.adult) FamilyRole role, String myMemberId, int memberCount, int seatCount, bool isOwned, DateTime? joinedAt
 });
 
 
@@ -4082,11 +4091,12 @@ class __$FamilyCircleSummaryCopyWithImpl<$Res>
 
 /// Create a copy of FamilyCircleSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? role = null,Object? myMemberId = null,Object? memberCount = null,Object? seatCount = null,Object? isOwned = null,Object? joinedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? circleId = null,Object? name = null,Object? themeColor = freezed,Object? photoUrl = freezed,Object? role = null,Object? myMemberId = null,Object? memberCount = null,Object? seatCount = null,Object? isOwned = null,Object? joinedAt = freezed,}) {
   return _then(_FamilyCircleSummary(
 circleId: null == circleId ? _self.circleId : circleId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,themeColor: freezed == themeColor ? _self.themeColor : themeColor // ignore: cast_nullable_to_non_nullable
+as String?,photoUrl: freezed == photoUrl ? _self.photoUrl : photoUrl // ignore: cast_nullable_to_non_nullable
 as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as FamilyRole,myMemberId: null == myMemberId ? _self.myMemberId : myMemberId // ignore: cast_nullable_to_non_nullable
 as String,memberCount: null == memberCount ? _self.memberCount : memberCount // ignore: cast_nullable_to_non_nullable

@@ -13,6 +13,7 @@ _FamilyCircle _$FamilyCircleFromJson(Map<String, dynamic> json) =>
       plan: json['plan'] as String? ?? 'plus',
       maxMembers: (json['maxMembers'] as num?)?.toInt() ?? 10,
       themeColor: json['themeColor'] as String?,
+      photoUrl: json['photoUrl'] as String?,
       isPaused: json['isPaused'] as bool? ?? false,
       pausedHostName: json['pausedHostName'] as String?,
       graceDaysLeft: (json['graceDaysLeft'] as num?)?.toInt(),
@@ -54,6 +55,7 @@ Map<String, dynamic> _$FamilyCircleToJson(
   'plan': instance.plan,
   'maxMembers': instance.maxMembers,
   'themeColor': ?instance.themeColor,
+  'photoUrl': ?instance.photoUrl,
   'isPaused': instance.isPaused,
   'pausedHostName': ?instance.pausedHostName,
   'graceDaysLeft': ?instance.graceDaysLeft,
@@ -457,6 +459,7 @@ _FamilyCircleSummary _$FamilyCircleSummaryFromJson(Map<String, dynamic> json) =>
       circleId: json['circleId'] as String,
       name: json['name'] as String,
       themeColor: json['themeColor'] as String?,
+      photoUrl: json['photoUrl'] as String?,
       role:
           $enumDecodeNullable(
             _$FamilyRoleEnumMap,
@@ -479,6 +482,7 @@ Map<String, dynamic> _$FamilyCircleSummaryToJson(
   'circleId': instance.circleId,
   'name': instance.name,
   'themeColor': ?instance.themeColor,
+  'photoUrl': ?instance.photoUrl,
   'role': _$FamilyRoleEnumMap[instance.role]!,
   'myMemberId': instance.myMemberId,
   'memberCount': instance.memberCount,

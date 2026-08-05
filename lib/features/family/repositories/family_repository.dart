@@ -61,6 +61,13 @@ abstract class FamilyRepository {
     required final File photo,
   });
 
+  /// The group picture for the whole circle (owner only).
+  Future<Either<void, AppError>> updateFamilyCirclePhoto({
+    required final File photo,
+  });
+
+  Future<Either<void, AppError>> removeFamilyCirclePhoto();
+
   Future<Either<FamilyInvite, AppError>> createFamilyInvite({
     final bool isGuestInvite = false,
   });
@@ -410,6 +417,35 @@ class FamilyRepositoryImpl implements FamilyRepository {
           photo: photo,
           circleId: _circleId,
         );
+        return const Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> updateFamilyCirclePhoto({
+    required File photo,
+  }) {
+    return runAsyncCall(
+      name: 'updateFamilyCirclePhoto',
+      future: () async {
+        await _restClient.updateFamilyCirclePhoto(
+          photo: photo,
+          circleId: _circleId,
+        );
+        return const Success(null);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<void, AppError>> removeFamilyCirclePhoto() {
+    return runAsyncCall(
+      name: 'removeFamilyCirclePhoto',
+      future: () async {
+        await _restClient.removeFamilyCirclePhoto(circleId: _circleId);
         return const Success(null);
       },
       onError: Failure.new,

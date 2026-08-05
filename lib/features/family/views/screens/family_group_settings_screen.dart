@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_group_avatar.dart';
+import 'package:hazard_app/features/shared/enums/alrt_media_source_types.dart';
+import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 
 /// Group settings: the beacon colour, and how this group sees you.
@@ -73,6 +78,7 @@ class _FamilyGroupSettingsScreenState
         padding: EdgeInsets.zero,
         children: [
           _headerBuilder(circle, selected),
+          _groupPictureCardBuilder(circle, selected),
           _beaconCardBuilder(selected, takenLabels),
           _seesYouCardBuilder(circle),
           SizedBox(height: 24.spMin),
@@ -172,6 +178,117 @@ class _FamilyGroupSettingsScreenState
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// The group picture: how the circle is recognised on the hub, in the
+  /// switcher and on the home-screen widget.
+  ///
+  /// Owner-only, like the beacon colour. Members see the picture without
+  /// the controls rather than a card that fails when they tap it.
+  Widget _groupPictureCardBuilder(
+    final FamilyCircle circle,
+    final Color beacon,
+  ) {
+    final isOwner = circle.me?.role == FamilyRole.owner;
+    final hasPhoto = (circle.photoUrl ?? '').isNotEmpty;
+
+    return _cardBuilder(
+      topMargin: 13,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'GROUP PICTURE',
+            style: TextStyle(
+              fontSize: 10.spMin,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.6,
+              color: _label,
+            ),
+          ),
+          SizedBox(height: 11.spMin),
+          Row(
+            children: [
+              FamilyGroupAvatar(
+                name: circle.name,
+                photoUrl: circle.photoUrl,
+                themeColorHex: _hexOf(beacon),
+                size: 60.spMin,
+              ),
+              SizedBox(width: 13.spMin),
+              Expanded(
+                child: Text(
+                  isOwner
+                      ? 'Shown wherever ${circle.name} is listed, including '
+                            'the home-screen widget. Without one the group '
+                            'wears its initial on the beacon colour.'
+                      : 'Set by the person who owns ${circle.name}.',
+                  style: TextStyle(
+                    fontSize: 11.5.spMin,
+                    height: 1.5,
+                    color: FamilyColors.v31Ink,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (isOwner) ...[
+            SizedBox(height: 13.spMin),
+            Row(
+              children: [
+                Expanded(
+                  child: _photoActionBuilder(
+                    label: hasPhoto ? 'Change picture' : 'Add a picture',
+                    isPrimary: true,
+                    onTap: _isSaving ? null : _changeGroupPhoto,
+                  ),
+                ),
+                if (hasPhoto) ...[
+                  SizedBox(width: 8.spMin),
+                  Expanded(
+                    child: _photoActionBuilder(
+                      label: 'Remove',
+                      isPrimary: false,
+                      onTap: _isSaving ? null : _removeGroupPhoto,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _photoActionBuilder({
+    required final String label,
+    required final bool isPrimary,
+    required final VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 11.spMin),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: isPrimary ? const Color(0xFFFFF4EC) : Colors.white,
+          borderRadius: BorderRadius.circular(11.spMin),
+          border: Border.all(
+            color: isPrimary ? _label : FamilyColors.v31Border,
+            width: 1.5,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12.spMin,
+            fontWeight: FontWeight.w800,
+            color: isPrimary ? _label : FamilyColors.v31Ink,
+          ),
         ),
       ),
     );
@@ -417,6 +534,44 @@ class _FamilyGroupSettingsScreenState
       ),
       child: child,
     );
+  }
+
+  /// Picks and uploads a group picture. Applies immediately rather than
+  /// waiting for SAVE: an image upload is its own action, and the group's
+  /// members see it the moment it lands.
+  Future<void> _changeGroupPhoto() async {
+    final medias = await showImagePickerBottomSheet(context: context);
+    final media = medias?.firstOrNull;
+    if (media == null || media.source != AlrtMediaSource.file) return;
+    if (!mounted) return;
+
+    setState(() => _isSaving = true);
+    final uploaded = await ref
+        .read(providerOfFamily.notifier)
+        .updateGroupPhoto(File(media.value));
+    if (!mounted) return;
+    setState(() => _isSaving = false);
+
+    uploaded
+        ? context.showSuccessToast(message: 'Group picture updated.')
+        : context.showErrorToast(
+            message: 'Could not upload the picture. Please try again.',
+          );
+  }
+
+  Future<void> _removeGroupPhoto() async {
+    setState(() => _isSaving = true);
+    final removed = await ref
+        .read(providerOfFamily.notifier)
+        .removeGroupPhoto();
+    if (!mounted) return;
+    setState(() => _isSaving = false);
+
+    removed
+        ? context.showSuccessToast(message: 'Group picture removed.')
+        : context.showErrorToast(
+            message: 'Could not remove the picture. Please try again.',
+          );
   }
 
   Future<void> _handleSave() async {

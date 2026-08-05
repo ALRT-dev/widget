@@ -89,6 +89,16 @@ class FamilyService {
     return _familyRepository.updateOwnFamilyMemberPhoto(photo: photo);
   }
 
+  Future<Either<void, AppError>> updateFamilyCirclePhoto({
+    required final File photo,
+  }) {
+    return _familyRepository.updateFamilyCirclePhoto(photo: photo);
+  }
+
+  Future<Either<void, AppError>> removeFamilyCirclePhoto() {
+    return _familyRepository.removeFamilyCirclePhoto();
+  }
+
   Future<Either<FamilyInvite, AppError>> createFamilyInvite({
     final bool isGuestInvite = false,
   }) {
