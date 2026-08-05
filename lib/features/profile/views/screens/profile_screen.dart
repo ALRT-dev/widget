@@ -36,6 +36,7 @@ import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_wrapper.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:hazard_app/features/profile/views/screens/blocked_accounts_screen.dart';
+import 'package:hazard_app/features/profile/views/screens/child_mode_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -458,6 +459,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 icon: LucideIcons.bell,
                 color: AppColors.orange,
                 onTap: _gotoManageNotificationsScreen,
+              ),
+              _buildAccountSettingsItem(
+                title: 'Child mode',
+                subtitle: 'Map, SOS and check-ins only on this phone',
+                icon: LucideIcons.baby,
+                color: AppColors.purple,
+                onTap: () => context.push(ChildModeScreen.route),
               ),
               _buildAccountSettingsItem(
                 title: 'Blocked accounts',

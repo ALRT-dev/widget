@@ -51,6 +51,8 @@ import 'package:hazard_app/features/shared/views/screens/splash_screen.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 import 'package:hazard_app/others/app_wrapper.dart';
 import 'package:hazard_app/features/profile/views/screens/blocked_accounts_screen.dart';
+import 'package:hazard_app/features/profile/providers/child_mode_provider.dart';
+import 'package:hazard_app/features/profile/views/screens/child_mode_screen.dart';
 
 class AppRouter {
   /// Builds and returns a [GoRouter] instance configured with routes and navigation settings.
@@ -235,6 +237,10 @@ class AppRouter {
         ),
         // ------------------------- LEARN HUB -------------------------
         GoRoute(
+          path: ChildModeScreen.route,
+          builder: (context, state) => const ChildModeScreen(),
+        ),
+        GoRoute(
           path: BlockedAccountsScreen.route,
           builder: (context, state) => const BlockedAccountsScreen(),
         ),
@@ -309,6 +315,11 @@ class AppRouter {
         ),
         GoRoute(
           path: CreateUpdateReportScreen.createRoute,
+          // Child mode hides the ALRT slot, but voice dictation and any
+          // deep link still route here, so the gate lives on the route
+          // rather than on one button.
+          redirect: (context, state) =>
+              ref.read(providerOfIsChildMode) ? HomeScreen.route : null,
           builder: (context, state) {
             return CreateUpdateReportScreen(
               args: state.extra as CreateUpdateReportScreenArgs?,

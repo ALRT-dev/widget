@@ -56,8 +56,16 @@ class IncomingFamilyAlert {
   }
 
   static void dismiss() {
-    _current?.remove();
+    final entry = _current;
     _current = null;
+    if (entry == null) return;
+    try {
+      entry.remove();
+    } catch (_) {
+      // The overlay can be torn down under us by a navigation, and
+      // removing an already-removed entry throws. An SOS banner must
+      // never be the thing that crashes the app on its way out.
+    }
   }
 }
 
