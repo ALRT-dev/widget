@@ -589,20 +589,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
           provider.select((value) => value.hazard?.updatedAt),
         );
 
-        final latitude = ref.watch(
-          provider.select((value) => value.hazard?.latitude),
-        );
-        final longitude = ref.watch(
-          provider.select((value) => value.hazard?.longitude),
-        );
-        final distance = latitude == null || longitude == null
-            ? null
-            : ref.watch(
-                providerOfLocation.select(
-                  (value) => value.distanceTo(latitude, longitude),
-                ),
-              );
-
         final hasAwsLevel =
             isAws && severityTitle.isNotEmpty && severityTitle != 'Unknown';
         final isLive =
@@ -652,13 +638,6 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 label: '● Live · updated ${updatedAt.timeAgo}',
                 backgroundColor: AlertCardStyle.livePillBackground,
                 foregroundColor: AlertCardStyle.livePillForeground,
-              ),
-            if (distance != null)
-              _v3PillBuilder(
-                label:
-                    '${(distance < 1000 ? '${distance.toStringAsFixed(1)} m' : '${(distance / 1000).toStringAsFixed(1)} km')} away',
-                backgroundColor: AppColors.extraLightGrey,
-                foregroundColor: AppColors.grey,
               ),
           ],
         );
@@ -1371,7 +1350,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
     );
   }
 
-  // ignore: unused_element
+  /// The agency's own words, under the V3 "WHAT WE KNOW" label.
   Widget _buildOfficialDescriptionSection() {
     return Consumer(
       builder: (context, ref, child) {
@@ -1388,46 +1367,73 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
         if (description?.isEmpty ?? true) return const SizedBox.shrink();
 
+        // Paired with WHAT TO DO, to the pixel. This used to be a blue
+        // card with a blue bar and a sentence-case heading: blue is the
+        // COMMUNITY colour, so an official agency's own words were wearing
+        // the unverified-report treatment, and the two halves of the alert
+        // read as parts of two different apps.
+        final color = AlertCardStyle.officialSectionHeaderColor;
+
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.blue.withValues(alpha: 0.05),
+            color: AppColors.white,
             borderRadius: BorderRadius.circular(16.spMin),
-            border: Border(
-              left: BorderSide(
-                color: AppColors.blue,
-                width: 4,
-              ),
-            ),
-          ),
-          padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 8.spMin, 16.spMin),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Official Description',
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontSize: 16.spMin,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    12.spMin.hSizedBox,
-                    Text(
-                      description!,
-                      style: TextStyle(
-                        fontSize: 14.spMin,
-                        height: 1.5,
-                      ),
-                    ),
-                  ],
-                ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.shadowColorLight,
+                blurRadius: 2.0,
+                offset: Offset(0.0, 0.0),
               ),
             ],
           ),
-        ).pB(24.0);
+          child: Container(
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(16.spMin),
+              border: Border(
+                left: BorderSide(color: color, width: 4),
+                right: BorderSide(color: color, width: 1),
+                bottom: BorderSide(color: color, width: 1),
+                top: BorderSide(color: color, width: 1),
+              ),
+            ),
+            padding: EdgeInsets.fromLTRB(
+              16.spMin,
+              16.spMin,
+              8.spMin,
+              16.spMin,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'WHAT WE KNOW',
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 10.5.spMin,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                      12.spMin.hSizedBox,
+                      Text(
+                        description!,
+                        style: TextStyle(
+                          color: AppColors.black.withValues(alpha: 0.9),
+                          fontSize: 14.spMin,
+                          height: 1.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ).pB(16.0);
       },
     );
   }
