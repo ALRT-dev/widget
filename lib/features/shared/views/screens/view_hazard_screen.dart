@@ -35,7 +35,9 @@ import 'package:hazard_app/features/shared/views/widgets/category_filter_chip.da
 import 'package:hazard_app/others/app_colors.dart';
 import 'dart:math' as math;
 
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:hazard_app/features/shared/services/alert_speech_service.dart';
 
 class ViewHazardScreenArgs {
@@ -823,8 +825,92 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
 
         // Source Section
         _buildSourceSection(),
+        16.hSizedBox,
+
+        // Locked rule: the disclaimer travels on the alert itself, and
+        // calling 000 is always one tap.
+        _buildEmergencyStrip(),
         40.hSizedBox,
       ],
+    );
+  }
+
+  /// ALRT never contacts emergency services, so every alert says so and
+  /// puts the real emergency number one tap away. On ACTION and CRITICAL
+  /// alerts the button is filled red; lower bands keep it calm but present,
+  /// because the number must never depend on how the alert was rated.
+  Widget _buildEmergencyStrip() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final band = ref.watch(
+          provider.select((value) => value.hazard?.severityBand),
+        );
+        final isUrgent = band == HazardSeverityBand.action ||
+            band == HazardSeverityBand.critical;
+
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(14.spMin),
+          decoration: BoxDecoration(
+            color: isUrgent ? const Color(0xFFFFF1F0) : const Color(0xFFF5F5F7),
+            borderRadius: BorderRadius.circular(14.spMin),
+            border: Border.all(
+              color: isUrgent
+                  ? AlertCardStyle.bandCritical.withValues(alpha: 0.35)
+                  : const Color(0xFFE2E0E6),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'ALRT does not contact emergency services. '
+                'If you are in danger, call 000 now.',
+                style: TextStyle(
+                  fontSize: 12.spMin,
+                  height: 1.45,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF3A3A42),
+                ),
+              ),
+              10.hSizedBox,
+              SizedBox(
+                width: double.infinity,
+                height: 44.spMin,
+                child: ElevatedButton.icon(
+                  onPressed: () => launchUrl(Uri.parse('tel:000')),
+                  icon: Icon(LucideIcons.phone, size: 17.spMin),
+                  label: Text(
+                    'Call 000',
+                    style: TextStyle(
+                      fontSize: 14.spMin,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isUrgent
+                        ? AlertCardStyle.bandCritical
+                        : AppColors.white,
+                    foregroundColor: isUrgent
+                        ? AppColors.white
+                        : AlertCardStyle.bandCritical,
+                    elevation: 0,
+                    side: isUrgent
+                        ? null
+                        : BorderSide(
+                            color: AlertCardStyle.bandCritical
+                                .withValues(alpha: 0.5),
+                          ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.spMin),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
