@@ -120,6 +120,7 @@ const _$XpEventTypeEnumMap = {
   XpEventType.reportRejected: 'reportRejected',
   XpEventType.reportCorroborated: 'reportCorroborated',
   XpEventType.officialMatch: 'officialMatch',
+  XpEventType.onboardingCompleted: 'onboardingCompleted',
   XpEventType.guideCompleted: 'guideCompleted',
   XpEventType.questCompleted: 'questCompleted',
   XpEventType.shareInstall: 'shareInstall',
