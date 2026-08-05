@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 556 416" width="556" height="416">
+  <!--
+    The ALRT mark: six paths, never fewer.
+
+    Three stacked bars with three dots, on a regular grid: row pitch 155,
+    bar height 106, every end fully rounded (r = 53) and every dot the same
+    diameter as a bar is tall. Rows 1 and 3 are red bars closed by an orange
+    dot on the right; row 2 is an orange dot on the left opening an orange
+    bar. That asymmetry is the mark, so nothing here may be simplified to
+    "three lines".
+
+    Colours are the app's own brand hexes (the splash rings): red #FF0004,
+    orange #FF6B01.
+
+    Dots sit BEHIND the bars so a bar's rounded end reads over its dot.
+  -->
+  <g>
+    <!-- 1: top dot -->
+    <circle cx="502" cy="53" r="53" fill="#FF6B01" />
+    <!-- 2: top bar -->
+    <rect x="8" y="0" width="457" height="106" rx="53" fill="#FF0004" />
+
+    <!-- 3: middle dot -->
+    <circle cx="54" cy="208" r="53" fill="#FF6B01" />
+    <!-- 4: middle bar -->
+    <rect x="143" y="155" width="413" height="106" rx="53" fill="#FF6B01" />
+
+    <!-- 5: bottom dot -->
+    <circle cx="502" cy="363" r="53" fill="#FF6B01" />
+    <!-- 6: bottom bar -->
+    <rect x="8" y="310" width="457" height="106" rx="53" fill="#FF0004" />
+  </g>
+</svg>

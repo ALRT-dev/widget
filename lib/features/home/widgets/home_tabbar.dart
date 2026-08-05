@@ -9,6 +9,7 @@ import 'package:hazard_app/features/notification/providers/notifications_feed_pr
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 /// The dark floating pill navigation bar.
 ///
@@ -115,8 +116,10 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
         return SizedBox(
           width: 32.spMin,
           height: 26.spMin,
-          child: Image.asset(
-            'assets/logos/alrt_logo.png',
+          child: SvgPicture.asset(
+            // The six-path mark, never redrawn and never substituted for
+            // a glyph. Vector so it stays crisp in its locked 32x26 box.
+            'assets/logos/alrt_logo.svg',
             fit: BoxFit.contain,
           ),
         );

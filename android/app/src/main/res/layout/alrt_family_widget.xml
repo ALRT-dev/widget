@@ -33,7 +33,7 @@
             android:layout_width="20dp"
             android:layout_height="15dp"
             android:layout_marginStart="8dp"
-            android:src="@drawable/alrt_logo"
+            android:src="@drawable/alrt_logo_vector"
             android:scaleType="fitCenter"
             android:contentDescription="ALRT" />
     </LinearLayout>
