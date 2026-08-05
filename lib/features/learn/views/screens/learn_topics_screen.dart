@@ -18,7 +18,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 /// This is NOT a routed screen — embed it directly (e.g. as the "Learn"
 /// toggle tab of the alerts feed screen). For direct navigation use
 /// [LearnTopicsScreen] (route `/learn`) which wraps this in a Scaffold.
-class LearnTopicsView extends ConsumerWidget {
+class LearnTopicsView extends ConsumerStatefulWidget {
   const LearnTopicsView({
     super.key,
     this.padding,
@@ -28,7 +28,28 @@ class LearnTopicsView extends ConsumerWidget {
   final EdgeInsetsGeometry? padding;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LearnTopicsView> createState() => _LearnTopicsViewState();
+}
+
+class _LearnTopicsViewState extends ConsumerState<LearnTopicsView> {
+  @override
+  void initState() {
+    super.initState();
+    // The learn provider is kept alive and loads once, in its
+    // constructor. If that first load failed (created before the auth
+    // token was ready, a network blip at startup) the failed state stuck
+    // and opening this tab just re-rendered it forever: nothing ever
+    // asked again. Opening the tab asks again.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (!ref.read(providerOfLearn).hasData) {
+        ref.read(providerOfLearn.notifier).load();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     _listenToRefreshErrors(context, ref);
 
     final learnState = ref.watch(providerOfLearn);
@@ -49,7 +70,7 @@ class LearnTopicsView extends ConsumerWidget {
       onRefresh: () => ref.read(providerOfLearn.notifier).refresh(),
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: padding ?? EdgeInsets.all(16.spMin),
+        padding: widget.padding ?? EdgeInsets.all(16.spMin),
         children: [
           LearnProgressHeroCard(
             completedCount: learnState.completedCount,

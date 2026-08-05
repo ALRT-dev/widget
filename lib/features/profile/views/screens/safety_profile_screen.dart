@@ -6,6 +6,7 @@ import 'package:hazard_app/features/onboarding/enums/onboarding_step_types.dart'
 import 'package:hazard_app/features/profile/models/safety_cohort.dart';
 import 'package:hazard_app/features/profile/providers/safety_profile_provider.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:hazard_app/features/notification/views/widgets/accessible_alerts_section.dart';
 
 /// The safety profile: coarse cohort chips that tailor For You guidance.
 ///
@@ -131,6 +132,10 @@ class SafetyProfileScreen extends ConsumerWidget {
                 ),
             ],
           ),
+          SizedBox(height: 20.spMin),
+          // How urgent alerts reach you lives with the profile that drives
+          // it: ticking Deaf or Vision here is what turns these on.
+          const AccessibleAlertsSection(),
           SizedBox(height: 18.spMin),
           Text(
             'Tick as many or as few as apply. Guidance for other groups stays '

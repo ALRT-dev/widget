@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hazard_app/features/notification/views/widgets/accessible_alerts_section.dart';
 import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -36,8 +35,6 @@ class _ManagePushNotificationsListState
           _alertTypesSection(),
           28.hSizedBox,
           _categoriesSection(),
-          28.hSizedBox,
-          const AccessibleAlertsSection(),
           24.hSizedBox,
         ],
       ).pX(20.0),

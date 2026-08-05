@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
-import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
 import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
 import 'package:hazard_app/features/profile/views/screens/safety_profile_screen.dart';
 import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
@@ -452,13 +451,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 icon: LucideIcons.shieldCheck,
                 color: AppColors.blue,
                 onTap: () => context.push(SafetyProfileScreen.route),
-              ),
-              _buildAccountSettingsItem(
-                title: 'Notifications',
-                subtitle: 'Alert preferences & push settings',
-                icon: LucideIcons.bell,
-                color: AppColors.orange,
-                onTap: _gotoManageNotificationsScreen,
               ),
               _buildAccountSettingsItem(
                 title: 'Child mode',
@@ -930,14 +922,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       extra: const MyHazardsScreenArgs(
         initialTab: MyHazardsTab.rejected,
       ),
-    );
-  }
-
-  /// Navigates to the Manage Notifications screen.
-  void _gotoManageNotificationsScreen() {
-    context.push(
-      ManageNotificationsScreen.route,
-      extra: const ManageNotificationsScreenArgs(initialTab: 0),
     );
   }
 
