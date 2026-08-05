@@ -22,10 +22,21 @@ class LearnTopicsView extends ConsumerStatefulWidget {
   const LearnTopicsView({
     super.key,
     this.padding,
+    this.isScrollable = true,
   });
 
   /// Outer scroll padding; defaults to 16 all around.
   final EdgeInsetsGeometry? padding;
+
+  /// Whether this view brings its own scrolling.
+  ///
+  /// False when it is embedded inside a parent that already scrolls, which
+  /// is how the alerts feed uses it. That matters more than it sounds: a
+  /// SliverToBoxAdapter hands its child UNBOUNDED height, and a ListView
+  /// given unbounded height throws. In a release build that exception
+  /// renders as nothing at all, which is why the Learn tab was blank
+  /// rather than showing an error.
+  final bool isScrollable;
 
   @override
   ConsumerState<LearnTopicsView> createState() => _LearnTopicsViewState();
@@ -55,22 +66,21 @@ class _LearnTopicsViewState extends ConsumerState<LearnTopicsView> {
     final learnState = ref.watch(providerOfLearn);
 
     if (!learnState.hasData) {
-      if (learnState.isLoading) return _loadingBuilder();
+      if (learnState.isLoading) return _wrap(_loadingBuilder());
       if (learnState.error != null) {
-        return _errorBuilder(
-          context: context,
-          ref: ref,
-          message: learnState.error?.message,
+        return _wrap(
+          _errorBuilder(
+            context: context,
+            ref: ref,
+            message: learnState.error?.message,
+          ),
         );
       }
     }
 
-    return RefreshIndicator(
-      color: AppColors.orange,
-      onRefresh: () => ref.read(providerOfLearn.notifier).refresh(),
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: widget.padding ?? EdgeInsets.all(16.spMin),
+    return _wrap(
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           LearnProgressHeroCard(
             completedCount: learnState.completedCount,
@@ -113,6 +123,26 @@ class _LearnTopicsViewState extends ConsumerState<LearnTopicsView> {
     );
   }
 
+  /// Puts [content] behind this view's own scroll view, or straight onto
+  /// the page when the parent is already scrolling it.
+  Widget _wrap(final Widget content) {
+    final padding = widget.padding ?? EdgeInsets.all(16.spMin);
+
+    if (!widget.isScrollable) {
+      return Padding(padding: padding, child: content);
+    }
+
+    return RefreshIndicator(
+      color: AppColors.orange,
+      onRefresh: () => ref.read(providerOfLearn.notifier).refresh(),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: padding,
+        children: [content],
+      ),
+    );
+  }
+
   /// Shows a toast when a pull-to-refresh fails while stale data is shown.
   void _listenToRefreshErrors(final BuildContext context, final WidgetRef ref) {
     ref.listen(
@@ -131,9 +161,10 @@ class _LearnTopicsViewState extends ConsumerState<LearnTopicsView> {
   }
 
   Widget _loadingBuilder() {
-    return const Center(
-      child: CircularProgressIndicator(
-        color: AppColors.orange,
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 60.spMin),
+      child: const Center(
+        child: CircularProgressIndicator(color: AppColors.orange),
       ),
     );
   }
@@ -143,9 +174,9 @@ class _LearnTopicsViewState extends ConsumerState<LearnTopicsView> {
     required final WidgetRef ref,
     final String? message,
   }) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(24.spMin),
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 40.spMin, horizontal: 24.spMin),
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

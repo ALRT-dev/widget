@@ -58,7 +58,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             30.hSizedBox.sliverBox,
           ] else
             SliverToBoxAdapter(
+              // The feed already scrolls, so Learn must not bring its own
+              // scroll view: a sliver gives its child unbounded height.
               child: LearnTopicsView(
+                isScrollable: false,
                 padding: EdgeInsets.fromLTRB(
                   16.spMin,
                   4.spMin,
