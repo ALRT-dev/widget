@@ -21,7 +21,6 @@ import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart
 import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
 import 'package:hazard_app/features/shared/views/widgets/hazard_shape_badge.dart';
 import 'package:hazard_app/others/app_colors.dart';
-import 'package:hazard_app/others/app_theme.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -143,11 +142,13 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              // One card, whatever it is shown in. The map callout, the
+              // list and the alert list all get the same thing: the
+              // coloured heading that says who and how urgent, the title,
+              // when and how far, and the way in. What we know and what to
+              // do are a read, not a glance, so they wait for the detail
+              // screen rather than being half-shown here.
               _coloredHeaderBuilder(),
-              // The map callout is a glance, not a read: band, title, when
-              // and how far, and the way in. Everything longer waits for
-              // the detail screen.
-              if (!widget.isInfoWindow) _plainTermsBuilder(),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -178,11 +179,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                   ),
                 ],
               ).pX(16.0).pT(16.0),
-              if (!widget.isInfoWindow) ...[
-                8.hSizedBox,
-                _shortDescriptionBuilder().pX(16.0),
-              ],
-              (widget.isInfoWindow ? 8 : 14).hSizedBox,
+              10.hSizedBox,
               if (widget.showTrustMeter &&
                   widget.hazard.isUserReported &&
                   !widget.isInfoWindow) ...[
@@ -245,53 +242,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               ),
             ),
           ],
-        );
-      },
-    );
-  }
-
-  /// The V3 "In plain terms" strip: a dark band under the header that says
-  /// what the warning means in ordinary words. Official alerts only.
-  Widget _plainTermsBuilder() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final hazard = ref.watch(provider.select((value) => value.hazard));
-        if (hazard == null) return const SizedBox.shrink();
-
-        final plainTerms = AlertCardStyle.plainTermsOf(
-          isOfficial: !hazard.isUserReported,
-          isAws: hazard.isAwsCompliant ?? false,
-          severity: hazard.severity,
-          band: hazard.severityBand,
-          categoryName: hazard.category?.name,
-          sourceName: hazard.source?.name,
-        );
-        if (plainTerms == null) return const SizedBox.shrink();
-
-        return Container(
-          width: double.infinity,
-          color: AlertCardStyle.plainTermsBackground,
-          padding: EdgeInsets.symmetric(
-            horizontal: 16.spMin,
-            vertical: 9.spMin,
-          ),
-          child: Text.rich(
-            TextSpan(
-              children: [
-                const TextSpan(
-                  text: 'In plain terms: ',
-                  style: TextStyle(fontWeight: FontWeight.w800),
-                ),
-                TextSpan(text: plainTerms),
-              ],
-            ),
-            style: TextStyle(
-              fontSize: 12.spMin,
-              height: 1.35,
-              color: Colors.white,
-              fontFamily: AppTheme.defaultFontFamily,
-            ),
-          ),
         );
       },
     );
@@ -777,51 +727,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                 ],
               ),
           ],
-        );
-      },
-    );
-  }
-
-  Widget _shortDescriptionBuilder() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final isUserReported = ref.watch(
-          provider.select(
-            (value) => value.hazard!.isUserReported,
-          ),
-        );
-
-        final shortDescription = ref.watch(
-          provider.select(
-            (value) =>
-                '${value.hazard!.category?.name} alert reported near ${value.hazard!.locationName}.',
-          ),
-        );
-
-        final aiSummary = ref.watch(
-          provider.select(
-            (value) => value.hazard!.aiSummary?.trim(),
-          ),
-        );
-
-        final text = isUserReported
-            ? [
-                if (aiSummary?.isNotEmpty ?? false) aiSummary,
-              ].join(' ')
-            : [
-                if (shortDescription.isNotEmpty) shortDescription,
-              ].join(' ');
-
-        if (text.isEmpty) {
-          return const SizedBox.shrink();
-        }
-
-        return Text(
-          text,
-          style: TextStyle(
-            fontSize: 12.spMin,
-            color: AppColors.grey,
-          ),
         );
       },
     );
