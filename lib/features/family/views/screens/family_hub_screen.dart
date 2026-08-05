@@ -101,11 +101,16 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
     );
   }
 
-  /// Group switcher chips — only rendered when the user belongs to more
-  /// than one circle. Tapping a chip rescopes the whole family tab.
+  /// Group switcher chips. Tapping a chip rescopes the whole family tab,
+  /// and the last slot opens the manage page.
+  ///
+  /// Shown from one group up, not two: with a single group the row was
+  /// hidden entirely, which left the only path to creating another buried
+  /// in the overflow menu. Being in one group is exactly when someone
+  /// wants a second.
   Widget _circleSwitcherBuilder(final FamilyCircle circle) {
     final circles = ref.watch(providerOfFamily.select((s) => s.circles));
-    if (circles.length < 2) {
+    if (circles.isEmpty) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
 
@@ -272,7 +277,9 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
         child: Row(
           children: [
             Text(
-              'Manage groups',
+              // Names the thing people come here for. A group can be made
+              // any time and stands on its own until someone accepts.
+              'Add or manage groups',
               style: TextStyle(
                 fontSize: 13.spMin,
                 fontWeight: FontWeight.w700,
@@ -444,7 +451,7 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
       itemBuilder: (context) => [
         const PopupMenuItem(
           value: 'switchGroups',
-          child: Text('Switch between groups'),
+          child: Text('Add, join or switch groups'),
         ),
         const PopupMenuItem(
           value: 'sosLists',

@@ -402,16 +402,24 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     final result = await _familyService.createFamilyCircle(name: name);
     if (!mounted) return;
 
-    result.when(
-      (circle) {
+    await result.when(
+      (circle) async {
+        // Scope the tab to the group just made. Without this the selection
+        // still points at the oldest membership, so the next load — a
+        // socket update, a pull-to-refresh, an app resume — quietly
+        // switched back and the new group looked like it had not been
+        // created. It also has to reach the circles list, or the switcher
+        // and the home-screen widget never learn about it.
+        _ref.read(providerOfSelectedCircleId.notifier).select(circle.id);
         state = state.copyWith(
           circle: circle,
           hasLoadedOnce: true,
           loadState: const FamilyActionState.success(),
           createCircleState: const FamilyActionState.success(),
         );
+        await _refreshCircleList();
       },
-      (error) {
+      (error) async {
         state = state.copyWith(
           createCircleState: FamilyActionState.error(error),
         );
@@ -425,16 +433,21 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     final result = await _familyService.joinFamilyCircle(code: code);
     if (!mounted) return;
 
-    result.when(
-      (circle) {
+    await result.when(
+      (circle) async {
+        // Same as creating: scope to the group just joined and pull it into
+        // the circles list, so it survives the next load and shows up in
+        // the switcher.
+        _ref.read(providerOfSelectedCircleId.notifier).select(circle.id);
         state = state.copyWith(
           circle: circle,
           hasLoadedOnce: true,
           loadState: const FamilyActionState.success(),
           joinCircleState: const FamilyActionState.success(),
         );
+        await _refreshCircleList();
       },
-      (error) {
+      (error) async {
         state = state.copyWith(joinCircleState: FamilyActionState.error(error));
       },
     );
