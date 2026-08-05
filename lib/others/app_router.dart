@@ -50,6 +50,7 @@ import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart
 import 'package:hazard_app/features/shared/views/screens/splash_screen.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 import 'package:hazard_app/others/app_wrapper.dart';
+import 'package:hazard_app/features/profile/views/screens/blocked_accounts_screen.dart';
 
 class AppRouter {
   /// Builds and returns a [GoRouter] instance configured with routes and navigation settings.
@@ -233,6 +234,10 @@ class AppRouter {
           ),
         ),
         // ------------------------- LEARN HUB -------------------------
+        GoRoute(
+          path: BlockedAccountsScreen.route,
+          builder: (context, state) => const BlockedAccountsScreen(),
+        ),
         GoRoute(
           path: LearnTopicsScreen.route,
           builder: (context, state) => const LearnTopicsScreen(),

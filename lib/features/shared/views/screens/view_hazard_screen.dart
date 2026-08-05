@@ -29,6 +29,7 @@ import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/utils/open_link.dart';
 import 'package:hazard_app/features/shared/utils/share_alert.dart';
 import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
+import 'package:hazard_app/features/shared/views/widgets/report_content_sheet.dart';
 import 'package:hazard_app/features/shared/views/widgets/small_map_view.dart';
 import 'package:hazard_app/features/shared/views/widgets/view_hazard_widgets/hazard_medias_carousel.dart';
 import 'package:hazard_app/features/shared/views/widgets/category_filter_chip.dart';
@@ -1030,6 +1031,19 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
               label: 'Listen',
               onTap: () => _speakAlert(ref, hazard),
             ),
+            // Community reports can be sent for review or the account
+            // blocked. Official alerts belong to their agency, so they
+            // carry no report action.
+            if (hazard.isUserReported) ...[
+              8.wSizedBox,
+              action(
+                label: 'Report',
+                onTap: () => showReportContentSheet(
+                  context: context,
+                  hazard: hazard,
+                ),
+              ),
+            ],
           ],
         ).pX(16.0);
       },

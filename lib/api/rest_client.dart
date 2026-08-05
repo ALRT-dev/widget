@@ -16,6 +16,7 @@ import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 import 'package:hazard_app/features/shared/models/get_hazards_with_subscription_id_reponse.dart';
 import 'package:hazard_app/features/shared/models/location_subscription_model.dart';
+import 'package:hazard_app/features/shared/models/blocked_user_model.dart';
 import 'package:hazard_app/features/shared/models/view_hazard_response_model.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -201,6 +202,25 @@ abstract class RestClient {
   Future<ViewHazardResponse> viewHazard({
     @Path() required final String hazardId,
   });
+
+  // ------------------------- COMMUNITY SAFETY -------------------------
+
+  @POST(kUrlHazardFlag)
+  Future<void> flagHazard({
+    @Path() required final String hazardId,
+    @Body() required final Map<String, dynamic> body,
+  });
+
+  @GET(kUrlUserBlocked)
+  Future<BlockedUsersResponse> getBlockedUsers();
+
+  @POST(kUrlUserBlocked)
+  Future<void> blockUser({
+    @Body() required final Map<String, dynamic> body,
+  });
+
+  @DELETE(kUrlUserUnblock)
+  Future<void> unblockUser({@Path() required final String userId});
 
   // ---------------------------- NOTIFICATION ----------------------------
 

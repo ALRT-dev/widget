@@ -49,6 +49,7 @@ import 'package:hazard_app/features/shared/services/hazard_service.dart';
 import 'package:hazard_app/features/shared/utils/location_helper.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:widget_to_marker/widget_to_marker.dart';
+import 'package:hazard_app/features/shared/providers/community_safety_provider.dart';
 
 final providerOfMap =
     StateNotifierProvider.autoDispose<MapProvider, MapProviderState>(
@@ -1795,13 +1796,18 @@ class MapProvider extends StateNotifier<MapProviderState> {
     // Exclude hazards whose source system is toggled off in the Map
     // details sheet.
     final visibleAlertSystems = _ref.read(providerOfVisibleAlertSystems);
+    // A blocked account is blocked everywhere. The feed already excludes
+    // them server-side; the map draws from cached state, so without this
+    // a blocked person lingers as a pin after vanishing from the list.
+    final blockedIds = _ref.read(providerOfBlockedUserIds);
     final hazards =
         (state.showRouteHazards
                 ? state.currentRoutePlan?.hazardsToAvoid ?? <Hazard>[]
                 : state.hazards)
             .where(
               (hazard) =>
-                  visibleAlertSystems.contains(AlertSourceSystem.of(hazard)),
+                  visibleAlertSystems.contains(AlertSourceSystem.of(hazard)) &&
+                  !blockedIds.contains(hazard.reportedBy?.id),
             )
             .toList();
     final currentZoom = state.cameraPosition.zoom;

@@ -35,6 +35,7 @@ import 'package:hazard_app/features/profile/views/widgets/share_alrt_sheet.dart'
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_wrapper.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:hazard_app/features/profile/views/screens/blocked_accounts_screen.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -457,6 +458,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 icon: LucideIcons.bell,
                 color: AppColors.orange,
                 onTap: _gotoManageNotificationsScreen,
+              ),
+              _buildAccountSettingsItem(
+                title: 'Blocked accounts',
+                subtitle: 'People whose reports you have hidden',
+                icon: LucideIcons.userX,
+                color: AppColors.grey,
+                onTap: () => context.push(BlockedAccountsScreen.route),
               ),
               _buildAccountSettingsItem(
                 title: 'Language',

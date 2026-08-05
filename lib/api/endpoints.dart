@@ -48,6 +48,11 @@ const kUrlUserAccountCancelDeletion = '$kUrlUserAccount/cancel-deletion';
 const kUrlHazards = '$kUrlApi/hazards';
 const kUrlHazardCategories = '$kUrlApi/hazard-categories';
 
+// Community safety: flagging a report, and blocking an account.
+const kUrlHazardFlag = '$kUrlHazards/{hazardId}/flag';
+const kUrlUserBlocked = '$kUrlUser/blocked';
+const kUrlUserUnblock = '$kUrlUserBlocked/{userId}';
+
 const kUrlHazardsWithSubscriptionId =
     '$kUrlHazards/hazards-with-subscription-id';
 const kUrlHazardCategoriesParent = '$kUrlHazardCategories/parent';
