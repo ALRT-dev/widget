@@ -471,6 +471,7 @@ class _SourceChip extends StatelessWidget {
     final shapeIcon = AlertCardStyle.systemShapeIcon(
       isAws: alert.isAwsCompliant == true,
       isOfficial: alert.source != null,
+      isGlobalHumanitarian: alert.isGlobalHumanitarian,
     );
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.spMin, vertical: 5.spMin),

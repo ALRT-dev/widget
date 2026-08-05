@@ -17,6 +17,7 @@ class HazardShapeBadge extends StatelessWidget {
     required this.isAws,
     required this.isOfficial,
     required this.band,
+    this.isGlobalHumanitarian = false,
     this.size = 30,
   });
 
@@ -26,6 +27,9 @@ class HazardShapeBadge extends StatelessWidget {
   /// Alerts from a recognised agency (diamond). Community reports are
   /// neither, and take the circle.
   final bool isOfficial;
+
+  /// Global humanitarian feeds (GDACS) take the rounded square.
+  final bool isGlobalHumanitarian;
 
   /// The severity band, which supplies the tint and the glyph ink.
   final HazardSeverityBand? band;
@@ -49,7 +53,11 @@ class HazardShapeBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(10.spMin),
       ),
       child: Icon(
-        AlertCardStyle.systemShapeIcon(isAws: isAws, isOfficial: isOfficial),
+        AlertCardStyle.systemShapeIcon(
+          isAws: isAws,
+          isOfficial: isOfficial,
+          isGlobalHumanitarian: isGlobalHumanitarian,
+        ),
         size: (size * 17 / 30).spMin,
         color: ink,
       ),

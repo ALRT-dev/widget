@@ -432,6 +432,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                 AlertCardStyle.systemShapeIcon(
                   isAws: isAwsCompliant,
                   isOfficial: isVerified,
+                  isGlobalHumanitarian: widget.hazard.isGlobalHumanitarian,
                 ),
                 size: 14.spMin,
                 // Official shapes carry the locked band hex; community
@@ -550,6 +551,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
         return HazardShapeBadge(
           isAws: isAwsCompliant,
           isOfficial: isOfficial,
+          isGlobalHumanitarian: widget.hazard.isGlobalHumanitarian,
           band: severityBand,
         );
       },

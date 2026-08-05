@@ -150,6 +150,23 @@ abstract class Hazard with _$Hazard {
   /// Indicates whether the hazard was reported by a user.
   bool get isUserReported => reportedBy != null;
 
+  /// The backend source ids publishing GLOBAL HUMANITARIAN events: disasters
+  /// rated for international humanitarian response, not Australian agency
+  /// warnings. Today that is GDACS, whose scale (Red/Orange/Green) describes
+  /// the likelihood of international aid, never personal danger, so it is
+  /// carried verbatim and never mapped onto an AWS level word.
+  ///
+  /// This system may be retired later. Everything that makes the square
+  /// exist hangs off this one set and [isGlobalHumanitarian] — empty the set
+  /// and the shape stops being produced everywhere at once.
+  static const globalHumanitarianSourceIds = {'gdacsGlobal'};
+
+  /// Whether this alert came from a global humanitarian feed (the square).
+  bool get isGlobalHumanitarian {
+    final id = source?.id;
+    return id != null && globalHumanitarianSourceIds.contains(id);
+  }
+
   /// Indicates whether the hazard has expired based on the current date and time.
   bool get isExpired {
     if (expiresAt == null) {

@@ -86,6 +86,12 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
                       tint: const Color(0xFF90A4AE),
                     ).pT(8.0),
                     _systemToggleRowBuilder(
+                      system: AlertSourceSystem.globalHumanitarian,
+                      title: 'Global humanitarian',
+                      subtitle: 'Disasters rated for international response',
+                      tint: const Color(0xFF7E8B9A),
+                    ).pT(8.0),
+                    _systemToggleRowBuilder(
                       system: AlertSourceSystem.community,
                       title: 'Community',
                       subtitle: 'Reports from people nearby',
@@ -247,6 +253,8 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
                   AlertCardStyle.systemShapeIcon(
                     isAws: system == AlertSourceSystem.aws,
                     isOfficial: system != AlertSourceSystem.community,
+                    isGlobalHumanitarian:
+                        system == AlertSourceSystem.globalHumanitarian,
                   ),
                   size: 16.spMin,
                   color: tint,
@@ -310,6 +318,12 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
           subtitle: 'State agencies and services',
         ),
         _keyRowBuilder(
+          icon: LucideIcons.square,
+          iconColor: const Color(0xFF7E8B9A),
+          title: 'Rounded square · global humanitarian',
+          subtitle: "Carries the source's own scale, not an AWS level",
+        ),
+        _keyRowBuilder(
           icon: LucideIcons.circle,
           iconColor: const Color(0xFF5AB0FF),
           title: 'Circle · community report',
@@ -318,8 +332,8 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
         _keyRowBuilder(
           icon: LucideIcons.shield,
           iconColor: AlertCardStyle.bandInfo,
-          title: 'Shield · ALRT',
-          subtitle: 'From ALRT itself, colour only, never a level word',
+          title: "Shield · ALRT's own assessment",
+          subtitle: 'Never restates or overrides an official warning',
         ),
       ],
     );

@@ -33,12 +33,22 @@ abstract final class AlertCardStyle {
   /// The source-system shape (V3 alert rendering spec): shape says WHICH
   /// SYSTEM an alert came from, colour says how urgent it is.
   ///
-  /// AWS = triangle, other official sources = diamond, community = circle.
-  /// (GDACS square and ALRT Intel shield join when those feeds exist.)
+  /// The five shapes, in the order they win:
+  /// - ALRT Intel shield: ALRT's own assessment, the only shape carrying
+  ///   ALRT's voice. It never restates or overrides an official warning.
+  /// - Global humanitarian rounded square: GDACS-style events rated for
+  ///   international response (may be retired later).
+  /// - AWS triangle: the only system that writes a level word.
+  /// - Official diamond: state agencies and services.
+  /// - Community circle: an unverified report from someone nearby.
   static IconData systemShapeIcon({
     required final bool isAws,
     required final bool isOfficial,
+    final bool isGlobalHumanitarian = false,
+    final bool isAlrtIntel = false,
   }) {
+    if (isAlrtIntel) return LucideIcons.shield;
+    if (isGlobalHumanitarian) return LucideIcons.square;
     if (isAws) return LucideIcons.triangleAlert;
     if (isOfficial) return LucideIcons.diamond;
     return LucideIcons.circle;
