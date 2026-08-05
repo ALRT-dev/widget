@@ -12,6 +12,7 @@ import 'package:hazard_app/features/shared/providers/service_providers.dart';
 import 'package:hazard_app/features/shared/providers/user_socket_manager_provider.dart';
 import 'package:hazard_app/features/shared/services/media_service.dart';
 import 'package:hazard_app/features/shared/services/user_service.dart';
+import 'package:hazard_app/features/shared/services/firebase_session_service.dart';
 
 final providerOfProfile =
     StateNotifierProvider.autoDispose<ProfileProvider, ProfileProviderState>(
@@ -180,6 +181,9 @@ class ProfileProvider extends StateNotifier<ProfileProviderState> {
 
     result.when(
       (_) {
+        // Drop the Firebase session too, or the next person to sign in on
+        // this phone inherits the previous user's Ask ALRT identity.
+        FirebaseSessionService.signOut();
         state = state.copyWith(
           logoutState: const LogoutState.success(),
         );

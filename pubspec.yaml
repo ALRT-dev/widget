@@ -69,6 +69,8 @@ dependencies:
   home_widget: ^0.7.0
   qr_flutter: ^4.1.0
   flutter_tts: ^4.2.5
+  firebase_auth: ^6.5.7
+  firebase_app_check: ^0.4.6
 
 dev_dependencies:
   flutter_test:
