@@ -13,6 +13,10 @@ import 'package:hazard_app/features/home_screen_widget/family_widget_sync.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/services/analytics_service.dart';
+import 'package:hazard_app/features/family/views/widgets/incoming_family_alert_overlay.dart';
+import 'package:hazard_app/features/family/views/screens/family_sos_receiver_screen.dart';
+import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
 
 final providerOfFamily =
     StateNotifierProvider<FamilyProvider, FamilyProviderState>(
@@ -114,7 +118,12 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
 
     if (request.requestedById != circle.myMemberId) {
       final name = request.requestedBy?.displayName ?? 'A family member';
-      _showToast(message: '$name asked everyone to check in');
+      _showBigAlert(
+        title: '$name asked everyone to check in',
+        body: 'One tap to let them know you are safe.',
+        isSos: false,
+        onTap: checkIn,
+      );
     }
   }
 
@@ -124,7 +133,25 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     if (sosEvent.memberId != state.circle?.myMemberId &&
         sosEvent.status == FamilySosStatus.active) {
       final name = sosEvent.member?.displayName ?? 'A family member';
-      _showToast(message: '$name triggered SOS', isWarning: true);
+      // Screen already on and in the app: a corner toast is the wrong
+      // size for this. Take the top of the screen with a bright pulsing
+      // outline, and open the SOS on tap.
+      _showBigAlert(
+        title: '$name triggered SOS',
+        body: sosEvent.locationLabel != null
+            ? 'Live location shared near ${sosEvent.locationLabel}.'
+            : 'Live location shared. Open to respond.',
+        isSos: true,
+        onTap: () {
+          final context =
+              _ref.read(providerOfGlobalNavigatorKey).currentContext;
+          if (context == null || !context.mounted) return;
+          context.push(
+            FamilySosReceiverScreen.route,
+            extra: FamilySosReceiverScreenArgs(sosEvent: sosEvent),
+          );
+        },
+      );
     }
   }
 
@@ -1231,6 +1258,24 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
   }
 
   /// Shows a toast via the global navigator, when a context is available.
+  /// The full-width in-app banner for an SOS or a check-in request.
+  void _showBigAlert({
+    required final String title,
+    required final String body,
+    required final bool isSos,
+    final VoidCallback? onTap,
+  }) {
+    final context = _ref.read(providerOfGlobalNavigatorKey).currentContext;
+    if (context == null || !context.mounted) return;
+    IncomingFamilyAlert.show(
+      context: context,
+      title: title,
+      body: body,
+      isSos: isSos,
+      onTap: onTap,
+    );
+  }
+
   void _showToast({
     required final String message,
     final bool isWarning = false,

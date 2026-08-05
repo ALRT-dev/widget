@@ -201,6 +201,14 @@ class _CreateUpdateReportScreenState
   /// Every step is on the page from the first frame — nothing unfolds only
   /// after a category is picked, so the whole job is visible up front.
   Widget _formBuilder() {
+    // Read once for the step ticks, so each card can show whether it is
+    // done without every section watching the provider separately.
+    final report = ref.watch(providerOfCreateReport);
+    final hazard = report.hazardToCreateOrUpdate;
+    final hasCategory = (hazard.categoryId ?? '').isNotEmpty;
+    final hasSeverityWording = hazard.severity != null;
+    final hasMedia = report.medias.isNotEmpty;
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,26 +221,38 @@ class _CreateUpdateReportScreenState
               children: [
                 _locationBuilder(),
                 _sectionBuilder(
+                  step: 1,
+                  isDone: hasCategory,
                   label: 'Category',
                   helper: 'one tap, pick the closest fit',
                   child: _categoriesBuilder(),
                 ),
                 _sectionBuilder(
+                  step: 2,
+                  isDone: _selectedChipIds.isNotEmpty,
                   label: 'What can you see?',
                   helper: 'tap any, this is an observation not a diagnosis',
                   child: _chipsBuilder(),
                 ),
                 _sectionBuilder(
+                  step: 3,
+                  isDone: hasSeverityWording,
                   label: 'How would you describe it?',
                   helper: 'auto-set from what you picked, tap to change',
                   child: _severityWordingBuilder(),
                 ),
                 _sectionBuilder(
+                  isOptional: true,
+                  step: 4,
+                  isDone: _descriptionController.text.trim().isNotEmpty,
                   label: 'Add details',
                   helper: 'optional',
                   child: _descriptionBuilder(),
                 ),
                 _sectionBuilder(
+                  isOptional: true,
+                  step: 5,
+                  isDone: hasMedia,
                   label: 'Photos',
                   helper: 'optional',
                   child: _mediaBuilder(),
@@ -258,7 +278,20 @@ class _CreateUpdateReportScreenState
     required final String label,
     required final Widget child,
     final String? helper,
+    final int? step,
+    final bool isDone = false,
+    final bool isOptional = false,
   }) {
+    // The steps are highlighted so the order is obvious at a glance:
+    // done goes green, the one you are up to wears the orange outline,
+    // and anything still ahead stays quiet. Optional steps never nag.
+    final isActive = !isDone && !isOptional;
+    final outline = isDone
+        ? const Color(0xFF17A05E)
+        : isActive
+            ? _sectionLabelColor
+            : const Color(0xFFE8E4EE);
+
     return Padding(
       padding: EdgeInsets.only(top: 12.spMin),
       child: Container(
@@ -272,6 +305,10 @@ class _CreateUpdateReportScreenState
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16.spMin),
+          border: Border.all(
+            color: outline.withValues(alpha: isDone || isActive ? 0.75 : 0.6),
+            width: (isDone || isActive ? 1.6 : 1.0).spMin,
+          ),
           boxShadow: const [
             BoxShadow(
               color: _cardShadow,
@@ -283,6 +320,57 @@ class _CreateUpdateReportScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (step != null)
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.spMin),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 20.spMin,
+                      height: 20.spMin,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isDone
+                            ? const Color(0xFF17A05E)
+                            : isActive
+                                ? _sectionLabelColor
+                                : const Color(0xFFEFEDF3),
+                        shape: BoxShape.circle,
+                      ),
+                      child: isDone
+                          ? Icon(
+                              Icons.check_rounded,
+                              size: 13.spMin,
+                              color: AppColors.white,
+                            )
+                          : Text(
+                              '\$step',
+                              style: TextStyle(
+                                fontSize: 11.spMin,
+                                fontWeight: FontWeight.w800,
+                                color: isActive
+                                    ? AppColors.white
+                                    : AppColors.mediumGrey,
+                              ),
+                            ),
+                    ),
+                    SizedBox(width: 7.spMin),
+                    Text(
+                      isOptional ? 'Optional' : 'Step \$step of 3',
+                      style: TextStyle(
+                        fontSize: 10.5.spMin,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                        color: isDone
+                            ? const Color(0xFF17A05E)
+                            : isActive
+                                ? _sectionLabelColor
+                                : AppColors.mediumGrey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             Padding(
               padding: EdgeInsets.only(bottom: 10.spMin),
               child: Text.rich(
