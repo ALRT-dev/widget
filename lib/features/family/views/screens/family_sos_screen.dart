@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/screens/family_sos_lists_screen.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/shared/services/emergency_number.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -66,6 +67,8 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
       providerOfFamily.select((s) => s.circle?.name ?? 'your family circle'),
     );
     final sosLists = ref.watch(providerOfFamily.select((s) => s.sosLists));
+    // Global app: the local emergency number, never a hard-coded 000.
+    final emergencyNumber = ref.watch(providerOfEmergencyNumber);
 
     // Default list preselected until the user picks one themselves.
     if (!_listTouched && _selectedListId == null) {
@@ -175,9 +178,9 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
                   ),
                 ),
               const Spacer(),
-              _whatThisDoesBuilder(),
+              _whatThisDoesBuilder(emergencyNumber),
               SizedBox(height: 14.spMin),
-              _call000ButtonBuilder(),
+              _callEmergencyButtonBuilder(emergencyNumber),
               SizedBox(height: 8.spMin),
               TextButton(
                 onPressed: () => context.pop(),
@@ -353,7 +356,7 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
     );
   }
 
-  Widget _whatThisDoesBuilder() {
+  Widget _whatThisDoesBuilder(final String emergencyNumber) {
     return Container(
       padding: EdgeInsets.all(16.spMin),
       decoration: BoxDecoration(
@@ -377,7 +380,7 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
           Text(
             'SOS notifies your family only. ALRT does not contact emergency '
             'services or monitor this alert. If life or property is in '
-            'danger, call Triple Zero.',
+            'danger, call $emergencyNumber.',
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.85),
               fontSize: 13.spMin,
@@ -389,7 +392,7 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
     );
   }
 
-  Widget _call000ButtonBuilder() {
+  Widget _callEmergencyButtonBuilder(final String emergencyNumber) {
     return SizedBox(
       height: 52.spMin,
       width: double.infinity,
@@ -401,10 +404,10 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
             borderRadius: BorderRadius.circular(16.spMin),
           ),
         ),
-        onPressed: () => launchUrl(Uri.parse('tel:000')),
+        onPressed: () => launchUrl(Uri.parse('tel:\$emergencyNumber')),
         icon: Icon(Icons.phone, size: 20.spMin),
         label: Text(
-          'Call 000',
+          'Call \$emergencyNumber',
           style: TextStyle(fontSize: 17.spMin, fontWeight: FontWeight.w700),
         ),
       ),

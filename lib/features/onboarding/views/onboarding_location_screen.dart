@@ -15,6 +15,7 @@ import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:hazard_app/features/shared/services/emergency_number.dart';
 
 enum LocationOption { none, current, manual, skip }
 
@@ -454,6 +455,8 @@ class _OnboardingLocationScreenState
   }
 
   Widget _buildDenyPopup() {
+    // Global app: never hard-code an Australian number in onboarding copy.
+    final emergencyNumber = ref.watch(providerOfEmergencyNumber);
     return _buildPopupOverlay(
       child: Container(
         padding: EdgeInsets.all(20.spMin),
@@ -603,7 +606,8 @@ class _OnboardingLocationScreenState
                   ),
                   4.hSizedBox,
                   Text(
-                    'ALRT isn\'t an emergency service. Call 000 in an emergency.',
+                    'ALRT isn\'t an emergency service. '
+                    'Call $emergencyNumber in an emergency.',
                     style: TextStyle(
                       fontSize: 12.spMin,
                       color: Colors.red,

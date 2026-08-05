@@ -39,6 +39,7 @@ import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:hazard_app/features/shared/services/alert_speech_service.dart';
+import 'package:hazard_app/features/shared/services/emergency_number.dart';
 
 class ViewHazardScreenArgs {
   ViewHazardScreenArgs({required this.hazard});
@@ -847,6 +848,9 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         );
         final isUrgent = band == HazardSeverityBand.action ||
             band == HazardSeverityBand.critical;
+        // Global app: the number is resolved for wherever the reader is,
+        // never hard-coded (product rules 16).
+        final emergencyNumber = ref.watch(providerOfEmergencyNumber);
 
         return Container(
           width: double.infinity,
@@ -865,7 +869,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             children: [
               Text(
                 'ALRT does not contact emergency services. '
-                'If you are in danger, call 000 now.',
+                'If you are in danger, call $emergencyNumber now.',
                 style: TextStyle(
                   fontSize: 12.spMin,
                   height: 1.45,
@@ -878,10 +882,11 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                 width: double.infinity,
                 height: 44.spMin,
                 child: ElevatedButton.icon(
-                  onPressed: () => launchUrl(Uri.parse('tel:000')),
+                  onPressed: () =>
+                      launchUrl(Uri.parse('tel:$emergencyNumber')),
                   icon: Icon(LucideIcons.phone, size: 17.spMin),
                   label: Text(
-                    'Call 000',
+                    'Call $emergencyNumber',
                     style: TextStyle(
                       fontSize: 14.spMin,
                       fontWeight: FontWeight.w800,

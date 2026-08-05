@@ -11,6 +11,7 @@ import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:hazard_app/features/shared/services/emergency_number.dart';
 
 class FamilySosReceiverScreenArgs {
   const FamilySosReceiverScreenArgs({required this.sosEvent});
@@ -179,6 +180,8 @@ class FamilySosReceiverScreen extends ConsumerWidget {
     final String name,
   ) {
     final notifier = ref.read(providerOfFamily.notifier);
+    // Global app: resolved for wherever the responder is, never 000.
+    final emergencyNumber = ref.watch(providerOfEmergencyNumber);
     return Column(
       children: [
         Row(
@@ -255,11 +258,11 @@ class FamilySosReceiverScreen extends ConsumerWidget {
                 sosEventId: sos.id,
                 type: FamilySosResponseType.called,
               );
-              await launchUrl(Uri.parse('tel:000'));
+              await launchUrl(Uri.parse('tel:\$emergencyNumber'));
             },
             icon: Icon(Icons.phone, size: 18.spMin),
             label: Text(
-              'Call 000 for $name',
+              'Call $emergencyNumber for $name',
               style: TextStyle(fontSize: 15.spMin, fontWeight: FontWeight.w700),
             ),
           ),

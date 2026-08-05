@@ -38,7 +38,14 @@ explicit instruction from the product owner in the current session.
 ## Safety and privacy (non-negotiable)
 
 - ALRT never contacts emergency services; the disclaimer travels on the
-  alert itself. Call 000 is always one tap.
+  alert itself. Calling the LOCAL emergency number is always one tap.
+  ALRT is a global app: copy never hard-codes 000 (product-owner
+  instruction 2026-08-05). The number resolves SIM country > device
+  region > locale country > 112 (GSM global fallback) via
+  EmergencyNumber/providerOfEmergencyNumber, mirroring emergencyLogic.ts
+  in the Ask ALRT backend. SIM country needs a telephony plugin and is
+  not wired yet; the seeded country table should move to Remote Config
+  so numbers can be corrected without a release.
 - Location leaves a phone only by the owner's action. No continuous
   tracking, ever.
 - Snapshots expire after 1 hour: the event log is kept, the locations are
