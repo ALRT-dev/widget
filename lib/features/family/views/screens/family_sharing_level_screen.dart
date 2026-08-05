@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_header_surface.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -22,11 +23,7 @@ class FamilySharingLevelScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: FamilyColors.v31Page,
-      appBar: AppBar(
-        title: const Text('Your sharing level'),
-        backgroundColor: FamilyColors.indigo,
-        foregroundColor: Colors.white,
-      ),
+      appBar: const FamilyAppBar(title: 'Your sharing level'),
       body: ListView(
         padding: EdgeInsets.all(20.spMin),
         children: [

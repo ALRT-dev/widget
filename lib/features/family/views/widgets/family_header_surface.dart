@@ -43,3 +43,66 @@ class FamilyHeaderSurface extends StatelessWidget {
     );
   }
 }
+
+/// The family app bar: the shared header blend behind a normal AppBar.
+///
+/// Family screens were each building their own flat `FamilyColors.indigo`
+/// bar, so the section had one screen with a rich purple gradient (the
+/// hub) and a dozen with a flat blue slab. Several also left the title in
+/// the default black, which on indigo is close to unreadable. This is the
+/// one header, so they cannot drift apart again.
+class FamilyAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const FamilyAppBar({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.actions,
+  });
+
+  final String title;
+
+  /// Optional line under the title, in the band rather than on the page.
+  final String? subtitle;
+
+  final List<Widget>? actions;
+
+  static const _subtitleHeight = 30.0;
+
+  @override
+  Size get preferredSize => Size.fromHeight(
+        kToolbarHeight + (subtitle == null ? 0 : _subtitleHeight),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return FamilyHeaderSurface(
+      child: AppBar(
+        title: Text(title),
+        backgroundColor: Colors.transparent,
+        // White, always: the default black on this blend is unreadable.
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: actions,
+        bottom: subtitle == null
+            ? null
+            : PreferredSize(
+                preferredSize: const Size.fromHeight(_subtitleHeight),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      subtitle!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withValues(alpha: 0.85),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+}

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_header_surface.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -43,11 +44,7 @@ class _FamilyInviteScreenState extends ConsumerState<FamilyInviteScreen> {
 
     return Scaffold(
       backgroundColor: FamilyColors.v31Page,
-      appBar: AppBar(
-        title: const Text('Invite members'),
-        backgroundColor: FamilyColors.indigo,
-        foregroundColor: Colors.white,
-      ),
+      appBar: const FamilyAppBar(title: 'Invite members'),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20.spMin),
         child: Column(
@@ -93,7 +90,7 @@ class _FamilyInviteScreenState extends ConsumerState<FamilyInviteScreen> {
                 style: TextStyle(
                   fontSize: 13.spMin,
                   fontWeight: FontWeight.w700,
-                  color: FamilyColors.indigo,
+                  color: FamilyColors.v31Label,
                   letterSpacing: 0.5,
                 ),
               ),

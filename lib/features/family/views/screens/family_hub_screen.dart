@@ -857,7 +857,7 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
       style: TextStyle(
         fontSize: 13.spMin,
         fontWeight: FontWeight.w700,
-        color: FamilyColors.indigo,
+        color: FamilyColors.v31Label,
         letterSpacing: 0.5,
       ),
     );

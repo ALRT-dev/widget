@@ -6,6 +6,7 @@ import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/screens/family_place_edit_screen.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_header_surface.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -24,23 +25,9 @@ class FamilyPlacesScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: FamilyColors.v31Page,
-      appBar: AppBar(
-        title: const Text('Places'),
-        backgroundColor: FamilyColors.indigo,
-        foregroundColor: Colors.white,
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(28.spMin),
-          child: Padding(
-            padding: EdgeInsets.only(bottom: 10.spMin),
-            child: Text(
-              'Get a quiet note when family arrive or leave',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.85),
-                fontSize: 13.spMin,
-              ),
-            ),
-          ),
-        ),
+      appBar: const FamilyAppBar(
+        title: 'Places',
+        subtitle: 'Get a quiet note when family arrive or leave',
       ),
       body: ListView(
         padding: EdgeInsets.all(20.spMin),
@@ -50,7 +37,7 @@ class FamilyPlacesScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 13.spMin,
               fontWeight: FontWeight.w700,
-              color: FamilyColors.indigo,
+              color: FamilyColors.v31Label,
               letterSpacing: 0.5,
             ),
           ),

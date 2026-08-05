@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_header_surface.dart';
 import 'package:hazard_app/features/map/models/alrt_location_model.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_on_map_screen.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -63,10 +64,8 @@ class _FamilyPlaceEditScreenState
 
     return Scaffold(
       backgroundColor: FamilyColors.v31Page,
-      appBar: AppBar(
-        title: Text(_editingPlace == null ? 'Add a place' : 'Edit place'),
-        backgroundColor: FamilyColors.indigo,
-        foregroundColor: Colors.white,
+      appBar: FamilyAppBar(
+        title: _editingPlace == null ? 'Add a place' : 'Edit place',
       ),
       body: ListView(
         padding: EdgeInsets.all(20.spMin),
@@ -139,7 +138,7 @@ class _FamilyPlaceEditScreenState
         style: TextStyle(
           fontSize: 12.spMin,
           fontWeight: FontWeight.w700,
-          color: FamilyColors.indigo,
+          color: FamilyColors.v31Label,
           letterSpacing: 0.5,
         ),
       ),
