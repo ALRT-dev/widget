@@ -202,6 +202,10 @@ class _CreateUpdateReportScreenState
     // done without every section watching the provider separately.
     final report = ref.watch(providerOfCreateReport);
     final hazard = report.hazardToCreateOrUpdate;
+    // Nothing below location glows until location is answered, so there
+    // is exactly one lit box at a time and the order is obvious without
+    // numbering it.
+    final hasLocation = (hazard.locationName ?? '').trim().isNotEmpty;
     final hasCategory = (hazard.categoryId ?? '').isNotEmpty;
     final hasSeverityWording = hazard.severity != null;
     final hasMedia = report.medias.isNotEmpty;
@@ -219,18 +223,21 @@ class _CreateUpdateReportScreenState
                 _locationBuilder(),
                 _sectionBuilder(
                   isDone: hasCategory,
+                  isUnlocked: hasLocation,
                   label: 'Category',
                   helper: 'one tap, pick the closest fit',
                   child: _categoriesBuilder(),
                 ),
                 _sectionBuilder(
                   isDone: _selectedChipIds.isNotEmpty,
+                  isUnlocked: hasLocation,
                   label: 'What can you see?',
                   helper: 'tap any, this is an observation not a diagnosis',
                   child: _chipsBuilder(),
                 ),
                 _sectionBuilder(
                   isDone: hasSeverityWording,
+                  isUnlocked: hasLocation,
                   label: 'How would you describe it?',
                   helper: 'auto-set from what you picked, tap to change',
                   child: _severityWordingBuilder(),
@@ -272,6 +279,7 @@ class _CreateUpdateReportScreenState
     final String? helper,
     final bool isDone = false,
     final bool isOptional = false,
+    final bool isUnlocked = true,
   }) {
     // The steps are highlighted so the order is obvious at a glance:
     // done goes green, the one you are up to wears the orange outline,
@@ -279,7 +287,7 @@ class _CreateUpdateReportScreenState
     // No numbers: the glow says which box wants you next. Done goes green
     // and settles down, the one you are up to carries a lit orange ring,
     // and optional boxes never demand attention.
-    final isActive = !isDone && !isOptional;
+    final isActive = !isDone && !isOptional && isUnlocked;
     final outline = isDone
         ? const Color(0xFF17A05E)
         : isActive
@@ -1272,19 +1280,37 @@ class _CreateUpdateReportScreenState
                 (value) => value.hazardToCreateOrUpdate.locationName,
               ),
             );
+            // Location is the first thing asked for, so it wears the glow
+            // until it is answered. Everything below it stays quiet until
+            // then: one lit box at a time is the whole point.
+            final hasLocation = (locationName ?? '').trim().isNotEmpty;
             return GestureDetector(
               onTap: _gotoSelectLocationScreen,
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: BorderRadius.circular(14.spMin),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: _cardShadow,
-                      blurRadius: 10.0,
-                      offset: Offset(0, 2),
-                    ),
+                  border: Border.all(
+                    color: hasLocation
+                        ? const Color(0xFF17A05E)
+                        : _labelColor,
+                    width: (hasLocation ? 1.6 : 2.0).spMin,
+                  ),
+                  boxShadow: [
+                    if (!hasLocation)
+                      BoxShadow(
+                        color: _labelColor.withValues(alpha: 0.28),
+                        blurRadius: 22.0,
+                        spreadRadius: 1.5,
+                      )
+                    else
+                      const BoxShadow(
+                        color: _cardShadow,
+                        blurRadius: 10.0,
+                        offset: Offset(0, 2),
+                      ),
                   ],
                 ),
                 padding: EdgeInsets.symmetric(
