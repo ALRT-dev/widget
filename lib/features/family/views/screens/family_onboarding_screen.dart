@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_header_surface.dart';
 import 'package:hazard_app/features/family/views/widgets/family_group_actions.dart';
 import 'package:hazard_app/features/family/views/screens/family_invite_screen.dart';
 import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
@@ -44,19 +45,12 @@ class _FamilyOnboardingScreenState
       body: ListView(
         padding: EdgeInsets.only(bottom: 120.spMin),
         children: [
-          Container(
-            padding: EdgeInsets.fromLTRB(16.spMin, 56.spMin, 16.spMin, 20.spMin),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment(-0.5, -1),
-                end: Alignment(0.5, 1),
-                stops: [0.0, 0.55, 1.0],
-                colors: [
-                  FamilyColors.v31HeaderTop,
-                  FamilyColors.v31HeaderMid,
-                  FamilyColors.v31HeaderDeep,
-                ],
-              ),
+          FamilyHeaderSurface(
+            padding: EdgeInsets.fromLTRB(
+              16.spMin,
+              56.spMin,
+              16.spMin,
+              20.spMin,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

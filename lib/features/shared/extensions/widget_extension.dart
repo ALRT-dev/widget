@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 
 extension WidgetExt on Widget {
+  /// Tap handler with feedback, because a button that does not answer a
+  /// press reads as broken: people press again, or assume it failed. Every
+  /// call site in the app gets it from here.
   Widget onPressed(
     final Function()? onPressed, {
     final bool changeCursor = true,
     final HitTestBehavior behaviour = HitTestBehavior.opaque,
+    final bool feedback = true,
   }) =>
       MouseRegion(
         cursor: changeCursor ? SystemMouseCursors.click : MouseCursor.defer,
-        child: GestureDetector(
-          onTap: onPressed,
-          behavior: behaviour,
-          child: this,
-        ),
+        child: feedback
+            ? PressFeedback(
+                onPressed: onPressed,
+                behaviour: behaviour,
+                child: this,
+              )
+            : GestureDetector(
+                onTap: onPressed,
+                behavior: behaviour,
+                child: this,
+              ),
       );
   Widget onPressedDown(final Function(TapDownDetails)? onPressed) =>
       GestureDetector(
@@ -209,4 +220,63 @@ extension WidgetExt on Widget {
         bottom: val,
         child: this,
       );
+}
+
+
+/// Dips and softens while held, and ticks the phone on release.
+///
+/// Deliberately small: 3 percent and 90 milliseconds is felt rather than
+/// watched, so it confirms the press without slowing anybody down. A
+/// disabled target does neither, which is how you can tell it is disabled.
+class PressFeedback extends StatefulWidget {
+  const PressFeedback({
+    super.key,
+    required this.child,
+    required this.onPressed,
+    this.behaviour = HitTestBehavior.opaque,
+  });
+
+  final Widget child;
+  final Function()? onPressed;
+  final HitTestBehavior behaviour;
+
+  @override
+  State<PressFeedback> createState() => _PressFeedbackState();
+}
+
+class _PressFeedbackState extends State<PressFeedback> {
+  bool _down = false;
+
+  bool get _enabled => widget.onPressed != null;
+
+  void _setDown(final bool value) {
+    if (!_enabled || _down == value) return;
+    setState(() => _down = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: widget.behaviour,
+      onTapDown: (_) => _setDown(true),
+      onTapCancel: () => _setDown(false),
+      onTap: _enabled
+          ? () {
+              _setDown(false);
+              HapticFeedback.selectionClick();
+              widget.onPressed!();
+            }
+          : null,
+      child: AnimatedScale(
+        scale: _down ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 90),
+        curve: Curves.easeOut,
+        child: AnimatedOpacity(
+          opacity: _down ? 0.75 : 1.0,
+          duration: const Duration(milliseconds: 90),
+          child: widget.child,
+        ),
+      ),
+    );
+  }
 }

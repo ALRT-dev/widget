@@ -3,7 +3,25 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
 class AppTheme {
-  static String? get defaultFontFamily => 'Poppins';
+  /// The app reads in the platform's own sans rather than Poppins.
+  ///
+  /// Poppins is a geometric display face: near-circular letterforms, tight
+  /// apertures, and a single-storey a. It looks smart in a mock and gets
+  /// noticeably harder to read at 11 to 13sp, which is most of this app,
+  /// and hardest for exactly the people the safety profile exists for.
+  /// Arial resolves to Helvetica on iOS and Roboto on Android, both of
+  /// which are designed for small sizes on screens.
+  static String? get defaultFontFamily => 'Arial';
+
+  /// Aptos first where it exists, then the platform sans. Flutter walks
+  /// this list when a glyph or the family itself is missing.
+  static const fontFallbacks = <String>[
+    'Aptos',
+    'Helvetica Neue',
+    'Helvetica',
+    'Roboto',
+    'San Francisco',
+  ];
 
   /// The default theme settings of the app.
   static ThemeData get _defaultTheme {
@@ -14,6 +32,7 @@ class AppTheme {
     return ThemeData(
       scaffoldBackgroundColor: AppColors.extraLightGrey,
       fontFamily: defaultFontFamily,
+      fontFamilyFallback: fontFallbacks,
       splashColor: AppColors.primary.withValues(alpha: 0.1),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

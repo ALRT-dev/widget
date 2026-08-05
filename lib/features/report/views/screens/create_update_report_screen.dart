@@ -31,9 +31,6 @@ import 'package:hazard_app/others/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// The V3 section label / helper text colour from the design screenshots.
-const _sectionLabelColor = Color(0xFFB84500);
-
 /// The soft grey the report page sits on, from the V3.1 prototype.
 const _pageColor = Color(0xFFF0EEF2);
 
@@ -286,7 +283,7 @@ class _CreateUpdateReportScreenState
     final outline = isDone
         ? const Color(0xFF17A05E)
         : isActive
-            ? _sectionLabelColor
+            ? _labelColor
             : const Color(0xFFE8E4EE);
 
     return Padding(
@@ -309,7 +306,7 @@ class _CreateUpdateReportScreenState
           boxShadow: [
             if (isActive)
               BoxShadow(
-                color: _sectionLabelColor.withValues(alpha: 0.28),
+                color: _labelColor.withValues(alpha: 0.28),
                 blurRadius: 22.0,
                 spreadRadius: 1.5,
               )
@@ -472,17 +469,17 @@ class _CreateUpdateReportScreenState
         padding: EdgeInsets.symmetric(horizontal: 14.spMin, vertical: 8.spMin),
         decoration: BoxDecoration(
           color: isSelected
-              ? _sectionLabelColor.withValues(alpha: 0.16)
+              ? _labelColor.withValues(alpha: 0.16)
               : AppColors.white,
           borderRadius: BorderRadius.circular(11.spMin),
           border: Border.all(
-            color: isSelected ? _sectionLabelColor : const Color(0xFFE8E4EE),
+            color: isSelected ? _labelColor : const Color(0xFFE8E4EE),
             width: 1.5,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: _sectionLabelColor.withValues(alpha: 0.28),
+                    color: _labelColor.withValues(alpha: 0.28),
                     blurRadius: 12.0,
                     offset: const Offset(0, 2),
                   ),
@@ -494,7 +491,7 @@ class _CreateUpdateReportScreenState
           style: TextStyle(
             fontSize: 15.spMin,
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            color: isSelected ? _sectionLabelColor : AppColors.black,
+            color: isSelected ? _labelColor : AppColors.black,
           ),
         ),
       ),
@@ -558,17 +555,17 @@ class _CreateUpdateReportScreenState
         padding: EdgeInsets.symmetric(horizontal: 10.spMin, vertical: 10.spMin),
         decoration: BoxDecoration(
           color: isSelected
-              ? _sectionLabelColor.withValues(alpha: 0.16)
+              ? _labelColor.withValues(alpha: 0.16)
               : AppColors.white,
           borderRadius: BorderRadius.circular(12.spMin),
           border: Border.all(
-            color: isSelected ? _sectionLabelColor : const Color(0xFFE8E4EE),
+            color: isSelected ? _labelColor : const Color(0xFFE8E4EE),
             width: 1.5,
           ),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: _sectionLabelColor.withValues(alpha: 0.28),
+                    color: _labelColor.withValues(alpha: 0.28),
                     blurRadius: 12.0,
                     offset: const Offset(0, 2),
                   ),
@@ -582,7 +579,7 @@ class _CreateUpdateReportScreenState
               style: TextStyle(
                 fontSize: 15.5.spMin,
                 fontWeight: FontWeight.w700,
-                color: isSelected ? _sectionLabelColor : AppColors.black,
+                color: isSelected ? _labelColor : AppColors.black,
               ),
             ),
             2.hSizedBox,
@@ -1010,7 +1007,7 @@ class _CreateUpdateReportScreenState
               fontSize: 12.spMin,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.6,
-              color: _sectionLabelColor,
+              color: _labelColor,
             ),
           ),
           10.hSizedBox,
@@ -1062,9 +1059,9 @@ class _CreateUpdateReportScreenState
               style: TextStyle(
                 fontSize: 13.5.spMin,
                 fontWeight: FontWeight.w700,
-                color: _sectionLabelColor,
+                color: _labelColor,
                 decoration: TextDecoration.underline,
-                decorationColor: _sectionLabelColor,
+                decorationColor: _labelColor,
               ),
             ),
           ),
@@ -1121,7 +1118,7 @@ class _CreateUpdateReportScreenState
             height: 19.spMin,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: _sectionLabelColor.withValues(alpha: 0.10),
+              color: _labelColor.withValues(alpha: 0.10),
               shape: BoxShape.circle,
             ),
             child: Text(
@@ -1129,7 +1126,7 @@ class _CreateUpdateReportScreenState
               style: TextStyle(
                 fontSize: 12.spMin,
                 fontWeight: FontWeight.w800,
-                color: _sectionLabelColor,
+                color: _labelColor,
               ),
             ),
           ),
@@ -1140,7 +1137,7 @@ class _CreateUpdateReportScreenState
             title.toUpperCase(),
             style: TextStyle(
               fontSize: 13.5.spMin,
-              color: _sectionLabelColor,
+              color: _labelColor,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.0,
             ),

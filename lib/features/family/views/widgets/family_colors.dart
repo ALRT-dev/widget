@@ -70,6 +70,33 @@ class FamilyColors {
   static const v31NoteBorder = Color(0xFFF5D98A);
   static const v31NoteInk = Color(0xFF8A6D1E);
 
+  /// The family header, in one place.
+  ///
+  /// Every family surface used to build its own gradient, so the hub, the
+  /// journey screen and the empty state were three slightly different
+  /// blues. This is the single blend they all take: violet at the top
+  /// left falling through indigo into the deep navy, warmer and more
+  /// purple than the old stops, which read as flat corporate blue.
+  static const headerGradient = LinearGradient(
+    begin: Alignment(-0.7, -1),
+    end: Alignment(0.6, 1),
+    stops: [0.0, 0.42, 0.78, 1.0],
+    colors: [
+      Color(0xFF7A4BF5),
+      Color(0xFF5238DE),
+      Color(0xFF2E1E9E),
+      Color(0xFF1B1470),
+    ],
+  );
+
+  /// The soft highlight that sits over [headerGradient] top-right, so the
+  /// band has a light source instead of looking like a flat fill.
+  static const headerHighlight = RadialGradient(
+    center: Alignment(0.75, -0.85),
+    radius: 1.1,
+    colors: [Color(0x40FFFFFF), Color(0x00FFFFFF)],
+  );
+
   /// The three stops of the family header gradient (165 degrees).
   static const v31HeaderTop = Color(0xFF4B4BF0);
   static const v31HeaderMid = Color(0xFF3229C4);

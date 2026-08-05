@@ -8,8 +8,10 @@ import 'package:flutter_tts/flutter_tts.dart';
 class AlertSpeechService {
   AlertSpeechService() {
     _tts
-      ..setSpeechRate(0.45)
-      ..setPitch(1.05)
+      // Deeper and slower than the default: an alert read at chat
+      // speed is hard to follow, and a lower pitch carries better.
+      ..setSpeechRate(0.38)
+      ..setPitch(0.85)
       ..setVolume(1.0)
       ..awaitSpeakCompletion(true);
     _configureVoice();
