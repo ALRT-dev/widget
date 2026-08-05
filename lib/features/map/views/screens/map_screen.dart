@@ -129,7 +129,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         children: [
                           Expanded(child: MapSearchbar()),
                         ],
-                      ).pX(20.0).pT(8.0);
+                      ).pX(20.0).pT(18.0);
                     },
                   ),
                 ],

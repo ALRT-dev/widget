@@ -4,6 +4,8 @@ import 'package:hazard_app/features/ask_alrt/models/ask_alrt_message.dart';
 import 'package:hazard_app/features/ask_alrt/providers/states/ask_alrt_provider_state.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
+import 'package:hazard_app/features/ask_alrt/models/ask_alrt_local_answers.dart';
+import 'package:hazard_app/features/shared/services/emergency_number.dart';
 
 final providerOfAskAlrt =
     NotifierProvider.autoDispose<AskAlrtProvider, AskAlrtProviderState>(
@@ -15,9 +17,11 @@ final providerOfAskAlrt =
 class AskAlrtProvider extends Notifier<AskAlrtProviderState> {
   /// Calm fallback shown for ANY failure (App Check rejection, function not
   /// deployed, network, malformed response). Never show a raw error.
-  static const fallbackAnswer =
-      "I can't answer right now. If you're in danger call 000; "
-      'for alert details tap the alert itself.';
+  /// Used only when nothing local matches and the backend is unreachable.
+  /// The emergency number is resolved per user, never hard-coded.
+  static String fallbackAnswerFor(final String emergencyNumber) =>
+      "I can't answer that one right now. If you're in danger call "
+      '$emergencyNumber; for alert details, tap the alert itself.';
 
   /// Shown when the backend reports a quota-style error mentioning 'limit'.
   static const limitAnswer =
@@ -43,7 +47,27 @@ class AskAlrtProvider extends Notifier<AskAlrtProviderState> {
       isSending: true,
     );
 
-    var answer = fallbackAnswer;
+    final emergencyNumber = ref.read(providerOfEmergencyNumber);
+
+    // The basics are answered on this phone: no network, no model, no wait.
+    // It also means the app can still explain itself when the assistant
+    // backend is unreachable.
+    final local = AskAlrtLocalAnswers.answerFor(
+      trimmed,
+      emergencyNumber: emergencyNumber,
+    );
+    if (local != null) {
+      state = state.copyWith(
+        messages: [
+          ...state.messages,
+          AskAlrtMessage(role: AskAlrtRole.assistant, text: local),
+        ],
+        isSending: false,
+      );
+      return;
+    }
+
+    var answer = fallbackAnswerFor(emergencyNumber);
     var usedContext = false;
 
     try {
@@ -62,11 +86,13 @@ class AskAlrtProvider extends Notifier<AskAlrtProviderState> {
         usedContext = contextString.isNotEmpty;
       }
     } on FirebaseFunctionsException catch (exception) {
-      answer = _isLimitError(exception) ? limitAnswer : fallbackAnswer;
+      answer = _isLimitError(exception)
+          ? limitAnswer
+          : fallbackAnswerFor(emergencyNumber);
     } catch (_) {
       // App Check rejection, not deployed, network loss, anything else:
       // stay calm, keep the fallback copy.
-      answer = fallbackAnswer;
+      answer = fallbackAnswerFor(emergencyNumber);
     }
 
     // The sheet may have been closed mid-flight (autoDispose).

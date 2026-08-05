@@ -113,6 +113,7 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
                   spreadRadius: 1.0,
                   offset: const Offset(0, 6),
                 ),
+                // Matched pair with the map capsule.
                 BoxShadow(
                   color: AppColors.black.withValues(alpha: 0.18),
                   blurRadius: 16.0,

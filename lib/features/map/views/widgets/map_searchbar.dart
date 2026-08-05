@@ -37,6 +37,21 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
   void initState() {
     super.initState();
     _searchController.text = ref.read(providerOfPlacesForMap).searchString;
+    // The capsule lifts when it is being typed into, so the tap target
+    // confirms itself without moving anything on the map.
+    _searchFocusNode.addListener(_onFocusChanged);
+  }
+
+  void _onFocusChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _searchFocusNode
+      ..removeListener(_onFocusChanged)
+      ..dispose();
+    super.dispose();
   }
 
   @override
@@ -51,18 +66,31 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
             ),
           );
 
-          return Container(
+          final isFocused = _searchFocusNode.hasFocus;
+
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
             decoration: BoxDecoration(
               color: AppColors.white,
-              // Same capsule as the footer, lit with an orange halo so the
-              // two floating controls read as a matched pair.
+              // The same capsule the search screen carries, lit with an
+              // orange halo. Typing into it brightens the halo rather than
+              // moving anything, so the focus is felt, not jumped to.
               borderRadius: BorderRadius.circular(40.spMin),
+              border: Border.all(
+                color: AppColors.searchGlow.withValues(
+                  alpha: isFocused ? 0.85 : 0.22,
+                ),
+                width: isFocused ? 1.6 : 1.0,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.searchGlow.withValues(alpha: 0.38),
-                  blurRadius: 26.0,
-                  spreadRadius: 1.0,
-                  offset: const Offset(0, 6),
+                  color: AppColors.searchGlow.withValues(
+                    alpha: isFocused ? 0.55 : 0.3,
+                  ),
+                  blurRadius: isFocused ? 34.0 : 24.0,
+                  spreadRadius: isFocused ? 3.0 : 1.0,
+                  offset: const Offset(0, 5),
                 ),
                 BoxShadow(
                   color: AppColors.black.withValues(alpha: 0.18),
@@ -71,7 +99,7 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
                 ),
               ],
             ),
-            height: 48.spMin,
+            height: 50.spMin,
             alignment: Alignment.center,
             child: TextFormField(
               focusNode: _searchFocusNode,
