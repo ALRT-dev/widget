@@ -7,6 +7,7 @@ import 'package:hazard_app/features/shared/providers/instance_providers.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
 import 'package:hazard_app/features/shared/utils/async_call_helper.dart';
+import 'package:hazard_app/features/shared/services/sim_country.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final providerOfAppInitialization =
@@ -29,6 +30,12 @@ class AppInitializationProvider extends Notifier<bool> {
     state = false;
 
     await _initializeSharedPreferences();
+    if (!ref.mounted) return;
+
+    // The SIM's country decides which emergency number the app offers, so
+    // it is read before any screen can ask. Never throws, and a null just
+    // falls the resolution through to device region.
+    await SimCountry.load();
     if (!ref.mounted) return;
 
     // initialize these things after shared preference is initialized but before logged in user is initialized

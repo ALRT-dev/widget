@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hazard_app/features/shared/services/sim_country.dart';
 
 /// The local emergency number, resolved per user (product rules §16).
 ///
@@ -104,15 +105,15 @@ class EmergencyNumber {
 
 /// The emergency number for this device.
 ///
-/// Device region and locale come from the platform. SIM country is the
-/// higher-priority tier in §16 and needs a telephony plugin; until one is
-/// added this resolves from the region the phone is set to, which is right
-/// for residents and for travellers who change their region, and falls back
-/// to 112 for everyone else.
+/// The full §16 chain: SIM country, then device region, then locale, then
+/// the GSM global 112. SIM country is read once at startup by [SimCountry]
+/// and is null on iOS, where the platform no longer exposes it, so those
+/// devices resolve from region exactly as before.
 final providerOfEmergencyNumber = Provider<String>((ref) {
   final dispatcher = PlatformDispatcher.instance;
   final primary = dispatcher.locale;
   return EmergencyNumber.resolve(
+    simCountry: SimCountry.value,
     deviceRegion: primary.countryCode,
     locale: primary.toLanguageTag(),
   );

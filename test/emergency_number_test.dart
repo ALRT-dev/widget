@@ -1,4 +1,6 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hazard_app/features/shared/services/sim_country.dart';
 import 'package:hazard_app/features/shared/services/emergency_number.dart';
 
 /// A wrong number here sends someone to the wrong place in an emergency, so
@@ -72,6 +74,64 @@ void main() {
           reason: '${entry.key} has a non-dialable number "${entry.value}"',
         );
       }
+    });
+  });
+
+  group('SimCountry', () {
+    tearDown(() => SimCountry.debugSet(null, hasLoaded: false));
+
+    test('the channel result feeds the top tier of the chain', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('com.safetyalrt.alrt/sim'),
+        (call) async => call.method == 'getSimCountryIso' ? 'es' : null,
+      );
+
+      expect(await SimCountry.load(), 'ES');
+      // An Australian phone in Spain is offered the Spanish number, which
+      // is the whole reason the SIM tier outranks device region.
+      expect(
+        EmergencyNumber.resolve(
+          simCountry: SimCountry.value,
+          deviceRegion: 'AU',
+          locale: 'en-AU',
+        ),
+        '112',
+      );
+    });
+
+    test('no SIM leaves the value null and falls through to region', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('com.safetyalrt.alrt/sim'),
+        (call) async => null,
+      );
+
+      expect(await SimCountry.load(), isNull);
+      expect(
+        EmergencyNumber.resolve(
+          simCountry: SimCountry.value,
+          deviceRegion: 'AU',
+        ),
+        '000',
+      );
+    });
+
+    test('a platform failure never costs the fallback', () async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+        const MethodChannel('com.safetyalrt.alrt/sim'),
+        (call) async => throw PlatformException(code: 'nope'),
+      );
+
+      expect(await SimCountry.load(), isNull);
+      expect(
+        EmergencyNumber.resolve(simCountry: SimCountry.value),
+        EmergencyNumber.gsmGlobalFallback,
+      );
     });
   });
 }

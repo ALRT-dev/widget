@@ -4,8 +4,10 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.telephony.TelephonyManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -14,6 +16,7 @@ class MainActivity : FlutterActivity() {
 
     private companion object {
         const val CHANNEL = "com.safetyalrt.alrt/widget_pinning"
+        const val SIM_CHANNEL = "com.safetyalrt.alrt/sim"
         const val EXTRA_PIN_WIDGET = "pin_widget"
     }
 
@@ -30,6 +33,32 @@ class MainActivity : FlutterActivity() {
                     else -> result.notImplemented()
                 }
             }
+
+        // The SIM's country, for picking the local emergency number. It is
+        // the only signal that follows the ground rather than the owner:
+        // an Australian phone in Spain should offer 112, not 000.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SIM_CHANNEL)
+            .setMethodCallHandler { call, result ->
+                when (call.method) {
+                    "getSimCountryIso" -> result.success(simCountryIso())
+                    else -> result.notImplemented()
+                }
+            }
+    }
+
+    /**
+     * The SIM's ISO country, or null when there is no SIM, the device has
+     * no telephony, or the platform declines. Needs no permission.
+     * Never throws: a failure here must not cost someone the fallback.
+     */
+    private fun simCountryIso(): String? {
+        return try {
+            val telephony =
+                getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
+            telephony?.simCountryIso?.takeIf { it.isNotBlank() }?.uppercase()
+        } catch (e: Exception) {
+            null
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
