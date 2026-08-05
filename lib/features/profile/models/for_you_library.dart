@@ -10,15 +10,40 @@ abstract final class ForYouLibrary {
   /// Coarse bucket for an alert. The title is checked for specific hazards
   /// first (cyclone, heatwave, snakes...), then the (parent) category name
   /// as the fallback. Returns null when no guidance applies.
+  /// Most specific wins: the alert title, then its own category, then the
+  /// parent category.
+  ///
+  /// Passing only the parent was quietly losing the point of this library.
+  /// Every hazard sits under a broad parent ("Weather & Environment"), so
+  /// a Flood alert matched severe_weather and a Bushfire alert matched
+  /// severe_weather, even though both have their own reviewed guidance.
+  /// Unless the title happened to say the word, the reader got generic
+  /// advice for a specific emergency.
   static String? bucketFor({
     final String? categoryName,
     final String? title,
+    final String? parentCategoryName,
   }) {
     final t = (title ?? '').toLowerCase();
     for (final entry in _titleKeywords) {
       if (entry.$1.any(t.contains)) return entry.$2;
     }
+    // The alert's own category, then the parent it hangs under.
+    for (final candidate in [categoryName, parentCategoryName]) {
+      final bucket = _bucketForName(candidate);
+      if (bucket != null) return bucket;
+    }
+    return null;
+  }
+
+  static String? _bucketForName(final String? categoryName) {
     final name = (categoryName ?? '').toLowerCase();
+    if (name.isEmpty) return null;
+    // The specific hazards first: these are subcategory names, and each
+    // has its own reviewed rows.
+    for (final entry in _titleKeywords) {
+      if (entry.$1.any(name.contains)) return entry.$2;
+    }
     if (name.contains('fire') && name.contains('smoke')) return 'smoke';
     if (name.contains('fire')) return 'bushfire';
     if (name.contains('smoke')) return 'smoke';

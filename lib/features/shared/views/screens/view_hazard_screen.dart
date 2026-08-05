@@ -802,12 +802,13 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
         // For You: profile-pinned guidance. On-device matching, zero AI.
         Consumer(
           builder: (context, ref, child) {
+            // Its own category first, the parent as the fallback: a Flood
+            // alert should get flood guidance, not generic weather.
             final categoryName = ref.watch(
-              provider.select(
-                (value) =>
-                    value.hazard?.category?.parent?.name ??
-                    value.hazard?.category?.name,
-              ),
+              provider.select((value) => value.hazard?.category?.name),
+            );
+            final parentCategoryName = ref.watch(
+              provider.select((value) => value.hazard?.category?.parent?.name),
             );
             final isAws = ref.watch(
               provider.select(
@@ -819,6 +820,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
             );
             return ForYouCard(
               categoryName: categoryName,
+              parentCategoryName: parentCategoryName,
               title: title,
               isAws: isAws,
             );

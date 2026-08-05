@@ -18,12 +18,17 @@ class ForYouCard extends ConsumerStatefulWidget {
   const ForYouCard({
     super.key,
     required this.categoryName,
+    this.parentCategoryName,
     this.title,
     this.isAws = false,
   });
 
-  /// The alert's (parent) category name, used to pick the hazard bucket.
+  /// The alert's own category name, tried first.
   final String? categoryName;
+
+  /// The broad parent it hangs under, used only if the specific one has
+  /// no guidance of its own.
+  final String? parentCategoryName;
 
   /// The alert title, checked for specific hazards (cyclone, snakes...).
   final String? title;
@@ -44,6 +49,7 @@ class _ForYouCardState extends ConsumerState<ForYouCard> {
 
     final bucket = ForYouLibrary.bucketFor(
       categoryName: widget.categoryName,
+      parentCategoryName: widget.parentCategoryName,
       title: widget.title,
     );
     if (bucket == null) return const SizedBox.shrink();
