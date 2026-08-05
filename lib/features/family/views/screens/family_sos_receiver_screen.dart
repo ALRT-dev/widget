@@ -258,7 +258,7 @@ class FamilySosReceiverScreen extends ConsumerWidget {
                 sosEventId: sos.id,
                 type: FamilySosResponseType.called,
               );
-              await launchUrl(Uri.parse('tel:\$emergencyNumber'));
+              await launchUrl(Uri.parse('tel:$emergencyNumber'));
             },
             icon: Icon(Icons.phone, size: 18.spMin),
             label: Text(

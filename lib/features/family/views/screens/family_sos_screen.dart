@@ -404,10 +404,10 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
             borderRadius: BorderRadius.circular(16.spMin),
           ),
         ),
-        onPressed: () => launchUrl(Uri.parse('tel:\$emergencyNumber')),
+        onPressed: () => launchUrl(Uri.parse('tel:$emergencyNumber')),
         icon: Icon(Icons.phone, size: 20.spMin),
         label: Text(
-          'Call \$emergencyNumber',
+          'Call $emergencyNumber',
           style: TextStyle(fontSize: 17.spMin, fontWeight: FontWeight.w700),
         ),
       ),

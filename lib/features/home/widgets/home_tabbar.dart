@@ -10,6 +10,7 @@ import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dar
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hazard_app/features/profile/providers/child_mode_provider.dart';
 
 /// The dark floating pill navigation bar.
 ///
@@ -49,6 +50,13 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
   @override
   Widget build(BuildContext context) {
     final currentTab = ref.watch(providerOfHomeTab);
+    // Child mode drops the ALRT slot, which is the way in to Report an
+    // ALRT: a child can see hazards and raise an SOS, but does not publish
+    // to strangers.
+    final isChildMode = ref.watch(providerOfIsChildMode);
+    final tabs = HomeTab.values
+        .where((tab) => !(isChildMode && tab == HomeTab.list))
+        .toList();
 
     return SafeArea(
       top: false,
@@ -77,7 +85,7 @@ class _HomeTabbarState extends ConsumerState<HomeTabbar> {
           padding: EdgeInsets.symmetric(horizontal: 8.spMin),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: HomeTab.values
+            children: tabs
                 .map((tab) => _tabItemBuilder(tab, isActive: tab == currentTab))
                 .toList(),
           ),
