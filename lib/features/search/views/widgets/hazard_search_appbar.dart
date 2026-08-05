@@ -15,6 +15,7 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
 import 'package:hazard_app/features/shared/views/widgets/voice/voice_search_mic_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
+import 'package:hazard_app/features/shared/views/widgets/search_field_style.dart';
 
 class HazardSearchAppBar extends ConsumerStatefulWidget {
   const HazardSearchAppBar({super.key});
@@ -41,6 +42,22 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
   void initState() {
     super.initState();
     _searchController.text = ref.read(providerOfPlacesForSearch).searchString;
+    // Without this the glow could never brighten: hasFocus was read in
+    // build, but nothing asked for a rebuild when focus changed.
+    _searchFocusNode.addListener(_onFocusChanged);
+  }
+
+  void _onFocusChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _searchFocusNode
+      ..removeListener(_onFocusChanged)
+      ..dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -100,29 +117,17 @@ class _HazardSearchAppBarState extends ConsumerState<HazardSearchAppBar> {
               (value) => value.searchString.isNotEmpty,
             ),
           );
-          return Container(
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
             decoration: BoxDecoration(
               color: AppColors.white,
-              // The same lit capsule the map search bar carries, so the
-              // shape follows you from the map into search.
-              borderRadius: BorderRadius.circular(40.spMin),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.searchGlow.withValues(alpha: 0.38),
-                  blurRadius: 26.0,
-                  spreadRadius: 1.0,
-                  offset: const Offset(0, 6),
-                ),
-                // Matched pair with the map capsule.
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.18),
-                  blurRadius: 16.0,
-                  offset: const Offset(0, 6),
-                ),
-              ],
+              // Same rounded rectangle as the map bar.
+              borderRadius: SearchFieldStyle.borderRadius,
+              boxShadow: SearchFieldStyle.glow(isLit: _searchFocusNode.hasFocus),
             ),
             padding: EdgeInsets.symmetric(vertical: 1.spMin),
-            height: 48.spMin,
+            height: SearchFieldStyle.height,
             alignment: Alignment.center,
             child: TextFormField(
               focusNode: _searchFocusNode,

@@ -14,6 +14,7 @@ import 'package:hazard_app/features/map/providers/places_provider.dart';
 import 'package:hazard_app/features/map/views/widgets/places_search_results_menu_content.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/views/widgets/dropdown.dart';
+import 'package:hazard_app/features/shared/views/widgets/search_field_style.dart';
 import 'package:hazard_app/features/shared/views/widgets/voice/voice_search_mic_button.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -73,40 +74,13 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
             curve: Curves.easeOut,
             decoration: BoxDecoration(
               color: AppColors.white,
-              // The same capsule the search screen carries, lit with an
-              // orange halo. Typing into it brightens the halo rather than
-              // moving anything, so the focus is felt, not jumped to.
-              borderRadius: BorderRadius.circular(40.spMin),
-              // Resting, there is NO drawn outline: a hard orange ring on
-              // white read as a stray border rather than a glow, which is
-              // what made this bar look unfinished against the map. The
-              // halo is light, so it lives in the shadow. Focus draws the
-              // faintest hairline and brightens the halo.
-              border: isFocused
-                  ? Border.all(
-                      color: AppColors.searchGlow.withValues(alpha: 0.5),
-                      width: 1.2,
-                    )
-                  : null,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.searchGlow.withValues(
-                    alpha: isFocused ? 0.5 : 0.22,
-                  ),
-                  blurRadius: isFocused ? 30.0 : 18.0,
-                  spreadRadius: isFocused ? 2.0 : 0.0,
-                  offset: const Offset(0, 4),
-                ),
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.14),
-                  blurRadius: 14.0,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+              // A rounded rectangle, matching the search screen. The old
+              // 40 radius on a 48 tall bar clamped to a full oval.
+              borderRadius: SearchFieldStyle.borderRadius,
+              boxShadow: SearchFieldStyle.glow(isLit: isFocused),
             ),
-            // Same capsule as the search screen, to the pixel.
             padding: EdgeInsets.symmetric(vertical: 1.spMin),
-            height: 48.spMin,
+            height: SearchFieldStyle.height,
             alignment: Alignment.center,
             child: TextFormField(
               focusNode: _searchFocusNode,
@@ -128,8 +102,9 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
                   left: 20.spMin,
                   right: 10.spMin,
                 ),
-                filled: true,
-                fillColor: AppColors.white,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
                 prefixIcon: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
