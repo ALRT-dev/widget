@@ -15,6 +15,7 @@ import 'package:hazard_app/features/profile/views/screens/my_hazards_screen.dart
 import 'package:hazard_app/features/report/providers/create_update_report_provider.dart';
 import 'package:hazard_app/features/report/providers/states/create_update_report_provider_state.dart';
 import 'package:hazard_app/features/shared/models/hazard_category_model.dart';
+import 'package:hazard_app/features/shared/views/widgets/category_filter_chip.dart';
 import 'package:hazard_app/features/report/models/report_taxonomy.dart';
 import 'package:hazard_app/features/report/views/widgets/create_report_medias_list.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
@@ -46,10 +47,6 @@ const _cardShadow = Color(0x0D1E142D);
 
 /// The chip treatment the prototype gives secondary actions.
 const _chipFill = Color(0xFFF0F2F5);
-
-/// Text on an unpicked category pill: grey, so seven categories do not read
-/// as seven competing colours before one is chosen.
-const _pillInk = Color(0xFF5F5C66);
 
 class CreateUpdateReportScreenArgs {
   CreateUpdateReportScreenArgs({this.hazardToUpdate});
@@ -649,80 +646,17 @@ class _CreateUpdateReportScreenState
           runSpacing: 6.spMin,
           children: [
             for (final category in categories)
-              _categoryPillBuilder(
+              // The same chip the map key draws, so a category looks
+              // identical whether you are reading one or choosing one.
+              CategoryFilterChip(
                 category: category,
                 isSelected: category.id == selectedCategoryId,
+                isCompact: true,
+                onToggle: (_) => _handleCategoryTap(category),
               ),
           ],
         );
       },
-    );
-  }
-
-  /// One category as a pill: its colour as a dot, its name beside it.
-  ///
-  /// Selecting fills the pill with the category's own tint and pulls the
-  /// border and text to that colour, so the choice is legible from the dot
-  /// alone. Unselected pills stay white with grey text, which keeps seven
-  /// categories from reading as seven competing colours at once.
-  Widget _categoryPillBuilder({
-    required final HazardCategory category,
-    required final bool isSelected,
-  }) {
-    final dotColor = category.resolvedColor;
-    final fill = Color.alphaBlend(
-      dotColor.withValues(alpha: 0.12),
-      AppColors.white,
-    );
-
-    return GestureDetector(
-      onTap: () => _handleCategoryTap(category),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 140),
-        padding: EdgeInsets.symmetric(
-          horizontal: 11.spMin,
-          vertical: 8.spMin,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? fill : AppColors.white,
-          borderRadius: BorderRadius.circular(16.spMin),
-          border: Border.all(
-            color: isSelected ? dotColor : const Color(0xFFE8E4EE),
-            width: 1.5,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: dotColor.withValues(alpha: 0.3),
-                    blurRadius: 12.0,
-                    offset: const Offset(0, 3),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 7.spMin,
-              height: 7.spMin,
-              decoration: BoxDecoration(
-                color: dotColor,
-                shape: BoxShape.circle,
-              ),
-            ),
-            SizedBox(width: 5.spMin),
-            Text(
-              category.name ?? 'Category',
-              style: TextStyle(
-                fontSize: 12.5.spMin,
-                fontWeight: FontWeight.w800,
-                color: isSelected ? dotColor : _pillInk,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

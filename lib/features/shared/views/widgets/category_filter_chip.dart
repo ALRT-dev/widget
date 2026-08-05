@@ -25,6 +25,7 @@ class CategoryFilterChip extends StatelessWidget {
     required this.category,
     required this.isSelected,
     this.onToggle,
+    this.isCompact = false,
   });
 
   /// The category the chip stands for.
@@ -37,20 +38,25 @@ class CategoryFilterChip extends StatelessWidget {
   /// chip as a legend entry that does not respond to touch.
   final ValueChanged<bool>? onToggle;
 
+  /// Tightens the padding and type one step, for screens that must fit the
+  /// whole set in a few rows (Report an ALRT). Colours, the dot and the
+  /// outline are untouched: it is the same chip, not a second design.
+  final bool isCompact;
+
   @override
   Widget build(BuildContext context) {
     final color = categoryChipColor(category);
 
     final chip = Container(
       padding: EdgeInsets.symmetric(
-        horizontal: 16.spMin,
-        vertical: 8.spMin,
+        horizontal: (isCompact ? 11 : 16).spMin,
+        vertical: (isCompact ? 7 : 8).spMin,
       ),
       decoration: BoxDecoration(
         color: isSelected
             ? color.withValues(alpha: 0.12)
             : color.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(20.spMin),
+          borderRadius: BorderRadius.circular((isCompact ? 16 : 20).spMin),
         // The outline always carries the category's own colour, softened
         // when unselected. A grey outline made every category look the
         // same until you tapped one, which is the opposite of the point:
@@ -66,15 +72,15 @@ class CategoryFilterChip extends StatelessWidget {
           // A filled dot repeats the colour where the outline is faint, so
           // the category still reads at a glance and never by colour alone.
           Container(
-            width: 8.spMin,
-            height: 8.spMin,
-            margin: EdgeInsets.only(right: 7.spMin),
+            width: (isCompact ? 7 : 8).spMin,
+            height: (isCompact ? 7 : 8).spMin,
+            margin: EdgeInsets.only(right: (isCompact ? 5 : 7).spMin),
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           Text(
             category.name ?? 'Unknown Category',
             style: TextStyle(
-              fontSize: 14.spMin,
+              fontSize: (isCompact ? 12.5 : 14).spMin,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
               color: isSelected ? color : AppColors.black,
             ),
