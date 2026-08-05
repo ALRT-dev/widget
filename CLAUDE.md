@@ -43,9 +43,12 @@ explicit instruction from the product owner in the current session.
   instruction 2026-08-05). The number resolves SIM country > device
   region > locale country > 112 (GSM global fallback) via
   EmergencyNumber/providerOfEmergencyNumber, mirroring emergencyLogic.ts
-  in the Ask ALRT backend. SIM country needs a telephony plugin and is
-  not wired yet; the seeded country table should move to Remote Config
-  so numbers can be corrected without a release.
+  in the Ask ALRT backend. SIM country is read on Android over the app's
+  own MethodChannel (com.safetyalrt.alrt/sim, TelephonyManager); iOS
+  returns null because CTCarrier was deprecated in iOS 16, so those
+  devices start at device region. The seeded country table is NOT
+  authoritative and should move to Remote Config so numbers can be
+  corrected without a release.
 - Location leaves a phone only by the owner's action. No continuous
   tracking, ever.
 - Snapshots expire after 1 hour: the event log is kept, the locations are
