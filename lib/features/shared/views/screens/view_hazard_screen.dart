@@ -659,11 +659,24 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
   Widget _buildPlainTermsBox({required final bool isUserReported}) {
     return Consumer(
       builder: (context, ref, child) {
-        final aiSummary = ref.watch(
-          provider.select((value) => value.hazard?.aiSummary),
-        );
+        // Locked rule (product owner, 2026-08-05): In plain terms states
+        // only what has been reported and that the agency is giving
+        // advice. This box used to print the AI summary, which is ALRT
+        // writing its own statements about a hazard: exactly what we do
+        // not do. The deterministic line is the same one the list card
+        // shows, so both surfaces say the same thing.
+        final hazard = ref.watch(provider.select((value) => value.hazard));
+        if (hazard == null) return const SizedBox.shrink();
 
-        if (aiSummary?.isEmpty ?? true) return const SizedBox.shrink();
+        final plainTerms = AlertCardStyle.plainTermsOf(
+          isOfficial: !hazard.isUserReported,
+          isAws: hazard.isAwsCompliant ?? false,
+          severity: hazard.severity,
+          band: hazard.severityBand,
+          categoryName: hazard.category?.name,
+          sourceName: hazard.source?.name,
+        );
+        if (plainTerms == null) return const SizedBox.shrink();
 
         return Container(
           width: double.infinity,
@@ -684,7 +697,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
                   text: 'In plain terms: ',
                   style: TextStyle(fontWeight: FontWeight.w700),
                 ),
-                TextSpan(text: aiSummary),
+                TextSpan(text: plainTerms),
               ],
             ),
             style: TextStyle(
@@ -933,6 +946,7 @@ class _ViewHazardScreenState extends ConsumerState<ViewHazardScreen> {
       severity: hazard.severity,
       band: hazard.severityBand,
       categoryName: hazard.category?.name,
+      sourceName: hazard.source?.name,
     );
     final text = [
       hazard.isUserReported

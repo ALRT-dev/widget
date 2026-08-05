@@ -85,58 +85,48 @@ abstract final class AlertCardStyle {
     };
   }
 
-  /// "In plain terms" — one fixed sentence per official severity level, so
-  /// anyone can read what the warning actually means. Deterministic copy,
-  /// zero AI at render time; action wording is always attributed to the
-  /// services, never spoken in ALRT's own voice. Community reports return
-  /// null — unverified posts don't get an authority strip.
+  /// The "In plain terms" line.
+  ///
+  /// Locked rule (product owner, 2026-08-05): this states only WHAT HAS
+  /// BEEN REPORTED and THAT the issuing agency is giving advice. ALRT does
+  /// not write the advice, does not paraphrase it, and does not judge how
+  /// dangerous something is. It used to say things like "Emergency services
+  /// say act immediately" and "the air outside is bad enough to affect
+  /// anyone" — words no agency actually said, attributed to them.
+  ///
+  /// Only AWS alerts carry a level word, and only because the source
+  /// publishes that word itself; every other source is described without
+  /// one. Community reports get no line at all.
   static String? plainTermsOf({
     required final bool isOfficial,
     required final bool isAws,
     final HazardSeverity? severity,
     final HazardSeverityBand? band,
     final String? categoryName,
+    final String? sourceName,
   }) {
     if (!isOfficial) return null;
 
-    final category = categoryName?.toLowerCase() ?? '';
+    final trimmed = sourceName?.trim();
+    final who = (trimmed != null && trimmed.isNotEmpty)
+        ? trimmed
+        : 'The issuing agency';
 
-    // Air quality reads better with its own line at the serious end.
-    final isAir = category.contains('air') || category.contains('health');
-    final isSevere = isAws
-        ? severity == HazardSeverity.emergency ||
-              severity == HazardSeverity.watchAndAct
-        : band == HazardSeverityBand.action ||
-              band == HazardSeverityBand.critical;
-    if (isAir && isSevere) {
-      return 'the air outside is bad enough to affect anyone, '
-          'not just people with health conditions.';
+    // The source's own level word, verbatim, never reworded.
+    final level = isAws
+        ? switch (severity) {
+            HazardSeverity.emergency => 'Emergency Warning',
+            HazardSeverity.watchAndAct => 'Watch and Act',
+            HazardSeverity.advice => 'Advice',
+            _ => null,
+          }
+        : null;
+
+    if (level != null) {
+      return '$who has issued a $level for this area. '
+          'Their advice is in this alert.';
     }
-
-    if (isAws) {
-      return switch (severity) {
-        HazardSeverity.emergency =>
-          'this is as serious as official warnings get. Emergency services '
-              'say act immediately.',
-        HazardSeverity.watchAndAct =>
-          'a hazard nearby is getting worse. The emergency services say '
-              'start acting now, before it becomes an emergency.',
-        HazardSeverity.advice =>
-          'no immediate danger, but stay aware — conditions can change.',
-        _ => null,
-      };
-    }
-
-    return switch (band) {
-      HazardSeverityBand.critical =>
-        'officials consider this dangerous right now. Take it seriously.',
-      HazardSeverityBand.action =>
-        'officials say this needs your attention now.',
-      HazardSeverityBand.monitor =>
-        'worth keeping an eye on if you are nearby.',
-      HazardSeverityBand.info || null =>
-        'for your awareness — nothing to act on right now.',
-    };
+    return '$who has reported this. Their advice is in this alert.';
   }
 
   // ── V3 expanded-card treatments (alert detail screen) ──────────────────

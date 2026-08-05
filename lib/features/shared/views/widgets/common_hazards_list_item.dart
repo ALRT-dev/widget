@@ -15,6 +15,7 @@ import 'package:hazard_app/features/shared/providers/hazard_item_provider.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/utils/share_alert.dart';
+import 'package:hazard_app/features/shared/views/widgets/freshness_chip.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
@@ -163,6 +164,11 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                               _titleBuilder(),
                               4.hSizedBox,
                               _dateAndDistanceBuilder(),
+                              // How recently this alert was really touched.
+                              // Never dressed up: green only inside the
+                              // hour, plain grey beyond it.
+                              6.hSizedBox,
+                              _freshnessRowBuilder(),
                             ],
                           ),
                         ),
@@ -191,6 +197,59 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
     ).pX(widget.horizontalPadding);
   }
 
+  /// The live-freshness chip, and on the map's list a share button beside
+  /// it: from the map you can pass an alert on without opening it first.
+  Widget _freshnessRowBuilder() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final hazard = ref.watch(provider.select((value) => value.hazard));
+        if (hazard == null) return const SizedBox.shrink();
+
+        final chip = FreshnessChip(
+          updatedAt: hazard.updatedAt,
+          createdAt: hazard.createdAt,
+        );
+        if (!isAlertShareable(hazard)) return chip;
+
+        return Row(
+          children: [
+            chip,
+            const Spacer(),
+            InkWell(
+              onTap: () => shareAlert(hazard: hazard, from: 'list'),
+              borderRadius: BorderRadius.circular(999),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 8.spMin,
+                  vertical: 4.spMin,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      LucideIcons.share2,
+                      size: 13.spMin,
+                      color: AppColors.grey,
+                    ),
+                    4.wSizedBox,
+                    Text(
+                      'Share',
+                      style: TextStyle(
+                        fontSize: 11.spMin,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   /// The V3 "In plain terms" strip: a dark band under the header that says
   /// what the warning means in ordinary words. Official alerts only.
   Widget _plainTermsBuilder() {
@@ -205,6 +264,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           severity: hazard.severity,
           band: hazard.severityBand,
           categoryName: hazard.category?.name,
+          sourceName: hazard.source?.name,
         );
         if (plainTerms == null) return const SizedBox.shrink();
 

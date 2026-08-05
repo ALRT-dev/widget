@@ -17,6 +17,19 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
+        <!-- The mark leads the card: bigger, left corner, on its own
+             orange tile so it reads as ALRT at a glance on a busy
+             home screen. -->
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="9dp"
+            android:background="@drawable/alrt_widget_mark_tile"
+            android:padding="5dp"
+            android:src="@drawable/alrt_logo"
+            android:scaleType="fitCenter"
+            android:contentDescription="ALRT" />
+
         <TextView
             android:id="@+id/widget_kicker"
             android:layout_width="0dp"
@@ -37,15 +50,6 @@
             android:textColor="#8B8B95"
             android:textSize="10sp"
             android:maxLines="1" />
-
-        <!-- ALRT mark so the card is recognisable at a glance. -->
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="15dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/alrt_logo"
-            android:scaleType="fitCenter"
-            android:contentDescription="ALRT" />
     </LinearLayout>
 
     <!-- ALERT block -->
