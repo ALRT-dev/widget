@@ -91,20 +91,24 @@ class _VoiceSearchMicButtonState extends ConsumerState<VoiceSearchMicButton> {
         onTap: _onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
-          width: 32.spMin,
-          height: 32.spMin,
+          width: 28.spMin,
+          height: 28.spMin,
           margin: EdgeInsets.only(right: 8.spMin),
+          // Brand orange, not the old orange-to-red gradient. Red is
+          // reserved for critical and SOS, so a red disc sitting in the
+          // search bar read as an emergency control and dominated a 48pt
+          // capsule it is only a corner of.
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFFFF6B01), Color(0xFFFF2020)],
+              colors: [Color(0xFFFF8C00), Color(0xFFFF6B01)],
             ),
           ),
           child: Icon(
             LucideIcons.mic,
-            size: 16.spMin,
+            size: 14.spMin,
             color: Colors.white,
           ),
         ),

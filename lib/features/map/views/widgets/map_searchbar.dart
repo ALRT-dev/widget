@@ -77,25 +77,30 @@ class _MapSearchbarState extends ConsumerState<MapSearchbar> {
               // orange halo. Typing into it brightens the halo rather than
               // moving anything, so the focus is felt, not jumped to.
               borderRadius: BorderRadius.circular(40.spMin),
-              border: Border.all(
-                color: AppColors.searchGlow.withValues(
-                  alpha: isFocused ? 0.85 : 0.22,
-                ),
-                width: isFocused ? 1.6 : 1.0,
-              ),
+              // Resting, there is NO drawn outline: a hard orange ring on
+              // white read as a stray border rather than a glow, which is
+              // what made this bar look unfinished against the map. The
+              // halo is light, so it lives in the shadow. Focus draws the
+              // faintest hairline and brightens the halo.
+              border: isFocused
+                  ? Border.all(
+                      color: AppColors.searchGlow.withValues(alpha: 0.5),
+                      width: 1.2,
+                    )
+                  : null,
               boxShadow: [
                 BoxShadow(
                   color: AppColors.searchGlow.withValues(
-                    alpha: isFocused ? 0.55 : 0.3,
+                    alpha: isFocused ? 0.5 : 0.22,
                   ),
-                  blurRadius: isFocused ? 34.0 : 24.0,
-                  spreadRadius: isFocused ? 3.0 : 1.0,
-                  offset: const Offset(0, 5),
+                  blurRadius: isFocused ? 30.0 : 18.0,
+                  spreadRadius: isFocused ? 2.0 : 0.0,
+                  offset: const Offset(0, 4),
                 ),
                 BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.18),
-                  blurRadius: 16.0,
-                  offset: const Offset(0, 6),
+                  color: AppColors.black.withValues(alpha: 0.14),
+                  blurRadius: 14.0,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),

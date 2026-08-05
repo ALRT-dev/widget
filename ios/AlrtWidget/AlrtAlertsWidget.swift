@@ -157,10 +157,10 @@ private struct AlrtWidgetView: View {
         VStack(alignment: .leading, spacing: 6) {
             header(payload.updatedLabel)
             Spacer(minLength: 4)
-            HStack(spacing: 8) {
-                Text(primary.emoji).font(.system(size: 15))
-                SeverityChip(band: primary.band, label: primary.severityLabel)
-            }
+            // The chip carries the band word and its colour. The emoji
+            // that sat beside it drew as a coloured blob from the system
+            // font and added nothing the chip does not already say.
+            SeverityChip(band: primary.band, label: primary.severityLabel)
             Text(primary.title)
                 .font(.system(size: 18, weight: .bold))
                 .foregroundColor(.white)

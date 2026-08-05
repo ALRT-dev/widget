@@ -123,13 +123,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           ],
                         );
                       }
-                      // A breath below the status bar so the capsule
-                      // floats instead of hugging the clock.
+                      // A real gap below the status bar. At 18 the capsule
+                      // still sat under the clock on tall screens and read
+                      // as part of the system bar rather than as something
+                      // floating over the map.
                       return Row(
                         children: [
                           Expanded(child: MapSearchbar()),
                         ],
-                      ).pX(20.0).pT(18.0);
+                      ).pX(20.0).pT(34.0);
                     },
                   ),
                 ],

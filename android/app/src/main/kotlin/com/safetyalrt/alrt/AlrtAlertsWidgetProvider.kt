@@ -15,7 +15,7 @@ import org.json.JSONObject
  * (`HomeWidgetKeys.payloadKey`). Honors the locked product rules:
  *  - the solid red gradient card is used ONLY for the `critical` band
  *    ("the two reds", rule 6);
- *  - severity always shows emoji + text label, never colour alone (rule 8);
+ *  - severity always shows a text label, never colour alone (rule 8);
  *  - tapping opens the app (never fires SOS directly, rule 3).
  */
 class AlrtAlertsWidgetProvider : HomeWidgetProvider() {
@@ -90,10 +90,12 @@ class AlrtAlertsWidgetProvider : HomeWidgetProvider() {
         val band = primary.optString("band", "info")
         val severityLabel = primary.optString("severityLabel", "")
         val title = primary.optString("title", "")
-        val emoji = primary.optString("emoji", "")
 
-        views.setTextViewText(R.id.widget_emoji, emoji)
         views.setTextViewText(R.id.widget_title, title)
+        // The chip carries the band word AND the band colour, so the row
+        // still reads with colour stripped. The emoji that used to sit
+        // beside it was a Unicode coloured circle drawn by the system
+        // font, which rendered as a gradient blob next to a clean chip.
         views.setTextViewText(R.id.widget_chip, severityLabel.uppercase())
 
         // Meta line: area · distance · time (only the parts we have).

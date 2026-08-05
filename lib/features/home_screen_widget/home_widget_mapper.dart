@@ -4,9 +4,19 @@ import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/models/hazard_model.dart';
 
-/// Monochrome-safe glyphs per band, so the row still reads if colour is
-/// stripped (locked rule 8).
-extension HazardSeverityBandWidgetEmoji on HazardSeverityBand {
+/// The band word, which is what the widget chip writes when the source
+/// publishes no level of its own (locked rule 8: never colour alone).
+extension HazardSeverityBandWidgetLabel on HazardSeverityBand {
+  String get widgetLabel => switch (this) {
+        HazardSeverityBand.info => 'Info',
+        HazardSeverityBand.monitor => 'Monitor',
+        HazardSeverityBand.action => 'Action',
+        HazardSeverityBand.critical => 'Critical',
+      };
+
+  /// Monochrome-safe glyphs per band. No longer drawn on the widget (the
+  /// system font rendered them as gradient blobs beside the chip), kept
+  /// for any surface that wants a colour-free marker.
   String get widgetEmoji => switch (this) {
         HazardSeverityBand.info => '🔵',
         HazardSeverityBand.monitor => '🟡',
@@ -66,9 +76,17 @@ class HomeWidgetMapper {
     final band = hazard.severityBand ??
         hazard.severity?.widgetBand ??
         HazardSeverityBand.info;
+    // A hazard with no published severity resolved to the literal word
+    // "Unknown", which is what the widget chip printed. It tells a reader
+    // nothing and looks broken; the band we already computed is the
+    // honest label for a source that publishes no level of its own.
+    final title = hazard.severityTitle.trim();
+    final label = (title.isEmpty || title.toLowerCase() == 'unknown')
+        ? band.widgetLabel
+        : title;
     return HomeWidgetAlert(
       band: band,
-      severityLabel: hazard.severityTitle,
+      severityLabel: label,
       title: hazard.title ?? hazard.category?.name ?? 'Hazard',
       emoji: band.widgetEmoji,
       area: hazard.locationName,

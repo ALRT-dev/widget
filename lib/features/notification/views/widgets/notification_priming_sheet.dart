@@ -41,6 +41,9 @@ class _NotificationPrimingSheetState
   bool get _wasDenied =>
       widget.kind == NotificationPrimingKind.previouslyDenied;
 
+  /// The V3 section label used across the app.
+  static const _sectionLabel = Color(0xFFB84500);
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -55,13 +58,28 @@ class _NotificationPrimingSheetState
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // The sheet used to be black, white and grey throughout, which
+            // is the one palette the app never uses. The bell wears the
+            // brand gradient with its own soft halo, the way every other
+            // primary surface in the app does.
             Container(
               width: 60.spMin,
               height: 60.spMin,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: AppColors.black,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFFFF8C00), Color(0xFFFF6B01)],
+                ),
                 borderRadius: BorderRadius.circular(18.spMin),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFF6B01).withValues(alpha: 0.35),
+                    blurRadius: 18.0,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
               child: Icon(
                 LucideIcons.bellRing,
@@ -69,7 +87,18 @@ class _NotificationPrimingSheetState
                 size: 30.spMin,
               ),
             ),
-            SizedBox(height: 16.spMin),
+            SizedBox(height: 14.spMin),
+            Text(
+              'NOTIFICATIONS',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 10.5.spMin,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.1,
+                color: _sectionLabel,
+              ),
+            ),
+            SizedBox(height: 6.spMin),
             Text(
               'Be first to know',
               textAlign: TextAlign.center,
@@ -96,26 +125,31 @@ class _NotificationPrimingSheetState
               ),
             ),
             SizedBox(height: 18.spMin),
+            // Each row wears the colour that thing already has elsewhere
+            // in the app: hazards orange, family indigo, official green.
             _benefitRowBuilder(
               icon: LucideIcons.triangleAlert,
               text: 'Hazard alerts in the areas you watch',
+              tint: const Color(0xFFFF6B01),
             ),
             SizedBox(height: 10.spMin),
             _benefitRowBuilder(
               icon: LucideIcons.users,
               text: 'Family check-ins, snapshots and SOS',
+              tint: const Color(0xFF3D3DDF),
             ),
             SizedBox(height: 10.spMin),
             _benefitRowBuilder(
               icon: LucideIcons.shieldCheck,
               text: 'Official emergency warnings, verified first',
+              tint: const Color(0xFF0A8A58),
             ),
             SizedBox(height: 22.spMin),
             SizedBox(
               height: 52.spMin,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.black,
+                  backgroundColor: const Color(0xFFFF6B01),
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
@@ -165,6 +199,7 @@ class _NotificationPrimingSheetState
   Widget _benefitRowBuilder({
     required final IconData icon,
     required final String text,
+    required final Color tint,
   }) {
     return Row(
       children: [
@@ -173,10 +208,10 @@ class _NotificationPrimingSheetState
           height: 34.spMin,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: const Color(0xFFF0F0F2),
+            color: tint.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10.spMin),
           ),
-          child: Icon(icon, size: 17.spMin, color: AppColors.black),
+          child: Icon(icon, size: 17.spMin, color: tint),
         ),
         SizedBox(width: 12.spMin),
         Expanded(
