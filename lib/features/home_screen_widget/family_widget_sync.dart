@@ -134,6 +134,24 @@ class FamilyWidgetSync {
       );
     }
 
+    // A check-in the user has not answered outranks the roll call: the
+    // widget is where they will see it if the app is closed, and the
+    // action they owe is their own.
+    final request = circle.latestCheckInRequest;
+    final askedAt = request?.createdAt;
+    if (request != null && !_hasAnsweredSince(circle.me, askedAt)) {
+      final who = request.requestedBy?.displayName ?? 'Your circle';
+      return FamilyWidgetPayload(
+        state: 'check_in_requested',
+        headline: '$who asked for a check-in',
+        sub: askedAt == null
+            ? 'Tap to say you are safe'
+            : '${timeago.format(askedAt)} · tap to say you are safe',
+        deeplink: _familyDeeplink,
+        circleName: circle.name,
+      );
+    }
+
     final others = circle.others;
     if (others.isEmpty) {
       return FamilyWidgetPayload(
@@ -145,7 +163,11 @@ class FamilyWidgetSync {
       );
     }
 
-    final checkedIn = others.where((m) => m.isCheckedInRecently).length;
+    // With an ask on record, "checked in" means since the ask, so the
+    // count on the home screen matches the roll call inside the app.
+    final checkedIn = others
+        .where((m) => _hasAnsweredSince(m, askedAt))
+        .length;
     final total = others.length;
     final updated = 'Updated ${DateFormat.jm().format(DateTime.now())}';
 
@@ -162,9 +184,21 @@ class FamilyWidgetSync {
     return FamilyWidgetPayload(
       state: 'partial',
       headline: '$checkedIn of $total checked in',
-      sub: updated,
+      sub: askedAt == null ? updated : 'Waiting on ${total - checkedIn}',
       deeplink: _familyDeeplink,
       circleName: circle.name,
     );
+  }
+
+  /// Whether [member] has checked in since [askedAt]. With no ask on
+  /// record the usual 24-hour "recently" window stands in.
+  static bool _hasAnsweredSince(
+    final FamilyMember? member,
+    final DateTime? askedAt,
+  ) {
+    if (member == null) return true;
+    if (askedAt == null) return member.isCheckedInRecently;
+    final last = member.lastCheckInAt;
+    return last != null && last.isAfter(askedAt);
   }
 }

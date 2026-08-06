@@ -502,6 +502,21 @@ class MapProvider extends StateNotifier<MapProviderState> {
     );
   }
 
+  /// Centres the map on [position], queueing the move when the map has not
+  /// been created yet (e.g. arriving from the family roll call before the
+  /// map tab has ever been shown).
+  Future<void> focusOnPosition({
+    required final LatLng position,
+    final double zoom = 16.0,
+  }) async {
+    final cameraUpdate = CameraUpdate.newLatLngZoom(position, zoom);
+    if (!state.isMapReady) {
+      state = state.copyWith(pendingCameraUpdateToApply: cameraUpdate);
+      return;
+    }
+    await _mapService.animateCamera(cameraUpdate: cameraUpdate);
+  }
+
   /// Animates the camera to fit within the given [bounds] with optional [padding].
   /// If the map is not ready, stores the bounds to animate to later.
   Future<void> animateToBounds({

@@ -62,12 +62,17 @@ private let familyCriticalGradient = LinearGradient(
 )
 private let familyDarkCard = Color(red: 0x16/255, green: 0x17/255, blue: 0x1C/255)
 private let familySuccessGreen = Color(red: 0x1E/255, green: 0xE2/255, blue: 0x8C/255)
+/// The Monitor band amber, for a check-in the user still owes an answer to.
+private let familyRequestAmber = Color(red: 0xF5/255, green: 0xC5/255, blue: 0x18/255)
 
 private struct FamilyWidgetView: View {
     let entry: FamilyEntry
 
     private var isCritical: Bool { entry.payload?.isCritical ?? false }
     private var isSafe: Bool { entry.payload?.state == "safe" }
+    private var isCheckInRequested: Bool {
+        entry.payload?.state == "check_in_requested"
+    }
 
     var body: some View {
         ZStack {
@@ -123,6 +128,7 @@ private struct FamilyWidgetView: View {
     private var headlineColor: Color {
         if isCritical { return .white }
         if isSafe { return familySuccessGreen }
+        if isCheckInRequested { return familyRequestAmber }
         return .white
     }
 }

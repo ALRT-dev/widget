@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hazard_app/features/auth/views/screens/auth_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_group_settings_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_switch_group_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_check_in_roll_call_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_sos_lists_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_sos_list_edit_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_group_paused_screen.dart';
@@ -156,6 +157,10 @@ class AppRouter {
         GoRoute(
           path: FamilySosListsScreen.route,
           builder: (context, state) => const FamilySosListsScreen(),
+        ),
+        GoRoute(
+          path: FamilyCheckInRollCallScreen.route,
+          builder: (context, state) => const FamilyCheckInRollCallScreen(),
         ),
         GoRoute(
           path: FamilySosListEditScreen.route,

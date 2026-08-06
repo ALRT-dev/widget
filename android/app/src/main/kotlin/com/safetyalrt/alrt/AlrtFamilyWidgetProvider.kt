@@ -130,10 +130,16 @@ class AlrtFamilyWidgetProvider : HomeWidgetProvider() {
         } else {
             views.setInt(R.id.family_root, "setBackgroundResource", R.drawable.alrt_widget_bg)
             views.setTextColor(R.id.family_kicker, 0xFFB7B7C0.toInt())
-            // "Everyone's safe" reads in success green; other states stay white.
+            // "Everyone's safe" reads in success green, an unanswered
+            // check-in in the family amber so it asks for something; other
+            // states stay white.
             views.setTextColor(
                 R.id.family_headline,
-                if (state == "safe") 0xFF1EE28C.toInt() else 0xFFFFFFFF.toInt()
+                when (state) {
+                    "safe" -> 0xFF1EE28C.toInt()
+                    "check_in_requested" -> 0xFFF5C518.toInt()
+                    else -> 0xFFFFFFFF.toInt()
+                }
             )
             views.setTextColor(R.id.family_sub, 0xFFC9C9D2.toInt())
         }

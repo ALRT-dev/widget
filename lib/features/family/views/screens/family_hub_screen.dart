@@ -6,6 +6,7 @@ import 'package:hazard_app/features/family/models/family_models.dart';
 import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/screens/family_group_settings_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_switch_group_screen.dart';
+import 'package:hazard_app/features/family/views/screens/family_check_in_roll_call_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_sos_lists_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_group_paused_screen.dart';
 import 'package:hazard_app/features/family/views/screens/family_journey_screen.dart';
@@ -907,6 +908,12 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
 
     final who = request.requestedBy?.displayName ?? 'Someone';
     final when = askedAt == null ? null : timeago.format(askedAt);
+    // Who has not answered since the ask (the requester excluded).
+    final waitingOn = circle.others.where((member) {
+      final last = member.lastCheckInAt;
+      if (askedAt == null) return !member.isCheckedInRecently;
+      return last == null || !last.isAfter(askedAt);
+    }).length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -931,7 +938,11 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                   SizedBox(width: 10.spMin),
                   Expanded(
                     child: Text(
-                      '$who asked everyone to check in',
+                      // Never "everyone": the requester is not waiting on
+                      // themself, and the count is what people act on.
+                      waitingOn > 1
+                          ? '$who is waiting on $waitingOn people'
+                          : '$who asked for a check-in',
                       style: TextStyle(
                         fontSize: 15.spMin,
                         fontWeight: FontWeight.w800,
@@ -976,6 +987,22 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                     style: TextStyle(
                       fontSize: 16.spMin,
                       fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 4.spMin),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton(
+                  onPressed: () =>
+                      context.push(FamilyCheckInRollCallScreen.route),
+                  child: Text(
+                    "See who's answered",
+                    style: TextStyle(
+                      fontSize: 13.spMin,
+                      fontWeight: FontWeight.w700,
+                      color: FamilyColors.amber,
                     ),
                   ),
                 ),
@@ -1070,9 +1097,9 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                 onTap: () async {
                   await ref.read(providerOfFamily.notifier).requestCheckIn();
                   if (!context.mounted) return;
-                  context.showSuccessToast(
-                    message: 'Check-in requested from everyone',
-                  );
+                  // Straight to the roll call: asking without being able to
+                  // see who answered was the gap people hit in testing.
+                  context.push(FamilyCheckInRollCallScreen.route);
                 },
               ),
             ),
