@@ -47,6 +47,37 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
 
   static const _recentCheckInsLimit = 20;
 
+  /// SOS live share: while MY SOS is active the phone shares a point every
+  /// [_sosLiveInterval]. This is the single permitted continuous stream
+  /// (locked spec); the server caps the event at 4 hours and stand-down
+  /// wipes the trail.
+  static const _sosLiveInterval = Duration(seconds: 20);
+  Timer? _sosLiveTimer;
+
+  void _startSosLiveShare() {
+    _sosLiveTimer?.cancel();
+    _sosLiveTimer = Timer.periodic(_sosLiveInterval, (_) async {
+      // Stop the loop the moment my SOS is no longer active, whichever
+      // side ended it (my stand-down, or the server's 4-hour lapse).
+      final myMemberId = state.circle?.myMemberId;
+      final mineActive = state.activeSosEvents.any(
+        (event) =>
+            event.memberId == myMemberId &&
+            event.status == FamilySosStatus.active,
+      );
+      if (!mineActive) {
+        _stopSosLiveShare();
+        return;
+      }
+      await _familyLocationService.shareSnapshotNow();
+    });
+  }
+
+  void _stopSosLiveShare() {
+    _sosLiveTimer?.cancel();
+    _sosLiveTimer = null;
+  }
+
   // ---------------------------- SOCKET EVENTS ----------------------------
 
   void _listenToSocketEvents() {
@@ -67,6 +98,7 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     ];
 
     _ref.onDispose(() {
+      _stopSosLiveShare();
       for (final subscription in subscriptions) {
         subscription.cancel();
       }
@@ -1215,6 +1247,9 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
       (sosEvent) {
         AnalyticsService.familySosTriggered();
         _upsertSosEvent(sosEvent);
+        // Live tracking starts automatically with the SOS: the people it
+        // reached can watch movement, not just the first point.
+        _startSosLiveShare();
         state = state.copyWith(
           sosTriggerState: const FamilyActionState.success(),
         );
@@ -1253,6 +1288,7 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
   }
 
   Future<void> resolveSos({required final String sosEventId}) async {
+    _stopSosLiveShare();
     final result = await _familyService.resolveFamilySos(
       sosEventId: sosEventId,
     );
@@ -1262,6 +1298,17 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
       (resolved) => _onSosResolved(resolved),
       (error) => _showToast(message: error.message, isWarning: true),
     );
+  }
+
+  /// Fetches the movement trail of an SOS for the receiver's live map.
+  /// Returns null on failure so the map quietly keeps its last trail.
+  Future<FamilySosTrail?> getSosTrail({
+    required final String sosEventId,
+  }) async {
+    final result = await _familyService.getFamilySosTrail(
+      sosEventId: sosEventId,
+    );
+    return result.when((trail) => trail, (_) => null);
   }
 
   Future<void> _refreshActiveSosEvents() async {

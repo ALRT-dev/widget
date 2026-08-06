@@ -5059,6 +5059,550 @@ $FamilyMemberSnippetCopyWith<$Res>? get member {
 
 
 /// @nodoc
+mixin _$FamilySosTrailPoint {
+
+ double get latitude; double get longitude; bool get isMoving; DateTime? get createdAt;
+/// Create a copy of FamilySosTrailPoint
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilySosTrailPointCopyWith<FamilySosTrailPoint> get copyWith => _$FamilySosTrailPointCopyWithImpl<FamilySosTrailPoint>(this as FamilySosTrailPoint, _$identity);
+
+  /// Serializes this FamilySosTrailPoint to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilySosTrailPoint&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.isMoving, isMoving) || other.isMoving == isMoving)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,latitude,longitude,isMoving,createdAt);
+
+@override
+String toString() {
+  return 'FamilySosTrailPoint(latitude: $latitude, longitude: $longitude, isMoving: $isMoving, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilySosTrailPointCopyWith<$Res>  {
+  factory $FamilySosTrailPointCopyWith(FamilySosTrailPoint value, $Res Function(FamilySosTrailPoint) _then) = _$FamilySosTrailPointCopyWithImpl;
+@useResult
+$Res call({
+ double latitude, double longitude, bool isMoving, DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$FamilySosTrailPointCopyWithImpl<$Res>
+    implements $FamilySosTrailPointCopyWith<$Res> {
+  _$FamilySosTrailPointCopyWithImpl(this._self, this._then);
+
+  final FamilySosTrailPoint _self;
+  final $Res Function(FamilySosTrailPoint) _then;
+
+/// Create a copy of FamilySosTrailPoint
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? latitude = null,Object? longitude = null,Object? isMoving = null,Object? createdAt = freezed,}) {
+  return _then(_self.copyWith(
+latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
+as double,isMoving: null == isMoving ? _self.isMoving : isMoving // ignore: cast_nullable_to_non_nullable
+as bool,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FamilySosTrailPoint].
+extension FamilySosTrailPointPatterns on FamilySosTrailPoint {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilySosTrailPoint value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilySosTrailPoint() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilySosTrailPoint value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilySosTrailPoint():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilySosTrailPoint value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilySosTrailPoint() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double latitude,  double longitude,  bool isMoving,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilySosTrailPoint() when $default != null:
+return $default(_that.latitude,_that.longitude,_that.isMoving,_that.createdAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double latitude,  double longitude,  bool isMoving,  DateTime? createdAt)  $default,) {final _that = this;
+switch (_that) {
+case _FamilySosTrailPoint():
+return $default(_that.latitude,_that.longitude,_that.isMoving,_that.createdAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double latitude,  double longitude,  bool isMoving,  DateTime? createdAt)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilySosTrailPoint() when $default != null:
+return $default(_that.latitude,_that.longitude,_that.isMoving,_that.createdAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilySosTrailPoint implements FamilySosTrailPoint {
+  const _FamilySosTrailPoint({required this.latitude, required this.longitude, this.isMoving = false, this.createdAt});
+  factory _FamilySosTrailPoint.fromJson(Map<String, dynamic> json) => _$FamilySosTrailPointFromJson(json);
+
+@override final  double latitude;
+@override final  double longitude;
+@override@JsonKey() final  bool isMoving;
+@override final  DateTime? createdAt;
+
+/// Create a copy of FamilySosTrailPoint
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilySosTrailPointCopyWith<_FamilySosTrailPoint> get copyWith => __$FamilySosTrailPointCopyWithImpl<_FamilySosTrailPoint>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilySosTrailPointToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilySosTrailPoint&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.isMoving, isMoving) || other.isMoving == isMoving)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,latitude,longitude,isMoving,createdAt);
+
+@override
+String toString() {
+  return 'FamilySosTrailPoint(latitude: $latitude, longitude: $longitude, isMoving: $isMoving, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilySosTrailPointCopyWith<$Res> implements $FamilySosTrailPointCopyWith<$Res> {
+  factory _$FamilySosTrailPointCopyWith(_FamilySosTrailPoint value, $Res Function(_FamilySosTrailPoint) _then) = __$FamilySosTrailPointCopyWithImpl;
+@override @useResult
+$Res call({
+ double latitude, double longitude, bool isMoving, DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$FamilySosTrailPointCopyWithImpl<$Res>
+    implements _$FamilySosTrailPointCopyWith<$Res> {
+  __$FamilySosTrailPointCopyWithImpl(this._self, this._then);
+
+  final _FamilySosTrailPoint _self;
+  final $Res Function(_FamilySosTrailPoint) _then;
+
+/// Create a copy of FamilySosTrailPoint
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? latitude = null,Object? longitude = null,Object? isMoving = null,Object? createdAt = freezed,}) {
+  return _then(_FamilySosTrailPoint(
+latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
+as double,isMoving: null == isMoving ? _self.isMoving : isMoving // ignore: cast_nullable_to_non_nullable
+as bool,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$FamilySosTrail {
+
+ String get sosEventId; List<FamilySosTrailPoint> get points;
+/// Create a copy of FamilySosTrail
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$FamilySosTrailCopyWith<FamilySosTrail> get copyWith => _$FamilySosTrailCopyWithImpl<FamilySosTrail>(this as FamilySosTrail, _$identity);
+
+  /// Serializes this FamilySosTrail to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FamilySosTrail&&(identical(other.sosEventId, sosEventId) || other.sosEventId == sosEventId)&&const DeepCollectionEquality().equals(other.points, points));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,sosEventId,const DeepCollectionEquality().hash(points));
+
+@override
+String toString() {
+  return 'FamilySosTrail(sosEventId: $sosEventId, points: $points)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $FamilySosTrailCopyWith<$Res>  {
+  factory $FamilySosTrailCopyWith(FamilySosTrail value, $Res Function(FamilySosTrail) _then) = _$FamilySosTrailCopyWithImpl;
+@useResult
+$Res call({
+ String sosEventId, List<FamilySosTrailPoint> points
+});
+
+
+
+
+}
+/// @nodoc
+class _$FamilySosTrailCopyWithImpl<$Res>
+    implements $FamilySosTrailCopyWith<$Res> {
+  _$FamilySosTrailCopyWithImpl(this._self, this._then);
+
+  final FamilySosTrail _self;
+  final $Res Function(FamilySosTrail) _then;
+
+/// Create a copy of FamilySosTrail
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? sosEventId = null,Object? points = null,}) {
+  return _then(_self.copyWith(
+sosEventId: null == sosEventId ? _self.sosEventId : sosEventId // ignore: cast_nullable_to_non_nullable
+as String,points: null == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
+as List<FamilySosTrailPoint>,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [FamilySosTrail].
+extension FamilySosTrailPatterns on FamilySosTrail {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _FamilySosTrail value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _FamilySosTrail() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _FamilySosTrail value)  $default,){
+final _that = this;
+switch (_that) {
+case _FamilySosTrail():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _FamilySosTrail value)?  $default,){
+final _that = this;
+switch (_that) {
+case _FamilySosTrail() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String sosEventId,  List<FamilySosTrailPoint> points)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _FamilySosTrail() when $default != null:
+return $default(_that.sosEventId,_that.points);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String sosEventId,  List<FamilySosTrailPoint> points)  $default,) {final _that = this;
+switch (_that) {
+case _FamilySosTrail():
+return $default(_that.sosEventId,_that.points);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String sosEventId,  List<FamilySosTrailPoint> points)?  $default,) {final _that = this;
+switch (_that) {
+case _FamilySosTrail() when $default != null:
+return $default(_that.sosEventId,_that.points);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _FamilySosTrail implements FamilySosTrail {
+  const _FamilySosTrail({required this.sosEventId, final  List<FamilySosTrailPoint> points = const <FamilySosTrailPoint>[]}): _points = points;
+  factory _FamilySosTrail.fromJson(Map<String, dynamic> json) => _$FamilySosTrailFromJson(json);
+
+@override final  String sosEventId;
+ final  List<FamilySosTrailPoint> _points;
+@override@JsonKey() List<FamilySosTrailPoint> get points {
+  if (_points is EqualUnmodifiableListView) return _points;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_points);
+}
+
+
+/// Create a copy of FamilySosTrail
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$FamilySosTrailCopyWith<_FamilySosTrail> get copyWith => __$FamilySosTrailCopyWithImpl<_FamilySosTrail>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$FamilySosTrailToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FamilySosTrail&&(identical(other.sosEventId, sosEventId) || other.sosEventId == sosEventId)&&const DeepCollectionEquality().equals(other._points, _points));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,sosEventId,const DeepCollectionEquality().hash(_points));
+
+@override
+String toString() {
+  return 'FamilySosTrail(sosEventId: $sosEventId, points: $points)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$FamilySosTrailCopyWith<$Res> implements $FamilySosTrailCopyWith<$Res> {
+  factory _$FamilySosTrailCopyWith(_FamilySosTrail value, $Res Function(_FamilySosTrail) _then) = __$FamilySosTrailCopyWithImpl;
+@override @useResult
+$Res call({
+ String sosEventId, List<FamilySosTrailPoint> points
+});
+
+
+
+
+}
+/// @nodoc
+class __$FamilySosTrailCopyWithImpl<$Res>
+    implements _$FamilySosTrailCopyWith<$Res> {
+  __$FamilySosTrailCopyWithImpl(this._self, this._then);
+
+  final _FamilySosTrail _self;
+  final $Res Function(_FamilySosTrail) _then;
+
+/// Create a copy of FamilySosTrail
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? sosEventId = null,Object? points = null,}) {
+  return _then(_FamilySosTrail(
+sosEventId: null == sosEventId ? _self.sosEventId : sosEventId // ignore: cast_nullable_to_non_nullable
+as String,points: null == points ? _self._points : points // ignore: cast_nullable_to_non_nullable
+as List<FamilySosTrailPoint>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$FamilyLocationRequest {
 
  String get id; String get circleId; String get requesterId; String get targetMemberId;@JsonKey(unknownEnumValue: FamilyLocationRequestStatus.pending) FamilyLocationRequestStatus get status; String? get message; FamilyMemberSnippet? get requester; DateTime? get respondedAt; DateTime? get expiresAt; DateTime? get createdAt;

@@ -623,6 +623,43 @@ const _$FamilySosStatusEnumMap = {
   FamilySosStatus.cancelled: 'cancelled',
 };
 
+_FamilySosTrailPoint _$FamilySosTrailPointFromJson(Map<String, dynamic> json) =>
+    _FamilySosTrailPoint(
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      isMoving: json['isMoving'] as bool? ?? false,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+    );
+
+Map<String, dynamic> _$FamilySosTrailPointToJson(
+  _FamilySosTrailPoint instance,
+) => <String, dynamic>{
+  'latitude': instance.latitude,
+  'longitude': instance.longitude,
+  'isMoving': instance.isMoving,
+  'createdAt': ?instance.createdAt?.toIso8601String(),
+};
+
+_FamilySosTrail _$FamilySosTrailFromJson(Map<String, dynamic> json) =>
+    _FamilySosTrail(
+      sosEventId: json['sosEventId'] as String,
+      points:
+          (json['points'] as List<dynamic>?)
+              ?.map(
+                (e) => FamilySosTrailPoint.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const <FamilySosTrailPoint>[],
+    );
+
+Map<String, dynamic> _$FamilySosTrailToJson(_FamilySosTrail instance) =>
+    <String, dynamic>{
+      'sosEventId': instance.sosEventId,
+      'points': instance.points.map((e) => e.toJson()).toList(),
+    };
+
 _FamilyLocationRequest _$FamilyLocationRequestFromJson(
   Map<String, dynamic> json,
 ) => _FamilyLocationRequest(

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,11 +21,15 @@ class FamilySosReceiverScreenArgs {
   final FamilySosEvent sosEvent;
 }
 
-/// What the circle sees when someone triggers SOS: the location snapshot
-/// shared at trigger time, one-tap responses, and calling 000 from their own
-/// phone — the person dials, never the platform. The sender can re-share a
-/// fresh snapshot at any time; ALRT never updates it automatically.
-class FamilySosReceiverScreen extends ConsumerWidget {
+/// What the circle sees when someone triggers SOS: a live map of the
+/// person's movements, one-tap responses, and calling the local emergency
+/// number from their own phone — the person dials, never the platform.
+///
+/// SOS is the one place location updates automatically: triggering it starts
+/// the live share (product owner 2026-08-06), so this screen follows the
+/// person while the SOS runs. Stand-down wipes the trail server-side, so a
+/// resolved SOS goes back to a static snapshot with nothing to replay.
+class FamilySosReceiverScreen extends ConsumerStatefulWidget {
   const FamilySosReceiverScreen({super.key, required this.args});
 
   static const route = '/family-sos-receiver';
@@ -31,16 +37,82 @@ class FamilySosReceiverScreen extends ConsumerWidget {
   final FamilySosReceiverScreenArgs args;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FamilySosReceiverScreen> createState() =>
+      _FamilySosReceiverScreenState();
+}
+
+class _FamilySosReceiverScreenState
+    extends ConsumerState<FamilySosReceiverScreen> {
+  /// A shade slower than the sender's 20 s share loop, so most polls find
+  /// at most one new point and none are wasted.
+  static const _trailRefreshInterval = Duration(seconds: 25);
+
+  Timer? _trailTimer;
+  List<FamilySosTrailPoint> _trail = const [];
+  GoogleMapController? _mapController;
+  LatLng? _followedTarget;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.args.sosEvent.status == FamilySosStatus.active) {
+      _refreshTrail();
+      _trailTimer = Timer.periodic(
+        _trailRefreshInterval,
+        (_) => _refreshTrail(),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _trailTimer?.cancel();
+    _mapController?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _refreshTrail() async {
+    final live = ref
+        .read(providerOfFamily)
+        .activeSosEvents
+        .any(
+          (e) =>
+              e.id == widget.args.sosEvent.id &&
+              e.status == FamilySosStatus.active,
+        );
+    if (!live) {
+      _trailTimer?.cancel();
+      return;
+    }
+
+    final trail = await ref
+        .read(providerOfFamily.notifier)
+        .getSosTrail(sosEventId: widget.args.sosEvent.id);
+    if (!mounted || trail == null) return;
+    setState(() => _trail = trail.points);
+  }
+
+  /// Keeps the camera on the person as new points arrive, without fighting
+  /// the map on rebuilds that changed nothing.
+  void _followPosition(final LatLng target) {
+    if (_followedTarget == target) return;
+    _followedTarget = target;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _mapController?.animateCamera(CameraUpdate.newLatLng(target));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // Prefer the live copy from state (updated by socket events).
     final sos = ref.watch(
           providerOfFamily.select(
             (s) => s.activeSosEvents
-                .where((e) => e.id == args.sosEvent.id)
+                .where((e) => e.id == widget.args.sosEvent.id)
                 .firstOrNull,
           ),
         ) ??
-        args.sosEvent;
+        widget.args.sosEvent;
 
     final name = sos.member?.displayName ?? 'A family member';
     final myMemberId = ref.watch(
@@ -48,6 +120,24 @@ class FamilySosReceiverScreen extends ConsumerWidget {
     );
     final isMine = sos.memberId == myMemberId;
     final isResolved = sos.status != FamilySosStatus.active;
+
+    // Where the person is right now: the socket-patched member location is
+    // the freshest, then the newest trail point, then the trigger snapshot.
+    final liveMember = ref.watch(
+      providerOfFamily.select(
+        (s) => s.circle?.members
+            .where((m) => m.id == sos.memberId)
+            .firstOrNull,
+      ),
+    );
+    final position = !isResolved && (liveMember?.hasLiveLocation ?? false)
+        ? LatLng(liveMember!.latitude!, liveMember.longitude!)
+        : !isResolved && _trail.isNotEmpty
+            ? LatLng(_trail.last.latitude, _trail.last.longitude)
+            : sos.latitude != null && sos.longitude != null
+                ? LatLng(sos.latitude!, sos.longitude!)
+                : null;
+    if (!isResolved && position != null) _followPosition(position);
 
     return Scaffold(
       backgroundColor: FamilyColors.v31Page,
@@ -58,10 +148,10 @@ class FamilySosReceiverScreen extends ConsumerWidget {
             child: ListView(
               padding: EdgeInsets.all(20.spMin),
               children: [
-                if (sos.latitude != null && sos.longitude != null)
-                  _mapBuilder(sos),
+                if (position != null)
+                  _mapBuilder(position, isLive: !isResolved),
                 SizedBox(height: 14.spMin),
-                _locationCardBuilder(sos),
+                _locationCardBuilder(sos, isResolved),
                 SizedBox(height: 16.spMin),
                 if (!isResolved && !isMine) _actionsBuilder(context, ref, sos, name),
                 if (!isResolved && isMine) ...[
@@ -112,7 +202,7 @@ class FamilySosReceiverScreen extends ConsumerWidget {
                     Text(
                       isResolved
                           ? 'SOS resolved'
-                          : 'Snapshot shared · started ${timeago.format(sos.createdAt!)}',
+                          : 'Live location on · started ${timeago.format(sos.createdAt!)}',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.85),
                         fontSize: 12.spMin,
@@ -127,26 +217,45 @@ class FamilySosReceiverScreen extends ConsumerWidget {
     );
   }
 
-  Widget _mapBuilder(final FamilySosEvent sos) {
-    final position = LatLng(sos.latitude!, sos.longitude!);
+  /// The live map: the person's current position plus the trail of points
+  /// shared since the SOS started, so movement reads at a glance. Once the
+  /// SOS is resolved the trail is gone (deleted server-side) and the map
+  /// drops back to a static snapshot.
+  Widget _mapBuilder(final LatLng position, {required final bool isLive}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20.spMin),
       child: SizedBox(
         height: 240.spMin,
         child: GoogleMap(
           initialCameraPosition: CameraPosition(target: position, zoom: 15.5),
+          onMapCreated: (controller) => _mapController = controller,
           markers: {
             Marker(markerId: const MarkerId('sos'), position: position),
           },
+          polylines: {
+            if (isLive && _trail.length >= 2)
+              Polyline(
+                polylineId: const PolylineId('sosTrail'),
+                points: [
+                  for (final point in _trail)
+                    LatLng(point.latitude, point.longitude),
+                  position,
+                ],
+                color: FamilyColors.sosRed,
+                width: 4,
+              ),
+          },
           zoomControlsEnabled: false,
           myLocationButtonEnabled: false,
-          liteModeEnabled: true,
+          // Lite mode renders a static image: fine for a resolved SOS,
+          // useless for following someone, so live maps use the real thing.
+          liteModeEnabled: !isLive,
         ),
       ),
     );
   }
 
-  Widget _locationCardBuilder(final FamilySosEvent sos) {
+  Widget _locationCardBuilder(final FamilySosEvent sos, final bool isResolved) {
     return Container(
       padding: EdgeInsets.all(14.spMin),
       decoration: BoxDecoration(
@@ -161,7 +270,9 @@ class FamilySosReceiverScreen extends ConsumerWidget {
             child: Text(
               sos.locationLabel != null
                   ? 'Near ${sos.locationLabel}'
-                  : 'Location shared with the circle',
+                  : isResolved
+                      ? 'Location was shared with the circle'
+                      : 'Live location shared with the circle',
               style: TextStyle(
                 fontSize: 14.spMin,
                 fontWeight: FontWeight.w600,
@@ -326,8 +437,8 @@ class FamilySosReceiverScreen extends ConsumerWidget {
     );
   }
 
-  /// Lets the person in SOS push a fresh snapshot to the circle — an explicit
-  /// tap, keeping the "requested, never tracked" posture even mid-SOS.
+  /// Lets the person in SOS push a fresh point right now, without waiting
+  /// for the automatic live share's next tick.
   Widget _shareUpdatedLocationButtonBuilder(
     final BuildContext context,
     final WidgetRef ref,

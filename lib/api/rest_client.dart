@@ -555,6 +555,11 @@ abstract class RestClient {
     @Path() required final String sosEventId,
   });
 
+  @GET(kUrlFamilySosTrail)
+  Future<FamilySosTrail> getFamilySosTrail({
+    @Path() required final String sosEventId,
+  });
+
   // ---------------------------- LEARN / GUIDES ----------------------------
 
   @GET(kUrlXpSummary)

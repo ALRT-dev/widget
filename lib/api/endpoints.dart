@@ -121,6 +121,7 @@ const kUrlFamilySos = '$kUrlFamily/sos';
 const kUrlFamilySosActive = '$kUrlFamilySos/active';
 const kUrlFamilySosRespond = '$kUrlFamilySos/{sosEventId}/respond';
 const kUrlFamilySosResolve = '$kUrlFamilySos/{sosEventId}/resolve';
+const kUrlFamilySosTrail = '$kUrlFamilySos/{sosEventId}/trail';
 
 // ---------------------------- XP / SCORING ----------------------------
 

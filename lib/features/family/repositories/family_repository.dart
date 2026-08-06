@@ -233,6 +233,10 @@ abstract class FamilyRepository {
   Future<Either<FamilySosEvent, AppError>> resolveFamilySos({
     required final String sosEventId,
   });
+
+  Future<Either<FamilySosTrail, AppError>> getFamilySosTrail({
+    required final String sosEventId,
+  });
 }
 
 class FamilyRepositoryImpl implements FamilyRepository {
@@ -1037,6 +1041,22 @@ class FamilyRepositoryImpl implements FamilyRepository {
       name: 'resolveFamilySos',
       future: () async {
         final result = await _restClient.resolveFamilySos(
+          sosEventId: sosEventId,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilySosTrail, AppError>> getFamilySosTrail({
+    required String sosEventId,
+  }) {
+    return runAsyncCall(
+      name: 'getFamilySosTrail',
+      future: () async {
+        final result = await _restClient.getFamilySosTrail(
           sosEventId: sosEventId,
         );
         return Success(result);

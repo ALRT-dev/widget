@@ -439,6 +439,33 @@ abstract class FamilySosEvent with _$FamilySosEvent {
       _$FamilySosEventFromJson(json);
 }
 
+/// One point of an SOS live trail. These rows exist only while the SOS
+/// runs: stand-down deletes them, so a trail can never outlive its SOS.
+@freezed
+abstract class FamilySosTrailPoint with _$FamilySosTrailPoint {
+  const factory FamilySosTrailPoint({
+    required final double latitude,
+    required final double longitude,
+    @Default(false) final bool isMoving,
+    final DateTime? createdAt,
+  }) = _FamilySosTrailPoint;
+
+  factory FamilySosTrailPoint.fromJson(Map<String, dynamic> json) =>
+      _$FamilySosTrailPointFromJson(json);
+}
+
+/// The movement trail of an active SOS, oldest point first.
+@freezed
+abstract class FamilySosTrail with _$FamilySosTrail {
+  const factory FamilySosTrail({
+    required final String sosEventId,
+    @Default(<FamilySosTrailPoint>[]) final List<FamilySosTrailPoint> points,
+  }) = _FamilySosTrail;
+
+  factory FamilySosTrail.fromJson(Map<String, dynamic> json) =>
+      _$FamilySosTrailFromJson(json);
+}
+
 /// "Sarah asked where you are" — a one-time, consent-gated location request.
 @freezed
 abstract class FamilyLocationRequest with _$FamilyLocationRequest {

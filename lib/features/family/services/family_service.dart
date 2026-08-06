@@ -397,4 +397,10 @@ class FamilyService {
   }) {
     return _familyRepository.resolveFamilySos(sosEventId: sosEventId);
   }
+
+  Future<Either<FamilySosTrail, AppError>> getFamilySosTrail({
+    required final String sosEventId,
+  }) {
+    return _familyRepository.getFamilySosTrail(sosEventId: sosEventId);
+  }
 }
