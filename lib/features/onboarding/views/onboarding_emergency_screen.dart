@@ -407,7 +407,7 @@ class _OnboardingEmergencyScreenState
                             ),
                             12.hSizedBox,
                             _buildNoticeText(
-                              'We are not an emergency service. In an emergency, call 000.',
+                              'We are not an emergency service. In an emergency, call your local emergency number.',
                               true,
                             ),
                             12.hSizedBox,

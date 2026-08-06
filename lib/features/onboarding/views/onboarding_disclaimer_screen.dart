@@ -265,7 +265,7 @@ class _OnboardingDisclaimerScreenState
               _buildDisclaimerItem(
                 normalText: 'In a life-threatening situation, ',
                 boldText:
-                    'always call 000 or your local emergency number immediately',
+                    'always call your local emergency number immediately',
                 trailingText: '.',
               ),
               20.hSizedBox,

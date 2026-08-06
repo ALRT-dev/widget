@@ -9,6 +9,8 @@ import 'package:hazard_app/features/subscription/views/screens/alrt_plus_welcome
 import 'package:hazard_app/features/subscription/views/widgets/alrt_plus_style.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:hazard_app/features/shared/utils/open_link.dart';
+import 'package:hazard_app/features/shared/utils/app_links.dart';
 
 /// The ALRT+ gate sheet. Per the product rules this appears only at the
 /// "premium moment" (hosting a family circle), never during onboarding, and
@@ -49,7 +51,7 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
     final offering = await rc.currentOffering();
     if (!mounted) return;
     final dummy = offering == null &&
-        dotenv.env['ALRT_PLUS_TEST_UNLOCK'] == 'true';
+        isAlrtPlusTestUnlocked;
     setState(() {
       _offering = offering;
       _selected = offering?.annual ?? offering?.availablePackages.firstOrNull;
@@ -197,6 +199,47 @@ class _AlrtPlusPaywallScreenState extends ConsumerState<AlrtPlusPaywallScreen> {
                           height: 1.6,
                           color: AlrtPlusStyle.inkFaint,
                         ),
+                      ),
+                      // Apple 3.1.2: terms and privacy must be IN the
+                      // purchase flow, not just at sign-up.
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: () => openLink(
+                              context: context,
+                              link: AppLinks.termsOfUse,
+                            ),
+                            child: Text(
+                              'Terms of Use',
+                              style: TextStyle(
+                                fontSize: 11.spMin,
+                                color: AlrtPlusStyle.inkFaint,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '·',
+                            style: TextStyle(
+                              color: AlrtPlusStyle.inkFaint,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => openLink(
+                              context: context,
+                              link: AppLinks.privacyPolicy,
+                            ),
+                            child: Text(
+                              'Privacy Policy',
+                              style: TextStyle(
+                                fontSize: 11.spMin,
+                                color: AlrtPlusStyle.inkFaint,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

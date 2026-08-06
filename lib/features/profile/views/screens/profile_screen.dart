@@ -36,6 +36,8 @@ import 'package:hazard_app/others/app_wrapper.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:hazard_app/features/profile/views/screens/blocked_accounts_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/child_mode_screen.dart';
+import 'package:hazard_app/features/shared/utils/open_link.dart';
+import 'package:hazard_app/features/shared/utils/app_links.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -437,7 +439,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               // QA builds ship with the test unlock on, which hides every
               // paywall gate — this row lets the paywall itself be reviewed.
-              if (dotenv.env['ALRT_PLUS_TEST_UNLOCK'] == 'true')
+              if (isAlrtPlusTestUnlocked)
                 _buildAccountSettingsItem(
                   title: 'Preview ALRT+ paywall',
                   subtitle: 'QA build only — gates are unlocked for testing',
@@ -493,6 +495,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 icon: LucideIcons.messageSquare,
                 color: AppColors.green,
                 onTap: _gotoSupportRequestScreen,
+              ),
+              _buildAccountSettingsItem(
+                title: 'Terms & Privacy',
+                subtitle: 'Terms of use, privacy policy and disclaimer',
+                icon: LucideIcons.scale,
+                color: AppColors.grey,
+                onTap: _showLegalSheet,
               ),
               _buildAccountSettingsItem(
                 title: 'Delete Account',
@@ -931,6 +940,42 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   /// Navigates to the Delete Account screen.
+  /// Terms, privacy and disclaimer, reachable AFTER onboarding: Play
+  /// requires a privacy-policy link inside the app, and reviewers look
+  /// for it in settings.
+  void _showLegalSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(LucideIcons.fileText),
+              title: const Text('Terms of Use'),
+              onTap: () =>
+                  openLink(context: sheetContext, link: AppLinks.termsOfUse),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.lock),
+              title: const Text('Privacy Policy'),
+              onTap: () =>
+                  openLink(context: sheetContext, link: AppLinks.privacyPolicy),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.shieldAlert),
+              title: const Text('Emergency services disclaimer'),
+              onTap: () =>
+                  openLink(context: sheetContext, link: AppLinks.disclaimer),
+            ),
+            SizedBox(height: 8.spMin),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _gotoDeleteAccountScreen() {
     context.push(DeleteAccountScreen.route);
   }

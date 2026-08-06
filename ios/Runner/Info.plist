@@ -59,10 +59,7 @@
     <key>LSRequiresIPhoneOS</key>
     <true />
     <key>NSCameraUsageDescription</key>
-    <string>This app needs access to your camera to take photos and videos.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>This app needs access to your location to show nearby alerts and help you navigate to
-      safety.</string>
+	<string>ALRT uses the camera only when you choose to attach a photo to a community safety report or set a profile picture.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>This app needs access to your location to show nearby alerts and help you navigate to
       safety.</string>
@@ -71,7 +68,7 @@
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>Speech is recognised on your device to fill the search box. ALRT never records, stores or sends audio.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app needs access to your photo library to upload images and videos.</string>
+	<string>ALRT accesses photos you pick to attach them to a community safety report or use as your profile picture.</string>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true />
     <key>UIBackgroundModes</key>
@@ -96,5 +93,7 @@
       <string>UIInterfaceOrientationLandscapeLeft</string>
       <string>UIInterfaceOrientationLandscapeRight</string>
     </array>
-  </dict>
+  	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
 </plist>

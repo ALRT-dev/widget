@@ -33,11 +33,7 @@ import 'package:hazard_app/features/map/providers/states/map_provider_state.dart
 import 'package:hazard_app/features/map/views/screens/select_location_on_map_screen.dart';
 import 'package:hazard_app/features/map/views/screens/select_location_screen.dart';
 import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_alert_sources_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_complete_screen.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_emergency_screen.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_location_screen.dart';
-import 'package:hazard_app/features/onboarding/views/onboarding_radius_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_disclaimer_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_legal_screen.dart';
 import 'package:hazard_app/features/onboarding/views/onboarding_welcome_screen.dart';
@@ -98,30 +94,6 @@ class AppRouter {
           path: OnboardingLegalScreen.route,
           builder: (context, state) {
             return const OnboardingLegalScreen();
-          },
-        ),
-        GoRoute(
-          path: OnboardingLocationScreen.route,
-          builder: (context, state) {
-            return const OnboardingLocationScreen();
-          },
-        ),
-        GoRoute(
-          path: OnboardingRadiusScreen.route,
-          builder: (context, state) {
-            return const OnboardingRadiusScreen();
-          },
-        ),
-        GoRoute(
-          path: OnboardingAlertSourcesScreen.route,
-          builder: (context, state) {
-            return const OnboardingAlertSourcesScreen();
-          },
-        ),
-        GoRoute(
-          path: OnboardingEmergencyScreen.route,
-          builder: (context, state) {
-            return const OnboardingEmergencyScreen();
           },
         ),
         GoRoute(

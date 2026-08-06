@@ -261,7 +261,7 @@ class _AskAlrtSheetState extends ConsumerState<AskAlrtSheet> {
       padding: EdgeInsets.symmetric(horizontal: 16.spMin, vertical: 8.spMin),
       color: _disclaimerBackground,
       child: Text(
-        "If you're in immediate danger, call 000 now. "
+        "If you're in immediate danger, call your local emergency number now. "
         'ALRT is information, not emergency services.',
         style: TextStyle(
           fontSize: 11.spMin,

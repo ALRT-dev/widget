@@ -485,7 +485,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
         next.maybeWhen(
           success: () {
             context.showSuccessToast(
-              message: 'Your account has been deleted successfully.',
+              message: 'Deletion scheduled. Your account and data will be permanently removed in 30 days.',
             );
             context.go(AppWrapper.route);
           },

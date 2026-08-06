@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/subscription/services/revenuecat_service.dart';
+import 'package:flutter/services.dart';
 
 final providerOfRevenueCat = Provider<RevenueCatService>(
   (ref) => RevenueCatService(),
@@ -10,6 +11,16 @@ final providerOfRevenueCat = Provider<RevenueCatService>(
 /// The free tier saves at most this many locations, no matter what
 /// (locked ALRT+ limits; moves to Remote Config in a later pass).
 const kFreeSavedLocationsLimit = 3;
+
+/// Whether the QA unlock is live: the env flag AND the dev flavour.
+///
+/// The env var alone used to decide, so a stray ALRT_PLUS_TEST_UNLOCK=true
+/// in a store build would have bypassed every paywall gate, rendered fake
+/// prices, and shown a "QA build only" row in Settings — an instant Apple
+/// 3.1.2 rejection. appFlavor is the honest signal: the sideloaded dev
+/// APK is built --release too, so kReleaseMode cannot tell them apart.
+bool get isAlrtPlusTestUnlocked =>
+    appFlavor == 'dev' && dotenv.env['ALRT_PLUS_TEST_UNLOCK'] == 'true';
 
 /// True when the signed-in user has an active ALRT+ entitlement. Ensures
 /// RevenueCat is configured for the current user before reading status.
@@ -20,7 +31,7 @@ final providerOfAlrtPlus = FutureProvider.autoDispose<bool>((ref) async {
   // Test-build escape hatch: sideloaded QA builds can't complete store
   // purchases, so CI sets ALRT_PLUS_TEST_UNLOCK=true in .env to open the
   // ALRT+ gates. Never set in store builds.
-  if (dotenv.env['ALRT_PLUS_TEST_UNLOCK'] == 'true') return true;
+  if (isAlrtPlusTestUnlocked) return true;
   final rc = ref.watch(providerOfRevenueCat);
   await rc.ensureConfigured(userId);
   return rc.isPlus();

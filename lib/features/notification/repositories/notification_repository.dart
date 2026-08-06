@@ -66,7 +66,7 @@ class NotificationRepositoryImpl implements NotificationRepository {
       name: 'getNotificationToken',
       future: () async {
         final notificationSettings = await _firebaseMessaging.requestPermission(
-          carPlay: true,
+          carPlay: false,
         );
         if (notificationSettings.authorizationStatus ==
             AuthorizationStatus.authorized) {
