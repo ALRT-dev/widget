@@ -233,7 +233,9 @@ class AppRouter {
         ),
         GoRoute(
           path: FamilyCircleProfileScreen.route,
-          builder: (context, state) => const FamilyCircleProfileScreen(),
+          builder: (context, state) => FamilyCircleProfileScreen(
+            args: state.extra as FamilyCircleProfileArgs?,
+          ),
         ),
         GoRoute(
           path: HowPointsWorkScreen.route,

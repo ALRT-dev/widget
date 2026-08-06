@@ -13,13 +13,26 @@ import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Lets a member personalise how they appear to their circle: a
-/// circle-specific photo, a display nickname and an accent colour that
-/// becomes their avatar ring and map pin.
+/// Which part of the screen to land on. Arriving from "Daily check-in"
+/// on the hub and landing on a nickname field is how people concluded the
+/// feature did not exist.
+enum FamilyProfileSection { top, dailyCheckIn, sosLists }
+
+class FamilyCircleProfileArgs {
+  const FamilyCircleProfileArgs({this.section = FamilyProfileSection.top});
+
+  final FamilyProfileSection section;
+}
+
+/// Everything a member sets for themselves in one group: their picture and
+/// nickname here, their accent colour, their daily check-in, and who their
+/// SOS reaches.
 class FamilyCircleProfileScreen extends ConsumerStatefulWidget {
-  const FamilyCircleProfileScreen({super.key});
+  const FamilyCircleProfileScreen({super.key, this.args});
 
   static const route = '/family-circle-profile';
+
+  final FamilyCircleProfileArgs? args;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -31,6 +44,9 @@ class _FamilyCircleProfileScreenState
   late final TextEditingController _nicknameController;
   String? _selectedColorHex;
   bool _isSaving = false;
+
+  final _dailyCheckInKey = GlobalKey();
+  final _sosListsKey = GlobalKey();
 
   static String _toHex(final Color color) =>
       '#${(color.toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0').toUpperCase()}';
@@ -45,6 +61,28 @@ class _FamilyCircleProfileScreenState
       ref.read(providerOfFamily.notifier)
         ..loadScheduledCheckIns()
         ..loadSosLists();
+    });
+    _scrollToRequestedSection();
+  }
+
+  /// Lands on the section the caller asked for, once there is a frame to
+  /// measure. Anything missing just leaves the screen at the top.
+  void _scrollToRequestedSection() {
+    final section = widget.args?.section ?? FamilyProfileSection.top;
+    if (section == FamilyProfileSection.top) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final key = section == FamilyProfileSection.dailyCheckIn
+          ? _dailyCheckInKey
+          : _sosListsKey;
+      final context = key.currentContext;
+      if (context == null) return;
+      Scrollable.ensureVisible(
+        context,
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeOutCubic,
+        alignment: 0.05,
+      );
     });
   }
 
@@ -71,7 +109,7 @@ class _FamilyCircleProfileScreenState
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          'My circle profile',
+          'My profile in this group',
           style: TextStyle(fontSize: 17.spMin, fontWeight: FontWeight.w700),
         ),
       ),
@@ -157,6 +195,7 @@ class _FamilyCircleProfileScreenState
           SizedBox(height: 20.spMin),
           Text(
             'DAILY CHECK-IN',
+            key: _dailyCheckInKey,
             style: TextStyle(
               fontSize: 12.spMin,
               fontWeight: FontWeight.w700,
@@ -174,6 +213,7 @@ class _FamilyCircleProfileScreenState
           SizedBox(height: 20.spMin),
           Text(
             'SOS LISTS',
+            key: _sosListsKey,
             style: TextStyle(
               fontSize: 12.spMin,
               fontWeight: FontWeight.w700,

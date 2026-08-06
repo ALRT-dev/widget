@@ -88,6 +88,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                     SizedBox(height: 10.spMin),
                     _quickTilesRowBuilder(),
                     SizedBox(height: 16.spMin),
+                    _setUpCardBuilder(),
+                    SizedBox(height: 16.spMin),
                     _privacyBannerBuilder(),
                     SizedBox(height: 20.spMin),
                     _membersSectionBuilder(circle, memberIdsNearAlert),
@@ -413,6 +415,84 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// The three things people set up once and could not find: their own
+  /// name and picture in the group, their daily check-in, and who their
+  /// SOS reaches. All three were only in the overflow menu, which is why
+  /// testers reported them missing (QA 2026-08-06).
+  Widget _setUpCardBuilder() {
+    return _cardBuilder(
+      padding: EdgeInsets.symmetric(vertical: 4.spMin),
+      child: Column(
+        children: [
+          _setUpRowBuilder(
+            icon: LucideIcons.userRoundPen,
+            label: 'My name & picture here',
+            sub: 'What this group sees you as',
+            onTap: () => context.push(
+              FamilyCircleProfileScreen.route,
+              extra: const FamilyCircleProfileArgs(),
+            ),
+          ),
+          Divider(
+            height: 1,
+            thickness: 1,
+            indent: 56.spMin,
+            color: FamilyColors.v31Divider,
+          ),
+          _setUpRowBuilder(
+            icon: LucideIcons.alarmClock,
+            label: 'Daily check-in',
+            sub: 'A reminder to say you are safe',
+            onTap: () => context.push(
+              FamilyCircleProfileScreen.route,
+              extra: const FamilyCircleProfileArgs(
+                section: FamilyProfileSection.dailyCheckIn,
+              ),
+            ),
+          ),
+          Divider(
+            height: 1,
+            thickness: 1,
+            indent: 56.spMin,
+            color: FamilyColors.v31Divider,
+          ),
+          _setUpRowBuilder(
+            icon: LucideIcons.siren,
+            label: 'Who your SOS reaches',
+            sub: 'Chosen in advance, across all your groups',
+            onTap: () => context.push(FamilySosListsScreen.route),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _setUpRowBuilder({
+    required final IconData icon,
+    required final String label,
+    required final String sub,
+    required final VoidCallback onTap,
+  }) {
+    return ListTile(
+      onTap: onTap,
+      contentPadding: EdgeInsets.symmetric(horizontal: 14.spMin),
+      leading: Icon(icon, size: 20.spMin, color: FamilyColors.indigo),
+      title: Text(
+        label,
+        style: TextStyle(fontSize: 14.5.spMin, fontWeight: FontWeight.w700),
+      ),
+      subtitle: Text(
+        sub,
+        style: TextStyle(fontSize: 12.spMin, color: AppColors.mediumGrey),
+      ),
+      trailing: Icon(
+        Icons.chevron_right,
+        size: 20.spMin,
+        color: AppColors.grey,
       ),
     );
   }
@@ -1122,7 +1202,13 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                 tint: const Color(0xFFFFF3E8),
                 ink: const Color(0xFFE05A00),
                 isLit: scheduledCount > 0,
-                onTap: () => context.push(FamilyCircleProfileScreen.route),
+                // Lands on the check-in times, not on the nickname field.
+                onTap: () => context.push(
+                  FamilyCircleProfileScreen.route,
+                  extra: const FamilyCircleProfileArgs(
+                    section: FamilyProfileSection.dailyCheckIn,
+                  ),
+                ),
               ),
             ),
             Expanded(child: _sosTileBuilder()),
