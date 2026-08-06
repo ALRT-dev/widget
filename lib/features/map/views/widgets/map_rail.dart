@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/ask_alrt/views/ask_alrt_sheet.dart';
+import 'package:hazard_app/features/family/providers/family_provider.dart';
+import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
+import 'package:hazard_app/features/family/views/widgets/family_journey_share_sheet.dart';
 import 'package:hazard_app/features/map/providers/location_provider.dart';
 import 'package:hazard_app/features/map/providers/map_display_settings_provider.dart';
 import 'package:hazard_app/features/map/providers/map_provider.dart';
@@ -26,6 +29,7 @@ class _MapRailState extends ConsumerState<MapRail> {
   static const _railColor = Color(0xFF23252B);
   static const _layersColor = Color(0xFFFF6B01);
   static const _locateColor = Color(0xFF4A90D9);
+  static const _journeyLitColor = FamilyColors.v31Indigo;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +63,7 @@ class _MapRailState extends ConsumerState<MapRail> {
         children: [
           _layersButtonBuilder(),
           _askAlrtButtonBuilder(),
+          _journeyButtonBuilder(),
           _locateButtonBuilder(),
           _listButtonBuilder(),
         ],
@@ -129,6 +134,22 @@ class _MapRailState extends ConsumerState<MapRail> {
       color: AppColors.transparent,
       icon: LucideIcons.sparkles,
       onPressed: () => showAskAlrtSheet(context),
+    );
+  }
+
+  /// Share a journey from the map, which is where people are when they set
+  /// off. Lit while a journey of theirs is running.
+  Widget _journeyButtonBuilder() {
+    final isSharing = ref.watch(
+      providerOfFamily.select((s) {
+        final journey = s.activeJourney;
+        return journey != null && journey.isActive;
+      }),
+    );
+    return _circleButtonBuilder(
+      color: isSharing ? _journeyLitColor : AppColors.transparent,
+      icon: isSharing ? LucideIcons.route : LucideIcons.share2,
+      onPressed: () => showFamilyJourneyShareSheet(context),
     );
   }
 

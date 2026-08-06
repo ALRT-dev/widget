@@ -327,6 +327,22 @@ class FamilyService {
     );
   }
 
+  /// Posts one point of a running journey (departure, a snap point, or
+  /// arrival). Snap points are the default; live journeys post more often.
+  Future<Either<FamilyJourney, AppError>> postFamilyJourneyPoint({
+    required final String journeyId,
+    required final double latitude,
+    required final double longitude,
+    final String? locationLabel,
+  }) {
+    return _familyRepository.postFamilyJourneyPoint(
+      journeyId: journeyId,
+      latitude: latitude,
+      longitude: longitude,
+      locationLabel: locationLabel,
+    );
+  }
+
   Future<Either<FamilyJourney, AppError>> stopFamilyJourney({
     required final String journeyId,
   }) {

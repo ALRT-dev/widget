@@ -199,6 +199,13 @@ abstract class FamilyRepository {
     required final String journeyId,
   });
 
+  Future<Either<FamilyJourney, AppError>> postFamilyJourneyPoint({
+    required final String journeyId,
+    required final double latitude,
+    required final double longitude,
+    final String? locationLabel,
+  });
+
   Future<Either<List<FamilySosList>, AppError>> getFamilySosLists();
 
   Future<Either<List<FamilySosRecipientGroup>, AppError>>
@@ -915,6 +922,28 @@ class FamilyRepositoryImpl implements FamilyRepository {
       future: () async {
         final result = await _restClient.stopFamilyJourney(
           journeyId: journeyId,
+        );
+        return Success(result);
+      },
+      onError: Failure.new,
+    );
+  }
+
+  @override
+  Future<Either<FamilyJourney, AppError>> postFamilyJourneyPoint({
+    required final String journeyId,
+    required final double latitude,
+    required final double longitude,
+    final String? locationLabel,
+  }) {
+    return runAsyncCall(
+      name: 'postFamilyJourneyPoint',
+      future: () async {
+        final result = await _restClient.postFamilyJourneyPoint(
+          journeyId: journeyId,
+          latitude: latitude,
+          longitude: longitude,
+          locationLabel: locationLabel,
         );
         return Success(result);
       },

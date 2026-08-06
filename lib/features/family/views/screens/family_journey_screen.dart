@@ -32,6 +32,9 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
   int _durationMinutes = 60;
   final Set<String> _recipientIds = {};
 
+  /// Snap points are the locked default; live is opted into per journey.
+  bool _isLive = false;
+
   /// The prompt is raised once per journey, never on a loop.
   String? _endingPromptShownFor;
 
@@ -64,7 +67,10 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
           Expanded(
             child: activeJourney != null && activeJourney.isActive
                 ? _runningBuilder(activeJourney)
-                : _setupBuilder(others),
+                : _setupBuilder(
+                    others,
+                    snapPointsOnly: circle.journeysSnapPointsOnly,
+                  ),
           ),
         ],
       ),
@@ -160,7 +166,7 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
             ),
             5.hSizedBox,
                   Text(
-                    'Live location while you travel, on your terms',
+                    'A few points along the way, on your terms',
                     style: TextStyle(
                       fontSize: 12.5.spMin,
                       color: Colors.white.withValues(alpha: 0.85),
@@ -177,7 +183,9 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
 
   // ── Setup ────────────────────────────────────────────────────────────
 
-  Widget _setupBuilder(final List<FamilyMember> others) {
+  Widget _setupBuilder(final List<FamilyMember> others, {
+    required final bool snapPointsOnly,
+  }) {
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(16.spMin, 16.spMin, 16.spMin, 28.spMin),
       child: Column(
@@ -240,15 +248,73 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
                     ],
                   ),
           ),
+          11.hSizedBox,
+          _cardBuilder(
+            label: 'How much detail',
+            child: _liveToggleBuilder(snapPointsOnly),
+          ),
           14.hSizedBox,
           _noteBuilder(
-            'A banner stays visible the whole time you’re sharing, and '
+            'A banner stays visible the whole time you are sharing, and '
             'Stop is one tap. Not an ALRT+ upsell.',
           ),
           18.hSizedBox,
           _startButtonBuilder(),
         ],
       ),
+    );
+  }
+
+  /// Snap points or live, chosen per journey. The group's own rule can
+  /// take live off the table, in which case the switch is stated as
+  /// unavailable rather than silently ignored.
+  Widget _liveToggleBuilder(final bool snapPointsOnly) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Send live updates',
+                style: TextStyle(
+                  fontSize: 14.spMin,
+                  fontWeight: FontWeight.w700,
+                  color: snapPointsOnly
+                      ? FamilyColors.v31Ink
+                      : AppColors.black,
+                ),
+              ),
+            ),
+            Switch(
+              value: _isLive && !snapPointsOnly,
+              activeTrackColor: FamilyColors.v31ToggleOn,
+              inactiveTrackColor: FamilyColors.v31ToggleOff,
+              inactiveThumbColor: Colors.white,
+              onChanged: snapPointsOnly
+                  ? null
+                  : (value) => setState(() => _isLive = value),
+            ),
+          ],
+        ),
+        8.hSizedBox,
+        Text(
+          snapPointsOnly
+              ? 'This group is set to snap points only: your circle sees '
+                    'your departure, a point about every 10 minutes, and '
+                    'your arrival.'
+              : _isLive
+                  ? 'Your position updates as you move, until the journey '
+                        'stops. It still ends at the time you picked.'
+                  : 'Snap points: your departure, a point about every 10 '
+                        'minutes, and your arrival. Nothing in between.',
+          style: TextStyle(
+            fontSize: 11.spMin,
+            height: 1.6,
+            color: FamilyColors.v31Ink,
+          ),
+        ),
+      ],
     );
   }
 
@@ -395,6 +461,18 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
                     fontSize: 12.5.spMin,
                     height: 1.45,
                     color: AppColors.mediumGrey,
+                  ),
+                ),
+                8.hSizedBox,
+                Text(
+                  journey.isLive
+                      ? 'Live updates as you move.'
+                      : 'Snap points: departure, about every 10 minutes, '
+                            'and arrival.',
+                  style: TextStyle(
+                    fontSize: 12.5.spMin,
+                    fontWeight: FontWeight.w600,
+                    color: FamilyColors.v31Indigo,
                   ),
                 ),
                 if (journey.recipients.isNotEmpty) ...[
@@ -554,11 +632,15 @@ class _FamilyJourneyScreenState extends ConsumerState<FamilyJourneyScreen> {
   }
 
   Future<void> _handleStart() async {
+    final snapPointsOnly = ref.read(
+      providerOfFamily.select((s) => s.circle?.journeysSnapPointsOnly ?? false),
+    );
     final ok = await ref
         .read(providerOfFamily.notifier)
         .startJourney(
           durationMinutes: _durationMinutes,
           recipientMemberIds: _recipientIds.toList(),
+          isLive: _isLive && !snapPointsOnly,
         );
     if (!mounted) return;
     if (ok) {

@@ -103,6 +103,7 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
 
     _ref.onDispose(() {
       _stopSosLiveShare();
+      _stopJourneyPoints();
       for (final subscription in subscriptions) {
         subscription.cancel();
       }
@@ -936,14 +937,77 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
 
   // ── Journeys ───────────────────────────────────────────────────────────
 
+  /// Snap points: the locked default. Departure, a point about every ten
+  /// minutes, then arrival. Nothing in between is recorded.
+  static const _journeySnapInterval = Duration(minutes: 10);
+
+  /// A live journey (per-journey opt-in, never an ALRT+ upsell) posts more
+  /// often so the map moves, still ending with the journey.
+  static const _journeyLiveInterval = Duration(seconds: 45);
+
+  Timer? _journeyTimer;
+
   /// Loads the caller's running journey, if any.
   Future<void> loadMyJourney() async {
     final result = await _familyService.getMyFamilyJourney();
     if (!mounted) return;
     result.when(
-      (journey) => state = state.copyWith(activeJourney: journey),
+      (journey) {
+        state = state.copyWith(activeJourney: journey);
+        // A journey that survived an app restart keeps sending points.
+        journey != null && journey.isActive
+            ? _startJourneyPoints(journey)
+            : _stopJourneyPoints();
+      },
       (error) => null,
     );
+  }
+
+  /// Starts the journey's point loop and posts the departure point now.
+  void _startJourneyPoints(final FamilyJourney journey) {
+    _journeyTimer?.cancel();
+    unawaited(_postJourneyPoint());
+    _journeyTimer = Timer.periodic(
+      journey.isLive ? _journeyLiveInterval : _journeySnapInterval,
+      (_) async {
+        final current = state.activeJourney;
+        // The journey's own stop time ends the loop: no journey outlives
+        // the window the traveller chose.
+        if (current == null || !current.isActive) {
+          _stopJourneyPoints();
+          return;
+        }
+        await _postJourneyPoint();
+      },
+    );
+  }
+
+  void _stopJourneyPoints() {
+    _journeyTimer?.cancel();
+    _journeyTimer = null;
+  }
+
+  /// Sends one point for the running journey. Failures are silent: a
+  /// missed point is not worth a banner mid-trip, and the next one is due
+  /// shortly.
+  Future<void> _postJourneyPoint() async {
+    final journey = state.activeJourney;
+    if (journey == null || !journey.isActive) return;
+
+    final position = await _familyLocationService
+        .getLastKnownOrCurrentPosition();
+    if (position == null || !mounted) return;
+
+    final result = await _familyService.postFamilyJourneyPoint(
+      journeyId: journey.id,
+      latitude: position.latitude,
+      longitude: position.longitude,
+    );
+    if (!mounted) return;
+    result.whenSuccess((updated) {
+      state = state.copyWith(activeJourney: updated);
+      return null;
+    });
   }
 
   /// Starts a journey shared with [recipientMemberIds] for [durationMinutes].
@@ -969,6 +1033,9 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
           activeJourney: journey,
           journeyState: const FamilyActionState.success(),
         );
+        // Departure point goes now; the rest follow on the journey's own
+        // cadence. Starting a share used to send nothing at all.
+        _startJourneyPoints(journey);
         return true;
       },
       (error) {
@@ -1016,6 +1083,11 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     state = state.copyWith(
       journeyState: const FamilyActionState.loading(),
     );
+
+    // The arrival point, then the loop stops. Arrival is the last thing
+    // the recipients see before the journey's location data is cleared.
+    await _postJourneyPoint();
+    _stopJourneyPoints();
 
     final result = await _familyService.stopFamilyJourney(
       journeyId: journey.id,
