@@ -30,6 +30,11 @@ class UserSocketManager {
   final StreamController<int> _userUpvotesReceivedCountUpdateStreamController =
       StreamController<int>.broadcast();
 
+  /// Badge name and description, as the banner needs them.
+  final StreamController<({String name, String description})>
+  _badgeEarnedStreamController =
+      StreamController<({String name, String description})>.broadcast();
+
   SocketService get _socketService => _ref.read(providerOfSocketService);
   UserService get _userService => _ref.read(providerOfUserService);
 
@@ -46,6 +51,11 @@ class UserSocketManager {
   /// Stream that broadcasts user upvotes received count updates to all listeners
   Stream<int> get userUpvotesReceivedCountUpdateStream =>
       _userUpvotesReceivedCountUpdateStreamController.stream;
+
+  /// Fires when the backend awards a badge, so it can be celebrated where
+  /// the person is rather than only appearing on the profile later.
+  Stream<({String name, String description})> get badgeEarnedStream =>
+      _badgeEarnedStreamController.stream;
 
   /// Sets up socket listeners for all user events.
   /// This is the single point where we listen to all user socket events.
@@ -93,6 +103,26 @@ class UserSocketManager {
     );
 
     _socketService.listenToEvent(
+      SocketEvent.badgeEarned,
+      (data) async {
+        if (data is Map<String, dynamic>) {
+          return runAsyncCall(
+            name: 'Listen to badgeEarned socket event',
+            future: () async {
+              final name = data['name'] as String?;
+              if (name == null) return;
+              _badgeEarnedStreamController.add((
+                name: name,
+                description: data['description'] as String? ?? '',
+              ));
+            },
+            onError: (_) {},
+          );
+        }
+      },
+    );
+
+    _socketService.listenToEvent(
       SocketEvent.updateUserUpvotesReceivedCount,
       (data) async {
         if (data is Map<String, dynamic>) {
@@ -119,5 +149,6 @@ class UserSocketManager {
     _userUpdateStreamController.close();
     _userXpUpdateStreamController.close();
     _userUpvotesReceivedCountUpdateStreamController.close();
+    _badgeEarnedStreamController.close();
   }
 }

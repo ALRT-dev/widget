@@ -30,6 +30,7 @@ abstract class XpSummary with _$XpSummary {
     final TrustTier? trustTier,
     final WeeklyQuest? weeklyQuest,
     @Default(<XpLedgerEvent>[]) final List<XpLedgerEvent> recentEvents,
+    @Default(<SafetyBadge>[]) final List<SafetyBadge> badges,
   }) = _XpSummary;
 
   factory XpSummary.fromJson(Map<String, dynamic> json) =>
@@ -77,6 +78,31 @@ abstract class WeeklyQuest with _$WeeklyQuest {
 
   factory WeeklyQuest.fromJson(Map<String, dynamic> json) =>
       _$WeeklyQuestFromJson(json);
+}
+
+/// One badge from Points and Badge Logic v1.1: earned, or locked with how
+/// far off it is. Every badge counts what other people confirmed about your
+/// reports, never how much you posted.
+@freezed
+abstract class SafetyBadge with _$SafetyBadge {
+  const SafetyBadge._();
+
+  const factory SafetyBadge({
+    required final String id,
+    required final String name,
+    @Default('') final String description,
+    @Default(1) final int threshold,
+    @Default(0) final int progress,
+    @Default(false) final bool earned,
+    final DateTime? earnedAt,
+  }) = _SafetyBadge;
+
+  /// 0..1 for the progress ring on a locked badge.
+  double get fraction =>
+      threshold <= 0 ? 0 : (progress / threshold).clamp(0.0, 1.0);
+
+  factory SafetyBadge.fromJson(Map<String, dynamic> json) =>
+      _$SafetyBadgeFromJson(json);
 }
 
 @freezed

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$XpSummary {
 
- int get xpPoints; int get streakDays; bool get streakMultiplierActive; TrustTier? get trustTier; WeeklyQuest? get weeklyQuest; List<XpLedgerEvent> get recentEvents;
+ int get xpPoints; int get streakDays; bool get streakMultiplierActive; TrustTier? get trustTier; WeeklyQuest? get weeklyQuest; List<XpLedgerEvent> get recentEvents; List<SafetyBadge> get badges;
 /// Create a copy of XpSummary
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $XpSummaryCopyWith<XpSummary> get copyWith => _$XpSummaryCopyWithImpl<XpSummary>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is XpSummary&&(identical(other.xpPoints, xpPoints) || other.xpPoints == xpPoints)&&(identical(other.streakDays, streakDays) || other.streakDays == streakDays)&&(identical(other.streakMultiplierActive, streakMultiplierActive) || other.streakMultiplierActive == streakMultiplierActive)&&(identical(other.trustTier, trustTier) || other.trustTier == trustTier)&&(identical(other.weeklyQuest, weeklyQuest) || other.weeklyQuest == weeklyQuest)&&const DeepCollectionEquality().equals(other.recentEvents, recentEvents));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is XpSummary&&(identical(other.xpPoints, xpPoints) || other.xpPoints == xpPoints)&&(identical(other.streakDays, streakDays) || other.streakDays == streakDays)&&(identical(other.streakMultiplierActive, streakMultiplierActive) || other.streakMultiplierActive == streakMultiplierActive)&&(identical(other.trustTier, trustTier) || other.trustTier == trustTier)&&(identical(other.weeklyQuest, weeklyQuest) || other.weeklyQuest == weeklyQuest)&&const DeepCollectionEquality().equals(other.recentEvents, recentEvents)&&const DeepCollectionEquality().equals(other.badges, badges));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,xpPoints,streakDays,streakMultiplierActive,trustTier,weeklyQuest,const DeepCollectionEquality().hash(recentEvents));
+int get hashCode => Object.hash(runtimeType,xpPoints,streakDays,streakMultiplierActive,trustTier,weeklyQuest,const DeepCollectionEquality().hash(recentEvents),const DeepCollectionEquality().hash(badges));
 
 @override
 String toString() {
-  return 'XpSummary(xpPoints: $xpPoints, streakDays: $streakDays, streakMultiplierActive: $streakMultiplierActive, trustTier: $trustTier, weeklyQuest: $weeklyQuest, recentEvents: $recentEvents)';
+  return 'XpSummary(xpPoints: $xpPoints, streakDays: $streakDays, streakMultiplierActive: $streakMultiplierActive, trustTier: $trustTier, weeklyQuest: $weeklyQuest, recentEvents: $recentEvents, badges: $badges)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $XpSummaryCopyWith<$Res>  {
   factory $XpSummaryCopyWith(XpSummary value, $Res Function(XpSummary) _then) = _$XpSummaryCopyWithImpl;
 @useResult
 $Res call({
- int xpPoints, int streakDays, bool streakMultiplierActive, TrustTier? trustTier, WeeklyQuest? weeklyQuest, List<XpLedgerEvent> recentEvents
+ int xpPoints, int streakDays, bool streakMultiplierActive, TrustTier? trustTier, WeeklyQuest? weeklyQuest, List<XpLedgerEvent> recentEvents, List<SafetyBadge> badges
 });
 
 
@@ -65,7 +65,7 @@ class _$XpSummaryCopyWithImpl<$Res>
 
 /// Create a copy of XpSummary
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? xpPoints = null,Object? streakDays = null,Object? streakMultiplierActive = null,Object? trustTier = freezed,Object? weeklyQuest = freezed,Object? recentEvents = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? xpPoints = null,Object? streakDays = null,Object? streakMultiplierActive = null,Object? trustTier = freezed,Object? weeklyQuest = freezed,Object? recentEvents = null,Object? badges = null,}) {
   return _then(_self.copyWith(
 xpPoints: null == xpPoints ? _self.xpPoints : xpPoints // ignore: cast_nullable_to_non_nullable
 as int,streakDays: null == streakDays ? _self.streakDays : streakDays // ignore: cast_nullable_to_non_nullable
@@ -73,7 +73,8 @@ as int,streakMultiplierActive: null == streakMultiplierActive ? _self.streakMult
 as bool,trustTier: freezed == trustTier ? _self.trustTier : trustTier // ignore: cast_nullable_to_non_nullable
 as TrustTier?,weeklyQuest: freezed == weeklyQuest ? _self.weeklyQuest : weeklyQuest // ignore: cast_nullable_to_non_nullable
 as WeeklyQuest?,recentEvents: null == recentEvents ? _self.recentEvents : recentEvents // ignore: cast_nullable_to_non_nullable
-as List<XpLedgerEvent>,
+as List<XpLedgerEvent>,badges: null == badges ? _self.badges : badges // ignore: cast_nullable_to_non_nullable
+as List<SafetyBadge>,
   ));
 }
 /// Create a copy of XpSummary
@@ -182,10 +183,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int xpPoints,  int streakDays,  bool streakMultiplierActive,  TrustTier? trustTier,  WeeklyQuest? weeklyQuest,  List<XpLedgerEvent> recentEvents)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int xpPoints,  int streakDays,  bool streakMultiplierActive,  TrustTier? trustTier,  WeeklyQuest? weeklyQuest,  List<XpLedgerEvent> recentEvents,  List<SafetyBadge> badges)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _XpSummary() when $default != null:
-return $default(_that.xpPoints,_that.streakDays,_that.streakMultiplierActive,_that.trustTier,_that.weeklyQuest,_that.recentEvents);case _:
+return $default(_that.xpPoints,_that.streakDays,_that.streakMultiplierActive,_that.trustTier,_that.weeklyQuest,_that.recentEvents,_that.badges);case _:
   return orElse();
 
 }
@@ -203,10 +204,10 @@ return $default(_that.xpPoints,_that.streakDays,_that.streakMultiplierActive,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int xpPoints,  int streakDays,  bool streakMultiplierActive,  TrustTier? trustTier,  WeeklyQuest? weeklyQuest,  List<XpLedgerEvent> recentEvents)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int xpPoints,  int streakDays,  bool streakMultiplierActive,  TrustTier? trustTier,  WeeklyQuest? weeklyQuest,  List<XpLedgerEvent> recentEvents,  List<SafetyBadge> badges)  $default,) {final _that = this;
 switch (_that) {
 case _XpSummary():
-return $default(_that.xpPoints,_that.streakDays,_that.streakMultiplierActive,_that.trustTier,_that.weeklyQuest,_that.recentEvents);case _:
+return $default(_that.xpPoints,_that.streakDays,_that.streakMultiplierActive,_that.trustTier,_that.weeklyQuest,_that.recentEvents,_that.badges);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -223,10 +224,10 @@ return $default(_that.xpPoints,_that.streakDays,_that.streakMultiplierActive,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int xpPoints,  int streakDays,  bool streakMultiplierActive,  TrustTier? trustTier,  WeeklyQuest? weeklyQuest,  List<XpLedgerEvent> recentEvents)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int xpPoints,  int streakDays,  bool streakMultiplierActive,  TrustTier? trustTier,  WeeklyQuest? weeklyQuest,  List<XpLedgerEvent> recentEvents,  List<SafetyBadge> badges)?  $default,) {final _that = this;
 switch (_that) {
 case _XpSummary() when $default != null:
-return $default(_that.xpPoints,_that.streakDays,_that.streakMultiplierActive,_that.trustTier,_that.weeklyQuest,_that.recentEvents);case _:
+return $default(_that.xpPoints,_that.streakDays,_that.streakMultiplierActive,_that.trustTier,_that.weeklyQuest,_that.recentEvents,_that.badges);case _:
   return null;
 
 }
@@ -238,7 +239,7 @@ return $default(_that.xpPoints,_that.streakDays,_that.streakMultiplierActive,_th
 @JsonSerializable()
 
 class _XpSummary implements XpSummary {
-  const _XpSummary({this.xpPoints = 0, this.streakDays = 0, this.streakMultiplierActive = false, this.trustTier, this.weeklyQuest, final  List<XpLedgerEvent> recentEvents = const <XpLedgerEvent>[]}): _recentEvents = recentEvents;
+  const _XpSummary({this.xpPoints = 0, this.streakDays = 0, this.streakMultiplierActive = false, this.trustTier, this.weeklyQuest, final  List<XpLedgerEvent> recentEvents = const <XpLedgerEvent>[], final  List<SafetyBadge> badges = const <SafetyBadge>[]}): _recentEvents = recentEvents,_badges = badges;
   factory _XpSummary.fromJson(Map<String, dynamic> json) => _$XpSummaryFromJson(json);
 
 @override@JsonKey() final  int xpPoints;
@@ -251,6 +252,13 @@ class _XpSummary implements XpSummary {
   if (_recentEvents is EqualUnmodifiableListView) return _recentEvents;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_recentEvents);
+}
+
+ final  List<SafetyBadge> _badges;
+@override@JsonKey() List<SafetyBadge> get badges {
+  if (_badges is EqualUnmodifiableListView) return _badges;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_badges);
 }
 
 
@@ -267,16 +275,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _XpSummary&&(identical(other.xpPoints, xpPoints) || other.xpPoints == xpPoints)&&(identical(other.streakDays, streakDays) || other.streakDays == streakDays)&&(identical(other.streakMultiplierActive, streakMultiplierActive) || other.streakMultiplierActive == streakMultiplierActive)&&(identical(other.trustTier, trustTier) || other.trustTier == trustTier)&&(identical(other.weeklyQuest, weeklyQuest) || other.weeklyQuest == weeklyQuest)&&const DeepCollectionEquality().equals(other._recentEvents, _recentEvents));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _XpSummary&&(identical(other.xpPoints, xpPoints) || other.xpPoints == xpPoints)&&(identical(other.streakDays, streakDays) || other.streakDays == streakDays)&&(identical(other.streakMultiplierActive, streakMultiplierActive) || other.streakMultiplierActive == streakMultiplierActive)&&(identical(other.trustTier, trustTier) || other.trustTier == trustTier)&&(identical(other.weeklyQuest, weeklyQuest) || other.weeklyQuest == weeklyQuest)&&const DeepCollectionEquality().equals(other._recentEvents, _recentEvents)&&const DeepCollectionEquality().equals(other._badges, _badges));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,xpPoints,streakDays,streakMultiplierActive,trustTier,weeklyQuest,const DeepCollectionEquality().hash(_recentEvents));
+int get hashCode => Object.hash(runtimeType,xpPoints,streakDays,streakMultiplierActive,trustTier,weeklyQuest,const DeepCollectionEquality().hash(_recentEvents),const DeepCollectionEquality().hash(_badges));
 
 @override
 String toString() {
-  return 'XpSummary(xpPoints: $xpPoints, streakDays: $streakDays, streakMultiplierActive: $streakMultiplierActive, trustTier: $trustTier, weeklyQuest: $weeklyQuest, recentEvents: $recentEvents)';
+  return 'XpSummary(xpPoints: $xpPoints, streakDays: $streakDays, streakMultiplierActive: $streakMultiplierActive, trustTier: $trustTier, weeklyQuest: $weeklyQuest, recentEvents: $recentEvents, badges: $badges)';
 }
 
 
@@ -287,7 +295,7 @@ abstract mixin class _$XpSummaryCopyWith<$Res> implements $XpSummaryCopyWith<$Re
   factory _$XpSummaryCopyWith(_XpSummary value, $Res Function(_XpSummary) _then) = __$XpSummaryCopyWithImpl;
 @override @useResult
 $Res call({
- int xpPoints, int streakDays, bool streakMultiplierActive, TrustTier? trustTier, WeeklyQuest? weeklyQuest, List<XpLedgerEvent> recentEvents
+ int xpPoints, int streakDays, bool streakMultiplierActive, TrustTier? trustTier, WeeklyQuest? weeklyQuest, List<XpLedgerEvent> recentEvents, List<SafetyBadge> badges
 });
 
 
@@ -304,7 +312,7 @@ class __$XpSummaryCopyWithImpl<$Res>
 
 /// Create a copy of XpSummary
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? xpPoints = null,Object? streakDays = null,Object? streakMultiplierActive = null,Object? trustTier = freezed,Object? weeklyQuest = freezed,Object? recentEvents = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? xpPoints = null,Object? streakDays = null,Object? streakMultiplierActive = null,Object? trustTier = freezed,Object? weeklyQuest = freezed,Object? recentEvents = null,Object? badges = null,}) {
   return _then(_XpSummary(
 xpPoints: null == xpPoints ? _self.xpPoints : xpPoints // ignore: cast_nullable_to_non_nullable
 as int,streakDays: null == streakDays ? _self.streakDays : streakDays // ignore: cast_nullable_to_non_nullable
@@ -312,7 +320,8 @@ as int,streakMultiplierActive: null == streakMultiplierActive ? _self.streakMult
 as bool,trustTier: freezed == trustTier ? _self.trustTier : trustTier // ignore: cast_nullable_to_non_nullable
 as TrustTier?,weeklyQuest: freezed == weeklyQuest ? _self.weeklyQuest : weeklyQuest // ignore: cast_nullable_to_non_nullable
 as WeeklyQuest?,recentEvents: null == recentEvents ? _self._recentEvents : recentEvents // ignore: cast_nullable_to_non_nullable
-as List<XpLedgerEvent>,
+as List<XpLedgerEvent>,badges: null == badges ? _self._badges : badges // ignore: cast_nullable_to_non_nullable
+as List<SafetyBadge>,
   ));
 }
 
@@ -1189,6 +1198,287 @@ as int,progress: null == progress ? _self.progress : progress // ignore: cast_nu
 as int,xpReward: null == xpReward ? _self.xpReward : xpReward // ignore: cast_nullable_to_non_nullable
 as int,completed: null == completed ? _self.completed : completed // ignore: cast_nullable_to_non_nullable
 as bool,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$SafetyBadge {
+
+ String get id; String get name; String get description; int get threshold; int get progress; bool get earned; DateTime? get earnedAt;
+/// Create a copy of SafetyBadge
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SafetyBadgeCopyWith<SafetyBadge> get copyWith => _$SafetyBadgeCopyWithImpl<SafetyBadge>(this as SafetyBadge, _$identity);
+
+  /// Serializes this SafetyBadge to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SafetyBadge&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.threshold, threshold) || other.threshold == threshold)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.earned, earned) || other.earned == earned)&&(identical(other.earnedAt, earnedAt) || other.earnedAt == earnedAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,name,description,threshold,progress,earned,earnedAt);
+
+@override
+String toString() {
+  return 'SafetyBadge(id: $id, name: $name, description: $description, threshold: $threshold, progress: $progress, earned: $earned, earnedAt: $earnedAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $SafetyBadgeCopyWith<$Res>  {
+  factory $SafetyBadgeCopyWith(SafetyBadge value, $Res Function(SafetyBadge) _then) = _$SafetyBadgeCopyWithImpl;
+@useResult
+$Res call({
+ String id, String name, String description, int threshold, int progress, bool earned, DateTime? earnedAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$SafetyBadgeCopyWithImpl<$Res>
+    implements $SafetyBadgeCopyWith<$Res> {
+  _$SafetyBadgeCopyWithImpl(this._self, this._then);
+
+  final SafetyBadge _self;
+  final $Res Function(SafetyBadge) _then;
+
+/// Create a copy of SafetyBadge
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = null,Object? threshold = null,Object? progress = null,Object? earned = null,Object? earnedAt = freezed,}) {
+  return _then(_self.copyWith(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,threshold: null == threshold ? _self.threshold : threshold // ignore: cast_nullable_to_non_nullable
+as int,progress: null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
+as int,earned: null == earned ? _self.earned : earned // ignore: cast_nullable_to_non_nullable
+as bool,earnedAt: freezed == earnedAt ? _self.earnedAt : earnedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [SafetyBadge].
+extension SafetyBadgePatterns on SafetyBadge {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SafetyBadge value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SafetyBadge() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SafetyBadge value)  $default,){
+final _that = this;
+switch (_that) {
+case _SafetyBadge():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SafetyBadge value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SafetyBadge() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  String description,  int threshold,  int progress,  bool earned,  DateTime? earnedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SafetyBadge() when $default != null:
+return $default(_that.id,_that.name,_that.description,_that.threshold,_that.progress,_that.earned,_that.earnedAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  String description,  int threshold,  int progress,  bool earned,  DateTime? earnedAt)  $default,) {final _that = this;
+switch (_that) {
+case _SafetyBadge():
+return $default(_that.id,_that.name,_that.description,_that.threshold,_that.progress,_that.earned,_that.earnedAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  String description,  int threshold,  int progress,  bool earned,  DateTime? earnedAt)?  $default,) {final _that = this;
+switch (_that) {
+case _SafetyBadge() when $default != null:
+return $default(_that.id,_that.name,_that.description,_that.threshold,_that.progress,_that.earned,_that.earnedAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _SafetyBadge extends SafetyBadge {
+  const _SafetyBadge({required this.id, required this.name, this.description = '', this.threshold = 1, this.progress = 0, this.earned = false, this.earnedAt}): super._();
+  factory _SafetyBadge.fromJson(Map<String, dynamic> json) => _$SafetyBadgeFromJson(json);
+
+@override final  String id;
+@override final  String name;
+@override@JsonKey() final  String description;
+@override@JsonKey() final  int threshold;
+@override@JsonKey() final  int progress;
+@override@JsonKey() final  bool earned;
+@override final  DateTime? earnedAt;
+
+/// Create a copy of SafetyBadge
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SafetyBadgeCopyWith<_SafetyBadge> get copyWith => __$SafetyBadgeCopyWithImpl<_SafetyBadge>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$SafetyBadgeToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SafetyBadge&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.threshold, threshold) || other.threshold == threshold)&&(identical(other.progress, progress) || other.progress == progress)&&(identical(other.earned, earned) || other.earned == earned)&&(identical(other.earnedAt, earnedAt) || other.earnedAt == earnedAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,id,name,description,threshold,progress,earned,earnedAt);
+
+@override
+String toString() {
+  return 'SafetyBadge(id: $id, name: $name, description: $description, threshold: $threshold, progress: $progress, earned: $earned, earnedAt: $earnedAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SafetyBadgeCopyWith<$Res> implements $SafetyBadgeCopyWith<$Res> {
+  factory _$SafetyBadgeCopyWith(_SafetyBadge value, $Res Function(_SafetyBadge) _then) = __$SafetyBadgeCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String name, String description, int threshold, int progress, bool earned, DateTime? earnedAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$SafetyBadgeCopyWithImpl<$Res>
+    implements _$SafetyBadgeCopyWith<$Res> {
+  __$SafetyBadgeCopyWithImpl(this._self, this._then);
+
+  final _SafetyBadge _self;
+  final $Res Function(_SafetyBadge) _then;
+
+/// Create a copy of SafetyBadge
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = null,Object? threshold = null,Object? progress = null,Object? earned = null,Object? earnedAt = freezed,}) {
+  return _then(_SafetyBadge(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
+as String,threshold: null == threshold ? _self.threshold : threshold // ignore: cast_nullable_to_non_nullable
+as int,progress: null == progress ? _self.progress : progress // ignore: cast_nullable_to_non_nullable
+as int,earned: null == earned ? _self.earned : earned // ignore: cast_nullable_to_non_nullable
+as bool,earnedAt: freezed == earnedAt ? _self.earnedAt : earnedAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
   ));
 }
 

@@ -5,6 +5,9 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:hazard_app/features/auth/providers/service_providers.dart';
 import 'package:hazard_app/features/auth/services/auth_service.dart';
 import 'package:hazard_app/features/profile/providers/states/profile_provider_state.dart';
+import 'package:hazard_app/features/profile/providers/xp_summary_provider.dart';
+import 'package:hazard_app/features/profile/views/widgets/profile_badges_card.dart';
+import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/enums/alrt_media_source_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
@@ -91,11 +94,27 @@ class ProfileProvider extends StateNotifier<ProfileProviderState> {
           },
         );
 
+    // A badge arriving while the app is open gets celebrated where the
+    // person actually is, and the profile shelf is refreshed behind it.
+    final badgeEarnedListener = _userSocketManager.badgeEarnedStream.listen(
+      (badge) {
+        _ref.invalidate(providerOfXpSummary);
+        final context = _ref.read(providerOfGlobalNavigatorKey).currentContext;
+        if (context == null || !context.mounted) return;
+        BadgeEarnedBanner.show(
+          context: context,
+          name: badge.name,
+          description: badge.description,
+        );
+      },
+    );
+
     // Cancel the subscriptions when the provider is disposed.
     _ref.onDispose(() {
       xpUpdatesListener.cancel();
       reliabilityUpdatesListener.cancel();
       upvotesReceivedCountListener.cancel();
+      badgeEarnedListener.cancel();
     });
   }
 

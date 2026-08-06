@@ -21,6 +21,11 @@ _XpSummary _$XpSummaryFromJson(Map<String, dynamic> json) => _XpSummary(
           ?.map((e) => XpLedgerEvent.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const <XpLedgerEvent>[],
+  badges:
+      (json['badges'] as List<dynamic>?)
+          ?.map((e) => SafetyBadge.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const <SafetyBadge>[],
 );
 
 Map<String, dynamic> _$XpSummaryToJson(_XpSummary instance) =>
@@ -31,6 +36,7 @@ Map<String, dynamic> _$XpSummaryToJson(_XpSummary instance) =>
       'trustTier': ?instance.trustTier?.toJson(),
       'weeklyQuest': ?instance.weeklyQuest?.toJson(),
       'recentEvents': instance.recentEvents.map((e) => e.toJson()).toList(),
+      'badges': instance.badges.map((e) => e.toJson()).toList(),
     };
 
 _TrustTier _$TrustTierFromJson(Map<String, dynamic> json) => _TrustTier(
@@ -87,6 +93,29 @@ Map<String, dynamic> _$WeeklyQuestToJson(_WeeklyQuest instance) =>
       'progress': instance.progress,
       'xpReward': instance.xpReward,
       'completed': instance.completed,
+    };
+
+_SafetyBadge _$SafetyBadgeFromJson(Map<String, dynamic> json) => _SafetyBadge(
+  id: json['id'] as String,
+  name: json['name'] as String,
+  description: json['description'] as String? ?? '',
+  threshold: (json['threshold'] as num?)?.toInt() ?? 1,
+  progress: (json['progress'] as num?)?.toInt() ?? 0,
+  earned: json['earned'] as bool? ?? false,
+  earnedAt: json['earnedAt'] == null
+      ? null
+      : DateTime.parse(json['earnedAt'] as String),
+);
+
+Map<String, dynamic> _$SafetyBadgeToJson(_SafetyBadge instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'description': instance.description,
+      'threshold': instance.threshold,
+      'progress': instance.progress,
+      'earned': instance.earned,
+      'earnedAt': ?instance.earnedAt?.toIso8601String(),
     };
 
 _XpLedgerEvent _$XpLedgerEventFromJson(Map<String, dynamic> json) =>

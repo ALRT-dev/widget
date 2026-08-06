@@ -5,5 +5,6 @@ enum SocketEvent {
 
   updateUser,
   updateUserXp,
+  badgeEarned,
   updateUserUpvotesReceivedCount,
 }
