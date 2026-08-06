@@ -71,6 +71,23 @@ class HowPointsWorkScreen extends ConsumerWidget {
             points: '+20',
           ),
           _pointRowBuilder(
+            icon: LucideIcons.sparkles,
+            color: const Color(0xFF27AE60),
+            title: 'Getting set up',
+            subtitle:
+                'One-off welcomes: finish onboarding +20, complete your '
+                'profile +10, post your first ALRT +10, join a family '
+                'group +10.',
+            points: '+50',
+          ),
+          _pointRowBuilder(
+            icon: LucideIcons.mapPin,
+            color: const Color(0xFF2D9CDB),
+            title: 'Saved place added',
+            subtitle: 'Each place your family watches over.',
+            points: '+5',
+          ),
+          _pointRowBuilder(
             icon: LucideIcons.circleX,
             color: const Color(0xFFD7263D),
             title: 'Report rejected',
@@ -83,9 +100,9 @@ class HowPointsWorkScreen extends ConsumerWidget {
             icon: LucideIcons.flame,
             color: const Color(0xFFF2994A),
             text:
-                'Reporting, checking in with family or finishing a guide keeps '
-                'your daily streak alive. From day 3, approved reports earn a '
-                '1.2× bonus.',
+                'An approved report, a family check-in or a finished guide '
+                'keeps your daily streak alive. From day 3, approved reports '
+                'earn a 1.2× bonus.',
           ),
           SizedBox(height: 16.spMin),
           _sectionTitleBuilder('TRUST TIERS'),

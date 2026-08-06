@@ -324,7 +324,7 @@ class _OnboardingCompleteScreenState
                             ),
                             4.hSizedBox,
                             Text(
-                              'Safety Explorer badge earned.',
+                              'Your first 20 points are on the board.',
                               style: TextStyle(
                                 fontSize: 16.spMin,
                                 fontWeight: FontWeight.w600,
