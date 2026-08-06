@@ -84,18 +84,27 @@ class _ChildModeScreenState extends ConsumerState<ChildModeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F4F6),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
         elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFFF8C00), Color(0xFFFF6B01)],
+            ),
+          ),
+        ),
         leading: IconButton(
           onPressed: () => context.pop(),
-          icon: const Icon(LucideIcons.arrowLeft, color: AppColors.black),
+          icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
         ),
         title: Text(
           'Child mode',
           style: TextStyle(
             fontSize: 17.spMin,
             fontWeight: FontWeight.w800,
-            color: AppColors.black,
+            color: Colors.white,
           ),
         ),
       ),

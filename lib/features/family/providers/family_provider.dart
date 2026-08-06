@@ -118,9 +118,16 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
 
     if (request.requestedById != circle.myMemberId) {
       final name = request.requestedBy?.displayName ?? 'A family member';
+      // "Everyone" was confusing: the requester is not waiting on
+      // themself. Count who is actually outstanding.
+      final waitingOn = circle.others
+          .where((m) => !m.isCheckedInRecently)
+          .length;
       _showBigAlert(
-        title: '$name asked everyone to check in',
-        body: 'One tap to let them know you are safe.',
+        title: '$name asked for a check-in',
+        body: waitingOn > 1
+            ? 'Waiting on $waitingOn people. One tap says you are safe.'
+            : 'One tap to let them know you are safe.',
         isSos: false,
         onTap: checkIn,
       );

@@ -9,9 +9,11 @@ import 'package:hazard_app/others/app_colors.dart';
 /// enough to stay readable as text and as a border.
 Color categoryChipColor(final HazardCategory category) {
   // Utilities amber needs the extra step to hold contrast on white.
+  // Product owner 2026-08-06: the chips read too dark, utilities nearly
+  // invisible. Keep just enough darkening to hold contrast on white.
   return category.id == 'utilitiesAndInfrastructure'
-      ? category.resolvedColor.darken(0.3)
-      : category.resolvedColor.darken(0.2);
+      ? category.resolvedColor.darken(0.16)
+      : category.resolvedColor.darken(0.06);
 }
 
 /// The one category pill in the app.
