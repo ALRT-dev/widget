@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -33,6 +34,7 @@ class IncomingFamilyAlert {
     if (overlay == null) return;
 
     dismiss();
+    _buzz(isSos: isSos);
 
     late final OverlayEntry entry;
     entry = OverlayEntry(
@@ -53,6 +55,18 @@ class IncomingFamilyAlert {
     Future<void>.delayed(timeout, () {
       if (_current == entry) dismiss();
     });
+  }
+
+  /// The banner must be felt, not just seen: three pulses for an SOS, one
+  /// for a check-in request. HapticFeedback needs no vibrate permission
+  /// and quietly does nothing on devices without a motor.
+  static Future<void> _buzz({required final bool isSos}) async {
+    for (var i = 0; i < (isSos ? 3 : 1); i++) {
+      if (i > 0) {
+        await Future<void>.delayed(const Duration(milliseconds: 350));
+      }
+      await HapticFeedback.vibrate();
+    }
   }
 
   static void dismiss() {

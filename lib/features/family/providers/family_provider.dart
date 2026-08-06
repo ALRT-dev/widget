@@ -33,6 +33,10 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
   }) : _ref = ref,
        super(state) {
     _listenToSocketEvents();
+    // Load the circle right away: the socket listeners above drop events
+    // when circle is null, so a phone that had not opened the family tab
+    // yet missed its check-in banner (QA 2026-08-06, one of two phones).
+    Future<void>.microtask(() => load(silent: true));
     // Mirror family status onto the home-screen widget on every state change
     // (a signature guard inside suppresses redundant writes).
     addListener(FamilyWidgetSync.push, fireImmediately: true);
@@ -142,7 +146,19 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
 
   void _onCheckInRequestReceived(final FamilyCheckInRequest request) {
     final circle = state.circle;
-    if (circle == null) return;
+    if (circle == null) {
+      // The event beat the first load. The backend only emits to members
+      // of the circle, so the request is real: alert now, catch up after.
+      unawaited(load(silent: true));
+      final name = request.requestedBy?.displayName ?? 'A family member';
+      _showBigAlert(
+        title: '$name asked for a check-in',
+        body: 'One tap to let them know you are safe.',
+        isSos: false,
+        onTap: checkIn,
+      );
+      return;
+    }
 
     state = state.copyWith(
       circle: circle.copyWith(latestCheckInRequest: request),
