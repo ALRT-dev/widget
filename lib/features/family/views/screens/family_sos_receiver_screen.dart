@@ -56,12 +56,33 @@ class _FamilySosReceiverScreenState
   void initState() {
     super.initState();
     if (widget.args.sosEvent.status == FamilySosStatus.active) {
+      _markSeen();
       _refreshTrail();
       _trailTimer = Timer.periodic(
         _trailRefreshInterval,
         (_) => _refreshTrail(),
       );
     }
+  }
+
+  /// "Seen" is automatic (locked rule): opening the SOS is what seeing it
+  /// means, so the person in trouble learns someone is looking without
+  /// anyone having to press anything. "On my way" stays deliberate.
+  void _markSeen() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final myMemberId = ref.read(providerOfFamily).circle?.myMemberId;
+      // Never against your own SOS, and never on a resolved one.
+      if (myMemberId == null || widget.args.sosEvent.memberId == myMemberId) {
+        return;
+      }
+      unawaited(
+        ref.read(providerOfFamily.notifier).respondToSos(
+              sosEventId: widget.args.sosEvent.id,
+              type: FamilySosResponseType.seen,
+            ),
+      );
+    });
   }
 
   @override
@@ -295,62 +316,33 @@ class _FamilySosReceiverScreenState
     final emergencyNumber = ref.watch(providerOfEmergencyNumber);
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: SizedBox(
-                height: 50.spMin,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FamilyColors.safeGreen,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.spMin),
-                    ),
-                  ),
-                  onPressed: () => notifier.respondToSos(
-                    sosEventId: sos.id,
-                    type: FamilySosResponseType.onMyWay,
-                  ),
-                  icon: Icon(LucideIcons.navigation, size: 16.spMin),
-                  label: Text(
-                    'On my way',
-                    style: TextStyle(
-                      fontSize: 14.spMin,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
+        // Only the deliberate actions are buttons. Seen was posted the
+        // moment this screen opened; there is deliberately no Monitoring
+        // option, and there is nothing here that says "I am watching".
+        SizedBox(
+          height: 50.spMin,
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: FamilyColors.safeGreen,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.spMin),
               ),
             ),
-            SizedBox(width: 10.spMin),
-            Expanded(
-              child: SizedBox(
-                height: 50.spMin,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FamilyColors.indigo,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.spMin),
-                    ),
-                  ),
-                  onPressed: () => notifier.respondToSos(
-                    sosEventId: sos.id,
-                    type: FamilySosResponseType.seen,
-                  ),
-                  icon: Icon(LucideIcons.eye, size: 16.spMin),
-                  label: Text(
-                    'Seen',
-                    style: TextStyle(
-                      fontSize: 14.spMin,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
+            onPressed: () => notifier.respondToSos(
+              sosEventId: sos.id,
+              type: FamilySosResponseType.onMyWay,
+            ),
+            icon: Icon(LucideIcons.navigation, size: 16.spMin),
+            label: Text(
+              'On my way',
+              style: TextStyle(
+                fontSize: 15.spMin,
+                fontWeight: FontWeight.w700,
               ),
             ),
-          ],
+          ),
         ),
         SizedBox(height: 10.spMin),
         SizedBox(
@@ -524,7 +516,8 @@ class _FamilySosReceiverScreenState
                       FamilySosResponseType.onMyWay =>
                         'On my way${response.createdAt != null ? ' · ${timeago.format(response.createdAt!)}' : ''}',
                       FamilySosResponseType.called => 'Called for help',
-                      FamilySosResponseType.seen => 'Seen',
+                      FamilySosResponseType.seen =>
+                        'Seen${response.createdAt != null ? ' · ${timeago.format(response.createdAt!)}' : ''}',
                     },
                     style: TextStyle(
                       fontSize: 12.spMin,

@@ -94,5 +94,37 @@ void main() {
       );
       expect(AlertSourceSystem.of(hazard), AlertSourceSystem.community);
     });
+
+    test('a source marked shield is ALRT Intel', () {
+      final hazard = hazardWith(
+        source: const HazardSource(
+          id: 'alrtIntel',
+          name: 'ALRT Intel',
+          shape: HazardSourceShape.shield,
+        ),
+      );
+      expect(hazard.isAlrtIntel, isTrue);
+      expect(AlertSourceSystem.of(hazard), AlertSourceSystem.alrtIntel);
+    });
+
+    test('ALRT Intel outranks AWS and global humanitarian', () {
+      final hazard = Hazard(
+        id: 'h3',
+        isAwsCompliant: true,
+        source: const HazardSource(
+          id: 'gdacsGlobal',
+          name: 'Intel over GDACS',
+          shape: HazardSourceShape.shield,
+        ),
+      );
+      expect(AlertSourceSystem.of(hazard), AlertSourceSystem.alrtIntel);
+    });
+
+    test('a source with no shape is unaffected', () {
+      final hazard = hazardWith(
+        source: const HazardSource(id: 'nswSes', name: 'NSW SES'),
+      );
+      expect(hazard.isAlrtIntel, isFalse);
+    });
   });
 }

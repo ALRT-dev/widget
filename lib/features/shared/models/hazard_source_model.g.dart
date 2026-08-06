@@ -19,6 +19,11 @@ _HazardSource _$HazardSourceFromJson(Map<String, dynamic> json) =>
       copyrightText: json['copyrightText'] as String?,
       copyrightLink: json['copyrightLink'] as String?,
       advisoryText: json['advisoryText'] as String?,
+      shape: $enumDecodeNullable(
+        _$HazardSourceShapeEnumMap,
+        json['shape'],
+        unknownValue: JsonKey.nullForUndefinedEnumValue,
+      ),
     );
 
 Map<String, dynamic> _$HazardSourceToJson(_HazardSource instance) =>
@@ -30,4 +35,13 @@ Map<String, dynamic> _$HazardSourceToJson(_HazardSource instance) =>
       'copyrightText': ?instance.copyrightText,
       'copyrightLink': ?instance.copyrightLink,
       'advisoryText': ?instance.advisoryText,
+      'shape': ?_$HazardSourceShapeEnumMap[instance.shape],
     };
+
+const _$HazardSourceShapeEnumMap = {
+  HazardSourceShape.triangle: 'triangle',
+  HazardSourceShape.diamond: 'diamond',
+  HazardSourceShape.circle: 'circle',
+  HazardSourceShape.square: 'square',
+  HazardSourceShape.shield: 'shield',
+};

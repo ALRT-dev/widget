@@ -18,6 +18,7 @@ class HazardShapeBadge extends StatelessWidget {
     required this.isOfficial,
     required this.band,
     this.isGlobalHumanitarian = false,
+    this.isAlrtIntel = false,
     this.size = 30,
   });
 
@@ -30,6 +31,11 @@ class HazardShapeBadge extends StatelessWidget {
 
   /// Global humanitarian feeds (GDACS) take the rounded square.
   final bool isGlobalHumanitarian;
+
+  /// ALRT's own assessment takes the shield, and outranks every other
+  /// shape. It never writes the band word and never restates or overrides
+  /// an official warning; it takes the same band hexes as everything else.
+  final bool isAlrtIntel;
 
   /// The severity band, which supplies the tint and the glyph ink.
   final HazardSeverityBand? band;
@@ -57,6 +63,7 @@ class HazardShapeBadge extends StatelessWidget {
           isAws: isAws,
           isOfficial: isOfficial,
           isGlobalHumanitarian: isGlobalHumanitarian,
+          isAlrtIntel: isAlrtIntel,
         ),
         size: (size * 17 / 30).spMin,
         color: ink,

@@ -15,7 +15,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$XpBreakdown {
 
- int get currentXpPoints; double get reliabilityScore; int get expectedXpFromCalculation; int get rank; int get totalUsers; int get percentile; XpBreakdownStats? get stats; List<XpHazardBreakdown> get hazardBreakdowns;
+ int get currentXpPoints; double get reliabilityScore;/// Everything the ledger has applied. Equal to [currentXpPoints] unless
+/// a total was floored at zero along the way.
+ int get ledgerTotal; int get rank; int get totalUsers; int get percentile; XpBreakdownStats? get stats;/// Points grouped by the kind of event that earned them.
+ List<XpTypeTotal> get byType;/// The reports that earned or cost the most, biggest first.
+ List<XpReportBreakdown> get reports;
 /// Create a copy of XpBreakdown
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +32,16 @@ $XpBreakdownCopyWith<XpBreakdown> get copyWith => _$XpBreakdownCopyWithImpl<XpBr
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is XpBreakdown&&(identical(other.currentXpPoints, currentXpPoints) || other.currentXpPoints == currentXpPoints)&&(identical(other.reliabilityScore, reliabilityScore) || other.reliabilityScore == reliabilityScore)&&(identical(other.expectedXpFromCalculation, expectedXpFromCalculation) || other.expectedXpFromCalculation == expectedXpFromCalculation)&&(identical(other.rank, rank) || other.rank == rank)&&(identical(other.totalUsers, totalUsers) || other.totalUsers == totalUsers)&&(identical(other.percentile, percentile) || other.percentile == percentile)&&(identical(other.stats, stats) || other.stats == stats)&&const DeepCollectionEquality().equals(other.hazardBreakdowns, hazardBreakdowns));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is XpBreakdown&&(identical(other.currentXpPoints, currentXpPoints) || other.currentXpPoints == currentXpPoints)&&(identical(other.reliabilityScore, reliabilityScore) || other.reliabilityScore == reliabilityScore)&&(identical(other.ledgerTotal, ledgerTotal) || other.ledgerTotal == ledgerTotal)&&(identical(other.rank, rank) || other.rank == rank)&&(identical(other.totalUsers, totalUsers) || other.totalUsers == totalUsers)&&(identical(other.percentile, percentile) || other.percentile == percentile)&&(identical(other.stats, stats) || other.stats == stats)&&const DeepCollectionEquality().equals(other.byType, byType)&&const DeepCollectionEquality().equals(other.reports, reports));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,currentXpPoints,reliabilityScore,expectedXpFromCalculation,rank,totalUsers,percentile,stats,const DeepCollectionEquality().hash(hazardBreakdowns));
+int get hashCode => Object.hash(runtimeType,currentXpPoints,reliabilityScore,ledgerTotal,rank,totalUsers,percentile,stats,const DeepCollectionEquality().hash(byType),const DeepCollectionEquality().hash(reports));
 
 @override
 String toString() {
-  return 'XpBreakdown(currentXpPoints: $currentXpPoints, reliabilityScore: $reliabilityScore, expectedXpFromCalculation: $expectedXpFromCalculation, rank: $rank, totalUsers: $totalUsers, percentile: $percentile, stats: $stats, hazardBreakdowns: $hazardBreakdowns)';
+  return 'XpBreakdown(currentXpPoints: $currentXpPoints, reliabilityScore: $reliabilityScore, ledgerTotal: $ledgerTotal, rank: $rank, totalUsers: $totalUsers, percentile: $percentile, stats: $stats, byType: $byType, reports: $reports)';
 }
 
 
@@ -48,7 +52,7 @@ abstract mixin class $XpBreakdownCopyWith<$Res>  {
   factory $XpBreakdownCopyWith(XpBreakdown value, $Res Function(XpBreakdown) _then) = _$XpBreakdownCopyWithImpl;
 @useResult
 $Res call({
- int currentXpPoints, double reliabilityScore, int expectedXpFromCalculation, int rank, int totalUsers, int percentile, XpBreakdownStats? stats, List<XpHazardBreakdown> hazardBreakdowns
+ int currentXpPoints, double reliabilityScore, int ledgerTotal, int rank, int totalUsers, int percentile, XpBreakdownStats? stats, List<XpTypeTotal> byType, List<XpReportBreakdown> reports
 });
 
 
@@ -65,17 +69,18 @@ class _$XpBreakdownCopyWithImpl<$Res>
 
 /// Create a copy of XpBreakdown
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? currentXpPoints = null,Object? reliabilityScore = null,Object? expectedXpFromCalculation = null,Object? rank = null,Object? totalUsers = null,Object? percentile = null,Object? stats = freezed,Object? hazardBreakdowns = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? currentXpPoints = null,Object? reliabilityScore = null,Object? ledgerTotal = null,Object? rank = null,Object? totalUsers = null,Object? percentile = null,Object? stats = freezed,Object? byType = null,Object? reports = null,}) {
   return _then(_self.copyWith(
 currentXpPoints: null == currentXpPoints ? _self.currentXpPoints : currentXpPoints // ignore: cast_nullable_to_non_nullable
 as int,reliabilityScore: null == reliabilityScore ? _self.reliabilityScore : reliabilityScore // ignore: cast_nullable_to_non_nullable
-as double,expectedXpFromCalculation: null == expectedXpFromCalculation ? _self.expectedXpFromCalculation : expectedXpFromCalculation // ignore: cast_nullable_to_non_nullable
+as double,ledgerTotal: null == ledgerTotal ? _self.ledgerTotal : ledgerTotal // ignore: cast_nullable_to_non_nullable
 as int,rank: null == rank ? _self.rank : rank // ignore: cast_nullable_to_non_nullable
 as int,totalUsers: null == totalUsers ? _self.totalUsers : totalUsers // ignore: cast_nullable_to_non_nullable
 as int,percentile: null == percentile ? _self.percentile : percentile // ignore: cast_nullable_to_non_nullable
 as int,stats: freezed == stats ? _self.stats : stats // ignore: cast_nullable_to_non_nullable
-as XpBreakdownStats?,hazardBreakdowns: null == hazardBreakdowns ? _self.hazardBreakdowns : hazardBreakdowns // ignore: cast_nullable_to_non_nullable
-as List<XpHazardBreakdown>,
+as XpBreakdownStats?,byType: null == byType ? _self.byType : byType // ignore: cast_nullable_to_non_nullable
+as List<XpTypeTotal>,reports: null == reports ? _self.reports : reports // ignore: cast_nullable_to_non_nullable
+as List<XpReportBreakdown>,
   ));
 }
 /// Create a copy of XpBreakdown
@@ -172,10 +177,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int currentXpPoints,  double reliabilityScore,  int expectedXpFromCalculation,  int rank,  int totalUsers,  int percentile,  XpBreakdownStats? stats,  List<XpHazardBreakdown> hazardBreakdowns)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int currentXpPoints,  double reliabilityScore,  int ledgerTotal,  int rank,  int totalUsers,  int percentile,  XpBreakdownStats? stats,  List<XpTypeTotal> byType,  List<XpReportBreakdown> reports)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _XpBreakdown() when $default != null:
-return $default(_that.currentXpPoints,_that.reliabilityScore,_that.expectedXpFromCalculation,_that.rank,_that.totalUsers,_that.percentile,_that.stats,_that.hazardBreakdowns);case _:
+return $default(_that.currentXpPoints,_that.reliabilityScore,_that.ledgerTotal,_that.rank,_that.totalUsers,_that.percentile,_that.stats,_that.byType,_that.reports);case _:
   return orElse();
 
 }
@@ -193,10 +198,10 @@ return $default(_that.currentXpPoints,_that.reliabilityScore,_that.expectedXpFro
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int currentXpPoints,  double reliabilityScore,  int expectedXpFromCalculation,  int rank,  int totalUsers,  int percentile,  XpBreakdownStats? stats,  List<XpHazardBreakdown> hazardBreakdowns)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int currentXpPoints,  double reliabilityScore,  int ledgerTotal,  int rank,  int totalUsers,  int percentile,  XpBreakdownStats? stats,  List<XpTypeTotal> byType,  List<XpReportBreakdown> reports)  $default,) {final _that = this;
 switch (_that) {
 case _XpBreakdown():
-return $default(_that.currentXpPoints,_that.reliabilityScore,_that.expectedXpFromCalculation,_that.rank,_that.totalUsers,_that.percentile,_that.stats,_that.hazardBreakdowns);case _:
+return $default(_that.currentXpPoints,_that.reliabilityScore,_that.ledgerTotal,_that.rank,_that.totalUsers,_that.percentile,_that.stats,_that.byType,_that.reports);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -213,10 +218,10 @@ return $default(_that.currentXpPoints,_that.reliabilityScore,_that.expectedXpFro
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int currentXpPoints,  double reliabilityScore,  int expectedXpFromCalculation,  int rank,  int totalUsers,  int percentile,  XpBreakdownStats? stats,  List<XpHazardBreakdown> hazardBreakdowns)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int currentXpPoints,  double reliabilityScore,  int ledgerTotal,  int rank,  int totalUsers,  int percentile,  XpBreakdownStats? stats,  List<XpTypeTotal> byType,  List<XpReportBreakdown> reports)?  $default,) {final _that = this;
 switch (_that) {
 case _XpBreakdown() when $default != null:
-return $default(_that.currentXpPoints,_that.reliabilityScore,_that.expectedXpFromCalculation,_that.rank,_that.totalUsers,_that.percentile,_that.stats,_that.hazardBreakdowns);case _:
+return $default(_that.currentXpPoints,_that.reliabilityScore,_that.ledgerTotal,_that.rank,_that.totalUsers,_that.percentile,_that.stats,_that.byType,_that.reports);case _:
   return null;
 
 }
@@ -227,22 +232,35 @@ return $default(_that.currentXpPoints,_that.reliabilityScore,_that.expectedXpFro
 /// @nodoc
 @JsonSerializable()
 
-class _XpBreakdown implements XpBreakdown {
-  const _XpBreakdown({this.currentXpPoints = 0, this.reliabilityScore = 0.0, this.expectedXpFromCalculation = 0, this.rank = 0, this.totalUsers = 0, this.percentile = 0, this.stats, final  List<XpHazardBreakdown> hazardBreakdowns = const <XpHazardBreakdown>[]}): _hazardBreakdowns = hazardBreakdowns;
+class _XpBreakdown extends XpBreakdown {
+  const _XpBreakdown({this.currentXpPoints = 0, this.reliabilityScore = 0.0, this.ledgerTotal = 0, this.rank = 0, this.totalUsers = 0, this.percentile = 0, this.stats, final  List<XpTypeTotal> byType = const <XpTypeTotal>[], final  List<XpReportBreakdown> reports = const <XpReportBreakdown>[]}): _byType = byType,_reports = reports,super._();
   factory _XpBreakdown.fromJson(Map<String, dynamic> json) => _$XpBreakdownFromJson(json);
 
 @override@JsonKey() final  int currentXpPoints;
 @override@JsonKey() final  double reliabilityScore;
-@override@JsonKey() final  int expectedXpFromCalculation;
+/// Everything the ledger has applied. Equal to [currentXpPoints] unless
+/// a total was floored at zero along the way.
+@override@JsonKey() final  int ledgerTotal;
 @override@JsonKey() final  int rank;
 @override@JsonKey() final  int totalUsers;
 @override@JsonKey() final  int percentile;
 @override final  XpBreakdownStats? stats;
- final  List<XpHazardBreakdown> _hazardBreakdowns;
-@override@JsonKey() List<XpHazardBreakdown> get hazardBreakdowns {
-  if (_hazardBreakdowns is EqualUnmodifiableListView) return _hazardBreakdowns;
+/// Points grouped by the kind of event that earned them.
+ final  List<XpTypeTotal> _byType;
+/// Points grouped by the kind of event that earned them.
+@override@JsonKey() List<XpTypeTotal> get byType {
+  if (_byType is EqualUnmodifiableListView) return _byType;
   // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_hazardBreakdowns);
+  return EqualUnmodifiableListView(_byType);
+}
+
+/// The reports that earned or cost the most, biggest first.
+ final  List<XpReportBreakdown> _reports;
+/// The reports that earned or cost the most, biggest first.
+@override@JsonKey() List<XpReportBreakdown> get reports {
+  if (_reports is EqualUnmodifiableListView) return _reports;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_reports);
 }
 
 
@@ -259,16 +277,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _XpBreakdown&&(identical(other.currentXpPoints, currentXpPoints) || other.currentXpPoints == currentXpPoints)&&(identical(other.reliabilityScore, reliabilityScore) || other.reliabilityScore == reliabilityScore)&&(identical(other.expectedXpFromCalculation, expectedXpFromCalculation) || other.expectedXpFromCalculation == expectedXpFromCalculation)&&(identical(other.rank, rank) || other.rank == rank)&&(identical(other.totalUsers, totalUsers) || other.totalUsers == totalUsers)&&(identical(other.percentile, percentile) || other.percentile == percentile)&&(identical(other.stats, stats) || other.stats == stats)&&const DeepCollectionEquality().equals(other._hazardBreakdowns, _hazardBreakdowns));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _XpBreakdown&&(identical(other.currentXpPoints, currentXpPoints) || other.currentXpPoints == currentXpPoints)&&(identical(other.reliabilityScore, reliabilityScore) || other.reliabilityScore == reliabilityScore)&&(identical(other.ledgerTotal, ledgerTotal) || other.ledgerTotal == ledgerTotal)&&(identical(other.rank, rank) || other.rank == rank)&&(identical(other.totalUsers, totalUsers) || other.totalUsers == totalUsers)&&(identical(other.percentile, percentile) || other.percentile == percentile)&&(identical(other.stats, stats) || other.stats == stats)&&const DeepCollectionEquality().equals(other._byType, _byType)&&const DeepCollectionEquality().equals(other._reports, _reports));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,currentXpPoints,reliabilityScore,expectedXpFromCalculation,rank,totalUsers,percentile,stats,const DeepCollectionEquality().hash(_hazardBreakdowns));
+int get hashCode => Object.hash(runtimeType,currentXpPoints,reliabilityScore,ledgerTotal,rank,totalUsers,percentile,stats,const DeepCollectionEquality().hash(_byType),const DeepCollectionEquality().hash(_reports));
 
 @override
 String toString() {
-  return 'XpBreakdown(currentXpPoints: $currentXpPoints, reliabilityScore: $reliabilityScore, expectedXpFromCalculation: $expectedXpFromCalculation, rank: $rank, totalUsers: $totalUsers, percentile: $percentile, stats: $stats, hazardBreakdowns: $hazardBreakdowns)';
+  return 'XpBreakdown(currentXpPoints: $currentXpPoints, reliabilityScore: $reliabilityScore, ledgerTotal: $ledgerTotal, rank: $rank, totalUsers: $totalUsers, percentile: $percentile, stats: $stats, byType: $byType, reports: $reports)';
 }
 
 
@@ -279,7 +297,7 @@ abstract mixin class _$XpBreakdownCopyWith<$Res> implements $XpBreakdownCopyWith
   factory _$XpBreakdownCopyWith(_XpBreakdown value, $Res Function(_XpBreakdown) _then) = __$XpBreakdownCopyWithImpl;
 @override @useResult
 $Res call({
- int currentXpPoints, double reliabilityScore, int expectedXpFromCalculation, int rank, int totalUsers, int percentile, XpBreakdownStats? stats, List<XpHazardBreakdown> hazardBreakdowns
+ int currentXpPoints, double reliabilityScore, int ledgerTotal, int rank, int totalUsers, int percentile, XpBreakdownStats? stats, List<XpTypeTotal> byType, List<XpReportBreakdown> reports
 });
 
 
@@ -296,17 +314,18 @@ class __$XpBreakdownCopyWithImpl<$Res>
 
 /// Create a copy of XpBreakdown
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? currentXpPoints = null,Object? reliabilityScore = null,Object? expectedXpFromCalculation = null,Object? rank = null,Object? totalUsers = null,Object? percentile = null,Object? stats = freezed,Object? hazardBreakdowns = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? currentXpPoints = null,Object? reliabilityScore = null,Object? ledgerTotal = null,Object? rank = null,Object? totalUsers = null,Object? percentile = null,Object? stats = freezed,Object? byType = null,Object? reports = null,}) {
   return _then(_XpBreakdown(
 currentXpPoints: null == currentXpPoints ? _self.currentXpPoints : currentXpPoints // ignore: cast_nullable_to_non_nullable
 as int,reliabilityScore: null == reliabilityScore ? _self.reliabilityScore : reliabilityScore // ignore: cast_nullable_to_non_nullable
-as double,expectedXpFromCalculation: null == expectedXpFromCalculation ? _self.expectedXpFromCalculation : expectedXpFromCalculation // ignore: cast_nullable_to_non_nullable
+as double,ledgerTotal: null == ledgerTotal ? _self.ledgerTotal : ledgerTotal // ignore: cast_nullable_to_non_nullable
 as int,rank: null == rank ? _self.rank : rank // ignore: cast_nullable_to_non_nullable
 as int,totalUsers: null == totalUsers ? _self.totalUsers : totalUsers // ignore: cast_nullable_to_non_nullable
 as int,percentile: null == percentile ? _self.percentile : percentile // ignore: cast_nullable_to_non_nullable
 as int,stats: freezed == stats ? _self.stats : stats // ignore: cast_nullable_to_non_nullable
-as XpBreakdownStats?,hazardBreakdowns: null == hazardBreakdowns ? _self._hazardBreakdowns : hazardBreakdowns // ignore: cast_nullable_to_non_nullable
-as List<XpHazardBreakdown>,
+as XpBreakdownStats?,byType: null == byType ? _self._byType : byType // ignore: cast_nullable_to_non_nullable
+as List<XpTypeTotal>,reports: null == reports ? _self._reports : reports // ignore: cast_nullable_to_non_nullable
+as List<XpReportBreakdown>,
   ));
 }
 
@@ -329,7 +348,9 @@ $XpBreakdownStatsCopyWith<$Res>? get stats {
 /// @nodoc
 mixin _$XpBreakdownStats {
 
- int get totalHazardsReported; int get totalVotesCast; int get totalHazardViews;
+ int get totalHazardsReported; int get approvedReports;/// How many people confirmed the caller's reports. This is what the
+/// badges are earned on.
+ int get corroborationsReceived;
 /// Create a copy of XpBreakdownStats
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -342,16 +363,16 @@ $XpBreakdownStatsCopyWith<XpBreakdownStats> get copyWith => _$XpBreakdownStatsCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is XpBreakdownStats&&(identical(other.totalHazardsReported, totalHazardsReported) || other.totalHazardsReported == totalHazardsReported)&&(identical(other.totalVotesCast, totalVotesCast) || other.totalVotesCast == totalVotesCast)&&(identical(other.totalHazardViews, totalHazardViews) || other.totalHazardViews == totalHazardViews));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is XpBreakdownStats&&(identical(other.totalHazardsReported, totalHazardsReported) || other.totalHazardsReported == totalHazardsReported)&&(identical(other.approvedReports, approvedReports) || other.approvedReports == approvedReports)&&(identical(other.corroborationsReceived, corroborationsReceived) || other.corroborationsReceived == corroborationsReceived));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,totalHazardsReported,totalVotesCast,totalHazardViews);
+int get hashCode => Object.hash(runtimeType,totalHazardsReported,approvedReports,corroborationsReceived);
 
 @override
 String toString() {
-  return 'XpBreakdownStats(totalHazardsReported: $totalHazardsReported, totalVotesCast: $totalVotesCast, totalHazardViews: $totalHazardViews)';
+  return 'XpBreakdownStats(totalHazardsReported: $totalHazardsReported, approvedReports: $approvedReports, corroborationsReceived: $corroborationsReceived)';
 }
 
 
@@ -362,7 +383,7 @@ abstract mixin class $XpBreakdownStatsCopyWith<$Res>  {
   factory $XpBreakdownStatsCopyWith(XpBreakdownStats value, $Res Function(XpBreakdownStats) _then) = _$XpBreakdownStatsCopyWithImpl;
 @useResult
 $Res call({
- int totalHazardsReported, int totalVotesCast, int totalHazardViews
+ int totalHazardsReported, int approvedReports, int corroborationsReceived
 });
 
 
@@ -379,11 +400,11 @@ class _$XpBreakdownStatsCopyWithImpl<$Res>
 
 /// Create a copy of XpBreakdownStats
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? totalHazardsReported = null,Object? totalVotesCast = null,Object? totalHazardViews = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? totalHazardsReported = null,Object? approvedReports = null,Object? corroborationsReceived = null,}) {
   return _then(_self.copyWith(
 totalHazardsReported: null == totalHazardsReported ? _self.totalHazardsReported : totalHazardsReported // ignore: cast_nullable_to_non_nullable
-as int,totalVotesCast: null == totalVotesCast ? _self.totalVotesCast : totalVotesCast // ignore: cast_nullable_to_non_nullable
-as int,totalHazardViews: null == totalHazardViews ? _self.totalHazardViews : totalHazardViews // ignore: cast_nullable_to_non_nullable
+as int,approvedReports: null == approvedReports ? _self.approvedReports : approvedReports // ignore: cast_nullable_to_non_nullable
+as int,corroborationsReceived: null == corroborationsReceived ? _self.corroborationsReceived : corroborationsReceived // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -469,10 +490,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int totalHazardsReported,  int totalVotesCast,  int totalHazardViews)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int totalHazardsReported,  int approvedReports,  int corroborationsReceived)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _XpBreakdownStats() when $default != null:
-return $default(_that.totalHazardsReported,_that.totalVotesCast,_that.totalHazardViews);case _:
+return $default(_that.totalHazardsReported,_that.approvedReports,_that.corroborationsReceived);case _:
   return orElse();
 
 }
@@ -490,10 +511,10 @@ return $default(_that.totalHazardsReported,_that.totalVotesCast,_that.totalHazar
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int totalHazardsReported,  int totalVotesCast,  int totalHazardViews)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int totalHazardsReported,  int approvedReports,  int corroborationsReceived)  $default,) {final _that = this;
 switch (_that) {
 case _XpBreakdownStats():
-return $default(_that.totalHazardsReported,_that.totalVotesCast,_that.totalHazardViews);case _:
+return $default(_that.totalHazardsReported,_that.approvedReports,_that.corroborationsReceived);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -510,10 +531,10 @@ return $default(_that.totalHazardsReported,_that.totalVotesCast,_that.totalHazar
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int totalHazardsReported,  int totalVotesCast,  int totalHazardViews)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int totalHazardsReported,  int approvedReports,  int corroborationsReceived)?  $default,) {final _that = this;
 switch (_that) {
 case _XpBreakdownStats() when $default != null:
-return $default(_that.totalHazardsReported,_that.totalVotesCast,_that.totalHazardViews);case _:
+return $default(_that.totalHazardsReported,_that.approvedReports,_that.corroborationsReceived);case _:
   return null;
 
 }
@@ -525,12 +546,14 @@ return $default(_that.totalHazardsReported,_that.totalVotesCast,_that.totalHazar
 @JsonSerializable()
 
 class _XpBreakdownStats implements XpBreakdownStats {
-  const _XpBreakdownStats({this.totalHazardsReported = 0, this.totalVotesCast = 0, this.totalHazardViews = 0});
+  const _XpBreakdownStats({this.totalHazardsReported = 0, this.approvedReports = 0, this.corroborationsReceived = 0});
   factory _XpBreakdownStats.fromJson(Map<String, dynamic> json) => _$XpBreakdownStatsFromJson(json);
 
 @override@JsonKey() final  int totalHazardsReported;
-@override@JsonKey() final  int totalVotesCast;
-@override@JsonKey() final  int totalHazardViews;
+@override@JsonKey() final  int approvedReports;
+/// How many people confirmed the caller's reports. This is what the
+/// badges are earned on.
+@override@JsonKey() final  int corroborationsReceived;
 
 /// Create a copy of XpBreakdownStats
 /// with the given fields replaced by the non-null parameter values.
@@ -545,16 +568,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _XpBreakdownStats&&(identical(other.totalHazardsReported, totalHazardsReported) || other.totalHazardsReported == totalHazardsReported)&&(identical(other.totalVotesCast, totalVotesCast) || other.totalVotesCast == totalVotesCast)&&(identical(other.totalHazardViews, totalHazardViews) || other.totalHazardViews == totalHazardViews));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _XpBreakdownStats&&(identical(other.totalHazardsReported, totalHazardsReported) || other.totalHazardsReported == totalHazardsReported)&&(identical(other.approvedReports, approvedReports) || other.approvedReports == approvedReports)&&(identical(other.corroborationsReceived, corroborationsReceived) || other.corroborationsReceived == corroborationsReceived));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,totalHazardsReported,totalVotesCast,totalHazardViews);
+int get hashCode => Object.hash(runtimeType,totalHazardsReported,approvedReports,corroborationsReceived);
 
 @override
 String toString() {
-  return 'XpBreakdownStats(totalHazardsReported: $totalHazardsReported, totalVotesCast: $totalVotesCast, totalHazardViews: $totalHazardViews)';
+  return 'XpBreakdownStats(totalHazardsReported: $totalHazardsReported, approvedReports: $approvedReports, corroborationsReceived: $corroborationsReceived)';
 }
 
 
@@ -565,7 +588,7 @@ abstract mixin class _$XpBreakdownStatsCopyWith<$Res> implements $XpBreakdownSta
   factory _$XpBreakdownStatsCopyWith(_XpBreakdownStats value, $Res Function(_XpBreakdownStats) _then) = __$XpBreakdownStatsCopyWithImpl;
 @override @useResult
 $Res call({
- int totalHazardsReported, int totalVotesCast, int totalHazardViews
+ int totalHazardsReported, int approvedReports, int corroborationsReceived
 });
 
 
@@ -582,11 +605,11 @@ class __$XpBreakdownStatsCopyWithImpl<$Res>
 
 /// Create a copy of XpBreakdownStats
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? totalHazardsReported = null,Object? totalVotesCast = null,Object? totalHazardViews = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? totalHazardsReported = null,Object? approvedReports = null,Object? corroborationsReceived = null,}) {
   return _then(_XpBreakdownStats(
 totalHazardsReported: null == totalHazardsReported ? _self.totalHazardsReported : totalHazardsReported // ignore: cast_nullable_to_non_nullable
-as int,totalVotesCast: null == totalVotesCast ? _self.totalVotesCast : totalVotesCast // ignore: cast_nullable_to_non_nullable
-as int,totalHazardViews: null == totalHazardViews ? _self.totalHazardViews : totalHazardViews // ignore: cast_nullable_to_non_nullable
+as int,approvedReports: null == approvedReports ? _self.approvedReports : approvedReports // ignore: cast_nullable_to_non_nullable
+as int,corroborationsReceived: null == corroborationsReceived ? _self.corroborationsReceived : corroborationsReceived // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -596,42 +619,42 @@ as int,
 
 
 /// @nodoc
-mixin _$XpHazardBreakdown {
+mixin _$XpTypeTotal {
 
- String get hazardId; String get title; String get reviewStatus; int get baseXpPoints; int get engagementXpPoints; int get totalEstimatedXp; DateTime? get createdAt;
-/// Create a copy of XpHazardBreakdown
+@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) XpEventType? get type; int get count; int get points;
+/// Create a copy of XpTypeTotal
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$XpHazardBreakdownCopyWith<XpHazardBreakdown> get copyWith => _$XpHazardBreakdownCopyWithImpl<XpHazardBreakdown>(this as XpHazardBreakdown, _$identity);
+$XpTypeTotalCopyWith<XpTypeTotal> get copyWith => _$XpTypeTotalCopyWithImpl<XpTypeTotal>(this as XpTypeTotal, _$identity);
 
-  /// Serializes this XpHazardBreakdown to a JSON map.
+  /// Serializes this XpTypeTotal to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is XpHazardBreakdown&&(identical(other.hazardId, hazardId) || other.hazardId == hazardId)&&(identical(other.title, title) || other.title == title)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.baseXpPoints, baseXpPoints) || other.baseXpPoints == baseXpPoints)&&(identical(other.engagementXpPoints, engagementXpPoints) || other.engagementXpPoints == engagementXpPoints)&&(identical(other.totalEstimatedXp, totalEstimatedXp) || other.totalEstimatedXp == totalEstimatedXp)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is XpTypeTotal&&(identical(other.type, type) || other.type == type)&&(identical(other.count, count) || other.count == count)&&(identical(other.points, points) || other.points == points));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,hazardId,title,reviewStatus,baseXpPoints,engagementXpPoints,totalEstimatedXp,createdAt);
+int get hashCode => Object.hash(runtimeType,type,count,points);
 
 @override
 String toString() {
-  return 'XpHazardBreakdown(hazardId: $hazardId, title: $title, reviewStatus: $reviewStatus, baseXpPoints: $baseXpPoints, engagementXpPoints: $engagementXpPoints, totalEstimatedXp: $totalEstimatedXp, createdAt: $createdAt)';
+  return 'XpTypeTotal(type: $type, count: $count, points: $points)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $XpHazardBreakdownCopyWith<$Res>  {
-  factory $XpHazardBreakdownCopyWith(XpHazardBreakdown value, $Res Function(XpHazardBreakdown) _then) = _$XpHazardBreakdownCopyWithImpl;
+abstract mixin class $XpTypeTotalCopyWith<$Res>  {
+  factory $XpTypeTotalCopyWith(XpTypeTotal value, $Res Function(XpTypeTotal) _then) = _$XpTypeTotalCopyWithImpl;
 @useResult
 $Res call({
- String hazardId, String title, String reviewStatus, int baseXpPoints, int engagementXpPoints, int totalEstimatedXp, DateTime? createdAt
+@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) XpEventType? type, int count, int points
 });
 
 
@@ -639,33 +662,29 @@ $Res call({
 
 }
 /// @nodoc
-class _$XpHazardBreakdownCopyWithImpl<$Res>
-    implements $XpHazardBreakdownCopyWith<$Res> {
-  _$XpHazardBreakdownCopyWithImpl(this._self, this._then);
+class _$XpTypeTotalCopyWithImpl<$Res>
+    implements $XpTypeTotalCopyWith<$Res> {
+  _$XpTypeTotalCopyWithImpl(this._self, this._then);
 
-  final XpHazardBreakdown _self;
-  final $Res Function(XpHazardBreakdown) _then;
+  final XpTypeTotal _self;
+  final $Res Function(XpTypeTotal) _then;
 
-/// Create a copy of XpHazardBreakdown
+/// Create a copy of XpTypeTotal
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? hazardId = null,Object? title = null,Object? reviewStatus = null,Object? baseXpPoints = null,Object? engagementXpPoints = null,Object? totalEstimatedXp = null,Object? createdAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? type = freezed,Object? count = null,Object? points = null,}) {
   return _then(_self.copyWith(
-hazardId: null == hazardId ? _self.hazardId : hazardId // ignore: cast_nullable_to_non_nullable
-as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
-as String,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
-as String,baseXpPoints: null == baseXpPoints ? _self.baseXpPoints : baseXpPoints // ignore: cast_nullable_to_non_nullable
-as int,engagementXpPoints: null == engagementXpPoints ? _self.engagementXpPoints : engagementXpPoints // ignore: cast_nullable_to_non_nullable
-as int,totalEstimatedXp: null == totalEstimatedXp ? _self.totalEstimatedXp : totalEstimatedXp // ignore: cast_nullable_to_non_nullable
-as int,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+type: freezed == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as XpEventType?,count: null == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
+as int,points: null == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [XpHazardBreakdown].
-extension XpHazardBreakdownPatterns on XpHazardBreakdown {
+/// Adds pattern-matching-related methods to [XpTypeTotal].
+extension XpTypeTotalPatterns on XpTypeTotal {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -678,10 +697,10 @@ extension XpHazardBreakdownPatterns on XpHazardBreakdown {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _XpHazardBreakdown value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _XpTypeTotal value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _XpHazardBreakdown() when $default != null:
+case _XpTypeTotal() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -700,10 +719,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _XpHazardBreakdown value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _XpTypeTotal value)  $default,){
 final _that = this;
 switch (_that) {
-case _XpHazardBreakdown():
+case _XpTypeTotal():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -721,10 +740,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _XpHazardBreakdown value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _XpTypeTotal value)?  $default,){
 final _that = this;
 switch (_that) {
-case _XpHazardBreakdown() when $default != null:
+case _XpTypeTotal() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -742,10 +761,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String hazardId,  String title,  String reviewStatus,  int baseXpPoints,  int engagementXpPoints,  int totalEstimatedXp,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  XpEventType? type,  int count,  int points)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _XpHazardBreakdown() when $default != null:
-return $default(_that.hazardId,_that.title,_that.reviewStatus,_that.baseXpPoints,_that.engagementXpPoints,_that.totalEstimatedXp,_that.createdAt);case _:
+case _XpTypeTotal() when $default != null:
+return $default(_that.type,_that.count,_that.points);case _:
   return orElse();
 
 }
@@ -763,10 +782,10 @@ return $default(_that.hazardId,_that.title,_that.reviewStatus,_that.baseXpPoints
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String hazardId,  String title,  String reviewStatus,  int baseXpPoints,  int engagementXpPoints,  int totalEstimatedXp,  DateTime? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  XpEventType? type,  int count,  int points)  $default,) {final _that = this;
 switch (_that) {
-case _XpHazardBreakdown():
-return $default(_that.hazardId,_that.title,_that.reviewStatus,_that.baseXpPoints,_that.engagementXpPoints,_that.totalEstimatedXp,_that.createdAt);case _:
+case _XpTypeTotal():
+return $default(_that.type,_that.count,_that.points);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -783,10 +802,10 @@ return $default(_that.hazardId,_that.title,_that.reviewStatus,_that.baseXpPoints
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String hazardId,  String title,  String reviewStatus,  int baseXpPoints,  int engagementXpPoints,  int totalEstimatedXp,  DateTime? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  XpEventType? type,  int count,  int points)?  $default,) {final _that = this;
 switch (_that) {
-case _XpHazardBreakdown() when $default != null:
-return $default(_that.hazardId,_that.title,_that.reviewStatus,_that.baseXpPoints,_that.engagementXpPoints,_that.totalEstimatedXp,_that.createdAt);case _:
+case _XpTypeTotal() when $default != null:
+return $default(_that.type,_that.count,_that.points);case _:
   return null;
 
 }
@@ -797,52 +816,48 @@ return $default(_that.hazardId,_that.title,_that.reviewStatus,_that.baseXpPoints
 /// @nodoc
 @JsonSerializable()
 
-class _XpHazardBreakdown implements XpHazardBreakdown {
-  const _XpHazardBreakdown({required this.hazardId, this.title = '', this.reviewStatus = 'pending', this.baseXpPoints = 0, this.engagementXpPoints = 0, this.totalEstimatedXp = 0, this.createdAt});
-  factory _XpHazardBreakdown.fromJson(Map<String, dynamic> json) => _$XpHazardBreakdownFromJson(json);
+class _XpTypeTotal implements XpTypeTotal {
+  const _XpTypeTotal({@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) this.type, this.count = 0, this.points = 0});
+  factory _XpTypeTotal.fromJson(Map<String, dynamic> json) => _$XpTypeTotalFromJson(json);
 
-@override final  String hazardId;
-@override@JsonKey() final  String title;
-@override@JsonKey() final  String reviewStatus;
-@override@JsonKey() final  int baseXpPoints;
-@override@JsonKey() final  int engagementXpPoints;
-@override@JsonKey() final  int totalEstimatedXp;
-@override final  DateTime? createdAt;
+@override@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) final  XpEventType? type;
+@override@JsonKey() final  int count;
+@override@JsonKey() final  int points;
 
-/// Create a copy of XpHazardBreakdown
+/// Create a copy of XpTypeTotal
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$XpHazardBreakdownCopyWith<_XpHazardBreakdown> get copyWith => __$XpHazardBreakdownCopyWithImpl<_XpHazardBreakdown>(this, _$identity);
+_$XpTypeTotalCopyWith<_XpTypeTotal> get copyWith => __$XpTypeTotalCopyWithImpl<_XpTypeTotal>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$XpHazardBreakdownToJson(this, );
+  return _$XpTypeTotalToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _XpHazardBreakdown&&(identical(other.hazardId, hazardId) || other.hazardId == hazardId)&&(identical(other.title, title) || other.title == title)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.baseXpPoints, baseXpPoints) || other.baseXpPoints == baseXpPoints)&&(identical(other.engagementXpPoints, engagementXpPoints) || other.engagementXpPoints == engagementXpPoints)&&(identical(other.totalEstimatedXp, totalEstimatedXp) || other.totalEstimatedXp == totalEstimatedXp)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _XpTypeTotal&&(identical(other.type, type) || other.type == type)&&(identical(other.count, count) || other.count == count)&&(identical(other.points, points) || other.points == points));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,hazardId,title,reviewStatus,baseXpPoints,engagementXpPoints,totalEstimatedXp,createdAt);
+int get hashCode => Object.hash(runtimeType,type,count,points);
 
 @override
 String toString() {
-  return 'XpHazardBreakdown(hazardId: $hazardId, title: $title, reviewStatus: $reviewStatus, baseXpPoints: $baseXpPoints, engagementXpPoints: $engagementXpPoints, totalEstimatedXp: $totalEstimatedXp, createdAt: $createdAt)';
+  return 'XpTypeTotal(type: $type, count: $count, points: $points)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$XpHazardBreakdownCopyWith<$Res> implements $XpHazardBreakdownCopyWith<$Res> {
-  factory _$XpHazardBreakdownCopyWith(_XpHazardBreakdown value, $Res Function(_XpHazardBreakdown) _then) = __$XpHazardBreakdownCopyWithImpl;
+abstract mixin class _$XpTypeTotalCopyWith<$Res> implements $XpTypeTotalCopyWith<$Res> {
+  factory _$XpTypeTotalCopyWith(_XpTypeTotal value, $Res Function(_XpTypeTotal) _then) = __$XpTypeTotalCopyWithImpl;
 @override @useResult
 $Res call({
- String hazardId, String title, String reviewStatus, int baseXpPoints, int engagementXpPoints, int totalEstimatedXp, DateTime? createdAt
+@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) XpEventType? type, int count, int points
 });
 
 
@@ -850,23 +865,572 @@ $Res call({
 
 }
 /// @nodoc
-class __$XpHazardBreakdownCopyWithImpl<$Res>
-    implements _$XpHazardBreakdownCopyWith<$Res> {
-  __$XpHazardBreakdownCopyWithImpl(this._self, this._then);
+class __$XpTypeTotalCopyWithImpl<$Res>
+    implements _$XpTypeTotalCopyWith<$Res> {
+  __$XpTypeTotalCopyWithImpl(this._self, this._then);
 
-  final _XpHazardBreakdown _self;
-  final $Res Function(_XpHazardBreakdown) _then;
+  final _XpTypeTotal _self;
+  final $Res Function(_XpTypeTotal) _then;
 
-/// Create a copy of XpHazardBreakdown
+/// Create a copy of XpTypeTotal
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? hazardId = null,Object? title = null,Object? reviewStatus = null,Object? baseXpPoints = null,Object? engagementXpPoints = null,Object? totalEstimatedXp = null,Object? createdAt = freezed,}) {
-  return _then(_XpHazardBreakdown(
+@override @pragma('vm:prefer-inline') $Res call({Object? type = freezed,Object? count = null,Object? points = null,}) {
+  return _then(_XpTypeTotal(
+type: freezed == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as XpEventType?,count: null == count ? _self.count : count // ignore: cast_nullable_to_non_nullable
+as int,points: null == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$XpReportBreakdown {
+
+ String get hazardId; String get title; String get reviewStatus; int get points; List<XpReportEvent> get events; DateTime? get createdAt;
+/// Create a copy of XpReportBreakdown
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$XpReportBreakdownCopyWith<XpReportBreakdown> get copyWith => _$XpReportBreakdownCopyWithImpl<XpReportBreakdown>(this as XpReportBreakdown, _$identity);
+
+  /// Serializes this XpReportBreakdown to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is XpReportBreakdown&&(identical(other.hazardId, hazardId) || other.hazardId == hazardId)&&(identical(other.title, title) || other.title == title)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.points, points) || other.points == points)&&const DeepCollectionEquality().equals(other.events, events)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,hazardId,title,reviewStatus,points,const DeepCollectionEquality().hash(events),createdAt);
+
+@override
+String toString() {
+  return 'XpReportBreakdown(hazardId: $hazardId, title: $title, reviewStatus: $reviewStatus, points: $points, events: $events, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $XpReportBreakdownCopyWith<$Res>  {
+  factory $XpReportBreakdownCopyWith(XpReportBreakdown value, $Res Function(XpReportBreakdown) _then) = _$XpReportBreakdownCopyWithImpl;
+@useResult
+$Res call({
+ String hazardId, String title, String reviewStatus, int points, List<XpReportEvent> events, DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$XpReportBreakdownCopyWithImpl<$Res>
+    implements $XpReportBreakdownCopyWith<$Res> {
+  _$XpReportBreakdownCopyWithImpl(this._self, this._then);
+
+  final XpReportBreakdown _self;
+  final $Res Function(XpReportBreakdown) _then;
+
+/// Create a copy of XpReportBreakdown
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? hazardId = null,Object? title = null,Object? reviewStatus = null,Object? points = null,Object? events = null,Object? createdAt = freezed,}) {
+  return _then(_self.copyWith(
 hazardId: null == hazardId ? _self.hazardId : hazardId // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
-as String,baseXpPoints: null == baseXpPoints ? _self.baseXpPoints : baseXpPoints // ignore: cast_nullable_to_non_nullable
-as int,engagementXpPoints: null == engagementXpPoints ? _self.engagementXpPoints : engagementXpPoints // ignore: cast_nullable_to_non_nullable
-as int,totalEstimatedXp: null == totalEstimatedXp ? _self.totalEstimatedXp : totalEstimatedXp // ignore: cast_nullable_to_non_nullable
+as String,points: null == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
+as int,events: null == events ? _self.events : events // ignore: cast_nullable_to_non_nullable
+as List<XpReportEvent>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [XpReportBreakdown].
+extension XpReportBreakdownPatterns on XpReportBreakdown {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _XpReportBreakdown value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _XpReportBreakdown() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _XpReportBreakdown value)  $default,){
+final _that = this;
+switch (_that) {
+case _XpReportBreakdown():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _XpReportBreakdown value)?  $default,){
+final _that = this;
+switch (_that) {
+case _XpReportBreakdown() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String hazardId,  String title,  String reviewStatus,  int points,  List<XpReportEvent> events,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _XpReportBreakdown() when $default != null:
+return $default(_that.hazardId,_that.title,_that.reviewStatus,_that.points,_that.events,_that.createdAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String hazardId,  String title,  String reviewStatus,  int points,  List<XpReportEvent> events,  DateTime? createdAt)  $default,) {final _that = this;
+switch (_that) {
+case _XpReportBreakdown():
+return $default(_that.hazardId,_that.title,_that.reviewStatus,_that.points,_that.events,_that.createdAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String hazardId,  String title,  String reviewStatus,  int points,  List<XpReportEvent> events,  DateTime? createdAt)?  $default,) {final _that = this;
+switch (_that) {
+case _XpReportBreakdown() when $default != null:
+return $default(_that.hazardId,_that.title,_that.reviewStatus,_that.points,_that.events,_that.createdAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _XpReportBreakdown implements XpReportBreakdown {
+  const _XpReportBreakdown({required this.hazardId, this.title = '', this.reviewStatus = 'pending', this.points = 0, final  List<XpReportEvent> events = const <XpReportEvent>[], this.createdAt}): _events = events;
+  factory _XpReportBreakdown.fromJson(Map<String, dynamic> json) => _$XpReportBreakdownFromJson(json);
+
+@override final  String hazardId;
+@override@JsonKey() final  String title;
+@override@JsonKey() final  String reviewStatus;
+@override@JsonKey() final  int points;
+ final  List<XpReportEvent> _events;
+@override@JsonKey() List<XpReportEvent> get events {
+  if (_events is EqualUnmodifiableListView) return _events;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_events);
+}
+
+@override final  DateTime? createdAt;
+
+/// Create a copy of XpReportBreakdown
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$XpReportBreakdownCopyWith<_XpReportBreakdown> get copyWith => __$XpReportBreakdownCopyWithImpl<_XpReportBreakdown>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$XpReportBreakdownToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _XpReportBreakdown&&(identical(other.hazardId, hazardId) || other.hazardId == hazardId)&&(identical(other.title, title) || other.title == title)&&(identical(other.reviewStatus, reviewStatus) || other.reviewStatus == reviewStatus)&&(identical(other.points, points) || other.points == points)&&const DeepCollectionEquality().equals(other._events, _events)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,hazardId,title,reviewStatus,points,const DeepCollectionEquality().hash(_events),createdAt);
+
+@override
+String toString() {
+  return 'XpReportBreakdown(hazardId: $hazardId, title: $title, reviewStatus: $reviewStatus, points: $points, events: $events, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$XpReportBreakdownCopyWith<$Res> implements $XpReportBreakdownCopyWith<$Res> {
+  factory _$XpReportBreakdownCopyWith(_XpReportBreakdown value, $Res Function(_XpReportBreakdown) _then) = __$XpReportBreakdownCopyWithImpl;
+@override @useResult
+$Res call({
+ String hazardId, String title, String reviewStatus, int points, List<XpReportEvent> events, DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$XpReportBreakdownCopyWithImpl<$Res>
+    implements _$XpReportBreakdownCopyWith<$Res> {
+  __$XpReportBreakdownCopyWithImpl(this._self, this._then);
+
+  final _XpReportBreakdown _self;
+  final $Res Function(_XpReportBreakdown) _then;
+
+/// Create a copy of XpReportBreakdown
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? hazardId = null,Object? title = null,Object? reviewStatus = null,Object? points = null,Object? events = null,Object? createdAt = freezed,}) {
+  return _then(_XpReportBreakdown(
+hazardId: null == hazardId ? _self.hazardId : hazardId // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,reviewStatus: null == reviewStatus ? _self.reviewStatus : reviewStatus // ignore: cast_nullable_to_non_nullable
+as String,points: null == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
+as int,events: null == events ? _self._events : events // ignore: cast_nullable_to_non_nullable
+as List<XpReportEvent>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$XpReportEvent {
+
+@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) XpEventType? get type; int get points; DateTime? get createdAt;
+/// Create a copy of XpReportEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$XpReportEventCopyWith<XpReportEvent> get copyWith => _$XpReportEventCopyWithImpl<XpReportEvent>(this as XpReportEvent, _$identity);
+
+  /// Serializes this XpReportEvent to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is XpReportEvent&&(identical(other.type, type) || other.type == type)&&(identical(other.points, points) || other.points == points)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,type,points,createdAt);
+
+@override
+String toString() {
+  return 'XpReportEvent(type: $type, points: $points, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $XpReportEventCopyWith<$Res>  {
+  factory $XpReportEventCopyWith(XpReportEvent value, $Res Function(XpReportEvent) _then) = _$XpReportEventCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) XpEventType? type, int points, DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class _$XpReportEventCopyWithImpl<$Res>
+    implements $XpReportEventCopyWith<$Res> {
+  _$XpReportEventCopyWithImpl(this._self, this._then);
+
+  final XpReportEvent _self;
+  final $Res Function(XpReportEvent) _then;
+
+/// Create a copy of XpReportEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? type = freezed,Object? points = null,Object? createdAt = freezed,}) {
+  return _then(_self.copyWith(
+type: freezed == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as XpEventType?,points: null == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
+as int,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [XpReportEvent].
+extension XpReportEventPatterns on XpReportEvent {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _XpReportEvent value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _XpReportEvent() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _XpReportEvent value)  $default,){
+final _that = this;
+switch (_that) {
+case _XpReportEvent():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _XpReportEvent value)?  $default,){
+final _that = this;
+switch (_that) {
+case _XpReportEvent() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  XpEventType? type,  int points,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _XpReportEvent() when $default != null:
+return $default(_that.type,_that.points,_that.createdAt);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  XpEventType? type,  int points,  DateTime? createdAt)  $default,) {final _that = this;
+switch (_that) {
+case _XpReportEvent():
+return $default(_that.type,_that.points,_that.createdAt);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  XpEventType? type,  int points,  DateTime? createdAt)?  $default,) {final _that = this;
+switch (_that) {
+case _XpReportEvent() when $default != null:
+return $default(_that.type,_that.points,_that.createdAt);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _XpReportEvent implements XpReportEvent {
+  const _XpReportEvent({@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) this.type, this.points = 0, this.createdAt});
+  factory _XpReportEvent.fromJson(Map<String, dynamic> json) => _$XpReportEventFromJson(json);
+
+@override@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) final  XpEventType? type;
+@override@JsonKey() final  int points;
+@override final  DateTime? createdAt;
+
+/// Create a copy of XpReportEvent
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$XpReportEventCopyWith<_XpReportEvent> get copyWith => __$XpReportEventCopyWithImpl<_XpReportEvent>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$XpReportEventToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _XpReportEvent&&(identical(other.type, type) || other.type == type)&&(identical(other.points, points) || other.points == points)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,type,points,createdAt);
+
+@override
+String toString() {
+  return 'XpReportEvent(type: $type, points: $points, createdAt: $createdAt)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$XpReportEventCopyWith<$Res> implements $XpReportEventCopyWith<$Res> {
+  factory _$XpReportEventCopyWith(_XpReportEvent value, $Res Function(_XpReportEvent) _then) = __$XpReportEventCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) XpEventType? type, int points, DateTime? createdAt
+});
+
+
+
+
+}
+/// @nodoc
+class __$XpReportEventCopyWithImpl<$Res>
+    implements _$XpReportEventCopyWith<$Res> {
+  __$XpReportEventCopyWithImpl(this._self, this._then);
+
+  final _XpReportEvent _self;
+  final $Res Function(_XpReportEvent) _then;
+
+/// Create a copy of XpReportEvent
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? type = freezed,Object? points = null,Object? createdAt = freezed,}) {
+  return _then(_XpReportEvent(
+type: freezed == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
+as XpEventType?,points: null == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
 as int,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));

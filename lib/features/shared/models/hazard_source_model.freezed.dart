@@ -22,7 +22,12 @@ mixin _$HazardSource {
  HazardSourceLicense? get license;/// The copyright information for the hazard source.
  String? get copyrightText;/// The link to the copyright information for the hazard source.
  String? get copyrightLink;/// The advisory text provided by the hazard source.
- String? get advisoryText;
+ String? get advisoryText;/// The One Glance shape this source's alerts render as, straight from
+/// the backend source registry: triangle (AWS), diamond (official),
+/// circle (community), square (global humanitarian), shield (ALRT
+/// Intel). Null on older rows, where the render path falls back to the
+/// documented defaults.
+@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) HazardSourceShape? get shape;
 /// Create a copy of HazardSource
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -35,16 +40,16 @@ $HazardSourceCopyWith<HazardSource> get copyWith => _$HazardSourceCopyWithImpl<H
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardSource&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.license, license) || other.license == license)&&(identical(other.copyrightText, copyrightText) || other.copyrightText == copyrightText)&&(identical(other.copyrightLink, copyrightLink) || other.copyrightLink == copyrightLink)&&(identical(other.advisoryText, advisoryText) || other.advisoryText == advisoryText));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardSource&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.license, license) || other.license == license)&&(identical(other.copyrightText, copyrightText) || other.copyrightText == copyrightText)&&(identical(other.copyrightLink, copyrightLink) || other.copyrightLink == copyrightLink)&&(identical(other.advisoryText, advisoryText) || other.advisoryText == advisoryText)&&(identical(other.shape, shape) || other.shape == shape));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,url,license,copyrightText,copyrightLink,advisoryText);
+int get hashCode => Object.hash(runtimeType,id,name,url,license,copyrightText,copyrightLink,advisoryText,shape);
 
 @override
 String toString() {
-  return 'HazardSource(id: $id, name: $name, url: $url, license: $license, copyrightText: $copyrightText, copyrightLink: $copyrightLink, advisoryText: $advisoryText)';
+  return 'HazardSource(id: $id, name: $name, url: $url, license: $license, copyrightText: $copyrightText, copyrightLink: $copyrightLink, advisoryText: $advisoryText, shape: $shape)';
 }
 
 
@@ -55,7 +60,7 @@ abstract mixin class $HazardSourceCopyWith<$Res>  {
   factory $HazardSourceCopyWith(HazardSource value, $Res Function(HazardSource) _then) = _$HazardSourceCopyWithImpl;
 @useResult
 $Res call({
- String id, String? name, String? url, HazardSourceLicense? license, String? copyrightText, String? copyrightLink, String? advisoryText
+ String id, String? name, String? url, HazardSourceLicense? license, String? copyrightText, String? copyrightLink, String? advisoryText,@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) HazardSourceShape? shape
 });
 
 
@@ -72,7 +77,7 @@ class _$HazardSourceCopyWithImpl<$Res>
 
 /// Create a copy of HazardSource
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? url = freezed,Object? license = freezed,Object? copyrightText = freezed,Object? copyrightLink = freezed,Object? advisoryText = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? url = freezed,Object? license = freezed,Object? copyrightText = freezed,Object? copyrightLink = freezed,Object? advisoryText = freezed,Object? shape = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -81,7 +86,8 @@ as String?,license: freezed == license ? _self.license : license // ignore: cast
 as HazardSourceLicense?,copyrightText: freezed == copyrightText ? _self.copyrightText : copyrightText // ignore: cast_nullable_to_non_nullable
 as String?,copyrightLink: freezed == copyrightLink ? _self.copyrightLink : copyrightLink // ignore: cast_nullable_to_non_nullable
 as String?,advisoryText: freezed == advisoryText ? _self.advisoryText : advisoryText // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,shape: freezed == shape ? _self.shape : shape // ignore: cast_nullable_to_non_nullable
+as HazardSourceShape?,
   ));
 }
 /// Create a copy of HazardSource
@@ -178,10 +184,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  HazardSourceShape? shape)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardSource() when $default != null:
-return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText);case _:
+return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText,_that.shape);case _:
   return orElse();
 
 }
@@ -199,10 +205,10 @@ return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  HazardSourceShape? shape)  $default,) {final _that = this;
 switch (_that) {
 case _HazardSource():
-return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText);case _:
+return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText,_that.shape);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -219,10 +225,10 @@ return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)  HazardSourceShape? shape)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardSource() when $default != null:
-return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText);case _:
+return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText,_that.shape);case _:
   return null;
 
 }
@@ -234,7 +240,7 @@ return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,
 @JsonSerializable()
 
 class _HazardSource implements HazardSource {
-  const _HazardSource({required this.id, this.name, this.url, this.license, this.copyrightText, this.copyrightLink, this.advisoryText});
+  const _HazardSource({required this.id, this.name, this.url, this.license, this.copyrightText, this.copyrightLink, this.advisoryText, @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) this.shape});
   factory _HazardSource.fromJson(Map<String, dynamic> json) => _$HazardSourceFromJson(json);
 
 /// The unique identifier for the hazard source.
@@ -251,6 +257,12 @@ class _HazardSource implements HazardSource {
 @override final  String? copyrightLink;
 /// The advisory text provided by the hazard source.
 @override final  String? advisoryText;
+/// The One Glance shape this source's alerts render as, straight from
+/// the backend source registry: triangle (AWS), diamond (official),
+/// circle (community), square (global humanitarian), shield (ALRT
+/// Intel). Null on older rows, where the render path falls back to the
+/// documented defaults.
+@override@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) final  HazardSourceShape? shape;
 
 /// Create a copy of HazardSource
 /// with the given fields replaced by the non-null parameter values.
@@ -265,16 +277,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardSource&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.license, license) || other.license == license)&&(identical(other.copyrightText, copyrightText) || other.copyrightText == copyrightText)&&(identical(other.copyrightLink, copyrightLink) || other.copyrightLink == copyrightLink)&&(identical(other.advisoryText, advisoryText) || other.advisoryText == advisoryText));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardSource&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.license, license) || other.license == license)&&(identical(other.copyrightText, copyrightText) || other.copyrightText == copyrightText)&&(identical(other.copyrightLink, copyrightLink) || other.copyrightLink == copyrightLink)&&(identical(other.advisoryText, advisoryText) || other.advisoryText == advisoryText)&&(identical(other.shape, shape) || other.shape == shape));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,url,license,copyrightText,copyrightLink,advisoryText);
+int get hashCode => Object.hash(runtimeType,id,name,url,license,copyrightText,copyrightLink,advisoryText,shape);
 
 @override
 String toString() {
-  return 'HazardSource(id: $id, name: $name, url: $url, license: $license, copyrightText: $copyrightText, copyrightLink: $copyrightLink, advisoryText: $advisoryText)';
+  return 'HazardSource(id: $id, name: $name, url: $url, license: $license, copyrightText: $copyrightText, copyrightLink: $copyrightLink, advisoryText: $advisoryText, shape: $shape)';
 }
 
 
@@ -285,7 +297,7 @@ abstract mixin class _$HazardSourceCopyWith<$Res> implements $HazardSourceCopyWi
   factory _$HazardSourceCopyWith(_HazardSource value, $Res Function(_HazardSource) _then) = __$HazardSourceCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? name, String? url, HazardSourceLicense? license, String? copyrightText, String? copyrightLink, String? advisoryText
+ String id, String? name, String? url, HazardSourceLicense? license, String? copyrightText, String? copyrightLink, String? advisoryText,@JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue) HazardSourceShape? shape
 });
 
 
@@ -302,7 +314,7 @@ class __$HazardSourceCopyWithImpl<$Res>
 
 /// Create a copy of HazardSource
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? url = freezed,Object? license = freezed,Object? copyrightText = freezed,Object? copyrightLink = freezed,Object? advisoryText = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? url = freezed,Object? license = freezed,Object? copyrightText = freezed,Object? copyrightLink = freezed,Object? advisoryText = freezed,Object? shape = freezed,}) {
   return _then(_HazardSource(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -311,7 +323,8 @@ as String?,license: freezed == license ? _self.license : license // ignore: cast
 as HazardSourceLicense?,copyrightText: freezed == copyrightText ? _self.copyrightText : copyrightText // ignore: cast_nullable_to_non_nullable
 as String?,copyrightLink: freezed == copyrightLink ? _self.copyrightLink : copyrightLink // ignore: cast_nullable_to_non_nullable
 as String?,advisoryText: freezed == advisoryText ? _self.advisoryText : advisoryText // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,shape: freezed == shape ? _self.shape : shape // ignore: cast_nullable_to_non_nullable
+as HazardSourceShape?,
   ));
 }
 

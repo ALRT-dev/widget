@@ -472,6 +472,7 @@ class _SourceChip extends StatelessWidget {
       isAws: alert.isAwsCompliant == true,
       isOfficial: alert.source != null,
       isGlobalHumanitarian: alert.isGlobalHumanitarian,
+      isAlrtIntel: alert.isAlrtIntel,
     );
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.spMin, vertical: 5.spMin),

@@ -97,6 +97,12 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
                       subtitle: 'Reports from people nearby',
                       tint: const Color(0xFF5AB0FF),
                     ).pT(8.0),
+                    _systemToggleRowBuilder(
+                      system: AlertSourceSystem.alrtIntel,
+                      title: 'ALRT Intel',
+                      subtitle: "ALRT's own assessment",
+                      tint: const Color(0xFFFF6B01),
+                    ).pT(8.0),
                     _sectionLabelBuilder('KEY · SHAPE SAYS WHO').pT(18.0),
                     _shapeKeyBuilder().pT(10.0),
                     _sectionLabelBuilder('COLOUR SAYS HOW URGENT').pT(16.0),
@@ -255,6 +261,7 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
                     isOfficial: system != AlertSourceSystem.community,
                     isGlobalHumanitarian:
                         system == AlertSourceSystem.globalHumanitarian,
+                    isAlrtIntel: system == AlertSourceSystem.alrtIntel,
                   ),
                   size: 16.spMin,
                   color: tint,

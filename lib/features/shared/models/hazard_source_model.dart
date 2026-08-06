@@ -4,6 +4,10 @@ import 'package:hazard_app/features/shared/models/hazard_source_license_model.da
 part 'hazard_source_model.freezed.dart';
 part 'hazard_source_model.g.dart';
 
+/// The shapes a source can render as. Mirrors HazardSourceShape in the
+/// backend schema; the shape carries the SOURCE system, never the severity.
+enum HazardSourceShape { triangle, diamond, circle, square, shield }
+
 @freezed
 abstract class HazardSource with _$HazardSource {
   const factory HazardSource({
@@ -27,6 +31,14 @@ abstract class HazardSource with _$HazardSource {
 
     /// The advisory text provided by the hazard source.
     final String? advisoryText,
+
+    /// The One Glance shape this source's alerts render as, straight from
+    /// the backend source registry: triangle (AWS), diamond (official),
+    /// circle (community), square (global humanitarian), shield (ALRT
+    /// Intel). Null on older rows, where the render path falls back to the
+    /// documented defaults.
+    @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
+    final HazardSourceShape? shape,
   }) = _HazardSource;
 
   factory HazardSource.fromJson(Map<String, dynamic> json) =>

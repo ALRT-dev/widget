@@ -167,6 +167,15 @@ abstract class Hazard with _$Hazard {
     return id != null && globalHumanitarianSourceIds.contains(id);
   }
 
+  /// ALRT's own assessment: the shield.
+  ///
+  /// Driven entirely by the source registry the backend already keeps, so
+  /// publishing intel is a matter of giving the source `shape: shield` in
+  /// the admin portal, with nothing to change in the app. The shield never
+  /// writes a band word and never restates or overrides an official
+  /// warning; like every other shape it takes the band hexes.
+  bool get isAlrtIntel => source?.shape == HazardSourceShape.shield;
+
   /// Indicates whether the hazard has expired based on the current date and time.
   bool get isExpired {
     if (expiresAt == null) {
