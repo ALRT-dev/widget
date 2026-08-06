@@ -45,7 +45,9 @@ enum HazardSeverity {
   Color get colorNonAws {
     return switch (this) {
       HazardSeverity.unknown => AppColors.transparent,
-      HazardSeverity.info => AppColors.blue,
+      // Info is the locked band grey everywhere; the old blue predates
+      // the locked palette and matched nothing else on screen.
+      HazardSeverity.info => AppColors.info,
       HazardSeverity.advice => AppColors.advice,
       HazardSeverity.watchAndAct => AppColors.watchAndAct,
       HazardSeverity.emergency => AppColors.emergency,

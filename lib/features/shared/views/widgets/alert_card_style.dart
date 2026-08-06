@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
+import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -59,10 +60,13 @@ abstract final class AlertCardStyle {
   // the band word is never written next to it. Community circles take the
   // category colour instead, never a band hex.
 
-  static const bandInfo = Color(0xFF8A93A0);
-  static const bandMonitor = Color(0xFFF5C518);
-  static const bandAction = Color(0xFFF07E1B);
-  static const bandCritical = Color(0xFFDA1F2D);
+  // One definition: AppColors carries the locked hexes, and everything
+  // severity-coloured (pins, clusters, cards, filters, both keys) reads
+  // them from there. These names stay for the call sites that use them.
+  static const bandInfo = AppColors.info;
+  static const bandMonitor = AppColors.advice;
+  static const bandAction = AppColors.watchAndAct;
+  static const bandCritical = AppColors.emergency;
 
   /// The shield colour for a severity band.
   ///

@@ -184,7 +184,7 @@ class _AlrtKeysBottomsheetContentState
               colorFilter: const ColorFilter.mode(ink, BlendMode.srcIn),
             ),
             name: 'Shield',
-            meaning: 'ALRT intel',
+            meaning: "ALRT Intel — ALRT's own assessment",
           ),
           divider,
           _shapeKeyRowBuilder(
@@ -297,8 +297,11 @@ class _AlrtKeysBottomsheetContentState
   }
 
   Widget _officialWarningsSection() {
+    // The four locked bands, lowest first. This used to open with a black
+    // diamond, which is not a band: the quiet end of the scale is the
+    // Info grey.
     final colors = [
-      AppColors.black,
+      AppColors.info,
       AppColors.advice,
       AppColors.watchAndAct,
       AppColors.emergency,

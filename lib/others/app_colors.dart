@@ -47,8 +47,14 @@ class AppColors {
   static const footerGlow = Color(0xFF6B6BE8);
   static const searchGlow = Color(0xFFFF6B01);
 
-  static const info = blue;
-  static const advice = yellow;
-  static const watchAndAct = orange;
-  static const emergency = red;
+  // The locked band hexes (product rules, design system): Info #8A93A0,
+  // Monitor #F5C518, Action #F07E1B, Critical #DA1F2D. These four aliases
+  // are how severity is coloured everywhere: pins, clusters, cards, app
+  // bars, filters and both keys. They used to point at the generic
+  // yellow/orange/red above, which predate the locked palette, so the map
+  // and the Map details legend disagreed about the same alert.
+  static const info = Color(0xFF8A93A0);
+  static const advice = Color(0xFFF5C518);
+  static const watchAndAct = Color(0xFFF07E1B);
+  static const emergency = Color(0xFFDA1F2D);
 }
