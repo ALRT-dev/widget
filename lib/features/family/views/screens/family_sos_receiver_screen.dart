@@ -9,6 +9,7 @@ import 'package:hazard_app/features/family/providers/family_provider.dart';
 import 'package:hazard_app/features/family/views/screens/family_sos_resolved_screen.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -97,8 +98,16 @@ class _FamilySosReceiverScreenState
   }
 
   void _postSeenIfNotMine(final String myMemberId) {
-    // Never against your own SOS, and never twice.
-    if (_seenPosted || widget.args.sosEvent.memberId == myMemberId) return;
+    // Never against your own SOS, and never twice. "Own" is checked by
+    // USER as well as member id: member ids differ per circle, so on a
+    // cross-group SOS the member-id check alone let the sender's phone
+    // post "Seen" on their own SOS.
+    final sosEvent = widget.args.sosEvent;
+    final myUserId = ref.read(providerOfLoggedInUser)?.id;
+    final senderUserId = sosEvent.member?.user?.id;
+    final isMine = sosEvent.memberId == myMemberId ||
+        (senderUserId != null && senderUserId == myUserId);
+    if (_seenPosted || isMine) return;
     _seenPosted = true;
     unawaited(
       ref.read(providerOfFamily.notifier).respondToSos(
@@ -163,7 +172,13 @@ class _FamilySosReceiverScreenState
     final myMemberId = ref.watch(
       providerOfFamily.select((s) => s.circle?.myMemberId),
     );
-    final isMine = sos.memberId == myMemberId;
+    final myUserId = ref.watch(
+      providerOfLoggedInUser.select((user) => user?.id),
+    );
+    // By user as well as member id: cross-group, the sender's member id
+    // in the SOS's circle never equals their id in the selected circle.
+    final isMine = sos.memberId == myMemberId ||
+        (sos.member?.user?.id != null && sos.member?.user?.id == myUserId);
     final isResolved = sos.status != FamilySosStatus.active;
 
     // Where the person is right now: the socket-patched member location is

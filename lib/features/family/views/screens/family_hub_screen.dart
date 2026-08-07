@@ -22,6 +22,7 @@ import 'package:hazard_app/features/family/views/widgets/family_group_avatar.dar
 import 'package:hazard_app/features/family/views/widgets/family_leave_confirm_sheet.dart';
 import 'package:hazard_app/features/family/views/widgets/family_member_list_item.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/subscription/views/widgets/billing_issue_banner.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -856,9 +857,12 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
     // The same banner reads completely differently on the two phones:
     // the person IN SOS is being watched over, everyone else is being
     // asked to respond. Two-phone testing showed neither could tell
-    // which side they were on.
+    // which side they were on. "Mine" is checked by user as well as
+    // member id, because member ids differ per circle.
     final isMine =
-        sos.memberId == ref.read(providerOfFamily).circle?.myMemberId;
+        sos.memberId == ref.read(providerOfFamily).circle?.myMemberId ||
+        (sos.member?.user?.id != null &&
+            sos.member?.user?.id == ref.read(providerOfLoggedInUser)?.id);
     return GestureDetector(
       onTap: () => context.push(
         FamilySosReceiverScreen.route,

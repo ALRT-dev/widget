@@ -11,6 +11,7 @@ import 'package:hazard_app/features/family/services/family_location_service.dart
 import 'package:hazard_app/features/family/services/family_service.dart';
 import 'package:hazard_app/features/home_screen_widget/family_widget_sync.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
+import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/services/analytics_service.dart';
 import 'package:hazard_app/features/family/views/widgets/family_location_request_sheet.dart';
@@ -150,11 +151,18 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
   }
 
   void _onCheckInRequestReceived(final FamilyCheckInRequest request) {
+    // Same user-level guard as SOS: member ids differ per circle, so the
+    // requester's own phone must be recognised by USER id too.
+    final myUserId = _ref.read(providerOfLoggedInUser)?.id;
+    final requesterUserId = request.requestedBy?.user?.id;
+    final isMine = requesterUserId != null && requesterUserId == myUserId;
+
     final circle = state.circle;
     if (circle == null) {
       // The event beat the first load. The backend only emits to members
       // of the circle, so the request is real: alert now, catch up after.
       unawaited(load(silent: true));
+      if (isMine) return;
       final name = request.requestedBy?.displayName ?? 'A family member';
       _showBigAlert(
         title: '$name asked for a check-in',
@@ -169,7 +177,7 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
       circle: circle.copyWith(latestCheckInRequest: request),
     );
 
-    if (request.requestedById != circle.myMemberId) {
+    if (!isMine && request.requestedById != circle.myMemberId) {
       final name = request.requestedBy?.displayName ?? 'A family member';
       // "Everyone" was confusing: the requester is not waiting on
       // themself. Count who is actually outstanding.
@@ -243,8 +251,17 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
   void _onSosReceived(final FamilySosEvent sosEvent) {
     _upsertSosEvent(sosEvent);
 
-    if (sosEvent.memberId != state.circle?.myMemberId &&
-        sosEvent.status == FamilySosStatus.active) {
+    // "Mine" is decided by USER, not by member id: member ids differ per
+    // circle, so a cross-group SOS (or a not-yet-loaded circle) made the
+    // member-id check pass on the sender's own phone and showed them the
+    // "needs help" banner for their own SOS (two-phone QA 2026-08-07).
+    final myUserId = _ref.read(providerOfLoggedInUser)?.id;
+    final senderUserId = sosEvent.member?.user?.id;
+    final isMine =
+        sosEvent.memberId == state.circle?.myMemberId ||
+        (senderUserId != null && senderUserId == myUserId);
+
+    if (!isMine && sosEvent.status == FamilySosStatus.active) {
       final name = sosEvent.member?.displayName ?? 'A family member';
       // Screen already on and in the app: a corner toast is the wrong
       // size for this. Take the top of the screen with a bright pulsing
@@ -281,6 +298,42 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
     }).toList();
 
     state = state.copyWith(activeSosEvents: events);
+
+    // The person IN SOS is told, loudly, who has seen it and who is
+    // coming — that reassurance is the point of responding (product
+    // owner 2026-08-07). Only for MY event, and never for my own tap.
+    FamilySosEvent? event;
+    for (final e in events) {
+      if (e.id == response.sosEventId) {
+        event = e;
+        break;
+      }
+    }
+    if (event == null) return;
+
+    final myUserId = _ref.read(providerOfLoggedInUser)?.id;
+    final eventIsMine =
+        event.memberId == state.circle?.myMemberId ||
+        (event.member?.user?.id != null &&
+            event.member?.user?.id == myUserId);
+    final responderIsMe =
+        response.memberId == state.circle?.myMemberId ||
+        (response.member?.user?.id != null &&
+            response.member?.user?.id == myUserId);
+    if (!eventIsMine || responderIsMe) return;
+
+    final name = response.member?.displayName ?? 'A family member';
+    final title = switch (response.type) {
+      FamilySosResponseType.onMyWay => '$name is on their way to you',
+      FamilySosResponseType.called => '$name is calling for help for you',
+      _ => '$name has seen your SOS',
+    };
+    _showBigAlert(
+      title: title,
+      body: 'They can see your live location.',
+      isSos: false,
+      onTap: null,
+    );
   }
 
   void _onSosResolved(final FamilySosEvent sosEvent) {
