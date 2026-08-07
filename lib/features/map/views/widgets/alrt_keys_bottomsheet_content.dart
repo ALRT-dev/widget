@@ -45,11 +45,7 @@ class _AlrtKeysBottomsheetContentState
                     20.hSizedBox,
                     _shapeKeySection(),
                     16.hSizedBox,
-                    _awsWarningsSection(),
-                    16.hSizedBox,
-                    _officialWarningsSection(),
-                    16.hSizedBox,
-                    _globalWarningsSection(),
+                    _bandColourSection(),
                     16.hSizedBox,
                     _categoriesSection(),
                     SafeArea(child: 20.hSizedBox),
@@ -112,9 +108,10 @@ class _AlrtKeysBottomsheetContentState
     );
   }
 
-  /// The shape system: a pin's SHAPE says where the alert came from, the
-  /// colour says how serious it is. Drawn in neutral ink here so the legend
-  /// reads as shape-means-source, never as a band.
+  /// The same key as the Map details sheet, word for word: shape says
+  /// which system, colour says how urgent, community wears its category.
+  /// Two sheets explaining the same pins differently is how the key
+  /// stopped being trusted (QA 2026-08-07).
   Widget _shapeKeySection() {
     final divider = Divider(
       color: AppColors.extraLightGrey,
@@ -124,7 +121,7 @@ class _AlrtKeysBottomsheetContentState
     final size = 26.spMin;
 
     return _sectionContainerBuilder(
-      title: 'What the shapes mean'.toUpperCase(),
+      title: 'Key · shape says who',
       subtitle:
           'The shape tells you who the alert came from. The colour tells '
           'you how serious it is.',
@@ -137,8 +134,8 @@ class _AlrtKeysBottomsheetContentState
               size: Size(size, size),
               borderRadius: 1.0,
             ),
-            name: 'Triangle',
-            meaning: 'Australian Warning System',
+            name: 'Triangle · AWS warning',
+            meaning: 'The only source that states a severity level',
           ),
           divider,
           _shapeKeyRowBuilder(
@@ -159,32 +156,8 @@ class _AlrtKeysBottomsheetContentState
                 ),
               ),
             ),
-            name: 'Diamond',
-            meaning: 'Official alert from a public agency',
-          ),
-          divider,
-          _shapeKeyRowBuilder(
-            shape: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: ink, width: 2.0),
-              ),
-            ),
-            name: 'Circle',
-            meaning: 'Community report from someone nearby',
-          ),
-          divider,
-          _shapeKeyRowBuilder(
-            shape: SvgPicture.asset(
-              'assets/icons/shield.svg',
-              width: size,
-              height: size,
-              colorFilter: const ColorFilter.mode(ink, BlendMode.srcIn),
-            ),
-            name: 'Shield',
-            meaning: "ALRT Intel — ALRT's own assessment",
+            name: 'Diamond · official source',
+            meaning: 'State agencies and services',
           ),
           divider,
           _shapeKeyRowBuilder(
@@ -196,8 +169,32 @@ class _AlrtKeysBottomsheetContentState
                 border: Border.all(color: ink, width: 2.0),
               ),
             ),
-            name: 'Rounded square',
-            meaning: 'Global event',
+            name: 'Rounded square · global humanitarian',
+            meaning: "Carries the source's own scale, not an AWS level",
+          ),
+          divider,
+          _shapeKeyRowBuilder(
+            shape: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: ink, width: 2.0),
+              ),
+            ),
+            name: 'Circle · community report',
+            meaning: 'Unverified, from someone nearby',
+          ),
+          divider,
+          _shapeKeyRowBuilder(
+            shape: SvgPicture.asset(
+              'assets/icons/shield.svg',
+              width: size,
+              height: size,
+              colorFilter: const ColorFilter.mode(ink, BlendMode.srcIn),
+            ),
+            name: "Shield · ALRT's own assessment",
+            meaning: 'Never restates or overrides an official warning',
           ),
         ],
       ),
@@ -240,190 +237,49 @@ class _AlrtKeysBottomsheetContentState
     );
   }
 
-  Widget _awsWarningsSection() {
-    final divider = Divider(
-      color: AppColors.extraLightGrey,
-      height: 35.spMin,
-    );
-    return Consumer(
-      builder: (context, ref, child) {
-        return _sectionContainerBuilder(
-          title: 'Australian Warning System'.toUpperCase(),
-          subtitle:
-              "Australia's standardized public warning system for natural hazards and emergencies.",
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _infoBuilder(
-                icon: TriangleOutline(
-                  color: AppColors.emergency,
-                  size: Size(24.spMin, 24.spMin),
-                  borderRadius: 1.0,
-                ),
-                color: AppColors.emergency,
-                title: 'Emergency Warning',
-                subtitle: 'Immediate threat to life and property',
-                indicatorText: 'Red triangle',
-              ),
-              divider,
-              _infoBuilder(
-                icon: TriangleOutline(
-                  color: AppColors.watchAndAct,
-                  size: Size(24.spMin, 24.spMin),
-                  borderRadius: 1.0,
-                ),
-                color: AppColors.watchAndAct,
-                title: 'Watch & Act',
-                subtitle: 'Conditions are changing, take actions now',
-                indicatorText: 'Orange triangle',
-              ),
-              divider,
-              _infoBuilder(
-                icon: TriangleOutline(
-                  color: AppColors.advice,
-                  size: Size(24.spMin, 24.spMin),
-                  borderRadius: 1.0,
-                ),
-                color: AppColors.advice,
-                title: 'Advice',
-                subtitle: 'Stay informed, monitor the situation',
-                indicatorText: 'Yellow triangle',
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _officialWarningsSection() {
-    // The four locked bands, lowest first. This used to open with a black
-    // diamond, which is not a band: the quiet end of the scale is the
-    // Info grey.
-    final colors = [
-      AppColors.info,
-      AppColors.advice,
-      AppColors.watchAndAct,
-      AppColors.emergency,
+  /// The four locked bands, lowest first — the same bar as Map details.
+  Widget _bandColourSection() {
+    const bands = [
+      (AppColors.info, 'Info'),
+      (AppColors.advice, 'Monitor'),
+      (AppColors.watchAndAct, 'Action'),
+      (AppColors.emergency, 'Critical'),
     ];
 
-    return Consumer(
-      builder: (context, ref, child) {
-        return _sectionContainerBuilder(
-          title: 'Official Alerts'.toUpperCase(),
-          subtitle:
-              "Verified alerts from recognised public agencies and emergency services.",
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            spacing: 10.spMin,
-            children: colors.map((e) {
-              return Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final width = constraints.maxWidth;
-                    return Container(
-                      height: width,
-                      decoration: BoxDecoration(
-                        color: AppColors.extraLightGrey,
-                        borderRadius: BorderRadius.circular(12.spMin),
-                      ),
-                      padding: EdgeInsets.all(27.spMin),
-                      child: Center(
-                        child: Transform.rotate(
-                          angle: math.pi / 4,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(1.spMin),
-                              border: Border.all(
-                                color: e,
-                                width: 3.0,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            }).toList(),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _globalWarningsSection() {
-    final divider = Divider(
-      color: AppColors.extraLightGrey,
-      height: 35.spMin,
-    );
-    return Consumer(
-      builder: (context, ref, child) {
-        return _sectionContainerBuilder(
-          title: 'Global Warnings'.toUpperCase(),
-          subtitle:
-              "Global disaster and humanitarian alerts sourced from international monitoring agencies.",
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _infoBuilder(
-                icon: Container(
-                  width: 25.spMin,
-                  height: 25.spMin,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.spMin),
-                    border: Border.all(
-                      color: AppColors.green,
-                      width: 2.0,
+    return _sectionContainerBuilder(
+      title: 'Colour says how urgent',
+      subtitle:
+          'Every shape takes the same four colours, so urgency reads the '
+          'same whoever sent the alert.',
+      child: Row(
+        children: [
+          for (final (index, (color, label)) in bands.indexed) ...[
+            if (index > 0) 10.wSizedBox,
+            Expanded(
+              child: Column(
+                children: [
+                  Container(
+                    height: 10.spMin,
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(999),
                     ),
                   ),
-                ),
-                color: AppColors.green,
-                title: 'Low Impact',
-                subtitle: 'International alert - low humanitarian impact',
-                indicatorText: 'Green square',
-              ),
-              divider,
-              _infoBuilder(
-                icon: Container(
-                  width: 25.spMin,
-                  height: 25.spMin,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.spMin),
-                    border: Border.all(
-                      color: AppColors.orange,
-                      width: 2.0,
+                  6.hSizedBox,
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 12.spMin,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.grey,
                     ),
                   ),
-                ),
-                color: AppColors.orange,
-                title: 'Medium Impact',
-                subtitle: 'International alert - medium humanitarian impact',
-                indicatorText: 'Orange square',
+                ],
               ),
-              divider,
-              _infoBuilder(
-                icon: Container(
-                  width: 25.spMin,
-                  height: 25.spMin,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5.spMin),
-                    border: Border.all(
-                      color: AppColors.red,
-                      width: 2.0,
-                    ),
-                  ),
-                ),
-                color: AppColors.red,
-                title: 'High Impact',
-                subtitle: 'International alert - high humanitarian impact',
-                indicatorText: 'Red square',
-              ),
-            ],
-          ),
-        );
-      },
+            ),
+          ],
+        ],
+      ),
     );
   }
 
@@ -436,9 +292,10 @@ class _AlrtKeysBottomsheetContentState
           ),
         );
         return _sectionContainerBuilder(
-          title: 'Alrt Categories'.toUpperCase(),
+          title: 'Community reports wear their category',
           subtitle:
-              'Every alert is assigned one of the following categories, shown as a colour label on all alert types.',
+              'Every alert carries one of these categories; community pins '
+              'take the category colour, never a severity colour.',
           child: Wrap(
             spacing: 10.spMin,
             runSpacing: 10.spMin,
@@ -511,72 +368,6 @@ class _AlrtKeysBottomsheetContentState
     );
   }
 
-  Widget _infoBuilder({
-    required final Widget icon,
-    required final String title,
-    required final String subtitle,
-    required final Color color,
-    required final String indicatorText,
-  }) {
-    return Row(
-      children: [
-        icon,
-        16.wSizedBox,
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16.spMin,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black,
-                ),
-              ),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 14.spMin,
-                  color: AppColors.grey.withValues(alpha: 0.8),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              5.hSizedBox,
-              Row(
-                children: [
-                  Container(
-                    width: 10.spMin,
-                    height: 10.spMin,
-                    decoration: BoxDecoration(
-                      color: color,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.5),
-                          blurRadius: 7,
-                          offset: const Offset(0.0, 0.0),
-                        ),
-                      ],
-                    ),
-                  ),
-                  5.wSizedBox,
-                  Text(
-                    indicatorText,
-                    style: TextStyle(
-                      fontSize: 12.spMin,
-                      color: AppColors.grey.withValues(alpha: 0.8),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 }
 
 class TriangleOutline extends StatelessWidget {

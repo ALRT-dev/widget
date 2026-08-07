@@ -446,7 +446,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   title: 'Preview ALRT+ paywall',
                   subtitle: 'QA build only — gates are unlocked for testing',
                   icon: LucideIcons.eye,
-                  color: AppColors.grey,
+                  color: const Color(0xFF5B5BD6),
                   onTap: () => context.push(AlrtPlusPaywallScreen.route),
                 ),
               _buildAccountSettingsItem(
@@ -460,21 +460,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 title: 'Child mode',
                 subtitle: 'Map, SOS and check-ins only on this phone',
                 icon: LucideIcons.baby,
-                color: AppColors.purple,
+                color: const Color(0xFF00A896),
                 onTap: () => context.push(ChildModeScreen.route),
               ),
               _buildAccountSettingsItem(
                 title: 'Blocked accounts',
                 subtitle: 'People whose reports you have hidden',
                 icon: LucideIcons.userX,
-                color: AppColors.grey,
+                color: const Color(0xFFB84500),
                 onTap: () => context.push(BlockedAccountsScreen.route),
               ),
               _buildAccountSettingsItem(
                 title: 'Language',
                 subtitle: _currentLanguageLabel(),
                 icon: LucideIcons.globe,
-                color: AppColors.purple,
+                color: const Color(0xFF2FA6FF),
                 onTap: _showLanguagePicker,
               ),
               _buildAccountSettingsItem(
@@ -487,8 +487,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               _buildAccountSettingsItem(
                 title: 'Share ALRT',
                 subtitle: 'QR code or link · help a neighbour get alerts',
-                icon: LucideIcons.share,
-                color: AppColors.purple,
+                icon: LucideIcons.share2,
+                color: const Color(0xFFC233DB),
                 onTap: () => showShareAlrtSheet(context),
               ),
               _buildAccountSettingsItem(
@@ -502,7 +502,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 title: 'Terms & Privacy',
                 subtitle: 'Terms of use, privacy policy and disclaimer',
                 icon: LucideIcons.scale,
-                color: AppColors.grey,
+                color: const Color(0xFF5A6270),
                 onTap: _showLegalSheet,
               ),
               _buildAccountSettingsItem(

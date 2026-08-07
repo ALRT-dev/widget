@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/family/views/widgets/family_colors.dart';
 
 /// The family header band: one blend, one light source, used everywhere.
@@ -80,7 +81,16 @@ class FamilyAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: Text(title),
         backgroundColor: Colors.transparent,
         // White, always: the default black on this blend is unreadable.
+        // foregroundColor alone is NOT enough — the app theme's
+        // titleTextStyle (black) outranks it, which is why these titles
+        // shipped black on the gradient (QA 2026-08-07).
         foregroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
+        titleTextStyle: TextStyle(
+          fontSize: 18.spMin,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+        ),
         elevation: 0,
         actions: actions,
         bottom: subtitle == null

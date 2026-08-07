@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hazard_app/features/profile/models/xp_summary_models.dart';
+import 'package:hazard_app/features/profile/providers/xp_summary_provider.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Dark hero card on top of the Learn tab: "3 of 20 guides done",
-/// a progress bar and an orange "+30 XP" pill.
-class LearnProgressHeroCard extends StatelessWidget {
+/// Dark hero card on top of the Learn tab: overall progress AND this
+/// week's challenge, in one card.
+///
+/// These used to be two stacked cards, and testers read them as two
+/// competing challenges (QA 2026-08-07): "0 of 20 guides" with an XP pill
+/// looked like one target, "learn 2 guides" like another. There is one
+/// story: the guides are the library, the weekly challenge is the ask.
+class LearnProgressHeroCard extends ConsumerWidget {
   const LearnProgressHeroCard({
     super.key,
     required this.completedCount,
@@ -36,7 +44,8 @@ class LearnProgressHeroCard extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final quest = ref.watch(providerOfXpSummary).asData?.value.weeklyQuest;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16.spMin),
@@ -76,8 +85,85 @@ class LearnProgressHeroCard extends StatelessWidget {
           ),
           14.hSizedBox,
           _progressBarBuilder(),
+          if (quest != null) ...[
+            14.hSizedBox,
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: AppColors.white.withValues(alpha: 0.12),
+            ),
+            12.hSizedBox,
+            _weeklyChallengeBuilder(quest),
+          ],
         ],
       ),
+    );
+  }
+
+  /// The weekly challenge strip, inside the same card so the Learn tab
+  /// asks for exactly one thing.
+  Widget _weeklyChallengeBuilder(final WeeklyQuest quest) {
+    final done = quest.completed;
+    final progress = quest.target > 0
+        ? (quest.progress / quest.target).clamp(0.0, 1.0)
+        : 0.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              done ? LucideIcons.trophy : LucideIcons.target,
+              size: 15.spMin,
+              color: done ? const Color(0xFF1EE28C) : AppColors.orange,
+            ),
+            6.wSizedBox,
+            Expanded(
+              child: Text(
+                done
+                    ? 'This week\'s challenge complete'
+                    : 'This week: ${quest.title.toLowerCase()}',
+                style: TextStyle(
+                  fontSize: 13.spMin,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.white,
+                ),
+              ),
+            ),
+            6.wSizedBox,
+            Text(
+              done ? '+${quest.xpReward} XP earned' : '+${quest.xpReward} XP',
+              style: TextStyle(
+                fontSize: 11.5.spMin,
+                fontWeight: FontWeight.w800,
+                color: done ? const Color(0xFF1EE28C) : AppColors.orange,
+              ),
+            ),
+          ],
+        ),
+        if (!done) ...[
+          8.hSizedBox,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 5.spMin,
+              backgroundColor: AppColors.white.withValues(alpha: 0.15),
+              valueColor: AlwaysStoppedAnimation(AppColors.orange),
+            ),
+          ),
+          5.hSizedBox,
+          Text(
+            '${quest.progress} of ${quest.target} done',
+            style: TextStyle(
+              fontSize: 11.spMin,
+              fontWeight: FontWeight.w600,
+              color: AppColors.grey,
+            ),
+          ),
+        ],
+      ],
     );
   }
 
