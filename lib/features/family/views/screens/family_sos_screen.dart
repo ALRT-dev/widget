@@ -127,7 +127,7 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
                     ? 'Your live location is now shared with '
                           '${selectedList?.name ?? circleName}. They can '
                           'watch your movements on the map until you stand '
-                          'down from the Family tab.'
+                          'down from the Family tab, for up to 4 hours.'
                     : 'Sends an SOS and your live location '
                           'to $targetLabel.',
                 textAlign: TextAlign.center,

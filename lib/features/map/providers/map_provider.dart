@@ -2221,9 +2221,17 @@ class MapProvider extends StateNotifier<MapProviderState> {
   void updateCameraPosition({
     required final CameraPosition cameraPosition,
   }) {
+    // Family pins are sized by zoom bucket at generation time, but
+    // generation otherwise only runs after a hazard fetch — which never
+    // happens offline or over an empty viewport. Crossing a bucket
+    // regenerates directly so the pins always match the zoom.
+    final crossedPinBucket =
+        _familyPinScaleForZoom(state.cameraPosition.zoom) !=
+        _familyPinScaleForZoom(cameraPosition.zoom);
     state = state.copyWith(
       cameraPosition: cameraPosition,
     );
+    if (crossedPinBucket && state.isMapReady) generateMarkers();
   }
 
   /// Updates [MapProviderState.markers] to the given [markers].

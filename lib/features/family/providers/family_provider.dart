@@ -201,25 +201,41 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
   }
 
   void _promptLocationRequest(final FamilyLocationRequest request) {
-    if (!_promptedLocationRequestIds.add(request.id)) return;
+    if (_promptedLocationRequestIds.contains(request.id)) return;
 
+    // The id is recorded only once the sheet actually shows: on a cold
+    // start this can run before the navigator exists, and marking the
+    // request "prompted" then would suppress it for the whole session.
     final context = _ref.read(providerOfGlobalNavigatorKey).currentContext;
     if (context == null || !context.mounted) return;
-    showFamilyLocationRequestSheet(
-      context: context,
-      requestId: request.id,
-      requesterName: request.requester?.displayName,
+    _promptedLocationRequestIds.add(request.id);
+    unawaited(
+      showFamilyLocationRequestSheet(
+        context: context,
+        requestId: request.id,
+        requesterName: request.requester?.displayName,
+      ).then((_) {
+        // One sheet at a time: once this ask is answered or dismissed,
+        // surface the next pending one, if another arrived meanwhile.
+        if (mounted) _checkPendingLocationRequests();
+      }),
     );
   }
 
   /// Catch-up for asks that arrived while the app was closed and whose
-  /// push never landed (notifications off). Called after each load.
+  /// push never landed (notifications off). Called after each load and
+  /// after each answered sheet.
   Future<void> _checkPendingLocationRequests() async {
     final result = await _familyService.getPendingFamilyLocationRequests();
     if (!mounted) return;
     result.whenSuccess((requests) {
       // Newest first; prompt one at a time, never a stack of sheets.
-      if (requests.isNotEmpty) _promptLocationRequest(requests.first);
+      for (final request in requests) {
+        if (!_promptedLocationRequestIds.contains(request.id)) {
+          _promptLocationRequest(request);
+          break;
+        }
+      }
       return null;
     });
   }
@@ -319,12 +335,16 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
         }
       },
       (error) async {
-        // A silent failure is only allowed to stay silent when there is
-        // already a circle on screen to keep showing. With nothing loaded
-        // yet, swallowing the error made the tab conclude "no group" and
-        // show the create-a-group pitch — on a phone with patchy network
-        // the group looked like it had vanished every cold start.
-        final canStaySilent = silent && state.circle != null;
+        // A silent failure is only allowed to stay silent when the screen
+        // already shows a truthful answer — a loaded circle, OR a prior
+        // successful load that said "no group" (a failed background
+        // refresh must not swap the onboarding pitch for an error). With
+        // nothing loaded yet, swallowing the error made the tab conclude
+        // "no group" and show the create-a-group pitch — on a phone with
+        // patchy network the group looked like it had vanished every
+        // cold start.
+        final canStaySilent =
+            silent && (state.circle != null || state.loadState.isSuccess);
         state = state.copyWith(
           hasLoadedOnce: true,
           loadState: canStaySilent

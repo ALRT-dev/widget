@@ -991,10 +991,19 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
     final request = circle.latestCheckInRequest;
     if (request == null) return const SizedBox.shrink();
 
-    // Once you have checked in since the ask, it stops nagging.
     final askedAt = request.createdAt;
     final myLastCheckIn = circle.me?.lastCheckInAt;
+    // The two sides of the same ask read completely differently: the
+    // person who ASKED is waiting on answers, not being asked to answer.
+    // Showing the requester their own green "I'm Safe" button was the
+    // single most confusing thing in two-phone testing.
+    final iAsked = request.requestedById == circle.myMemberId;
+
+    // Once you have checked in since the ask, it stops nagging — but the
+    // requester's card is their waiting TRACKER, so their own check-in
+    // must not dismiss it while others still owe an answer.
     final alreadyAnswered =
+        !iAsked &&
         askedAt != null &&
         myLastCheckIn != null &&
         myLastCheckIn.isAfter(askedAt);
@@ -1002,17 +1011,18 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
 
     final who = request.requestedBy?.displayName ?? 'Someone';
     final when = askedAt == null ? null : timeago.format(askedAt);
-    // The two sides of the same ask read completely differently: the
-    // person who ASKED is waiting on answers, not being asked to answer.
-    // Showing the requester their own green "I'm Safe" button was the
-    // single most confusing thing in two-phone testing.
-    final iAsked = request.requestedById == circle.myMemberId;
-    // Who has not answered since the ask (the requester excluded).
-    final waitingOn = circle.others.where((member) {
+    // Everyone but the requester is expected to answer, the viewer
+    // included — counting circle.others here undercounted whenever the
+    // requester had since checked in themself.
+    final waitingOn = circle.members.where((member) {
+      if (member.id == request.requestedById) return false;
       final last = member.lastCheckInAt;
       if (askedAt == null) return !member.isCheckedInRecently;
       return last == null || !last.isAfter(askedAt);
     }).length;
+
+    // The requester's job ends when the last answer lands.
+    if (iAsked && waitingOn == 0) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1040,11 +1050,8 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                       // Never "everyone": the requester is not waiting on
                       // themself, and the count is what people act on.
                       iAsked
-                          ? (waitingOn > 0
-                                ? 'You asked for a check-in · waiting on '
-                                      '$waitingOn'
-                                : 'You asked for a check-in · everyone '
-                                      'answered')
+                          ? 'You asked for a check-in · waiting on '
+                                '$waitingOn'
                           : (waitingOn > 1
                                 ? '$who asked if you are OK · $waitingOn '
                                       'still to answer'
