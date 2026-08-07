@@ -6,6 +6,7 @@ import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.da
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/hazard_filters_provider.dart';
 import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
+import 'package:hazard_app/features/shared/views/widgets/alert_key_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/base_bottomsheet_v2.dart';
 import 'package:hazard_app/features/shared/views/widgets/category_filter_chip.dart';
 import 'package:hazard_app/others/app_colors.dart';
@@ -59,6 +60,16 @@ class _HazardFiltersBottomsheetContentState
                     _alertTypesSection(),
                     16.hSizedBox,
                     _categoriesSection(),
+                    16.hSizedBox,
+                    // THE key, same widget as the map's sheet, on the
+                    // light surface: filters above, meanings below.
+                    _sectionContainerBuilder(
+                      title: 'What the shapes and colours mean',
+                      subtitle:
+                          'The same key as the map, so an alert reads the '
+                          'same wherever you meet it.',
+                      child: const AlertKeyContent(isDark: false),
+                    ),
                     SafeArea(child: 20.hSizedBox),
                   ],
                 ),

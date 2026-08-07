@@ -1,26 +1,14 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/shared/extensions/num_sized_box_extension.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
-import 'package:hazard_app/features/shared/providers/main_categories_provider.dart';
+import 'package:hazard_app/features/shared/views/widgets/alert_key_content.dart';
 import 'package:hazard_app/features/shared/views/widgets/base_bottomsheet_v2.dart';
-import 'package:hazard_app/features/shared/views/widgets/category_filter_chip.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
-class AlrtKeysBottomsheetContent extends ConsumerStatefulWidget {
+class AlrtKeysBottomsheetContent extends StatelessWidget {
   const AlrtKeysBottomsheetContent({super.key});
 
-  @override
-  ConsumerState<AlrtKeysBottomsheetContent> createState() =>
-      _AlrtKeysBottomsheetContentState();
-}
-
-class _AlrtKeysBottomsheetContentState
-    extends ConsumerState<AlrtKeysBottomsheetContent> {
   @override
   Widget build(BuildContext context) {
     return BaseBottomsheetV2(
@@ -31,7 +19,7 @@ class _AlrtKeysBottomsheetContentState
       builder: (context, scrollController) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _headerBuilder(),
+          _headerBuilder(context),
           Expanded(
             child: Container(
               color: AppColors.extraLightGrey,
@@ -43,11 +31,13 @@ class _AlrtKeysBottomsheetContentState
                 child: Column(
                   children: [
                     20.hSizedBox,
-                    _shapeKeySection(),
-                    16.hSizedBox,
-                    _bandColourSection(),
-                    16.hSizedBox,
-                    _categoriesSection(),
+                    _sectionContainerBuilder(
+                      title: 'The ALRT key',
+                      subtitle:
+                          'The same key as the map, so an alert reads the '
+                          'same wherever you meet it.',
+                      child: const AlertKeyContent(isDark: false),
+                    ),
                     SafeArea(child: 20.hSizedBox),
                   ],
                 ),
@@ -59,7 +49,7 @@ class _AlrtKeysBottomsheetContentState
     );
   }
 
-  Widget _headerBuilder() {
+  Widget _headerBuilder(final BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -105,267 +95,6 @@ class _AlrtKeysBottomsheetContentState
           ).onPressed(() => Navigator.pop(context)),
         ],
       ),
-    );
-  }
-
-  /// The same key as the Map details sheet, word for word: shape says
-  /// which system, colour says how urgent, community wears its category.
-  /// Two sheets explaining the same pins differently is how the key
-  /// stopped being trusted (QA 2026-08-07).
-  Widget _shapeKeySection() {
-    final divider = Divider(
-      color: AppColors.extraLightGrey,
-      height: 28.spMin,
-    );
-    const ink = AppColors.mediumGrey;
-    final size = 26.spMin;
-
-    return _sectionContainerBuilder(
-      title: 'Key · shape says who',
-      subtitle:
-          'The shape tells you who the alert came from. The colour tells '
-          'you how serious it is.',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _shapeKeyRowBuilder(
-            shape: TriangleOutline(
-              color: ink,
-              size: Size(size, size),
-              borderRadius: 1.0,
-            ),
-            name: 'Triangle · AWS warning',
-            meaning: 'The only source that states a severity level',
-          ),
-          divider,
-          _shapeKeyRowBuilder(
-            shape: SizedBox(
-              width: size,
-              height: size,
-              child: Center(
-                child: Transform.rotate(
-                  angle: math.pi / 4,
-                  child: Container(
-                    width: size * 0.72,
-                    height: size * 0.72,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(1.spMin),
-                      border: Border.all(color: ink, width: 2.0),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            name: 'Diamond · official source',
-            meaning: 'State agencies and services',
-          ),
-          divider,
-          _shapeKeyRowBuilder(
-            shape: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5.spMin),
-                border: Border.all(color: ink, width: 2.0),
-              ),
-            ),
-            name: 'Rounded square · global humanitarian',
-            meaning: "Carries the source's own scale, not an AWS level",
-          ),
-          divider,
-          _shapeKeyRowBuilder(
-            shape: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: ink, width: 2.0),
-              ),
-            ),
-            name: 'Circle · community report',
-            meaning: 'Unverified, from someone nearby',
-          ),
-          divider,
-          _shapeKeyRowBuilder(
-            shape: SvgPicture.asset(
-              'assets/icons/shield.svg',
-              width: size,
-              height: size,
-              colorFilter: const ColorFilter.mode(ink, BlendMode.srcIn),
-            ),
-            name: "Shield · ALRT's own assessment",
-            meaning: 'Never restates or overrides an official warning',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _shapeKeyRowBuilder({
-    required final Widget shape,
-    required final String name,
-    required final String meaning,
-  }) {
-    return Row(
-      children: [
-        SizedBox(width: 30.spMin, child: Center(child: shape)),
-        16.wSizedBox,
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name,
-                style: TextStyle(
-                  fontSize: 15.spMin,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.black,
-                ),
-              ),
-              Text(
-                meaning,
-                style: TextStyle(
-                  fontSize: 13.5.spMin,
-                  color: AppColors.grey.withValues(alpha: 0.9),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// The AWS words first, then the official colours — the same key as the
-  /// Map details sheet, word for word (product owner 2026-08-07: the
-  /// internal band names never face the user).
-  Widget _bandColourSection() {
-    const awsLevels = [
-      (AppColors.advice, 'Advice'),
-      (AppColors.watchAndAct, 'Watch and Act'),
-      (AppColors.emergency, 'Emergency Warning'),
-    ];
-    const officialColours = [
-      AppColors.info,
-      AppColors.advice,
-      AppColors.watchAndAct,
-      AppColors.emergency,
-    ];
-
-    return _sectionContainerBuilder(
-      title: 'AWS warning levels',
-      subtitle:
-          'Only the Australian Warning System states a level. Other official '
-          'sources use colour alone: it shows the suggested severity.',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              for (final (color, label) in awsLevels)
-                Expanded(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 10.spMin,
-                        margin: EdgeInsets.symmetric(horizontal: 3.spMin),
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      ),
-                      6.hSizedBox,
-                      Text(
-                        label,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 11.spMin,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          16.hSizedBox,
-          Text(
-            'OFFICIAL ALERT COLOURS',
-            style: TextStyle(
-              fontSize: 10.5.spMin,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.1,
-              color: const Color(0xFFB84500),
-            ),
-          ),
-          8.hSizedBox,
-          Row(
-            children: [
-              for (final color in officialColours)
-                Expanded(
-                  child: Container(
-                    height: 10.spMin,
-                    margin: EdgeInsets.symmetric(horizontal: 3.spMin),
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          6.hSizedBox,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Lower',
-                style: TextStyle(fontSize: 11.spMin, color: AppColors.grey),
-              ),
-              Text(
-                'The colour shows the suggested severity',
-                style: TextStyle(fontSize: 11.spMin, color: AppColors.grey),
-              ),
-              Text(
-                'Higher',
-                style: TextStyle(fontSize: 11.spMin, color: AppColors.grey),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _categoriesSection() {
-    return Consumer(
-      builder: (context, ref, child) {
-        final categories = ref.watch(
-          providerOfMainCategories.select(
-            (value) => value.mainCategories,
-          ),
-        );
-        return _sectionContainerBuilder(
-          title: 'Community reports wear their category',
-          subtitle:
-              'Every alert carries one of these categories; community pins '
-              'take the category colour, never a severity colour.',
-          child: Wrap(
-            spacing: 10.spMin,
-            runSpacing: 10.spMin,
-            children: categories
-                .map(
-                  (category) => CategoryFilterChip(
-                    category: category,
-                    isSelected: true,
-                  ),
-                )
-                .toList(),
-          ),
-        );
-      },
     );
   }
 
@@ -424,108 +153,4 @@ class _AlrtKeysBottomsheetContentState
     );
   }
 
-}
-
-class TriangleOutline extends StatelessWidget {
-  final Size size;
-  final double borderRadius;
-  final double strokeWidth;
-  final Color color;
-
-  const TriangleOutline({
-    super.key,
-    required this.size,
-    this.borderRadius = 0,
-    this.strokeWidth = 2,
-    this.color = Colors.black,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      size: size,
-      painter: TriangleOutlinePainter(
-        borderRadius: borderRadius,
-        strokeWidth: strokeWidth,
-        color: color,
-      ),
-    );
-  }
-}
-
-class TriangleOutlinePainter extends CustomPainter {
-  final double borderRadius;
-  final double strokeWidth;
-  final Color color;
-
-  TriangleOutlinePainter({
-    required this.borderRadius,
-    required this.strokeWidth,
-    required this.color,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth;
-
-    final p1 = Offset(size.width / 2, 0);
-    final p2 = Offset(0, size.height);
-    final p3 = Offset(size.width, size.height);
-
-    final path = _roundedTrianglePath(p1, p2, p3, borderRadius);
-
-    canvas.drawPath(path, paint);
-  }
-
-  Path _roundedTrianglePath(
-    Offset p1,
-    Offset p2,
-    Offset p3,
-    double radius,
-  ) {
-    final points = [p1, p2, p3];
-    final path = Path();
-
-    for (int i = 0; i < points.length; i++) {
-      final prev = points[(i - 1 + points.length) % points.length];
-      final curr = points[i];
-      final next = points[(i + 1) % points.length];
-
-      final v1 = prev - curr;
-      final v2 = next - curr;
-
-      final len1 = v1.distance;
-      final len2 = v2.distance;
-
-      final r = math.min(radius, math.min(len1, len2) / 2);
-
-      final dir1 = Offset(v1.dx / len1, v1.dy / len1);
-      final dir2 = Offset(v2.dx / len2, v2.dy / len2);
-
-      final pA = curr + dir1 * r;
-      final pB = curr + dir2 * r;
-
-      if (i == 0) {
-        path.moveTo(pA.dx, pA.dy);
-      } else {
-        path.lineTo(pA.dx, pA.dy);
-      }
-
-      path.quadraticBezierTo(curr.dx, curr.dy, pB.dx, pB.dy);
-    }
-
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldRepaint(covariant TriangleOutlinePainter oldDelegate) {
-    return oldDelegate.borderRadius != borderRadius ||
-        oldDelegate.strokeWidth != strokeWidth ||
-        oldDelegate.color != color;
-  }
 }
