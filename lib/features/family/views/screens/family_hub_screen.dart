@@ -539,7 +539,11 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
           child: Text('Who your SOS reaches'),
         ),
         const PopupMenuItem(value: 'places', child: Text('Places')),
-        const PopupMenuItem(value: 'invite', child: Text('Invite members')),
+        // Owner-only: joiners consume the OWNER's paid seats, so nobody
+        // may invite people into another payer's group (product owner
+        // 2026-08-07). The server enforces the same rule.
+        if (isOwner)
+          const PopupMenuItem(value: 'invite', child: Text('Invite members')),
         const PopupMenuItem(value: 'sharing', child: Text('My sharing level')),
         const PopupMenuItem(value: 'profile', child: Text('My circle profile')),
         if (isOwner)
@@ -849,6 +853,12 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
 
   Widget _sosBannerBuilder(final FamilySosEvent sos) {
     final name = sos.member?.displayName ?? 'A family member';
+    // The same banner reads completely differently on the two phones:
+    // the person IN SOS is being watched over, everyone else is being
+    // asked to respond. Two-phone testing showed neither could tell
+    // which side they were on.
+    final isMine =
+        sos.memberId == ref.read(providerOfFamily).circle?.myMemberId;
     return GestureDetector(
       onTap: () => context.push(
         FamilySosReceiverScreen.route,
@@ -869,7 +879,7 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$name triggered SOS',
+                    isMine ? 'Your SOS is live' : '$name needs help · SOS',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 15.spMin,
@@ -878,7 +888,11 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                   ),
                   if (sos.createdAt != null)
                     Text(
-                      'Started ${timeago.format(sos.createdAt!)} · tap to respond',
+                      isMine
+                          ? 'Your family can watch your movements · tap '
+                                'to update or stand down'
+                          : 'Started ${timeago.format(sos.createdAt!)} · '
+                                'tap to see them on the map and respond',
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.85),
                         fontSize: 12.spMin,
@@ -988,6 +1002,11 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
 
     final who = request.requestedBy?.displayName ?? 'Someone';
     final when = askedAt == null ? null : timeago.format(askedAt);
+    // The two sides of the same ask read completely differently: the
+    // person who ASKED is waiting on answers, not being asked to answer.
+    // Showing the requester their own green "I'm Safe" button was the
+    // single most confusing thing in two-phone testing.
+    final iAsked = request.requestedById == circle.myMemberId;
     // Who has not answered since the ask (the requester excluded).
     final waitingOn = circle.others.where((member) {
       final last = member.lastCheckInAt;
@@ -1020,9 +1039,16 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                     child: Text(
                       // Never "everyone": the requester is not waiting on
                       // themself, and the count is what people act on.
-                      waitingOn > 1
-                          ? '$who is waiting on $waitingOn people'
-                          : '$who asked for a check-in',
+                      iAsked
+                          ? (waitingOn > 0
+                                ? 'You asked for a check-in · waiting on '
+                                      '$waitingOn'
+                                : 'You asked for a check-in · everyone '
+                                      'answered')
+                          : (waitingOn > 1
+                                ? '$who asked if you are OK · $waitingOn '
+                                      'still to answer'
+                                : '$who asked if you are OK'),
                       style: TextStyle(
                         fontSize: 15.spMin,
                         fontWeight: FontWeight.w800,
@@ -1046,47 +1072,75 @@ class _FamilyHubScreenState extends ConsumerState<FamilyHubScreen> {
                 ),
               ],
               SizedBox(height: 12.spMin),
-              SizedBox(
-                height: 46.spMin,
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: FamilyColors.safeGreen,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.spMin),
+              if (iAsked)
+                // The requester's one job is watching answers come in.
+                SizedBox(
+                  height: 46.spMin,
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: FamilyColors.amber,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.spMin),
+                      ),
+                    ),
+                    onPressed: () =>
+                        context.push(FamilyCheckInRollCallScreen.route),
+                    icon: Icon(LucideIcons.users, size: 18.spMin),
+                    label: Text(
+                      "See who's answered",
+                      style: TextStyle(
+                        fontSize: 16.spMin,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
-                  onPressed: checkInState.isLoading
-                      ? null
-                      : () => ref.read(providerOfFamily.notifier).checkIn(),
-                  icon: Icon(Icons.check, size: 20.spMin),
-                  label: Text(
-                    "I'm Safe",
-                    style: TextStyle(
-                      fontSize: 16.spMin,
-                      fontWeight: FontWeight.w800,
+                )
+              else ...[
+                SizedBox(
+                  height: 46.spMin,
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: FamilyColors.safeGreen,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.spMin),
+                      ),
+                    ),
+                    onPressed: checkInState.isLoading
+                        ? null
+                        : () => ref.read(providerOfFamily.notifier).checkIn(),
+                    icon: Icon(Icons.check, size: 20.spMin),
+                    label: Text(
+                      "I'm Safe · lets $who know",
+                      style: TextStyle(
+                        fontSize: 15.spMin,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 4.spMin),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton(
-                  onPressed: () =>
-                      context.push(FamilyCheckInRollCallScreen.route),
-                  child: Text(
-                    "See who's answered",
-                    style: TextStyle(
-                      fontSize: 13.spMin,
-                      fontWeight: FontWeight.w700,
-                      color: FamilyColors.amber,
+                SizedBox(height: 4.spMin),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () =>
+                        context.push(FamilyCheckInRollCallScreen.route),
+                    child: Text(
+                      "See who's answered",
+                      style: TextStyle(
+                        fontSize: 13.spMin,
+                        fontWeight: FontWeight.w700,
+                        color: FamilyColors.amber,
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
         ),

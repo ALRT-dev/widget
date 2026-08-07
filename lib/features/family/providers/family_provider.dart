@@ -13,6 +13,7 @@ import 'package:hazard_app/features/home_screen_widget/family_widget_sync.dart';
 import 'package:hazard_app/features/shared/extensions/context_extension.dart';
 import 'package:hazard_app/features/shared/providers/navigator_key_provider.dart';
 import 'package:hazard_app/features/shared/services/analytics_service.dart';
+import 'package:hazard_app/features/family/views/widgets/family_location_request_sheet.dart';
 import 'package:hazard_app/features/family/views/widgets/incoming_family_alert_overlay.dart';
 import 'package:hazard_app/features/family/views/screens/family_sos_receiver_screen.dart';
 import 'package:flutter/widgets.dart';
@@ -93,6 +94,9 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
       _familySocketManager.checkInStream.listen(_onCheckInReceived),
       _familySocketManager.checkInRequestStream.listen(
         _onCheckInRequestReceived,
+      ),
+      _familySocketManager.locationRequestStream.listen(
+        _onLocationRequestReceived,
       ),
       _familySocketManager.placeEventStream.listen((_) => _refreshPlaces()),
       _familySocketManager.sosStream.listen(_onSosReceived),
@@ -181,6 +185,43 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
         onTap: checkIn,
       );
     }
+  }
+
+  /// Request ids the consent sheet has already been raised for, so a
+  /// socket event and the pending-requests catch-up never double-prompt.
+  final Set<String> _promptedLocationRequestIds = {};
+
+  /// Raises the Share once / Not now sheet for a "where are you" ask.
+  ///
+  /// The push notification used to be the ONLY path to this sheet, so a
+  /// phone with notifications off never saw the ask and the requester
+  /// waited forever. The socket brings it up while the app is open.
+  void _onLocationRequestReceived(final FamilyLocationRequest request) {
+    _promptLocationRequest(request);
+  }
+
+  void _promptLocationRequest(final FamilyLocationRequest request) {
+    if (!_promptedLocationRequestIds.add(request.id)) return;
+
+    final context = _ref.read(providerOfGlobalNavigatorKey).currentContext;
+    if (context == null || !context.mounted) return;
+    showFamilyLocationRequestSheet(
+      context: context,
+      requestId: request.id,
+      requesterName: request.requester?.displayName,
+    );
+  }
+
+  /// Catch-up for asks that arrived while the app was closed and whose
+  /// push never landed (notifications off). Called after each load.
+  Future<void> _checkPendingLocationRequests() async {
+    final result = await _familyService.getPendingFamilyLocationRequests();
+    if (!mounted) return;
+    result.whenSuccess((requests) {
+      // Newest first; prompt one at a time, never a stack of sheets.
+      if (requests.isNotEmpty) _promptLocationRequest(requests.first);
+      return null;
+    });
   }
 
   void _onSosReceived(final FamilySosEvent sosEvent) {
@@ -273,13 +314,20 @@ class FamilyProvider extends StateNotifier<FamilyProviderState> {
           await Future.wait([
             _refreshRecentCheckIns(),
             _refreshActiveSosEvents(),
+            _checkPendingLocationRequests(),
           ]);
         }
       },
       (error) async {
+        // A silent failure is only allowed to stay silent when there is
+        // already a circle on screen to keep showing. With nothing loaded
+        // yet, swallowing the error made the tab conclude "no group" and
+        // show the create-a-group pitch — on a phone with patchy network
+        // the group looked like it had vanished every cold start.
+        final canStaySilent = silent && state.circle != null;
         state = state.copyWith(
           hasLoadedOnce: true,
-          loadState: silent
+          loadState: canStaySilent
               ? state.loadState
               : FamilyActionState.error(error),
         );

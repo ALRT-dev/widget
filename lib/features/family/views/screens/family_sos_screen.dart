@@ -124,9 +124,11 @@ class _FamilySosScreenState extends ConsumerState<FamilySosScreen>
               SizedBox(height: 8.spMin),
               Text(
                 _sent
-                    ? 'A snapshot of your location was shared with '
-                          '${selectedList?.name ?? circleName}.'
-                    : 'Sends an SOS and a one-time snapshot of your location '
+                    ? 'Your live location is now shared with '
+                          '${selectedList?.name ?? circleName}. They can '
+                          'watch your movements on the map until you stand '
+                          'down from the Family tab.'
+                    : 'Sends an SOS and your live location '
                           'to $targetLabel.',
                 textAlign: TextAlign.center,
                 style: TextStyle(

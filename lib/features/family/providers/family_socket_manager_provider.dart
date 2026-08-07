@@ -19,6 +19,7 @@ class FamilySocketEvents {
   static const locationUpdate = 'familyLocationUpdate';
   static const checkIn = 'familyCheckIn';
   static const checkInRequest = 'familyCheckInRequest';
+  static const locationRequest = 'familyLocationRequest';
   static const placeEvent = 'familyPlaceEvent';
   static const sos = 'familySos';
   static const sosResponse = 'familySosResponse';
@@ -30,6 +31,7 @@ class FamilySocketEvents {
     locationUpdate,
     checkIn,
     checkInRequest,
+    locationRequest,
     placeEvent,
     sos,
     sosResponse,
@@ -60,6 +62,8 @@ class FamilySocketManager {
   final _checkInStreamController = StreamController<FamilyCheckIn>.broadcast();
   final _checkInRequestStreamController =
       StreamController<FamilyCheckInRequest>.broadcast();
+  final _locationRequestStreamController =
+      StreamController<FamilyLocationRequest>.broadcast();
   final _placeEventStreamController = StreamController<void>.broadcast();
   final _sosStreamController = StreamController<FamilySosEvent>.broadcast();
   final _sosResponseStreamController =
@@ -82,6 +86,12 @@ class FamilySocketManager {
   /// Broadcasts new check-in requests.
   Stream<FamilyCheckInRequest> get checkInRequestStream =>
       _checkInRequestStreamController.stream;
+
+  /// Broadcasts "where are you" asks addressed to THIS user. The server
+  /// emits the event to the target only, so anything arriving here is
+  /// ours to answer.
+  Stream<FamilyLocationRequest> get locationRequestStream =>
+      _locationRequestStreamController.stream;
 
   /// Fires when a place was created/updated/deleted or a member arrived/left.
   Stream<void> get placeEventStream => _placeEventStreamController.stream;
@@ -162,6 +172,16 @@ class FamilySocketManager {
     );
 
     socket.on(
+      FamilySocketEvents.locationRequest,
+      (data) => _parseAndAdd(
+        eventName: FamilySocketEvents.locationRequest,
+        data: data,
+        parse: FamilyLocationRequest.fromJson,
+        controller: _locationRequestStreamController,
+      ),
+    );
+
+    socket.on(
       FamilySocketEvents.placeEvent,
       (_) => _placeEventStreamController.add(null),
     );
@@ -234,6 +254,7 @@ class FamilySocketManager {
     _locationUpdateStreamController.close();
     _checkInStreamController.close();
     _checkInRequestStreamController.close();
+    _locationRequestStreamController.close();
     _placeEventStreamController.close();
     _sosStreamController.close();
     _sosResponseStreamController.close();

@@ -16,13 +16,31 @@ class FamilyTabView extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _FamilyTabViewState();
 }
 
-class _FamilyTabViewState extends ConsumerState<FamilyTabView> {
+class _FamilyTabViewState extends ConsumerState<FamilyTabView>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => ref.read(providerOfFamily.notifier).load(),
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(final AppLifecycleState lifecycleState) {
+    // Coming back to the app refreshes the circle. A load that failed
+    // while the phone was between networks (wifi-only phones especially)
+    // otherwise stayed failed until a manual retry.
+    if (lifecycleState == AppLifecycleState.resumed) {
+      ref.read(providerOfFamily.notifier).load(silent: true);
+    }
   }
 
   @override
@@ -55,6 +73,10 @@ class _FamilyTabViewState extends ConsumerState<FamilyTabView> {
       );
     }
 
+    // A failed load with nothing to show is a retry, never the
+    // create-a-group pitch: only a SUCCESSFUL load may conclude the user
+    // has no group.
+    if (!isInAGroup && loadState.isError) return _errorBuilder();
     if (!isInAGroup) return const FamilyOnboardingScreen();
     // In a group, detail still arriving: wait, never fall back to the pitch.
     if (!hasScopedCircle) {

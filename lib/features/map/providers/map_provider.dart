@@ -1921,6 +1921,17 @@ class MapProvider extends StateNotifier<MapProviderState> {
   /// Cache of member avatar pin bitmaps keyed by member id + initials.
   final Map<String, BitmapDescriptor> _familyPinBitmapCache = {};
 
+  /// The avatar pin shrinks in steps as the camera zooms out, so a city
+  /// or country view is not dominated by full-size family circles
+  /// (product owner 2026-08-07). Buckets, not a continuous function, so
+  /// the bitmap cache stays small and pins do not shimmer on every tick.
+  static double _familyPinScaleForZoom(final double zoom) {
+    if (zoom >= 14) return 1.0;
+    if (zoom >= 12) return 0.85;
+    if (zoom >= 10) return 0.68;
+    return 0.52;
+  }
+
   /// Builds avatar pins for family members currently sharing a location
   /// (other than the user themself).
   Future<List<Marker>> _generateFamilyMemberMarkers() async {
@@ -1929,15 +1940,17 @@ class MapProvider extends StateNotifier<MapProviderState> {
       final circle = familyState.circle;
       if (circle == null) return const [];
 
+      final scale = _familyPinScaleForZoom(state.cameraPosition.zoom);
+
       final markers = <Marker>[];
       for (final member in circle.others) {
         if (!member.hasLiveLocation) continue;
 
-        final cacheKey = '${member.id}_${member.initials}';
+        final cacheKey = '${member.id}_${member.initials}_$scale';
         var bitmap = _familyPinBitmapCache[cacheKey];
         if (bitmap == null) {
           final color = FamilyColors.memberColor(member.id);
-          const size = 44.0;
+          final size = 44.0 * scale;
           final widget = Container(
             width: size,
             height: size,
@@ -1945,7 +1958,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
             decoration: BoxDecoration(
               color: color,
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.white, width: 3),
+              border: Border.all(color: AppColors.white, width: 3 * scale),
               boxShadow: const [
                 BoxShadow(
                   color: Color(0x40000000),
@@ -1956,17 +1969,17 @@ class MapProvider extends StateNotifier<MapProviderState> {
             ),
             child: Text(
               member.initials,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.white,
-                fontSize: 15,
+                fontSize: 15 * scale,
                 fontWeight: FontWeight.w700,
                 decoration: TextDecoration.none,
               ),
             ),
           );
           bitmap = await widget.toBitmapDescriptor(
-            logicalSize: const Size(size, size),
-            imageSize: const Size(size * 2.5, size * 2.5),
+            logicalSize: Size(size, size),
+            imageSize: Size(size * 2.5, size * 2.5),
           );
           _familyPinBitmapCache[cacheKey] = bitmap;
         }
