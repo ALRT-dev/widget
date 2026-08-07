@@ -36,6 +36,7 @@ import 'package:hazard_app/features/map/utils/navigation_polyline_simulation.dar
 import 'package:hazard_app/features/map/views/widgets/route_label_marker.dart';
 import 'package:hazard_app/features/search/models/hazard_search_params.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_category_types.dart';
 import 'package:hazard_app/features/shared/enums/sort_order_types.dart';
@@ -1844,7 +1845,7 @@ class MapProvider extends StateNotifier<MapProviderState> {
               onTap: () => _onIndividualMarkerTap(hazard: hazard),
               consumeTapEvents: true,
               icon:
-                  hazard.getMarkerBitmapDescriptor(markerBitmaps) ??
+                  await _hazardMarkerBitmap(hazard, markerBitmaps) ??
                   BitmapDescriptor.defaultMarker,
             ),
           );
@@ -1869,7 +1870,8 @@ class MapProvider extends StateNotifier<MapProviderState> {
         if (hazard.latitude == null || hazard.longitude == null) continue;
 
         final markerBitmaps = _hazardMarkerBitmapsProviderState.markerBitmaps;
-        final bitmapDescriptor = hazard.getMarkerBitmapDescriptor(
+        final bitmapDescriptor = await _hazardMarkerBitmap(
+          hazard,
           markerBitmaps,
         );
 
@@ -2038,6 +2040,57 @@ class MapProvider extends StateNotifier<MapProviderState> {
       position: LatLng(cluster.latitude, cluster.longitude),
       zoom: targetZoom,
     );
+  }
+
+  /// Cache of ALRT Intel shield pins, one per band.
+  final Map<String, BitmapDescriptor> _intelShieldBitmapCache = {};
+
+  /// The marker for a hazard: the shield for ALRT Intel, the category pin
+  /// sets for everything else.
+  ///
+  /// The pin assets only know AWS vs non-AWS, so without this branch an
+  /// intel alert wore an official-style pin on the map while the keys, the
+  /// feed and the source chips all showed the shield for the same alert.
+  Future<BitmapDescriptor?> _hazardMarkerBitmap(
+    final Hazard hazard,
+    final Map<String, BitmapDescriptor> markerBitmaps,
+  ) async {
+    if (hazard.isAlrtIntel) {
+      final shield = await _getIntelShieldBitmap(hazard);
+      if (shield != null) return shield;
+    }
+    return hazard.getMarkerBitmapDescriptor(markerBitmaps);
+  }
+
+  /// Draws (and caches) the shield pin: the band hex on a white ground so
+  /// it reads against the map, same treatment as every other shape —
+  /// colour says urgency, the shape says it is ALRT's own assessment.
+  Future<BitmapDescriptor?> _getIntelShieldBitmap(final Hazard hazard) async {
+    final band = hazard.severityBand ?? HazardSeverityBand.info;
+    final cached = _intelShieldBitmapCache[band.name];
+    if (cached != null) return cached;
+
+    try {
+      final tint = band.colorNonAws;
+      const size = 44.0;
+      final widget = Stack(
+        alignment: Alignment.center,
+        children: [
+          // White halo so the shape holds against any map tile.
+          Icon(LucideIcons.shield, size: size, color: AppColors.white),
+          Icon(LucideIcons.shield, size: size - 9, color: tint),
+        ],
+      );
+      final bitmap = await widget.toBitmapDescriptor(
+        logicalSize: const Size(size, size),
+        imageSize: const Size(size * 2.5, size * 2.5),
+      );
+      _intelShieldBitmapCache[band.name] = bitmap;
+      return bitmap;
+    } catch (_) {
+      // The intel layer must never break marker rendering.
+      return null;
+    }
   }
 
   /// Cache of cluster badge bitmaps keyed by label + severity, so repeated

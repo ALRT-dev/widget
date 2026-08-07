@@ -251,6 +251,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               ref.read(providerOfFamily.notifier).load(silent: true);
               ref.read(providerOfHomeTab.notifier).state = HomeTab.family;
               return;
+            case PushNotificationType.badgeEarned:
+              // The badge shelf lives on the profile.
+              ref.read(providerOfHomeTab.notifier).state = HomeTab.profile;
+              return;
             default:
           }
         }

@@ -65,29 +65,53 @@ class _FamilySosReceiverScreenState
     }
   }
 
+  bool _seenPosted = false;
+  ProviderSubscription<String?>? _seenRetry;
+
   /// "Seen" is automatic (locked rule): opening the SOS is what seeing it
   /// means, so the person in trouble learns someone is looking without
   /// anyone having to press anything. "On my way" stays deliberate.
+  ///
+  /// A push can open this screen before the circle has loaded, so when
+  /// myMemberId is not known yet the post waits for it instead of being
+  /// dropped: losing the signal because the app was cold is exactly the
+  /// silent failure the automatic rule exists to prevent.
   void _markSeen() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final myMemberId = ref.read(providerOfFamily).circle?.myMemberId;
-      // Never against your own SOS, and never on a resolved one.
-      if (myMemberId == null || widget.args.sosEvent.memberId == myMemberId) {
+      if (myMemberId != null) {
+        _postSeenIfNotMine(myMemberId);
         return;
       }
-      unawaited(
-        ref.read(providerOfFamily.notifier).respondToSos(
-              sosEventId: widget.args.sosEvent.id,
-              type: FamilySosResponseType.seen,
-            ),
+      _seenRetry = ref.listenManual<String?>(
+        providerOfFamily.select((s) => s.circle?.myMemberId),
+        (_, memberId) {
+          if (memberId == null) return;
+          _seenRetry?.close();
+          _seenRetry = null;
+          _postSeenIfNotMine(memberId);
+        },
       );
     });
+  }
+
+  void _postSeenIfNotMine(final String myMemberId) {
+    // Never against your own SOS, and never twice.
+    if (_seenPosted || widget.args.sosEvent.memberId == myMemberId) return;
+    _seenPosted = true;
+    unawaited(
+      ref.read(providerOfFamily.notifier).respondToSos(
+            sosEventId: widget.args.sosEvent.id,
+            type: FamilySosResponseType.seen,
+          ),
+    );
   }
 
   @override
   void dispose() {
     _trailTimer?.cancel();
+    _seenRetry?.close();
     _mapController?.dispose();
     super.dispose();
   }

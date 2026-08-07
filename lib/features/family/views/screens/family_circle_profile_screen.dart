@@ -113,9 +113,15 @@ class _FamilyCircleProfileScreenState
           style: TextStyle(fontSize: 17.spMin, fontWeight: FontWeight.w700),
         ),
       ),
-      body: ListView(
+      // Not a ListView: lazy lists only build what is on screen, so the
+      // section keys below the fold had no context and the deep links from
+      // the hub silently landed at the top. This screen is small; building
+      // it all makes Scrollable.ensureVisible reliable.
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(20.spMin),
-        children: [
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           Center(
             child: Column(
               children: [
@@ -260,7 +266,8 @@ class _FamilyCircleProfileScreenState
                     ),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
