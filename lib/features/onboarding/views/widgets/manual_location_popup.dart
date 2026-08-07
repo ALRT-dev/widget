@@ -244,7 +244,7 @@ class _ManualLocationPopupState extends ConsumerState<ManualLocationPopup>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Enter suburb manually',
+                  'Enter your area manually',
                   style: TextStyle(
                     fontSize: 20.spMin,
                     fontWeight: FontWeight.w600,
@@ -301,7 +301,7 @@ class _ManualLocationPopupState extends ConsumerState<ManualLocationPopup>
           focusNode: _searchFocusNode,
           onChanged: _onSearchChanged,
           decoration: InputDecoration(
-            hintText: 'Search for suburb, city or area...',
+            hintText: 'Search for a suburb, town, city or area...',
             hintStyle: TextStyle(
               color: AppColors.grey,
               fontSize: 16.spMin,

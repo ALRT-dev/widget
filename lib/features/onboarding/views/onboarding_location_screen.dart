@@ -309,7 +309,7 @@ class _OnboardingLocationScreenState
         _buildOptionCard(
           option: LocationOption.manual,
           icon: Icons.edit_location,
-          title: 'Enter suburb manually',
+          title: 'Enter your area manually',
           subtitle: 'Type your location',
         ),
       ],
@@ -558,7 +558,8 @@ class _OnboardingLocationScreenState
                     _buildFeatureItem('Reduce irrelevant notifications'),
                     12.hSizedBox,
                     Text(
-                      'You can still search by suburb manually if you prefer.',
+                      'You can still search for your area manually if you '
+                      'prefer.',
                       style: TextStyle(
                         fontSize: 14.spMin,
                         color: AppColors.grey,
@@ -583,7 +584,7 @@ class _OnboardingLocationScreenState
               ),
               12.hSizedBox,
               _buildIconButton(
-                title: "No, I'll search by suburb",
+                title: "No, I'll search for my area",
                 icon: Icons.search,
                 onPressed: () {
                   setState(() {

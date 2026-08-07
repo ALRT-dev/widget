@@ -292,7 +292,8 @@ class _OnboardingLegalScreenState extends ConsumerState<OnboardingLegalScreen>
             children: [
               _buildLegalItem(
                 boldText: 'Age:',
-                normalText: ' Must be 16+ (Online Safety Act 2021)',
+                normalText: ' 13 or older, or any age with Child mode set '
+                    'up by a parent or guardian',
               ),
               16.hSizedBox,
               _buildLegalItem(
@@ -302,7 +303,8 @@ class _OnboardingLegalScreenState extends ConsumerState<OnboardingLegalScreen>
               16.hSizedBox,
               _buildLegalItem(
                 boldText: 'Location:',
-                normalText: ' Used for nearby alerts (suburb-level privacy)',
+                normalText: ' Used only to show alerts near you. Your exact '
+                    'location is never shared unless you choose to share it',
               ),
               16.hSizedBox,
               _buildLegalItem(

@@ -61,7 +61,7 @@ class FamilySharingLevelScreen extends ConsumerWidget {
       ),
       FamilySharingLevel.approximate => (
         'Approximate',
-        'Only a suburb-level label — no precise pin.',
+        'Only a general area label, never a precise pin.',
         LucideIcons.mapPin,
       ),
       FamilySharingLevel.alertsOnly => (

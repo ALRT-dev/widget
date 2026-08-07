@@ -121,7 +121,7 @@ class _ChangeLocationBottomsheetContentState
         _buildOptionCard(
           option: LocationOption.manual,
           icon: Icons.edit_location,
-          title: 'Enter suburb manually',
+          title: 'Enter your area manually',
           subtitle: 'Type your location',
         ),
       ],
@@ -363,7 +363,7 @@ class _ChangeLocationBottomsheetContentState
                   ),
                   24.hSizedBox,
                   _buildIconButton(
-                    title: "Search by Suburb",
+                    title: "Search for my area",
                     icon: Icons.search,
                     onPressed: () {
                       setState(() {
