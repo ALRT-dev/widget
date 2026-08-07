@@ -148,10 +148,14 @@ abstract final class AlertCardStyle {
   // ── V3 expanded-card treatments (alert detail screen) ──────────────────
 
   /// Official (AWS and non-AWS) expanded-card header band.
+  ///
+  /// Anchored on the locked Action hex, like the pin and the key. The old
+  /// start (#FF8C00) was the header-gradient orange, so an Action alert's
+  /// expanded card was a different orange from its own pin.
   static const officialHeaderGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFFFF8C00), Color(0xFFFF6B01)],
+    colors: [AppColors.watchAndAct, Color(0xFFB8560E)],
   );
 
   /// Official expanded-card header, coloured by severity — the top of the
@@ -172,11 +176,14 @@ abstract final class AlertCardStyle {
         ? severity == HazardSeverity.advice
         : band == HazardSeverityBand.monitor;
 
+    // Every gradient starts on the band's own locked hex (AppColors, the
+    // single definition) and falls to its dark stop. Re-typing the hexes
+    // here is how a second palette grows back.
     if (isCriticalTier) {
       return const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Color(0xFFDA1F2D), Color(0xFF9E1520)],
+        colors: [AppColors.emergency, Color(0xFF9E1520)],
       );
     }
     if (isActionTier) return officialHeaderGradient;
@@ -184,13 +191,13 @@ abstract final class AlertCardStyle {
       return const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Color(0xFFF5C518), Color(0xFFDCA900)],
+        colors: [AppColors.advice, Color(0xFFDCA900)],
       );
     }
     return const LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [Color(0xFF8A93A0), Color(0xFF6E7683)],
+      colors: [AppColors.info, Color(0xFF6E7683)],
     );
   }
 

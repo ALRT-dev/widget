@@ -34,7 +34,10 @@ enum HazardSeverity {
   Color get colorAws {
     return switch (this) {
       HazardSeverity.unknown => AppColors.transparent,
-      HazardSeverity.info => AppColors.info,
+      // AWS never renders the grey info band: its quietest level is
+      // Advice, so info under AWS wears the same yellow the band enum
+      // resolves to. Grey here would colour the same alert two ways.
+      HazardSeverity.info => AppColors.advice,
       HazardSeverity.advice => AppColors.advice,
       HazardSeverity.watchAndAct => AppColors.watchAndAct,
       HazardSeverity.emergency => AppColors.emergency,

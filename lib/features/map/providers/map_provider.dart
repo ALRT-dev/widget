@@ -2054,7 +2054,9 @@ class MapProvider extends StateNotifier<MapProviderState> {
       HazardSeverity.emergency => AppColors.emergency,
       HazardSeverity.watchAndAct => AppColors.watchAndAct,
       HazardSeverity.advice => AppColors.advice,
-      _ => AppColors.black,
+      // The quiet end of the scale is the Info grey. Black is not a band,
+      // and the key says so.
+      _ => AppColors.info,
     };
     final cacheKey = '${cluster.label}_${severity.name}';
 

@@ -1,5 +1,4 @@
-import 'dart:ui';
-
+import 'package:flutter/painting.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
@@ -52,6 +51,19 @@ void main() {
       expect(HazardSeverity.watchAndAct.colorAws, action);
       expect(HazardSeverity.emergency.colorAws, critical);
       expect(HazardSeverity.info.colorNonAws, info);
+      // AWS has no grey: info under AWS is Advice yellow, matching the
+      // band enum, so one alert is never coloured two ways.
+      expect(HazardSeverity.info.colorAws, monitor);
+    });
+
+    test('expanded-card headers start on the locked hexes', () {
+      LinearGradient headerFor(final HazardSeverityBand band) =>
+          AlertCardStyle.officialHeaderGradientFor(isAws: false, band: band);
+
+      expect(headerFor(HazardSeverityBand.critical).colors.first, critical);
+      expect(headerFor(HazardSeverityBand.action).colors.first, action);
+      expect(headerFor(HazardSeverityBand.monitor).colors.first, monitor);
+      expect(headerFor(HazardSeverityBand.info).colors.first, info);
     });
   });
 }
