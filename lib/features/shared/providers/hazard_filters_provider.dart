@@ -89,6 +89,16 @@ class HazardFiltersProvider extends StateNotifier<HazardFiltersProviderState> {
     state = state.copyWith(userReported: value);
   }
 
+  /// Updates the global humanitarian filter state.
+  void updateGlobalHumanitarian(bool value) {
+    state = state.copyWith(globalHumanitarian: value);
+  }
+
+  /// Updates the ALRT Intel filter state.
+  void updateAlrtIntel(bool value) {
+    state = state.copyWith(alrtIntel: value);
+  }
+
   /// Updates all available category IDs.
   void updateAllCategories(Set<String> categoryIds) {
     state = state.copyWith(allCategoryIds: categoryIds);

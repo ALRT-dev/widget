@@ -143,13 +143,16 @@ class NotificationsFeedProvider
 
     result.when(
       (hazards) {
+        // The two newest source toggles filter on the phone.
+        final filters = _ref.read(providerOfHazardFiltersForNotifications);
+        final visible = hazards.where(filters.allowsHazard).toList();
         state = state.copyWith(
           getNotificationsFeedHazardsState:
               GetNotificationsFeedHazardsState.success(
-                hazards,
+                visible,
               ),
         );
-        updateHazards(hazards);
+        updateHazards(visible);
       },
       (error) {
         state = state.copyWith(
@@ -219,11 +222,13 @@ class NotificationsFeedProvider
 
     result.when(
       (hazards) {
+        final filters = _ref.read(providerOfHazardFiltersForNotifications);
+        final visible = hazards.where(filters.allowsHazard).toList();
         state = state.copyWith(
           getNextNotificationsFeedHazardsState:
-              GetNotificationsFeedHazardsState.success(hazards),
+              GetNotificationsFeedHazardsState.success(visible),
         );
-        addMultipleToHazards(hazards);
+        addMultipleToHazards(visible);
       },
       (error) {
         state = state.copyWith(

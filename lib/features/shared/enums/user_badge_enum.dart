@@ -28,4 +28,14 @@ enum UserBadge {
       UserBadge.guardian => 1500,
     };
   }
+
+  /// The tier [xp] has reached. Derived from the same number the bar
+  /// draws, so the tier and the bar can never disagree.
+  static UserBadge forXp(final int xp) {
+    var badge = UserBadge.watcher;
+    for (final candidate in UserBadge.values) {
+      if (xp >= candidate.requiredXpPoints) badge = candidate;
+    }
+    return badge;
+  }
 }

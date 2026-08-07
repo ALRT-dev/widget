@@ -70,6 +70,16 @@ class PointsBreakdownScreen extends ConsumerWidget {
               else
                 ...data.byType.map(_typeRowBuilder),
               SizedBox(height: 16.spMin),
+              _sectionTitleBuilder('YOUR LEARNING'),
+              if ((data.learning?.guides.isEmpty ?? true) &&
+                  (data.learning?.challenges.isEmpty ?? true))
+                _emptyBuilder('Finish a guide in the Learn tab and it '
+                    'appears here by name, like your reports do.')
+              else ...[
+                ...?data.learning?.guides.map(_guideRowBuilder),
+                ...?data.learning?.challenges.map(_challengeRowBuilder),
+              ],
+              SizedBox(height: 16.spMin),
               _sectionTitleBuilder('YOUR REPORTS'),
               if (data.reports.isEmpty)
                 _emptyBuilder('No reports have earned or cost points yet.')
@@ -249,6 +259,83 @@ class PointsBreakdownScreen extends ConsumerWidget {
               color: isNegative
                   ? const Color(0xFFCC1010)
                   : const Color(0xFF27AE60),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// One completed guide, named — the same treatment a report gets.
+  Widget _guideRowBuilder(final XpGuideCompletion guide) {
+    return _learningRowBuilder(
+      icon: LucideIcons.bookOpen,
+      title: guide.title,
+      subtitle: 'Safety guide completed',
+      points: guide.points,
+    );
+  }
+
+  Widget _challengeRowBuilder(final XpChallengeCompletion challenge) {
+    return _learningRowBuilder(
+      icon: LucideIcons.trophy,
+      title: 'Weekly challenge',
+      subtitle: 'Completed the guides for the week',
+      points: challenge.points,
+    );
+  }
+
+  Widget _learningRowBuilder({
+    required final IconData icon,
+    required final String title,
+    required final String subtitle,
+    required final int points,
+  }) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 8.spMin),
+      padding: EdgeInsets.symmetric(
+        horizontal: 14.spMin,
+        vertical: 12.spMin,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14.spMin),
+        border: Border.all(color: const Color(0xFFECECEF)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 18.spMin, color: const Color(0xFFE1A500)),
+          SizedBox(width: 10.spMin),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14.spMin,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 2.spMin),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    fontSize: 11.5.spMin,
+                    color: const Color(0xFF5f5c66),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '+$points',
+            style: TextStyle(
+              fontSize: 15.spMin,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF27AE60),
             ),
           ),
         ],

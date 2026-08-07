@@ -237,47 +237,103 @@ class _AlrtKeysBottomsheetContentState
     );
   }
 
-  /// The four locked bands, lowest first — the same bar as Map details.
+  /// The AWS words first, then the official colours — the same key as the
+  /// Map details sheet, word for word (product owner 2026-08-07: the
+  /// internal band names never face the user).
   Widget _bandColourSection() {
-    const bands = [
-      (AppColors.info, 'Info'),
-      (AppColors.advice, 'Monitor'),
-      (AppColors.watchAndAct, 'Action'),
-      (AppColors.emergency, 'Critical'),
+    const awsLevels = [
+      (AppColors.advice, 'Advice'),
+      (AppColors.watchAndAct, 'Watch and Act'),
+      (AppColors.emergency, 'Emergency Warning'),
+    ];
+    const officialColours = [
+      AppColors.info,
+      AppColors.advice,
+      AppColors.watchAndAct,
+      AppColors.emergency,
     ];
 
     return _sectionContainerBuilder(
-      title: 'Colour says how urgent',
+      title: 'AWS warning levels',
       subtitle:
-          'Every shape takes the same four colours, so urgency reads the '
-          'same whoever sent the alert.',
-      child: Row(
+          'Only the Australian Warning System states a level. Other official '
+          'sources use colour alone: it shows the suggested severity.',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final (index, (color, label)) in bands.indexed) ...[
-            if (index > 0) 10.wSizedBox,
-            Expanded(
-              child: Column(
-                children: [
-                  Container(
+          Row(
+            children: [
+              for (final (color, label) in awsLevels)
+                Expanded(
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 10.spMin,
+                        margin: EdgeInsets.symmetric(horizontal: 3.spMin),
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                      6.hSizedBox,
+                      Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 11.spMin,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          16.hSizedBox,
+          Text(
+            'OFFICIAL ALERT COLOURS',
+            style: TextStyle(
+              fontSize: 10.5.spMin,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.1,
+              color: const Color(0xFFB84500),
+            ),
+          ),
+          8.hSizedBox,
+          Row(
+            children: [
+              for (final color in officialColours)
+                Expanded(
+                  child: Container(
                     height: 10.spMin,
+                    margin: EdgeInsets.symmetric(horizontal: 3.spMin),
                     decoration: BoxDecoration(
                       color: color,
                       borderRadius: BorderRadius.circular(999),
                     ),
                   ),
-                  6.hSizedBox,
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 12.spMin,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.grey,
-                    ),
-                  ),
-                ],
+                ),
+            ],
+          ),
+          6.hSizedBox,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Lower',
+                style: TextStyle(fontSize: 11.spMin, color: AppColors.grey),
               ),
-            ),
-          ],
+              Text(
+                'The colour shows the suggested severity',
+                style: TextStyle(fontSize: 11.spMin, color: AppColors.grey),
+              ),
+              Text(
+                'Higher',
+                style: TextStyle(fontSize: 11.spMin, color: AppColors.grey),
+              ),
+            ],
+          ),
         ],
       ),
     );

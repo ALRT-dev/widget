@@ -31,7 +31,13 @@ class AlrtAlertsWidgetProvider : HomeWidgetProvider() {
         widgetData: android.content.SharedPreferences
     ) {
         for (widgetId in appWidgetIds) {
-            val views = RemoteViews(context.packageName, R.layout.alrt_widget)
+            val layout = layoutFor(
+                appWidgetManager,
+                widgetId,
+                R.layout.alrt_widget,
+                R.layout.alrt_widget_compact
+            )
+            val views = RemoteViews(context.packageName, layout)
             val raw = widgetData.getString(PAYLOAD_KEY, null)
 
             val payload = raw?.let {
@@ -57,6 +63,36 @@ class AlrtAlertsWidgetProvider : HomeWidgetProvider() {
 
             appWidgetManager.updateAppWidget(widgetId, views)
         }
+    }
+
+
+    /** Compact card when the widget is one cell high; full card otherwise. */
+    private fun layoutFor(
+        appWidgetManager: AppWidgetManager,
+        widgetId: Int,
+        full: Int,
+        compact: Int
+    ): Int {
+        val options = appWidgetManager.getAppWidgetOptions(widgetId)
+        val minHeight = options.getInt(
+            AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0
+        )
+        return if (minHeight in 1..99) compact else full
+    }
+
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: android.os.Bundle?
+    ) {
+        // Re-render at the new size so the layout swap happens live.
+        onUpdate(
+            context,
+            appWidgetManager,
+            intArrayOf(appWidgetId),
+            es.antonborri.home_widget.HomeWidgetPlugin.getData(context)
+        )
     }
 
     /** Live relative freshness, e.g. "Checked 1 min ago" (Edit 6). */

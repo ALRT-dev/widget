@@ -203,14 +203,24 @@ class _HazardFiltersBottomsheetContentState
           _filtersProvider.select((value) => value.userReported),
         );
 
+        final globalHumanitarian = ref.watch(
+          _filtersProvider.select((value) => value.globalHumanitarian),
+        );
+        final alrtIntel = ref.watch(
+          _filtersProvider.select((value) => value.alrtIntel),
+        );
+
+        // The same five systems as the map's "Show alerts from", with the
+        // same names, so the feed and the map filter one way (product
+        // owner 2026-08-07). AWS has its own level section above.
         return _sectionContainerBuilder(
-          title: 'Alrt Type'.toUpperCase(),
-          subtitle: 'Select the alerts you want to see',
+          title: 'Show alerts from'.toUpperCase(),
+          subtitle: 'The same sources as the map',
           child: Column(
             children: [
               _switchBuilder(
-                title: 'Official Alerts',
-                subtitle: 'Verified alerts from official agencies (non-AWS)',
+                title: 'Official',
+                subtitle: 'State agencies and services',
                 isEnabled: officialAlerts,
                 onToggle: (value) {
                   ref
@@ -221,11 +231,33 @@ class _HazardFiltersBottomsheetContentState
               ),
               10.hSizedBox,
               _switchBuilder(
-                title: 'User Alerts',
-                subtitle: 'Community-reported alerts (unverified)',
+                title: 'Global humanitarian',
+                subtitle: 'Disasters rated for international response',
+                isEnabled: globalHumanitarian,
+                onToggle: (value) {
+                  ref
+                      .read(_filtersProvider.notifier)
+                      .updateGlobalHumanitarian(value);
+                  widget.onFiltersUpdated?.call();
+                },
+              ),
+              10.hSizedBox,
+              _switchBuilder(
+                title: 'Community',
+                subtitle: 'Reports from people nearby',
                 isEnabled: userAlerts,
                 onToggle: (value) {
                   ref.read(_filtersProvider.notifier).updateUserReported(value);
+                  widget.onFiltersUpdated?.call();
+                },
+              ),
+              10.hSizedBox,
+              _switchBuilder(
+                title: 'ALRT Intel',
+                subtitle: "ALRT's own assessment",
+                isEnabled: alrtIntel,
+                onToggle: (value) {
+                  ref.read(_filtersProvider.notifier).updateAlrtIntel(value);
                   widget.onFiltersUpdated?.call();
                 },
               ),

@@ -9,7 +9,7 @@
     android:previewLayout="@layout/alrt_family_widget"
     android:resizeMode="horizontal|vertical"
     android:minResizeWidth="180dp"
-    android:minResizeHeight="70dp"
+    android:minResizeHeight="40dp"
     android:maxResizeWidth="360dp"
     android:maxResizeHeight="200dp"
     android:description="@string/widget_family_description"

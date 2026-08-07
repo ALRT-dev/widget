@@ -24,9 +24,7 @@
             android:layout_width="34dp"
             android:layout_height="34dp"
             android:layout_marginEnd="10dp"
-            android:background="@drawable/alrt_widget_mark_tile"
-            android:padding="6dp"
-            android:src="@drawable/alrt_logo_vector"
+            android:src="@mipmap/ic_launcher"
             android:scaleType="fitCenter"
             android:contentDescription="ALRT" />
 

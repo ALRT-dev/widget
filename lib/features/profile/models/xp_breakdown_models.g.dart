@@ -26,6 +26,9 @@ _XpBreakdown _$XpBreakdownFromJson(Map<String, dynamic> json) => _XpBreakdown(
           ?.map((e) => XpReportBreakdown.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const <XpReportBreakdown>[],
+  learning: json['learning'] == null
+      ? null
+      : XpLearningBreakdown.fromJson(json['learning'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$XpBreakdownToJson(_XpBreakdown instance) =>
@@ -39,6 +42,7 @@ Map<String, dynamic> _$XpBreakdownToJson(_XpBreakdown instance) =>
       'stats': ?instance.stats?.toJson(),
       'byType': instance.byType.map((e) => e.toJson()).toList(),
       'reports': instance.reports.map((e) => e.toJson()).toList(),
+      'learning': ?instance.learning?.toJson(),
     };
 
 _XpBreakdownStats _$XpBreakdownStatsFromJson(Map<String, dynamic> json) =>
@@ -88,6 +92,66 @@ const _$XpEventTypeEnumMap = {
   XpEventType.guideCompleted: 'guideCompleted',
   XpEventType.questCompleted: 'questCompleted',
   XpEventType.shareInstall: 'shareInstall',
+};
+
+_XpLearningBreakdown _$XpLearningBreakdownFromJson(Map<String, dynamic> json) =>
+    _XpLearningBreakdown(
+      guides:
+          (json['guides'] as List<dynamic>?)
+              ?.map(
+                (e) => XpGuideCompletion.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const <XpGuideCompletion>[],
+      challenges:
+          (json['challenges'] as List<dynamic>?)
+              ?.map(
+                (e) =>
+                    XpChallengeCompletion.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const <XpChallengeCompletion>[],
+    );
+
+Map<String, dynamic> _$XpLearningBreakdownToJson(
+  _XpLearningBreakdown instance,
+) => <String, dynamic>{
+  'guides': instance.guides.map((e) => e.toJson()).toList(),
+  'challenges': instance.challenges.map((e) => e.toJson()).toList(),
+};
+
+_XpGuideCompletion _$XpGuideCompletionFromJson(Map<String, dynamic> json) =>
+    _XpGuideCompletion(
+      guideId: json['guideId'] as String?,
+      title: json['title'] as String? ?? 'Safety guide',
+      points: (json['points'] as num?)?.toInt() ?? 0,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
+    );
+
+Map<String, dynamic> _$XpGuideCompletionToJson(_XpGuideCompletion instance) =>
+    <String, dynamic>{
+      'guideId': ?instance.guideId,
+      'title': instance.title,
+      'points': instance.points,
+      'createdAt': ?instance.createdAt?.toIso8601String(),
+    };
+
+_XpChallengeCompletion _$XpChallengeCompletionFromJson(
+  Map<String, dynamic> json,
+) => _XpChallengeCompletion(
+  points: (json['points'] as num?)?.toInt() ?? 0,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+);
+
+Map<String, dynamic> _$XpChallengeCompletionToJson(
+  _XpChallengeCompletion instance,
+) => <String, dynamic>{
+  'points': instance.points,
+  'createdAt': ?instance.createdAt?.toIso8601String(),
 };
 
 _XpReportBreakdown _$XpReportBreakdownFromJson(Map<String, dynamic> json) =>

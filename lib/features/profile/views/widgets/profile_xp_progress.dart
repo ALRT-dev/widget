@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hazard_app/features/shared/enums/user_badge_enum.dart';
 import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
+import 'package:hazard_app/features/profile/providers/xp_summary_provider.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/others/app_colors.dart';
 
@@ -30,16 +31,18 @@ class _ProfileXpProgressState extends ConsumerState<ProfileXpProgress> {
   Widget _buildXpPoints() {
     return Consumer(
       builder: (context, ref, child) {
-        final xpPoints = ref.watch(
-          providerOfLoggedInUser.select(
-            (value) => value?.xpPoints ?? 0,
-          ),
-        );
-        final userBadge = ref.watch(
-          providerOfLoggedInUser.select(
-            (value) => value?.userBadge ?? UserBadge.watcher,
-          ),
-        );
+        // The fresh ledger total first (which also catches the cached
+        // copy up); the login copy only bridges the first frames.
+        final int xpPoints = ref.watch(
+              providerOfXpSummary.select((s) => s.value?.xpPoints),
+            ) ??
+            ref.watch(
+              providerOfLoggedInUser.select((value) => value?.xpPoints),
+            ) ??
+            0;
+        // Derived from the same number the bar draws, never a second
+        // stored copy that can lag it.
+        final userBadge = UserBadge.forXp(xpPoints);
         final nextBadge = userBadge.nextBadge;
         final requiredXpPoints = nextBadge.requiredXpPoints;
         final isLastBadge = userBadge == UserBadge.values.last;
@@ -91,11 +94,14 @@ class _ProfileXpProgressState extends ConsumerState<ProfileXpProgress> {
         return Consumer(
           builder: (context, ref, child) {
             final maxXpPoints = UserBadge.values.last.requiredXpPoints;
-            final xpPoints = ref.watch(
-              providerOfLoggedInUser.select(
-                (value) => (value?.xpPoints ?? 0).clamp(0, maxXpPoints),
-              ),
-            );
+            final int rawXp = ref.watch(
+                  providerOfXpSummary.select((s) => s.value?.xpPoints),
+                ) ??
+                ref.watch(
+                  providerOfLoggedInUser.select((value) => value?.xpPoints),
+                ) ??
+                0;
+            final xpPoints = rawXp.clamp(0, maxXpPoints);
             final progressWidth = xpPoints / maxXpPoints * constraints.maxWidth;
 
             return Container(
@@ -132,11 +138,14 @@ class _ProfileXpProgressState extends ConsumerState<ProfileXpProgress> {
     return Consumer(
       builder: (context, ref, child) {
         final allBadges = UserBadge.values;
-        final userBadge = ref.watch(
-          providerOfLoggedInUser.select(
-            (value) => value?.userBadge ?? UserBadge.watcher,
-          ),
-        );
+        final int xpPoints = ref.watch(
+              providerOfXpSummary.select((s) => s.value?.xpPoints),
+            ) ??
+            ref.watch(
+              providerOfLoggedInUser.select((value) => value?.xpPoints),
+            ) ??
+            0;
+        final userBadge = UserBadge.forXp(xpPoints);
 
         return Row(
           spacing: 8.spMin,

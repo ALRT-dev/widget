@@ -31,6 +31,9 @@ abstract class XpBreakdown with _$XpBreakdown {
 
     /// The reports that earned or cost the most, biggest first.
     @Default(<XpReportBreakdown>[]) final List<XpReportBreakdown> reports,
+
+    /// Learning, itemised like reports: guides by name, challenges by week.
+    final XpLearningBreakdown? learning,
   }) = _XpBreakdown;
 
   /// True when the shown total and the ledger disagree, which only happens
@@ -68,6 +71,44 @@ abstract class XpTypeTotal with _$XpTypeTotal {
 
   factory XpTypeTotal.fromJson(Map<String, dynamic> json) =>
       _$XpTypeTotalFromJson(json);
+}
+
+/// Learning on the points screen, named like reports are: which guide,
+/// what it paid, and each completed weekly challenge.
+@freezed
+abstract class XpLearningBreakdown with _$XpLearningBreakdown {
+  const factory XpLearningBreakdown({
+    @Default(<XpGuideCompletion>[]) final List<XpGuideCompletion> guides,
+    @Default(<XpChallengeCompletion>[])
+    final List<XpChallengeCompletion> challenges,
+  }) = _XpLearningBreakdown;
+
+  factory XpLearningBreakdown.fromJson(Map<String, dynamic> json) =>
+      _$XpLearningBreakdownFromJson(json);
+}
+
+@freezed
+abstract class XpGuideCompletion with _$XpGuideCompletion {
+  const factory XpGuideCompletion({
+    final String? guideId,
+    @Default('Safety guide') final String title,
+    @Default(0) final int points,
+    final DateTime? createdAt,
+  }) = _XpGuideCompletion;
+
+  factory XpGuideCompletion.fromJson(Map<String, dynamic> json) =>
+      _$XpGuideCompletionFromJson(json);
+}
+
+@freezed
+abstract class XpChallengeCompletion with _$XpChallengeCompletion {
+  const factory XpChallengeCompletion({
+    @Default(0) final int points,
+    final DateTime? createdAt,
+  }) = _XpChallengeCompletion;
+
+  factory XpChallengeCompletion.fromJson(Map<String, dynamic> json) =>
+      _$XpChallengeCompletionFromJson(json);
 }
 
 /// What one report earned, and the ledger events behind it.

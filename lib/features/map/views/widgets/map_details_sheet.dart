@@ -105,7 +105,9 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
                     ).pT(8.0),
                     _sectionLabelBuilder('KEY · SHAPE SAYS WHO').pT(18.0),
                     _shapeKeyBuilder().pT(10.0),
-                    _sectionLabelBuilder('COLOUR SAYS HOW URGENT').pT(16.0),
+                    _sectionLabelBuilder('AWS WARNING LEVELS').pT(16.0),
+                    _awsLevelKeyBuilder().pT(10.0),
+                    _sectionLabelBuilder('OFFICIAL ALERT COLOURS').pT(16.0),
                     _bandKeyBuilder().pT(10.0),
                     _sectionLabelBuilder('COMMUNITY REPORTS WEAR THEIR '
                             'CATEGORY')
@@ -393,16 +395,16 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
     );
   }
 
-  Widget _bandKeyBuilder() {
-    const bands = [
-      (AlertCardStyle.bandInfo, 'Info'),
-      (AlertCardStyle.bandMonitor, 'Monitor'),
-      (AlertCardStyle.bandAction, 'Action'),
-      (AlertCardStyle.bandCritical, 'Critical'),
+  /// The AWS words, in AWS's own colours. Only AWS states a level.
+  Widget _awsLevelKeyBuilder() {
+    const levels = [
+      (AppColors.advice, 'Advice'),
+      (AppColors.watchAndAct, 'Watch and Act'),
+      (AppColors.emergency, 'Emergency Warning'),
     ];
     return Row(
       children: [
-        for (final (color, label) in bands)
+        for (final (color, label) in levels)
           Expanded(
             child: Column(
               children: [
@@ -417,15 +419,75 @@ class _MapDetailsSheetState extends ConsumerState<MapDetailsSheet> {
                 4.hSizedBox,
                 Text(
                   label,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 10.5.spMin,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.white.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.white.withValues(alpha: 0.8),
                   ),
                 ),
               ],
             ),
           ),
+      ],
+    );
+  }
+
+  /// The four official colours, no words: official sources never write a
+  /// level, so the colour only SUGGESTS how serious it is (product owner
+  /// 2026-08-07 — the internal band names never face the user).
+  Widget _bandKeyBuilder() {
+    const bands = [
+      AppColors.info,
+      AppColors.advice,
+      AppColors.watchAndAct,
+      AppColors.emergency,
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            for (final color in bands)
+              Expanded(
+                child: Container(
+                  height: 8.spMin,
+                  margin: EdgeInsets.symmetric(horizontal: 3.spMin),
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        6.hSizedBox,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Lower',
+              style: TextStyle(
+                fontSize: 10.5.spMin,
+                color: AppColors.white.withValues(alpha: 0.6),
+              ),
+            ),
+            Text(
+              'The colour shows the suggested severity',
+              style: TextStyle(
+                fontSize: 10.5.spMin,
+                color: AppColors.white.withValues(alpha: 0.6),
+              ),
+            ),
+            Text(
+              'Higher',
+              style: TextStyle(
+                fontSize: 10.5.spMin,
+                color: AppColors.white.withValues(alpha: 0.6),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
