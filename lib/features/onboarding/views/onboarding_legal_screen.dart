@@ -292,8 +292,9 @@ class _OnboardingLegalScreenState extends ConsumerState<OnboardingLegalScreen>
             children: [
               _buildLegalItem(
                 boldText: 'Age:',
-                normalText: ' 13 or older, or any age with Child mode set '
-                    'up by a parent or guardian',
+                normalText: ' 13 or older, or the minimum age required by '
+                    'law where you live if that is higher. Any age with '
+                    'Child mode set up by a parent or guardian',
               ),
               16.hSizedBox,
               _buildLegalItem(
