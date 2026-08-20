@@ -8,6 +8,8 @@ import 'package:hazard_app/features/home/enums/home_tab_types.dart';
 import 'package:hazard_app/features/home/providers/home_tab_provider.dart';
 import 'package:hazard_app/features/notification/views/screens/manage_notifications_screen.dart';
 import 'package:hazard_app/features/profile/enums/my_hazards_tab_types.dart';
+import 'package:hazard_app/features/subscription/providers/alrt_plus_provider.dart';
+import 'package:hazard_app/features/subscription/views/screens/alrt_plus_manage_screen.dart';
 import 'package:hazard_app/features/profile/views/screens/support_request_screen.dart';
 import 'package:hazard_app/features/profile/providers/my_hazards_provider.dart';
 import 'package:hazard_app/features/profile/providers/profile_provider.dart';
@@ -25,6 +27,7 @@ import 'package:hazard_app/features/shared/extensions/widget_extension.dart';
 import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dart';
 import 'package:hazard_app/features/shared/utils/dialogs.dart';
 import 'package:hazard_app/features/shared/views/widgets/button.dart';
+import 'package:hazard_app/features/subscription/views/widgets/alrt_plus_seat_card.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:hazard_app/others/app_wrapper.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -58,6 +61,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   24.spMin.hSizedBox,
                   _buildFamilySafetyCard(),
                   14.spMin.hSizedBox,
+                  const AlrtPlusSeatCard(),
                   _buildLearnAndPrepareCard(),
                   24.spMin.hSizedBox,
                   _buildSubmittedHazardsSection(),
@@ -413,6 +417,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           child: Column(
             children: [
+              if (ref.watch(providerOfAlrtPlus).value == true)
+                _buildAccountSettingsItem(
+                  title: 'Your ALRT+',
+                  subtitle: 'Plan, seats and billing',
+                  icon: LucideIcons.crown,
+                  color: const Color(0xFFA63BD4),
+                  onTap: () => context.push(AlrtPlusManageScreen.route),
+                ),
               _buildAccountSettingsItem(
                 title: 'Notifications',
                 subtitle: 'Alert preferences & push settings',
@@ -682,11 +694,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 title: 'English',
                 subtitle: 'English',
               ),
-              languageTile(
-                code: 'es',
-                title: 'Español',
-                subtitle: 'Spanish',
-              ),
+              // Spanish hidden until the app is actually localised — only ~5
+              // strings are translated today, so switching locale changes
+              // nothing visible. Restore this tile when full l10n lands.
+              // languageTile(
+              //   code: 'es',
+              //   title: 'Español',
+              //   subtitle: 'Spanish',
+              // ),
               Padding(
                 padding: EdgeInsets.all(16.spMin),
                 child: Text(

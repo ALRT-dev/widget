@@ -22,7 +22,13 @@ mixin _$HazardSource {
  HazardSourceLicense? get license;/// The copyright information for the hazard source.
  String? get copyrightText;/// The link to the copyright information for the hazard source.
  String? get copyrightLink;/// The advisory text provided by the hazard source.
- String? get advisoryText;
+ String? get advisoryText;/// The marker shape for this source's alerts in the "One Glance" model.
+ HazardSourceShape? get shape;/// The severity vocabulary this source speaks.
+ HazardSeveritySystem? get severitySystem;/// How this source's severity word/level is rendered.
+ SeverityLevelHandling? get levelHandling;/// Minutes a marker lingers after the underlying alert clears.
+ int? get stickiness;/// The ceiling on the internal band for this source.
+ HazardSeverityBand? get maxInternalBand;/// When alerts from this source generate a push notification.
+ SourcePushPolicy? get pushPolicy;
 /// Create a copy of HazardSource
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -35,16 +41,16 @@ $HazardSourceCopyWith<HazardSource> get copyWith => _$HazardSourceCopyWithImpl<H
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardSource&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.license, license) || other.license == license)&&(identical(other.copyrightText, copyrightText) || other.copyrightText == copyrightText)&&(identical(other.copyrightLink, copyrightLink) || other.copyrightLink == copyrightLink)&&(identical(other.advisoryText, advisoryText) || other.advisoryText == advisoryText));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HazardSource&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.license, license) || other.license == license)&&(identical(other.copyrightText, copyrightText) || other.copyrightText == copyrightText)&&(identical(other.copyrightLink, copyrightLink) || other.copyrightLink == copyrightLink)&&(identical(other.advisoryText, advisoryText) || other.advisoryText == advisoryText)&&(identical(other.shape, shape) || other.shape == shape)&&(identical(other.severitySystem, severitySystem) || other.severitySystem == severitySystem)&&(identical(other.levelHandling, levelHandling) || other.levelHandling == levelHandling)&&(identical(other.stickiness, stickiness) || other.stickiness == stickiness)&&(identical(other.maxInternalBand, maxInternalBand) || other.maxInternalBand == maxInternalBand)&&(identical(other.pushPolicy, pushPolicy) || other.pushPolicy == pushPolicy));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,url,license,copyrightText,copyrightLink,advisoryText);
+int get hashCode => Object.hash(runtimeType,id,name,url,license,copyrightText,copyrightLink,advisoryText,shape,severitySystem,levelHandling,stickiness,maxInternalBand,pushPolicy);
 
 @override
 String toString() {
-  return 'HazardSource(id: $id, name: $name, url: $url, license: $license, copyrightText: $copyrightText, copyrightLink: $copyrightLink, advisoryText: $advisoryText)';
+  return 'HazardSource(id: $id, name: $name, url: $url, license: $license, copyrightText: $copyrightText, copyrightLink: $copyrightLink, advisoryText: $advisoryText, shape: $shape, severitySystem: $severitySystem, levelHandling: $levelHandling, stickiness: $stickiness, maxInternalBand: $maxInternalBand, pushPolicy: $pushPolicy)';
 }
 
 
@@ -55,7 +61,7 @@ abstract mixin class $HazardSourceCopyWith<$Res>  {
   factory $HazardSourceCopyWith(HazardSource value, $Res Function(HazardSource) _then) = _$HazardSourceCopyWithImpl;
 @useResult
 $Res call({
- String id, String? name, String? url, HazardSourceLicense? license, String? copyrightText, String? copyrightLink, String? advisoryText
+ String id, String? name, String? url, HazardSourceLicense? license, String? copyrightText, String? copyrightLink, String? advisoryText, HazardSourceShape? shape, HazardSeveritySystem? severitySystem, SeverityLevelHandling? levelHandling, int? stickiness, HazardSeverityBand? maxInternalBand, SourcePushPolicy? pushPolicy
 });
 
 
@@ -72,7 +78,7 @@ class _$HazardSourceCopyWithImpl<$Res>
 
 /// Create a copy of HazardSource
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? url = freezed,Object? license = freezed,Object? copyrightText = freezed,Object? copyrightLink = freezed,Object? advisoryText = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = freezed,Object? url = freezed,Object? license = freezed,Object? copyrightText = freezed,Object? copyrightLink = freezed,Object? advisoryText = freezed,Object? shape = freezed,Object? severitySystem = freezed,Object? levelHandling = freezed,Object? stickiness = freezed,Object? maxInternalBand = freezed,Object? pushPolicy = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -81,7 +87,13 @@ as String?,license: freezed == license ? _self.license : license // ignore: cast
 as HazardSourceLicense?,copyrightText: freezed == copyrightText ? _self.copyrightText : copyrightText // ignore: cast_nullable_to_non_nullable
 as String?,copyrightLink: freezed == copyrightLink ? _self.copyrightLink : copyrightLink // ignore: cast_nullable_to_non_nullable
 as String?,advisoryText: freezed == advisoryText ? _self.advisoryText : advisoryText // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,shape: freezed == shape ? _self.shape : shape // ignore: cast_nullable_to_non_nullable
+as HazardSourceShape?,severitySystem: freezed == severitySystem ? _self.severitySystem : severitySystem // ignore: cast_nullable_to_non_nullable
+as HazardSeveritySystem?,levelHandling: freezed == levelHandling ? _self.levelHandling : levelHandling // ignore: cast_nullable_to_non_nullable
+as SeverityLevelHandling?,stickiness: freezed == stickiness ? _self.stickiness : stickiness // ignore: cast_nullable_to_non_nullable
+as int?,maxInternalBand: freezed == maxInternalBand ? _self.maxInternalBand : maxInternalBand // ignore: cast_nullable_to_non_nullable
+as HazardSeverityBand?,pushPolicy: freezed == pushPolicy ? _self.pushPolicy : pushPolicy // ignore: cast_nullable_to_non_nullable
+as SourcePushPolicy?,
   ));
 }
 /// Create a copy of HazardSource
@@ -178,10 +190,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText,  HazardSourceShape? shape,  HazardSeveritySystem? severitySystem,  SeverityLevelHandling? levelHandling,  int? stickiness,  HazardSeverityBand? maxInternalBand,  SourcePushPolicy? pushPolicy)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HazardSource() when $default != null:
-return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText);case _:
+return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText,_that.shape,_that.severitySystem,_that.levelHandling,_that.stickiness,_that.maxInternalBand,_that.pushPolicy);case _:
   return orElse();
 
 }
@@ -199,10 +211,10 @@ return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText,  HazardSourceShape? shape,  HazardSeveritySystem? severitySystem,  SeverityLevelHandling? levelHandling,  int? stickiness,  HazardSeverityBand? maxInternalBand,  SourcePushPolicy? pushPolicy)  $default,) {final _that = this;
 switch (_that) {
 case _HazardSource():
-return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText);case _:
+return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText,_that.shape,_that.severitySystem,_that.levelHandling,_that.stickiness,_that.maxInternalBand,_that.pushPolicy);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -219,10 +231,10 @@ return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String? name,  String? url,  HazardSourceLicense? license,  String? copyrightText,  String? copyrightLink,  String? advisoryText,  HazardSourceShape? shape,  HazardSeveritySystem? severitySystem,  SeverityLevelHandling? levelHandling,  int? stickiness,  HazardSeverityBand? maxInternalBand,  SourcePushPolicy? pushPolicy)?  $default,) {final _that = this;
 switch (_that) {
 case _HazardSource() when $default != null:
-return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText);case _:
+return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,_that.copyrightLink,_that.advisoryText,_that.shape,_that.severitySystem,_that.levelHandling,_that.stickiness,_that.maxInternalBand,_that.pushPolicy);case _:
   return null;
 
 }
@@ -234,7 +246,7 @@ return $default(_that.id,_that.name,_that.url,_that.license,_that.copyrightText,
 @JsonSerializable()
 
 class _HazardSource implements HazardSource {
-  const _HazardSource({required this.id, this.name, this.url, this.license, this.copyrightText, this.copyrightLink, this.advisoryText});
+  const _HazardSource({required this.id, this.name, this.url, this.license, this.copyrightText, this.copyrightLink, this.advisoryText, this.shape, this.severitySystem, this.levelHandling, this.stickiness, this.maxInternalBand, this.pushPolicy});
   factory _HazardSource.fromJson(Map<String, dynamic> json) => _$HazardSourceFromJson(json);
 
 /// The unique identifier for the hazard source.
@@ -251,6 +263,18 @@ class _HazardSource implements HazardSource {
 @override final  String? copyrightLink;
 /// The advisory text provided by the hazard source.
 @override final  String? advisoryText;
+/// The marker shape for this source's alerts in the "One Glance" model.
+@override final  HazardSourceShape? shape;
+/// The severity vocabulary this source speaks.
+@override final  HazardSeveritySystem? severitySystem;
+/// How this source's severity word/level is rendered.
+@override final  SeverityLevelHandling? levelHandling;
+/// Minutes a marker lingers after the underlying alert clears.
+@override final  int? stickiness;
+/// The ceiling on the internal band for this source.
+@override final  HazardSeverityBand? maxInternalBand;
+/// When alerts from this source generate a push notification.
+@override final  SourcePushPolicy? pushPolicy;
 
 /// Create a copy of HazardSource
 /// with the given fields replaced by the non-null parameter values.
@@ -265,16 +289,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardSource&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.license, license) || other.license == license)&&(identical(other.copyrightText, copyrightText) || other.copyrightText == copyrightText)&&(identical(other.copyrightLink, copyrightLink) || other.copyrightLink == copyrightLink)&&(identical(other.advisoryText, advisoryText) || other.advisoryText == advisoryText));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _HazardSource&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.url, url) || other.url == url)&&(identical(other.license, license) || other.license == license)&&(identical(other.copyrightText, copyrightText) || other.copyrightText == copyrightText)&&(identical(other.copyrightLink, copyrightLink) || other.copyrightLink == copyrightLink)&&(identical(other.advisoryText, advisoryText) || other.advisoryText == advisoryText)&&(identical(other.shape, shape) || other.shape == shape)&&(identical(other.severitySystem, severitySystem) || other.severitySystem == severitySystem)&&(identical(other.levelHandling, levelHandling) || other.levelHandling == levelHandling)&&(identical(other.stickiness, stickiness) || other.stickiness == stickiness)&&(identical(other.maxInternalBand, maxInternalBand) || other.maxInternalBand == maxInternalBand)&&(identical(other.pushPolicy, pushPolicy) || other.pushPolicy == pushPolicy));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,url,license,copyrightText,copyrightLink,advisoryText);
+int get hashCode => Object.hash(runtimeType,id,name,url,license,copyrightText,copyrightLink,advisoryText,shape,severitySystem,levelHandling,stickiness,maxInternalBand,pushPolicy);
 
 @override
 String toString() {
-  return 'HazardSource(id: $id, name: $name, url: $url, license: $license, copyrightText: $copyrightText, copyrightLink: $copyrightLink, advisoryText: $advisoryText)';
+  return 'HazardSource(id: $id, name: $name, url: $url, license: $license, copyrightText: $copyrightText, copyrightLink: $copyrightLink, advisoryText: $advisoryText, shape: $shape, severitySystem: $severitySystem, levelHandling: $levelHandling, stickiness: $stickiness, maxInternalBand: $maxInternalBand, pushPolicy: $pushPolicy)';
 }
 
 
@@ -285,7 +309,7 @@ abstract mixin class _$HazardSourceCopyWith<$Res> implements $HazardSourceCopyWi
   factory _$HazardSourceCopyWith(_HazardSource value, $Res Function(_HazardSource) _then) = __$HazardSourceCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String? name, String? url, HazardSourceLicense? license, String? copyrightText, String? copyrightLink, String? advisoryText
+ String id, String? name, String? url, HazardSourceLicense? license, String? copyrightText, String? copyrightLink, String? advisoryText, HazardSourceShape? shape, HazardSeveritySystem? severitySystem, SeverityLevelHandling? levelHandling, int? stickiness, HazardSeverityBand? maxInternalBand, SourcePushPolicy? pushPolicy
 });
 
 
@@ -302,7 +326,7 @@ class __$HazardSourceCopyWithImpl<$Res>
 
 /// Create a copy of HazardSource
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? url = freezed,Object? license = freezed,Object? copyrightText = freezed,Object? copyrightLink = freezed,Object? advisoryText = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = freezed,Object? url = freezed,Object? license = freezed,Object? copyrightText = freezed,Object? copyrightLink = freezed,Object? advisoryText = freezed,Object? shape = freezed,Object? severitySystem = freezed,Object? levelHandling = freezed,Object? stickiness = freezed,Object? maxInternalBand = freezed,Object? pushPolicy = freezed,}) {
   return _then(_HazardSource(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -311,7 +335,13 @@ as String?,license: freezed == license ? _self.license : license // ignore: cast
 as HazardSourceLicense?,copyrightText: freezed == copyrightText ? _self.copyrightText : copyrightText // ignore: cast_nullable_to_non_nullable
 as String?,copyrightLink: freezed == copyrightLink ? _self.copyrightLink : copyrightLink // ignore: cast_nullable_to_non_nullable
 as String?,advisoryText: freezed == advisoryText ? _self.advisoryText : advisoryText // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,shape: freezed == shape ? _self.shape : shape // ignore: cast_nullable_to_non_nullable
+as HazardSourceShape?,severitySystem: freezed == severitySystem ? _self.severitySystem : severitySystem // ignore: cast_nullable_to_non_nullable
+as HazardSeveritySystem?,levelHandling: freezed == levelHandling ? _self.levelHandling : levelHandling // ignore: cast_nullable_to_non_nullable
+as SeverityLevelHandling?,stickiness: freezed == stickiness ? _self.stickiness : stickiness // ignore: cast_nullable_to_non_nullable
+as int?,maxInternalBand: freezed == maxInternalBand ? _self.maxInternalBand : maxInternalBand // ignore: cast_nullable_to_non_nullable
+as HazardSeverityBand?,pushPolicy: freezed == pushPolicy ? _self.pushPolicy : pushPolicy // ignore: cast_nullable_to_non_nullable
+as SourcePushPolicy?,
   ));
 }
 

@@ -16,7 +16,10 @@ import 'package:hazard_app/features/shared/providers/logged_in_user_provider.dar
 import 'package:hazard_app/features/shared/providers/states/hazard_item_provider_state.dart';
 import 'package:hazard_app/features/shared/utils/share_alert.dart';
 import 'package:hazard_app/features/shared/views/screens/view_hazard_screen.dart';
+import 'package:hazard_app/features/shared/views/widgets/alert_icon.dart';
 import 'package:hazard_app/features/shared/views/widgets/app_cached_network_image.dart';
+import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
+import 'package:hazard_app/features/shared/views/widgets/alert_card_style.dart';
 import 'package:hazard_app/others/app_colors.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -91,19 +94,46 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
       return const SizedBox.shrink();
     }
 
+    // Locked two-reds rule: solid red + glow is reserved for official
+    // CRITICAL; official ACTION gets the dashed needs-attention outline.
+    final isOfficialCritical = ref.watch(
+      provider.select(
+        (value) =>
+            value.hazard?.source != null &&
+            value.hazard?.severityBand == HazardSeverityBand.critical,
+      ),
+    );
+    final isOfficialAction = ref.watch(
+      provider.select(
+        (value) =>
+            value.hazard?.source != null &&
+            value.hazard?.severityBand == HazardSeverityBand.action,
+      ),
+    );
+
     return InkWell(
       onTap: widget.isInfoWindow ? null : _gotoViewHazard,
       borderRadius: BorderRadius.circular(14.spMin),
-      child: Container(
+      child: CustomPaint(
+        foregroundPainter: isOfficialAction
+            ? DashedRRectPainter(
+                color: AlertCardStyle.dashedBorderColor,
+                radius: 16.spMin,
+              )
+            : null,
+        child: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16.spMin),
           boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowColor,
-              blurRadius: 5.0,
-              offset: const Offset(0.0, 0.0),
-            ),
+            if (isOfficialCritical)
+              AlertCardStyle.criticalGlow
+            else
+              BoxShadow(
+                color: AppColors.shadowColor,
+                blurRadius: 5.0,
+                offset: const Offset(0.0, 0.0),
+              ),
           ],
         ),
         child: ClipRRect(
@@ -149,6 +179,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
               _categoryAndViewDetailsBuilder(),
             ],
           ),
+        ),
         ),
       ),
     ).pX(widget.horizontalPadding);
@@ -310,12 +341,25 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             ? AppColors.lightGrey
             : null;
 
+        final severityBand = ref.watch(
+          provider.select(
+            (value) => value.hazard?.severityBand,
+          ),
+        );
+        // Solid red fill is reserved for official CRITICAL (two-reds rule).
+        final isOfficialCritical =
+            isVerified && severityBand == HazardSeverityBand.critical;
+
         return Container(
           width: double.infinity,
           padding: EdgeInsets.all(10.spMin),
 
           decoration: BoxDecoration(
-            color: hazardColor == AppColors.transparent
+            gradient:
+                isOfficialCritical ? AlertCardStyle.solidRedGradient : null,
+            color: isOfficialCritical
+                ? null
+                : hazardColor == AppColors.transparent
                 ? AppColors.white
                 : hazardColor,
             border: hazardColor == AppColors.transparent
@@ -330,6 +374,21 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
           child: Row(
             spacing: 10.spMin,
             children: [
+              // V3 rule: shape identifies the source system, colour carries
+              // urgency — never colour alone.
+              Icon(
+                AlertCardStyle.systemShapeIcon(
+                  isAws: isAwsCompliant,
+                  isOfficial: isVerified,
+                ),
+                size: 14.spMin,
+                color: isOfficialCritical
+                    ? AppColors.white
+                    : hazardColor == AppColors.transparent ||
+                            hazardColor.isLight
+                        ? AppColors.grey
+                        : AppColors.white,
+              ),
               if (isAwsCompliant &&
                   severityTitle.isNotEmpty &&
                   severityTitle != 'Unknown')
@@ -342,7 +401,7 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
                 ),
               if (isUserReported)
                 _headerPillBuilder(
-                  label: 'USER',
+                  label: 'UNVERIFIED',
                   foregroundColor: pillForegroundColor,
                   backgroundColor: pillBackgroundColor,
                   backgroundColorAlpha: pillBackgroundColorAlpha,
@@ -425,11 +484,6 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             (value) => value.hazard!.categoryImage,
           ),
         );
-        final hazardColor = ref.watch(
-          provider.select(
-            (value) => value.hazard?.color ?? AppColors.black,
-          ),
-        );
         final fallbackIconPath = ref.watch(
           provider.select(
             (value) => value.hazard?.fallbackIconPath ?? '',
@@ -446,19 +500,10 @@ class _CommonHazardsListItemState extends ConsumerState<CommonHazardsListItem> {
             errorWidget: (context, url, error) => Image.asset(
               fallbackIconPath,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Container(
-                decoration: BoxDecoration(
-                  color: hazardColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12.spMin),
-                ),
-                child: Icon(
-                  Icons.error,
-                  size: 24.spMin,
-                  color: hazardColor == AppColors.transparent
-                      ? AppColors.grey
-                      : hazardColor,
-                ),
-              ),
+              // Final fallback: the drawn "One Glance" icon (shape · colour ·
+              // glyph) instead of a plain error box.
+              errorBuilder: (context, error, stackTrace) =>
+                  AlertIcon(hazard: widget.hazard, dimension: 48),
             ),
           ),
         );

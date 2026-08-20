@@ -2,13 +2,14 @@ import 'dart:ui';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hazard_app/features/shared/converters/date_time_converter.dart';
 import 'package:hazard_app/features/shared/enums/ai_confidence_types.dart';
+import 'package:hazard_app/features/shared/converters/date_time_converter.dart';
 import 'package:hazard_app/features/shared/enums/category_image_type.dart';
 import 'package:hazard_app/features/shared/enums/fire_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_review_status_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_band_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_severity_types.dart';
+import 'package:hazard_app/features/shared/enums/hazard_source_shape_types.dart';
 import 'package:hazard_app/features/shared/enums/hazard_vote_types.dart';
 import 'package:hazard_app/features/shared/models/alrt_media_model.dart';
 import 'package:hazard_app/features/shared/models/app_user_model.dart';
@@ -149,6 +150,31 @@ abstract class Hazard with _$Hazard {
 
   /// Indicates whether the hazard was reported by a user.
   bool get isUserReported => reportedBy != null;
+
+  /// The marker shape for this hazard in the V3 "One Glance" model.
+  ///
+  /// Resolves per the source-registry rule (V3 checklist §1):
+  /// `reportedBy → circle, else source.shape ?? diamond`. AWS-compliant alerts
+  /// bridge to a triangle before the backend registry is seeded.
+  HazardSourceShape get resolvedShape {
+    if (reportedBy != null) return HazardSourceShape.circle;
+    final registryShape = source?.shape;
+    if (registryShape != null) return registryShape;
+    if (isAwsCompliant == true) return HazardSourceShape.triangle;
+    return HazardSourceShape.diamond;
+  }
+
+  /// The severity band after applying the source's internal-band ceiling.
+  ///
+  /// Some sources cap how severe their alerts may appear (e.g. community reports
+  /// never exceed [HazardSeverityBand.action]). Returns the raw [severityBand]
+  /// unchanged when the source has no cap.
+  HazardSeverityBand? get effectiveSeverityBand {
+    final band = severityBand;
+    final cap = source?.maxInternalBand;
+    if (band == null || cap == null) return band;
+    return band.index > cap.index ? cap : band;
+  }
 
   /// Indicates whether the hazard has expired based on the current date and time.
   bool get isExpired {

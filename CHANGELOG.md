@@ -1,3 +1,16 @@
+## v1.0.5+35 - unreleased
+* In-map navigation mode: travel modes, alternate routes, hazard corridors and bypass re-routing.
+* Home-screen widgets: Nearby Alerts + Family status (Android fully wired; iOS needs the Xcode target step in ios/AlrtWidget/SETUP.md).
+* ALRT+ subscription paywall (RevenueCat) gating hosting a family circle.
+* ALRT+ flow screens in the blended purple style: redesigned gate sheet, post-purchase welcome, Your ALRT+ manage screen (seats, members, store management), billing-issue banner on the family hub.
+* Leaderboard and points breakdown screens on the existing XP endpoints.
+* Voice search (tap-to-talk) in map and hazard search.
+* Email + password sign-in / sign-up.
+* Server-driven hazard category images.
+* Matches live 1.0.4+34 behaviour: Learn hub toggle and Spanish language option stay hidden.
+* Removed dead code (temp provider, dummy data).
+
+
 ## v1.0.3+33 - 2026/07/08
 * Bug fixes and improvements
 
