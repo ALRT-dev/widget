@@ -119,7 +119,9 @@ Color? lockedCategoryColorFor(final String? categoryName) {
     return const Color(0xFFFF7E29);
   }
   if (name.contains('security') || name.contains('crime')) {
-    return const Color(0xFFFF2E44);
+    // Magenta, deliberately NOT red: red is reserved for highest-danger
+    // severity semantics (product-owner ruling 2026-08-20, FINAL_HANDOFF).
+    return const Color(0xFFD946EF);
   }
   if (name.contains('traffic') || name.contains('transport')) {
     return const Color(0xFF00CC96);
